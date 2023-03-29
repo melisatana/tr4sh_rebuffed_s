@@ -16,11 +16,17 @@ fn purin_frame(fighter: &mut L2CFighterCommon) {
 
         println!("It'sa me, Jigglypuff, *zzzzz*");
 
+
         if [*FIGHTER_PURIN_STATUS_KIND_SPECIAL_N_ROLL, *FIGHTER_PURIN_STATUS_KIND_SPECIAL_N_HIT_END].contains(&status) {
             if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false {
                 CancelModule::enable_cancel(fighter.module_accessor);
             }
         }
+
+        if [*FIGHTER_STATUS_KIND_SPECIAL_HI].contains(&status) {
+            crate::custom::fastfall_helper(fighter);
+        }
+
     }
 }
 
