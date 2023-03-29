@@ -1,4 +1,4 @@
-# tr4sh_rebuffed_s
+# TR4SH Rebuffed S
 TR4SH Rebuffed S Moveset Code
 
 
