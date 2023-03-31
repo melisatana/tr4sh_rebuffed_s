@@ -42,6 +42,11 @@ fn ness_frame(fighter: &mut L2CFighterCommon) {
                 NESS_DASHATTACK_HOLD[entry_id] = false;
             }
         }
+
+        if [*FIGHTER_STATUS_KIND_SPECIAL_S].contains(&status) {
+            crate::custom::fastfall_helper(fighter);
+        }
+
     }
 }
 

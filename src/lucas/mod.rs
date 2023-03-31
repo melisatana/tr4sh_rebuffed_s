@@ -12,8 +12,13 @@ use smash_script::*;
 #[fighter_frame( agent = FIGHTER_KIND_LUCAS )]
 fn lucas_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        let status = StatusModule::status_kind(fighter.module_accessor);
 
         println!("It'sa me, Lucas, PK Love!");
+        
+        if [*FIGHTER_STATUS_KIND_SPECIAL_S].contains(&status) {
+            crate::custom::fastfall_helper(fighter);
+        }
         
     }
 }
@@ -321,7 +326,8 @@ unsafe fn lucas_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 20.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.3, 135, 100, 10, 10, 8.0, 0.0, 2.5, 8.0, None, None, None, 0.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 8, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_PSI);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.3, 130, 80, 7, 7, 8.0, 0.0, 2.5, 8.0, None, None, None, 0.4, 0.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 8, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_PSI);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 4.0, false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
@@ -329,7 +335,8 @@ unsafe fn lucas_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 29.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.3, 135, 100, 10, 10, 9.8, 3.3, 2.5, 8.5, None, None, None, 0.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 9, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_PSI);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.3, 130, 80, 7, 7, 9.8, 3.3, 2.5, 8.5, None, None, None, 0.4, 0.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 9, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_PSI);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 4.0, false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
