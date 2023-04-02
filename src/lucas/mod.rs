@@ -4,7 +4,7 @@ use smash::phx::Hash40;
 use smash::lib::lua_const::*;
 use smash::app::*;
 use smash::app::lua_bind::*;
-use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
+use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase, L2CFighterBase};
 use smashline::*;
 use smash_script::*;
 
@@ -20,6 +20,28 @@ fn lucas_frame(fighter: &mut L2CFighterCommon) {
             crate::custom::fastfall_helper(fighter);
         }
         
+
+        if [*FIGHTER_LUCAS_STATUS_KIND_SPECIAL_HI_HOLD].contains(&status) {
+            if ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_GUARD) {
+                StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_LUCAS_STATUS_KIND_SPECIAL_HI_END, false);
+            }
+        }
+
+    }
+}
+
+#[weapon_frame( agent = WEAPON_KIND_LUCAS_PK_THUNDER )]
+pub fn lucas_pkthunder_weapon_frame(weapon : &mut L2CFighterBase) {
+    unsafe {
+        let status = StatusModule::status_kind(weapon.module_accessor);
+        let owner_module_accessor = &mut *sv_battle_object::module_accessor((WorkModule::get_int(weapon.module_accessor, *WEAPON_INSTANCE_WORK_ID_INT_LINK_OWNER)) as u32);
+
+        if [*WEAPON_LUCAS_PK_THUNDER_STATUS_KIND_MOVE].contains(&status) {
+            if ControlModule::check_button_on(owner_module_accessor, *CONTROL_PAD_BUTTON_GUARD) {
+                StatusModule::change_status_request_from_script(weapon.module_accessor, *WEAPON_LUCAS_PK_THUNDER_STATUS_KIND_VANISH, false);
+            }
+        }
+
     }
 }
 
@@ -938,7 +960,8 @@ unsafe fn lucas_uptaunt_right_smash_script(fighter: &mut L2CAgentBase) {
 
 pub fn install() {
     smashline::install_agent_frames!(
-        lucas_frame
+        lucas_frame,
+        lucas_pkthunder_weapon_frame
     );
     smashline::install_acmd_scripts!(
         lucas_jab_smash_script,

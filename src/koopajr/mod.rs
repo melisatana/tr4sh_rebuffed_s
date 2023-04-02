@@ -22,6 +22,11 @@ fn koopajr_frame(fighter: &mut L2CFighterCommon) {
                 macros::SET_SPEED_EX(fighter, 0, 0.0, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
             }
         }
+
+        if [*FIGHTER_STATUS_KIND_SPECIAL_N].contains(&status) {
+            crate::custom::fastfall_helper(fighter);
+        }
+
     }
 }
 
@@ -942,6 +947,9 @@ unsafe fn koopajr_neutralb_start_air_smash_script(fighter: &mut L2CAgentBase) {
 
 #[acmd_script( agent = "koopajr", script = "game_specialnshoot", category = ACMD_GAME )]
 unsafe fn koopajr_neutralb_shoot_smash_script(fighter: &mut L2CAgentBase) {
+    if StatusModule::prev_situation_kind(fighter.module_accessor) == SITUATION_KIND_AIR {
+        StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_LANDING, true);
+    }
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         JostleModule::set_status(fighter.module_accessor, false);
