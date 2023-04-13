@@ -102,7 +102,6 @@ fn bayonetta_frame(fighter: &mut L2CFighterCommon) {
             else {
                 GroundModule::set_passable_check(fighter.module_accessor, false);
             } 
-
         }
 
         if [*FIGHTER_BAYONETTA_STATUS_KIND_ATTACK_AIR_F].contains(&status) {
@@ -111,6 +110,7 @@ fn bayonetta_frame(fighter: &mut L2CFighterCommon) {
                 fighter.sub_transition_group_check_air_special();
             }
         }
+
 
     }
 }
@@ -1538,7 +1538,7 @@ unsafe fn bayonetta_sideb_afterburner_down_smash_script(fighter: &mut L2CAgentBa
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_BAYONETTA_STATUS_WORK_ID_SPECIAL_AIR_S_FLAG_WALL_CHECK);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 10.5, 286, 90, 0, 25, 5.5, 0.0, 1.5, 4.8, Some(0.0), Some(4.0), Some(3.2), 1.2, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 10.5, 286, 85, 0, 25, 5.5, 0.0, 1.5, 4.8, Some(0.0), Some(4.0), Some(3.2), 1.2, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 25.0);
     if macros::is_excute(fighter) {

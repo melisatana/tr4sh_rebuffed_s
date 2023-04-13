@@ -243,7 +243,7 @@ pub unsafe fn get_param_float_replace(module_accessor: u64, param_type: u64, par
 			}
     	}
 		if fighter_kind == *FIGHTER_KIND_EFLAME {
-			if param_type ==hash40("weight") {
+			if param_type == hash40("weight") {
 				if crate::eflame::PYRA_FTHROW_ARMOR[entry_id] {
 					return 120.0;
 				}

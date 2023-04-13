@@ -12,7 +12,9 @@ use smash_script::*;
 #[fighter_frame( agent = FIGHTER_KIND_MIISWORDSMAN )]
 fn miiswordsman_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+
         println!("It'sa Mii!?!?!?!?");
+
     }
 }
 
@@ -77,18 +79,15 @@ unsafe fn miiswordsman_jab3_smash_script(fighter: &mut L2CAgentBase) {
 unsafe fn miiswordsman_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 9.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 9.5, 0, 30, 0, 10, 4.0, 0.0, 7.0, 8.0, Some(0.0), Some(7.0), Some(18.0), 1.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 1.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 9.5, 15, 100, 0, 30, 4.0, 0.0, 7.0, 8.0, Some(0.0), Some(7.0), Some(18.0), 1.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_A, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 1.6);
-        macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 1, 1.6);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 10.5, 0, 30, 0, 10, 4.0, 0.0, 7.0, 8.0, Some(0.0), Some(7.0), Some(18.0), 1.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 1.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 10.5, 15, 100, 0, 30, 4.0, 0.0, 7.0, 8.0, Some(0.0), Some(7.0), Some(18.0), 1.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_A, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 1.4);
+        macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 1, 1.4);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 11.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 15.0);
-    if macros::is_excute(fighter) {
-        MotionModule::set_rate(fighter.module_accessor, 1.333333333);
+        MotionModule::set_rate(fighter.module_accessor, 1.5);
     }
 }
 
@@ -105,7 +104,7 @@ unsafe fn miiswordsman_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 10.1, 361, 97, 0, 20, 3.7, 0.0, 5.4, 4.0, Some(0.0), Some(5.4), Some(16.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 9.7, 361, 97, 0, 35, 3.7, 0.0, 5.4, 4.0, Some(0.0), Some(5.4), Some(16.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
@@ -591,6 +590,30 @@ unsafe fn miiswordsman_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         CancelModule::enable_cancel(fighter.module_accessor);
     }
+}
+
+#[acmd_script( agent = "miiswordsman", script = "game_specialn1", category = ACMD_GAME )]
+unsafe fn miiswordsman_neutralb_galestrike_smash_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    macros::FT_MOTION_RATE(fighter, 0.8);
+    sv_animcmd::frame(fighter.lua_state_agent, 17.0);
+    if macros::is_excute(fighter) {
+        ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_MIISWORDSMAN_GENERATE_ARTICLE_TORNADOSHOT, false, -1);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 18.0);
+    macros::FT_MOTION_RATE(fighter, 0.9);
+}
+
+#[acmd_script( agent = "miiswordsman", script = "game_specialairn1", category = ACMD_GAME )]
+unsafe fn miiswordsman_neutralb_galestrike_air_smash_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    macros::FT_MOTION_RATE(fighter, 0.8);
+    sv_animcmd::frame(fighter.lua_state_agent, 17.0);
+    if macros::is_excute(fighter) {
+        ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_MIISWORDSMAN_GENERATE_ARTICLE_TORNADOSHOT, false, -1);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 18.0);
+    macros::FT_MOTION_RATE(fighter, 0.9);
 }
 
 #[acmd_script( agent = "miiswordsman_tornadoshot", script = "game_fly", category = ACMD_GAME )]
@@ -1495,6 +1518,8 @@ pub fn install() {
         miiswordsman_bthrow_smash_script,
         miiswordsman_uthrow_smash_script,
         miiswordsman_dthrow_smash_script,
+        miiswordsman_neutralb_galestrike_smash_script,
+        miiswordsman_neutralb_galestrike_air_smash_script,
         galestrike_projectile,
         shuriken_projectile,
         miiswordsman_neutralb_blurblade_end_smash_script,

@@ -54,6 +54,43 @@ unsafe fn kirby_run_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
+#[acmd_script( agent = "kirby", script = "game_justshieldoff", category = ACMD_GAME )]
+unsafe fn kirby_parry_smash_script(fighter: &mut L2CAgentBase) {
+    if WorkModule::get_int64(fighter.module_accessor, *FIGHTER_SHULK_INSTANCE_WORK_ID_INT_SPECIAL_N_TYPE) == *FIGHTER_SHULK_MONAD_TYPE_SHIELD as u64 {
+        sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+        if macros::is_excute(fighter) {
+            macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
+            macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_recovery"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
+            if DamageModule::damage(fighter.module_accessor, 0) < 2.0 {
+                DamageModule::add_damage(fighter.module_accessor, -1.0 * DamageModule::damage(fighter.module_accessor, 0), 0);
+            }
+            else {
+                DamageModule::add_damage(fighter.module_accessor, -2.0, 0);
+            }
+        }
+    }
+}
+
+#[acmd_script( agent = "kirby", script = "game_shieldbreakfly", category = ACMD_GAME )]
+unsafe fn kirby_shieldbreak_smash_script(fighter: &mut L2CAgentBase) {
+    if WorkModule::get_int64(fighter.module_accessor, *FIGHTER_SHULK_INSTANCE_WORK_ID_INT_SPECIAL_N_TYPE) == *FIGHTER_SHULK_MONAD_TYPE_SHIELD as u64 {
+        sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+        if macros::is_excute(fighter) {
+            macros::PLAY_SE(fighter, Hash40::new("se_common_bomb_ll"));
+            macros::EFFECT(fighter, Hash40::new("sys_bomb_a"), Hash40::new("top"), 0.0, 0.0, 0.0, 0, 0, 0, 2.3, 0, 0, 0, 0, 0, 0, false);
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 420.0, 361, 50, 0, 68, 35.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_LL, *COLLISION_SOUND_ATTR_BOMB, *ATTACK_REGION_PUNCH);
+        }
+        sv_animcmd::wait(fighter.lua_state_agent, 4.0);
+        if macros::is_excute(fighter) {
+            AttackModule::clear_all(fighter.module_accessor);
+        }
+        sv_animcmd::frame(fighter.lua_state_agent, 30.0);
+        if macros::is_excute(fighter) {
+            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_DEAD, false);
+        }
+    }
+}
+
 #[acmd_script( agent = "kirby", script = "game_attack11", category = ACMD_GAME )]
 unsafe fn kirby_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -703,6 +740,33 @@ unsafe fn kirby_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
+#[acmd_script( agent = "kirby", script = "game_catchattack", category = ACMD_GAME )]
+unsafe fn kirby_pummel_smash_script(fighter: &mut L2CAgentBase) {
+    if WorkModule::get_int64(fighter.module_accessor, *FIGHTER_SHULK_INSTANCE_WORK_ID_INT_SPECIAL_N_TYPE) == *FIGHTER_SHULK_MONAD_TYPE_BUSTER as u64 {
+        sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+        if macros::is_excute(fighter) {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 0.6, 361, 100, 30, 0, 4.5, 0.0, 6.0, 10.0, Some(0.0), Some(6.0), Some(15.0), 0.6, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KAMEHIT, *ATTACK_REGION_PUNCH);
+            AttackModule::set_catch_only_all(fighter.module_accessor, true, false);
+        }
+        sv_animcmd::wait(fighter.lua_state_agent, 1.0);
+        if macros::is_excute(fighter) {
+            AttackModule::clear_all(fighter.module_accessor);
+            MotionModule::set_rate(fighter.module_accessor, 2.75);
+        }
+    }
+    else {
+        sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+        if macros::is_excute(fighter) {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.1, 361, 100, 30, 0, 4.5, 0.0, 6.0, 10.0, Some(0.0), Some(6.0), Some(15.0), 1.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+            AttackModule::set_catch_only_all(fighter.module_accessor, true, false);
+        }
+        sv_animcmd::wait(fighter.lua_state_agent, 1.0);
+        if macros::is_excute(fighter) {
+            AttackModule::clear_all(fighter.module_accessor);
+        }
+    }
+}
+
 #[acmd_script( agent = "kirby", script = "game_throwf", category = ACMD_GAME )]
 unsafe fn kirby_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
@@ -1232,6 +1296,8 @@ pub fn install() {
     );
     smashline::install_acmd_scripts!(
         kirby_run_smash_script,
+        kirby_parry_smash_script,
+        kirby_shieldbreak_smash_script,
         kirby_jab_smash_script,
         kirby_jab2_smash_script,
         kirby_jab100_smash_script,
@@ -1255,6 +1321,7 @@ pub fn install() {
         kirby_grab_smash_script,
         kirby_grabd_smash_script,
         kirby_grabp_smash_script,
+        kirby_pummel_smash_script,
         kirby_fthrow_smash_script,
         kirby_bthrow_smash_script,
         kirby_uthrow_smash_script,

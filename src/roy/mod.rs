@@ -32,6 +32,27 @@ fn roy_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
+#[fighter_frame( agent = FIGHTER_KIND_KIRBY )]
+fn kirby_royhat_frame(fighter: &mut L2CFighterCommon) {
+    unsafe {
+        let status = StatusModule::status_kind(fighter.module_accessor);
+
+        if [*FIGHTER_KIRBY_STATUS_KIND_ROY_SPECIAL_N_LOOP, *FIGHTER_KIRBY_STATUS_KIND_ROY_SPECIAL_N_TURN].contains(&status) {
+            WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_GUARD_ON);
+            WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ESCAPE);
+            WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ESCAPE_F);
+            WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ESCAPE_B);
+            WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ESCAPE_AIR);
+            WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_JUMP_AERIAL);
+            WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_JUMP_AERIAL_BUTTON);
+            fighter.sub_transition_group_check_air_escape();
+            fighter.sub_transition_group_check_ground_escape();
+            fighter.sub_transition_group_check_ground_guard();
+            fighter.sub_transition_group_check_air_jump_aerial();
+        }
+    }
+}
+
 #[acmd_script( agent = "roy", script = "game_attack11", category = ACMD_GAME )]
 unsafe fn roy_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
@@ -1285,7 +1306,8 @@ unsafe fn roy_downtaunt_right_smash_script(fighter: &mut L2CAgentBase) {
 
 pub fn install() {
     smashline::install_agent_frames!(
-        roy_frame
+        roy_frame,
+        kirby_royhat_frame
     );
     smashline::install_acmd_scripts!(
         roy_jab_smash_script,

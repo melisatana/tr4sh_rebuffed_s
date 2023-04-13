@@ -8,16 +8,26 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase, L2CFighterBase};
 use smashline::*;
 use smash_script::*;
 
+static mut EDGE_FLARE_IS_HITSTUN : [bool; 8] = [false; 8];
+
 // A Once-Per-Fighter-Frame that only applies to Sephiroth
 #[fighter_frame( agent = FIGHTER_KIND_EDGE )]
 fn edge_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
         let status = StatusModule::status_kind(fighter.module_accessor);
+        let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
         if [*FIGHTER_STATUS_KIND_ATTACK_LW3].contains(&status) {
             if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false {
                 CancelModule::enable_cancel(fighter.module_accessor);
             }
+        }
+
+        if [*FIGHTER_STATUS_KIND_DAMAGE, *FIGHTER_STATUS_KIND_DAMAGE_AIR, *FIGHTER_STATUS_KIND_DAMAGE_FLY, *FIGHTER_STATUS_KIND_DAMAGE_FLY_ROLL, *FIGHTER_STATUS_KIND_DAMAGE_FLY_METEOR, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_D, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_U, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_LR, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_JUMP_BOARD].contains(&status) {
+            EDGE_FLARE_IS_HITSTUN[entry_id] = true ;
+        }
+        else {
+            EDGE_FLARE_IS_HITSTUN[entry_id] = false;
         }
     }
 
@@ -28,21 +38,21 @@ pub fn edge_gigaflare_weapon_frame(weapon : &mut L2CFighterBase) {
     unsafe {
         let status = StatusModule::status_kind(weapon.module_accessor);
         let owner_module_accessor = &mut *sv_battle_object::module_accessor((WorkModule::get_int(weapon.module_accessor, *WEAPON_INSTANCE_WORK_ID_INT_LINK_OWNER)) as u32);
-
+        let entry_id = WorkModule::get_int(weapon.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         
-        if [*WEAPON_EDGE_FIRE_STATUS_KIND_FLY_S].contains(&status) {
+        if EDGE_FLARE_IS_HITSTUN[entry_id] == false && [*WEAPON_EDGE_FIRE_STATUS_KIND_FLY_S].contains(&status) {
             if ControlModule::check_button_on(owner_module_accessor, *CONTROL_PAD_BUTTON_GUARD) && ControlModule::check_button_on(owner_module_accessor, *CONTROL_PAD_BUTTON_SPECIAL) {
                 StatusModule::change_status_request_from_script(weapon.module_accessor, *WEAPON_EDGE_FIRE_STATUS_KIND_BURST_S, false);
             }
         }
 
-        if [*WEAPON_EDGE_FIRE_STATUS_KIND_FLY_M].contains(&status) {
+        if EDGE_FLARE_IS_HITSTUN[entry_id] == false && [*WEAPON_EDGE_FIRE_STATUS_KIND_FLY_M].contains(&status) {
             if ControlModule::check_button_on(owner_module_accessor, *CONTROL_PAD_BUTTON_GUARD) && ControlModule::check_button_on(owner_module_accessor, *CONTROL_PAD_BUTTON_SPECIAL) {
                 StatusModule::change_status_request_from_script(weapon.module_accessor, *WEAPON_EDGE_FIRE_STATUS_KIND_BURST_M, false);
             }
         }
 
-        if [*WEAPON_EDGE_FIRE_STATUS_KIND_FLY_L].contains(&status) {
+        if EDGE_FLARE_IS_HITSTUN[entry_id] == false && [*WEAPON_EDGE_FIRE_STATUS_KIND_FLY_L].contains(&status) {
             if ControlModule::check_button_on(owner_module_accessor, *CONTROL_PAD_BUTTON_GUARD) && ControlModule::check_button_on(owner_module_accessor, *CONTROL_PAD_BUTTON_SPECIAL) {
                 StatusModule::change_status_request_from_script(weapon.module_accessor, *WEAPON_EDGE_FIRE_STATUS_KIND_BURST_L, false);
             }

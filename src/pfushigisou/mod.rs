@@ -75,6 +75,46 @@ fn pfushigisou_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
+#[fighter_frame( agent = FIGHTER_KIND_KIRBY )]
+fn kirby_ivyhat_frame(fighter: &mut L2CFighterCommon) {
+    unsafe {
+        let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+        let status = StatusModule::status_kind(fighter.module_accessor);
+        let stickx = ControlModule::get_stick_x(fighter.module_accessor);
+        let lr = PostureModule::lr(fighter.module_accessor);
+
+        //ivy-copter
+        if PFUSHIGISOU_NEUTRALB_IN_USE[entry_id] {
+            if [*FIGHTER_KIRBY_STATUS_KIND_PFUSHIGISOU_SPECIAL_N_LOOP].contains(&status) {
+                if StatusModule::situation_kind(fighter.module_accessor) == *SITUATION_KIND_AIR {
+                    let mut velocity_x = KineticModule::get_sum_speed_x(fighter.module_accessor, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
+
+                    if stickx > 0.5 {
+                        velocity_x += 0.3;
+                        if velocity_x > 1.2 {
+                            velocity_x = 1.2;
+                        }
+                    }
+                    else if stickx < -0.5 {
+                        velocity_x -= 0.3;
+                        if velocity_x < -1.2 {
+                            velocity_x = -1.2;
+                        }
+                    }
+                    
+                    macros::SET_SPEED_EX(fighter, velocity_x * lr, -0.005, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
+                }
+            }
+        }
+
+        if StatusModule::situation_kind(fighter.module_accessor) == *SITUATION_KIND_GROUND {
+            PFUSHIGISOU_NEUTRALB_HAS_USED[entry_id] = false ;
+        }
+
+
+    }
+}
+
 #[acmd_script( agent = "pfushigisou", script = "game_attack11", category = ACMD_GAME )]
 unsafe fn pfushigisou_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -1004,7 +1044,8 @@ unsafe fn pfushigisou_upb_air_smash_script(fighter: &mut L2CAgentBase) {
 
 pub fn install() {
     smashline::install_agent_frames!(
-        pfushigisou_frame
+        pfushigisou_frame,
+        kirby_ivyhat_frame
     );
     smashline::install_acmd_scripts!(
         pfushigisou_jab_smash_script,

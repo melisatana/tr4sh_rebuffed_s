@@ -7,6 +7,7 @@ use smashline::*;
 use smash::app::*;
 use smash::phx::Hash40;
 use smash_script::*;
+use smash::lib::L2CValue;
 
 static DEBUG_ALLOW_MOMENTUM_JUMPS : bool = false;
 
@@ -29,6 +30,53 @@ pub unsafe fn fastfall_helper(fighter: &mut L2CFighterCommon) {
             }
         }
     }
+}
+
+
+//determines who cannot z-nair
+unsafe fn can_z_nair(fighter: &mut L2CFighterCommon) -> bool {
+    let fighter_kind = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_KIND);
+    if [
+        *FIGHTER_KIND_SAMUS,
+        *FIGHTER_KIND_SAMUSD,
+        *FIGHTER_KIND_LUIGI,
+        *FIGHTER_KIND_YOUNGLINK,
+        *FIGHTER_KIND_SZEROSUIT,
+        *FIGHTER_KIND_LUCAS,
+        *FIGHTER_KIND_TOONLINK
+    ].contains(&fighter_kind) {
+        return false;
+    }
+    return true;
+}
+
+
+#[skyline::hook(replace = smash::lua2cpp::L2CFighterCommon_sub_transition_group_check_air_escape)]
+pub unsafe fn escape_air_subtransition(fighter: &mut L2CFighterCommon) -> L2CValue {
+
+    let boma = smash::app::sv_system::battle_object_module_accessor(fighter.lua_state_agent);
+    
+    if can_z_nair(fighter) && ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_CATCH) {
+        ControlModule::set_attack_air_kind(fighter.module_accessor, *FIGHTER_COMMAND_ATTACK_AIR_KIND_N);
+        ControlModule::clear_command_one(boma, *FIGHTER_PAD_COMMAND_CATEGORY1, *FIGHTER_PAD_CMD_CAT1_AIR_ESCAPE); //test?
+        return false.into();
+        
+    }
+    original!()(fighter)
+}
+
+//stop buffering dodges when landing
+#[skyline::hook(replace = smash::lua2cpp::L2CFighterCommon_status_Landing_MainSub)]
+pub unsafe fn status_landing_main_sub(fighter: &mut L2CFighterCommon) -> L2CValue {
+    
+    let boma = smash::app::sv_system::battle_object_module_accessor(fighter.lua_state_agent);
+
+    if StatusModule::prev_status_kind(boma, 0) == *FIGHTER_STATUS_KIND_ESCAPE_AIR || ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_GUARD) {
+        ControlModule::clear_command_one(boma, *FIGHTER_PAD_COMMAND_CATEGORY1, *FIGHTER_PAD_CMD_CAT1_ESCAPE);
+        ControlModule::clear_command_one(boma, *FIGHTER_PAD_COMMAND_CATEGORY1, *FIGHTER_PAD_CMD_CAT1_ESCAPE_F);
+        ControlModule::clear_command_one(boma, *FIGHTER_PAD_COMMAND_CATEGORY1, *FIGHTER_PAD_CMD_CAT1_ESCAPE_B);
+    }
+    original!()(fighter)
 }
 
 
@@ -202,6 +250,13 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
             }
         }
 
+        //salty confetti?
+        if [*FIGHTER_STATUS_KIND_DAMAGE, *FIGHTER_STATUS_KIND_DAMAGE_AIR, *FIGHTER_STATUS_KIND_DAMAGE_FLY, *FIGHTER_STATUS_KIND_DAMAGE_FLY_ROLL, *FIGHTER_STATUS_KIND_DAMAGE_FLY_METEOR, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_D, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_U, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_LR, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_JUMP_BOARD].contains(&status) {
+            if ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_HI) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_LW) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_L) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_R) {
+                macros::EFFECT(fighter, Hash40::new("sys_kusudama"), Hash40::new("top"), 0, 28, 0, 0, 0, 0, 0.75, 0, 0, 0, 0, 0, 0, false); //confetti!
+            }
+        }
+
         //Shield dropping with just the stick??
         if [*FIGHTER_STATUS_KIND_GUARD, *FIGHTER_STATUS_KIND_GUARD_DAMAGE, *FIGHTER_STATUS_KIND_GUARD_ON].contains(&status) {
             if GroundModule::is_passable_ground(fighter.module_accessor) {
@@ -220,7 +275,6 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
                 GroundModule::set_passable_check(fighter.module_accessor, false);
             }
         }
-
 
         //momentum jumps (currently disabled)
         if DEBUG_ALLOW_MOMENTUM_JUMPS && WorkModule::is_flag(module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_JUMP_NO_LIMIT) == false {
@@ -336,10 +390,19 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
         }
 
 
-        //fastfall in tumble hopefully
+        //fastfall in tumble
         if [*FIGHTER_STATUS_KIND_DAMAGE_FALL].contains(&status) {
             fastfall_helper(fighter);
         }
+
+
+        //znair
+        /*if can_z_nair(fighter) && StatusModule::situation_kind(fighter.module_accessor) == SITUATION_KIND_AIR && [*FIGHTER_STATUS_KIND_JUMP, *FIGHTER_STATUS_KIND_JUMP_AERIAL, *FIGHTER_STATUS_KIND_FALL, *FIGHTER_STATUS_KIND_FALL_AERIAL, *FIGHTER_STATUS_KIND_DAMAGE_FALL].contains(&status) && ![*FIGHTER_STATUS_KIND_ATTACK_AIR].contains(&status){ 
+            if ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_SMASH) {
+                MotionModule::change_motion(fighter.module_accessor, Hash40::new("attack_air_n"), 0.0, 1.0, false, 0.0, false, false);
+            }
+        }*/
+
 
     }
 }
@@ -411,7 +474,18 @@ pub fn global_weapon_frame(fighter_base : &mut L2CFighterBase) {
 }
 
 
+
+fn nro_hook(info: &skyline::nro::NroInfo) {
+    if info.name == "common" {
+        skyline::install_hooks!(
+            status_landing_main_sub,
+            escape_air_subtransition
+        );
+    }
+}
+
 pub fn install() {
+    
     smashline::install_agent_frame_callbacks!(
         global_fighter_frame,
         global_weapon_frame
@@ -420,4 +494,5 @@ pub fn install() {
         change_kinetic_hook,
         add_motion_2nd_hook
     );
+    skyline::nro::add_hook(nro_hook);
 }

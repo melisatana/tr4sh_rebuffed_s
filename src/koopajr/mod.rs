@@ -23,10 +23,21 @@ fn koopajr_frame(fighter: &mut L2CFighterCommon) {
             }
         }
 
-        if [*FIGHTER_STATUS_KIND_SPECIAL_N].contains(&status) {
+        if [*FIGHTER_STATUS_KIND_SPECIAL_N, *FIGHTER_KOOPAJR_STATUS_KIND_SPECIAL_N_HOLD, *FIGHTER_KOOPAJR_STATUS_KIND_SPECIAL_N_SHOOT].contains(&status) {
             crate::custom::fastfall_helper(fighter);
         }
 
+    }
+}
+
+#[fighter_frame( agent = FIGHTER_KIND_KIRBY )]
+fn kirby_jrhat_frame(fighter: &mut L2CFighterCommon) {
+    unsafe {
+        let status = StatusModule::status_kind(fighter.module_accessor);
+
+        if [*FIGHTER_STATUS_KIND_SPECIAL_N, *FIGHTER_KIRBY_STATUS_KIND_KOOPAJR_SPECIAL_N_HOLD, *FIGHTER_KIRBY_STATUS_KIND_KOOPAJR_SPECIAL_N_SHOOT].contains(&status) {
+            crate::custom::fastfall_helper(fighter);
+        }
     }
 }
 
@@ -526,8 +537,8 @@ unsafe fn koopajr_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.0, 367, 100, 20, 20, 5.2, 0.0, 3.5, 12.5, Some(0.0), Some(6.5), Some(12.5), 0.8, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 5.0, 367, 100, 20, 20, 5.2, 0.0, 3.5, -12.0, Some(0.0), Some(6.5), Some(-12.0), 0.8, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.0, 367, 90, 20, 20, 5.2, 0.0, 3.5, 12.5, Some(0.0), Some(8.5), Some(12.5), 0.8, 0.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 5.0, 367, 90, 20, 20, 5.2, 0.0, 3.5, -12.0, Some(0.0), Some(8.5), Some(-12.0), 0.8, 0.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
@@ -1169,7 +1180,8 @@ unsafe fn koopajr_downb_air_smash_script(fighter: &mut L2CAgentBase) {
 
 pub fn install() {
     smashline::install_agent_frames!(
-        koopajr_frame
+        koopajr_frame,
+        kirby_jrhat_frame
     );
     smashline::install_acmd_scripts!(
         koopajr_jab_smash_script,
