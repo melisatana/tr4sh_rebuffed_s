@@ -59,7 +59,6 @@ fn eflame_frame(fighter: &mut L2CFighterCommon) {
             }
         }
 
-
     }
 }
 

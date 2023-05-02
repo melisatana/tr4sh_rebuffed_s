@@ -557,6 +557,8 @@ unsafe fn dark_samus_fsmash_charge(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 51.0);
     if macros::is_excute(fighter) {
         DARKSAMUS_FSMASH_FULLCHARGE[entry_id] = true ;
+        macros::PLAY_SE(fighter, Hash40::new("se_common_spirits_critical_l_tail"));
+        //macros::PLAY_SE(fighter, Hash40::new("se_common_assist_escapeair"));
     }
 }
 

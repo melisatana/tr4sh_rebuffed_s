@@ -8,7 +8,7 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 
-static mut SELF_DAMAGE_METER : [f32; 8] = [0.0; 8]; //total stored self-damage
+pub static mut SELF_DAMAGE_METER : [f32; 8] = [0.0; 8]; //total stored self-damage
 static mut SELF_DAMAGE_FRAME : [i32; 8] = [0; 8]; //for effect frames
 static mut SELF_DAMAGE_FRAME_CURRENT_STATUS : [i32; 8] = [0; 8]; //for effect frames
 static mut PICHU_NEUTRALSPECIAL_FROMGROUND : [bool; 8] = [false; 8]; //if neutral special was started on the ground
@@ -67,6 +67,14 @@ fn pichu_frame(fighter: &mut L2CFighterCommon) {
             SELF_DAMAGE_FRAME_CURRENT_STATUS[entry_id] = status ;
         }
 
+
+        if [*FIGHTER_PIKACHU_STATUS_KIND_SPECIAL_HI_WARP].contains(&status) {
+            if SELF_DAMAGE_METER[entry_id] <= -10.0 {
+                if ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_ATTACK) {
+                    StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_PIKACHU_STATUS_KIND_SPECIAL_LW_HIT, false);
+                }
+            }
+        }
 
 
     }

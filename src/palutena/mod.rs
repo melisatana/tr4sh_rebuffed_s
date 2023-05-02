@@ -407,6 +407,7 @@ unsafe fn palutena_usmash_charge_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 48.0);
     if macros::is_excute(fighter) {
         PALUTENA_UPSMASH_FULLCHARGE[entry_id] = true ;
+        macros::PLAY_SE(fighter, Hash40::new("se_common_spirits_critical_l_tail"));
     }
 }
 

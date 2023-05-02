@@ -8,11 +8,66 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 
+pub static mut PIKACHU_DOWNB_STATIC_IS_HIT : [bool; 8] = [false; 8];
+static mut PIKACHU_DOWNB_STATIC_TIMER : [i32; 8] = [0; 8];
+
 // A Once-Per-Fighter-Frame that only applies to the rat
 #[fighter_frame( agent = FIGHTER_KIND_PIKACHU )]
 fn pikachu_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+
+        let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+        let status = StatusModule::status_kind(fighter.module_accessor);
+
         println!("It'sa me, Pikachu, Biggah!!");
+        
+        
+        if PIKACHU_DOWNB_STATIC_TIMER[entry_id] > 0 {
+            PIKACHU_DOWNB_STATIC_TIMER[entry_id] -= 1 ;
+            if PIKACHU_DOWNB_STATIC_TIMER[entry_id] % 7 == 0 {
+                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_damage_elec"), Hash40::new("top"), 0, 4.0, 0, 0, 0, 0, 1.0, true);
+            }
+            if PIKACHU_DOWNB_STATIC_TIMER[entry_id] == 0 {
+                PIKACHU_DOWNB_STATIC_IS_HIT[entry_id] = false ;
+            }
+        }
+
+        if sv_information::is_ready_go() == false || [*FIGHTER_STATUS_KIND_WIN, *FIGHTER_STATUS_KIND_LOSE, *FIGHTER_STATUS_KIND_DEAD].contains(&status) {
+			PIKACHU_DOWNB_STATIC_IS_HIT[entry_id] = false;
+            PIKACHU_DOWNB_STATIC_TIMER[entry_id] = 0;
+        }
+
+
+    }
+}
+
+#[acmd_script( agent = "pikachu", script = "game_justshieldoff", category = ACMD_GAME )]
+unsafe fn pikachu_perfectshield_smash_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
+    if macros::is_excute(fighter) {
+        AttackModule::clear_all(fighter.module_accessor);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        if PIKACHU_DOWNB_STATIC_IS_HIT[entry_id] {
+            macros::PLAY_SE(fighter, Hash40::new("se_pikachu_attackair_f01"));
+            macros::EFFECT_FOLLOW(fighter, Hash40::new("pikachu_cheek"), Hash40::new("top"), 0, 4, 0, 0, 0, 0, 1.2, true);
+            macros::EFFECT_FOLLOW(fighter, Hash40::new("pikachu_elec"), Hash40::new("top"), 0, 4, 0, 0, 0, 0, 1.8, true);
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.5, 31, 30, 30, 30, 11.0, 0.0, 5.0, 0.0, None, None, None, 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_BODY);
+            AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 2.0, false);
+        }
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 2.0);
+    if macros::is_excute(fighter) {
+        AttackModule::clear_all(fighter.module_accessor);
+    }
+    sv_animcmd::wait(fighter.lua_state_agent, 2.0);
+    if macros::is_excute(fighter) {
+        if PIKACHU_DOWNB_STATIC_IS_HIT[entry_id] {
+            macros::EFFECT_OFF_KIND(fighter, Hash40::new("pikachu_elec"), false, true);
+            macros::EFFECT_OFF_KIND(fighter, Hash40::new("pikachu_cheek"), false, true);
+        }
     }
 }
 
@@ -611,8 +666,24 @@ unsafe fn pikachu_upb1_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
+#[acmd_script( agent = "pikachu", script = "game_specialairhi1", category = ACMD_GAME )]
+unsafe fn pikachu_upb1_air_smash_script(fighter: &mut L2CAgentBase) {
+    if macros::is_excute(fighter) {
+        macros::ATTACK(fighter, 0, 0, Hash40::new("neck"), 4.5, 70, 50, 0, 20, 2.5, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_BODY);
+        JostleModule::set_status(fighter.module_accessor, false);
+    }
+}
+
 #[acmd_script( agent = "pikachu", script = "game_specialhi2", category = ACMD_GAME )]
 unsafe fn pikachu_upb2_smash_script(fighter: &mut L2CAgentBase) {
+    if macros::is_excute(fighter) {
+        macros::ATTACK(fighter, 0, 0, Hash40::new("neck"), 6.6, 70, 100, 0, 20, 2.5, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_BODY);
+        JostleModule::set_status(fighter.module_accessor, false);
+    }
+}
+
+#[acmd_script( agent = "pikachu", script = "game_specialhi2", category = ACMD_GAME )]
+unsafe fn pikachu_upb2_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("neck"), 6.6, 70, 100, 0, 20, 2.5, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_BODY);
         JostleModule::set_status(fighter.module_accessor, false);
@@ -637,8 +708,12 @@ unsafe fn pikachu_downb_air_smash_script(fighter: &mut L2CAgentBase) {
 
 #[acmd_script( agent = "pikachu", script = "game_speciallwhit", category = ACMD_GAME )]
 unsafe fn pikachu_downb_blast_smash_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 21.6, 361, 70, 0, 40, 13.0, 0.0, 10.2, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, false, 12, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_NONE);
+        PIKACHU_DOWNB_STATIC_IS_HIT[entry_id] = true ;
+        PIKACHU_DOWNB_STATIC_TIMER[entry_id] = 540 ;
     }
     sv_animcmd::wait(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
@@ -648,8 +723,12 @@ unsafe fn pikachu_downb_blast_smash_script(fighter: &mut L2CAgentBase) {
 
 #[acmd_script( agent = "pikachu", script = "game_specialairlwhit", category = ACMD_GAME )]
 unsafe fn pikachu_downb_blast_air_smash_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 21.6, 361, 70, 0, 40, 13.0, 0.0, 10.2, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, false, 12, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_NONE);
+        PIKACHU_DOWNB_STATIC_IS_HIT[entry_id] = true ;
+        PIKACHU_DOWNB_STATIC_TIMER[entry_id] = 540 ;
     }
     sv_animcmd::wait(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
@@ -676,6 +755,7 @@ pub fn install() {
         pikachu_frame
     );
     smashline::install_acmd_scripts!(
+        pikachu_perfectshield_smash_script,
         pikachu_jab_smash_script,
         pikachu_dashattack_smash_script,
         pikachu_ftilt_smash_script,
@@ -703,7 +783,9 @@ pub fn install() {
         pikachu_thunderjolt_air,
         pikachu_sideb_smash_script,
         pikachu_upb1_smash_script,
+        pikachu_upb1_air_smash_script,
         pikachu_upb2_smash_script,
+        pikachu_upb2_air_smash_script,
         pikachu_downb_smash_script,
         pikachu_downb_air_smash_script,
         pikachu_thunderbolt,

@@ -8,11 +8,16 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 
+
+static mut HOTSLAP_FRAME : [i32; 8] = [0; 8];
+static mut HOTSLAP_CURRENT_STATUS : [i32; 8] = [0; 8];
+
 // A Once-Per-Fighter-Frame that only applies to Donkey Kong
 #[fighter_frame( agent = FIGHTER_KIND_DONKEY )]
 fn donkey_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
         let status = StatusModule::status_kind(fighter.module_accessor);
+        let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
         println!("It'sa me, Donkey Kong, ook.");
 
@@ -20,6 +25,21 @@ fn donkey_frame(fighter: &mut L2CFighterCommon) {
         if [*FIGHTER_STATUS_KIND_DAMAGE, *FIGHTER_STATUS_KIND_DAMAGE_AIR, *FIGHTER_STATUS_KIND_DAMAGE_FLY, *FIGHTER_STATUS_KIND_DAMAGE_FLY_ROLL, *FIGHTER_STATUS_KIND_DAMAGE_FLY_METEOR, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_D, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_U, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_LR, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_JUMP_BOARD, *FIGHTER_STATUS_KIND_FALL].contains(&status) {
             ModelModule::set_scale(fighter.module_accessor, 1.0);
         }
+
+        if [*FIGHTER_STATUS_KIND_SPECIAL_LW, *FIGHTER_DONKEY_STATUS_KIND_SPECIAL_LW_LOOP].contains(&status) {
+            HOTSLAP_FRAME[entry_id] += 1 ;
+            if HOTSLAP_FRAME[entry_id] == 6 || HOTSLAP_CURRENT_STATUS[entry_id] != status {
+                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_damage_fire"), Hash40::new("handr"), 0, 0, 0, 0, 0, 0, 0.9, true);
+                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_damage_fire"), Hash40::new("handl"), 0, 0, 0, 0, 0, 0, 0.9, true);
+        
+                HOTSLAP_FRAME[entry_id] = 0 ;
+            }
+            HOTSLAP_CURRENT_STATUS[entry_id] = status ;
+        }
+        else {
+            HOTSLAP_FRAME[entry_id] = 0;
+        }
+
     }
 }
 
@@ -70,7 +90,6 @@ unsafe fn donkey_dash_attack_smash_script(fighter: &mut L2CAgentBase) {
         MotionModule::set_rate(fighter.module_accessor, 1.22);
     }
 }
-
 
 #[acmd_script( agent = "donkey", script = "game_attacks3", category = ACMD_GAME )]
 unsafe fn donkey_ftilt_smash_script(fighter: &mut L2CAgentBase) {
@@ -436,7 +455,7 @@ unsafe fn donkey_dair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
-        MotionModule::set_rate(fighter.module_accessor, 1.1);
+        MotionModule::set_rate(fighter.module_accessor, 1.2);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 42.0);
     if macros::is_excute(fighter) {
@@ -826,6 +845,7 @@ unsafe fn donkey_sideb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
+        macros::FT_MOTION_RATE(fighter, 0.869565217);
     }
 }
 
@@ -850,6 +870,7 @@ unsafe fn donkey_sideb_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
+        macros::FT_MOTION_RATE(fighter, 0.869565217);
     }
 }
 
@@ -1084,7 +1105,7 @@ unsafe fn donkey_downb_air_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 19.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("handr"), 7.2, 367, 100, 36, 0, 7.0, 4.0, 0.0, 2.0, None, None, None, 0.7, 0.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.2, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("handr"), 7.2, 367, 100, 36, 0, 7.0, 4.0, 0.0, 2.0, None, None, None, 0.7, 0.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.2, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PUNCH);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
@@ -1092,14 +1113,13 @@ unsafe fn donkey_downb_air_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 28.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("handl"), 7.7, 270, 100, 0, 30, 8.0, 4.0, 0.0, -2.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.2, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("handl"), 7.7, 270, 100, 0, 30, 8.0, 4.0, 0.0, -2.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.2, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PUNCH);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
     }
 }
-
 
 #[acmd_script( agent = "donkey", script = "game_appeallwl", category = ACMD_GAME )]
 unsafe fn donkey_downtaunt_left_smash_script(fighter: &mut L2CAgentBase) {

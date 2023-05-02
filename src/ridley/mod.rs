@@ -814,14 +814,14 @@ unsafe fn ridley_dthrow_smash_script(fighter: &mut L2CAgentBase) {
 #[acmd_script( agent = "ridley", script = "game_specialnstart", category = ACMD_GAME )]
 unsafe fn ridley_neutralb_start_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.75);
+        macros::FT_MOTION_RATE(fighter, 0.7142857);
     }
 }
 
 #[acmd_script( agent = "ridley", script = "game_specialairnstart", category = ACMD_GAME )]
 unsafe fn ridley_neutralb_start_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.75);
+        macros::FT_MOTION_RATE(fighter, 0.7142857);
     }
 }
 
@@ -829,7 +829,7 @@ unsafe fn ridley_neutralb_start_air_smash_script(fighter: &mut L2CAgentBase) {
 unsafe fn fireball_projectile(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.9, 361, 30, 0, 17, 2.5, 0.0, 0.0, 0.0, None, None, None, 0.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, -2, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_NONE);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 10.0, false);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 11.0, false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 30.0);
     if macros::is_excute(fighter) {
@@ -881,6 +881,7 @@ unsafe fn ridley_sideb_start_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         GrabModule::clear_all(fighter.module_accessor);
         GrabModule::set_rebound(fighter.module_accessor, false);
+        macros::FT_MOTION_RATE(fighter, 0.7142857);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 49.0);
     if macros::is_excute(fighter) {
@@ -931,6 +932,7 @@ unsafe fn ridley_sideb_start_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         GrabModule::clear_all(fighter.module_accessor);
         GrabModule::set_rebound(fighter.module_accessor, false);
+        macros::FT_MOTION_RATE(fighter, 0.7142857);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 49.0);
     if macros::is_excute(fighter) {

@@ -83,6 +83,9 @@ unsafe fn koopajr_jab2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
+    }
+    sv_animcmd::wait(fighter.lua_state_agent, 2.0);
+    if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_ENABLE_100);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
@@ -781,7 +784,7 @@ unsafe fn koopajr_grab_smash_script(fighter: &mut L2CAgentBase) {
         macros::CATCH(fighter, 0, Hash40::new("top"), 4.3, 0.0, 6.6, 6.5, Some(0.0), Some(6.6), Some(15.0), *FIGHTER_STATUS_KIND_CAPTURE_PULLED, *COLLISION_SITUATION_MASK_GA);
     }
     macros::game_CaptureCutCommon(fighter);
-    sv_animcmd::wait(fighter.lua_state_agent, 4.0);
+    sv_animcmd::wait(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         GrabModule::clear_all(fighter.module_accessor);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_CATCH_FLAG_CATCH_WAIT);
@@ -805,7 +808,7 @@ unsafe fn koopajr_grabd_smash_script(fighter: &mut L2CAgentBase) {
         macros::CATCH(fighter, 0, Hash40::new("top"), 3.8, 0.0, 6.6, 6.5, Some(0.0), Some(6.6), Some(16.0), *FIGHTER_STATUS_KIND_CAPTURE_PULLED, *COLLISION_SITUATION_MASK_GA);
     }
     macros::game_CaptureCutCommon(fighter);
-    sv_animcmd::wait(fighter.lua_state_agent, 4.0);
+    sv_animcmd::wait(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         GrabModule::clear_all(fighter.module_accessor);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_CATCH_FLAG_CATCH_WAIT);
@@ -829,7 +832,7 @@ unsafe fn koopajr_grabp_smash_script(fighter: &mut L2CAgentBase) {
         macros::CATCH(fighter, 0, Hash40::new("top"), 4.2, 0.0, 6.6, -6.5, Some(0.0), Some(6.6), Some(-18.4), *FIGHTER_STATUS_KIND_CAPTURE_PULLED, *COLLISION_SITUATION_MASK_GA);
     }
     macros::game_CaptureCutCommon(fighter);
-    sv_animcmd::wait(fighter.lua_state_agent, 4.0);
+    sv_animcmd::wait(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         GrabModule::clear_all(fighter.module_accessor);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_CATCH_FLAG_CATCH_WAIT);

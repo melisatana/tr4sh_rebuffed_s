@@ -668,7 +668,7 @@ unsafe fn wolf_neutralb_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
         if WOLF_STRONG_BLASTER[entry_id] {
-            MotionModule::set_rate(fighter.module_accessor, 0.065);
+            MotionModule::set_rate(fighter.module_accessor, 0.06);
         }
     }
     sv_animcmd::frame(fighter.lua_state_agent, 14.0);
@@ -728,7 +728,7 @@ unsafe fn wolf_neutralb_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
         if WOLF_STRONG_BLASTER[entry_id] {
-            MotionModule::set_rate(fighter.module_accessor, 0.065);
+            MotionModule::set_rate(fighter.module_accessor, 0.06);
         }
     }
     sv_animcmd::frame(fighter.lua_state_agent, 14.0);
@@ -769,9 +769,9 @@ unsafe fn laser_projectile(fighter: &mut L2CAgentBase) {
 
     if entry_id < 8 && WOLF_STRONG_BLASTER[entry_id] {
         if macros::is_excute(fighter) {
-            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 15.5, 40, 100, 0, 50, 6.5, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_SPEED, false, -2, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 14.5, 40, 100, 0, 50, 6.5, 0.0, 0.0, 0.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_SPEED, false, -2, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
             ModelModule::set_scale(fighter.module_accessor, 1.5);
-            macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 0.85);
+            macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 0.77);
         }
     }
     else {

@@ -8,13 +8,43 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 
+static mut MIISWORDSMAN_FSMASH_FULLCHARGE : [bool; 8] = [false; 8];
+static mut MIISWORDSMAN_FSMASH_HITBOX_ACTIVE : [bool; 8] = [false; 8];
+static mut MIISWORDSMAN_FSMASH_HITBOX_X : [f32; 8] = [0.0; 8];
+static mut MIISWORDSMAN_FSMASH_HITBOX_Y : [f32; 8] = [0.0; 8];
+
+unsafe fn set_dash_hitbox(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+    let point_offset_x = PostureModule::lr(fighter.module_accessor) * (MIISWORDSMAN_FSMASH_HITBOX_X[entry_id] - PostureModule::pos_x(fighter.module_accessor));
+    let point_offset_y = MIISWORDSMAN_FSMASH_HITBOX_Y[entry_id] - PostureModule::pos_y(fighter.module_accessor);
+    
+    macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 17.1, 361, 100, 0, 55, 6.0, 0.0, 8.0, 4.0, Some(0.0), Some(point_offset_y), Some(point_offset_x), 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_B, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_SWORD);
+
+}
+
+
 // A Once-Per-Fighter-Frame that only applies to Mii Swordfighter
 #[fighter_frame( agent = FIGHTER_KIND_MIISWORDSMAN )]
 fn miiswordsman_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        let status = StatusModule::status_kind(fighter.module_accessor);
+        let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
 
         println!("It'sa Mii!?!?!?!?");
 
+
+        if MIISWORDSMAN_FSMASH_HITBOX_ACTIVE[entry_id] {
+            if status == *FIGHTER_STATUS_KIND_ATTACK_S4 {
+                set_dash_hitbox(fighter);
+            }
+            else
+            {
+                MIISWORDSMAN_FSMASH_HITBOX_ACTIVE[entry_id] = false;
+            }
+        }
+
+        
     }
 }
 
@@ -145,11 +175,26 @@ unsafe fn miiswordsman_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
+#[acmd_script( agent = "miiswordsman", script = "game_attacks4charge", category = ACMD_GAME )]
+unsafe fn miiswordsman_fsmash_charge_smash_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
+    sv_animcmd::frame(fighter.lua_state_agent, 45.0);
+    if macros::is_excute(fighter) {
+        macros::PLAY_SE(fighter, Hash40::new("se_miiswordsman_appeal_l01"));
+        MIISWORDSMAN_FSMASH_FULLCHARGE[entry_id] = true ;
+    }
+
+}
+
 #[acmd_script( agent = "miiswordsman", script = "game_attacks4", category = ACMD_GAME )]
 unsafe fn miiswordsman_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
+        MIISWORDSMAN_FSMASH_FULLCHARGE[entry_id] = false;
     }
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
@@ -159,14 +204,41 @@ unsafe fn miiswordsman_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 11.0);
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 1.0, 4.0);
+        if MIISWORDSMAN_FSMASH_FULLCHARGE[entry_id] {
+            JostleModule::set_status(fighter.module_accessor, false);
+            KineticModule::add_speed(fighter.module_accessor, &smash::phx::Vector3f{x: 13.1, y: 0.0, z: 0.0});
+            MIISWORDSMAN_FSMASH_HITBOX_X[entry_id] = PostureModule::pos_x(fighter.module_accessor);
+            MIISWORDSMAN_FSMASH_HITBOX_Y[entry_id] = PostureModule::pos_y(fighter.module_accessor) + 8.0;
+        }
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 15.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 14.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 17.1, 361, 100, 0, 33, 4.8, 0.0, 5.5, 7.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 17.1, 361, 100, 0, 33, 4.8, 0.0, 5.5, 12.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 17.1, 361, 100, 0, 33, 4.8, 0.0, 5.5, 17.8, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        if MIISWORDSMAN_FSMASH_FULLCHARGE[entry_id] {
+            JostleModule::set_status(fighter.module_accessor, true);
+            macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_hit_sting"), Hash40::new("top"), 0, 8, -20, 0, 0, 0, 0.8, true);
+            MIISWORDSMAN_FSMASH_HITBOX_ACTIVE[entry_id] = true;
+        }
     }
-    sv_animcmd::wait(fighter.lua_state_agent, 3.0);
+    
+    sv_animcmd::frame(fighter.lua_state_agent, 15.0);
+    if MIISWORDSMAN_FSMASH_FULLCHARGE[entry_id] == false {
+        if macros::is_excute(fighter) {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 17.1, 361, 100, 0, 33, 4.8, 0.0, 5.5, 7.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+            macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 17.1, 361, 100, 0, 33, 4.8, 0.0, 5.5, 12.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+            macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 17.1, 361, 100, 0, 33, 4.8, 0.0, 5.5, 17.8, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        }
+    }
+    sv_animcmd::wait(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        if MIISWORDSMAN_FSMASH_FULLCHARGE[entry_id] {
+            macros::SET_SPEED_EX(fighter, 1.7, 0.0, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
+        }
+    }
+    sv_animcmd::wait(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        MIISWORDSMAN_FSMASH_HITBOX_ACTIVE[entry_id] = false;
+    }
+    sv_animcmd::wait(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -1502,6 +1574,7 @@ pub fn install() {
         miiswordsman_ftilt_smash_script,
         miiswordsman_utilt_smash_script,
         miiswordsman_dtilt_smash_script,
+        miiswordsman_fsmash_charge_smash_script,
         miiswordsman_fsmash_smash_script,
         miiswordsman_usmash_smash_script,
         miiswordsman_dsmash_smash_script,

@@ -251,7 +251,18 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
         }
 
         //salty confetti?
-        if [*FIGHTER_STATUS_KIND_DAMAGE, *FIGHTER_STATUS_KIND_DAMAGE_AIR, *FIGHTER_STATUS_KIND_DAMAGE_FLY, *FIGHTER_STATUS_KIND_DAMAGE_FLY_ROLL, *FIGHTER_STATUS_KIND_DAMAGE_FLY_METEOR, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_D, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_U, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_LR, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_JUMP_BOARD].contains(&status) {
+        if 
+            [*FIGHTER_STATUS_KIND_DAMAGE, 
+            *FIGHTER_STATUS_KIND_DAMAGE_AIR, 
+            *FIGHTER_STATUS_KIND_DAMAGE_FLY, 
+            *FIGHTER_STATUS_KIND_DAMAGE_FLY_ROLL, 
+            *FIGHTER_STATUS_KIND_DAMAGE_FLY_METEOR, 
+            *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_D, 
+            *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_U, 
+            *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_LR, 
+            *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_JUMP_BOARD,
+            *FIGHTER_STATUS_KIND_FURAFURA]
+            .contains(&status) {
             if ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_HI) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_LW) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_L) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_R) {
                 macros::EFFECT(fighter, Hash40::new("sys_kusudama"), Hash40::new("top"), 0, 28, 0, 0, 0, 0, 0.75, 0, 0, 0, 0, 0, 0, false); //confetti!
             }
