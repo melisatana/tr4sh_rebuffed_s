@@ -32,6 +32,16 @@ pub unsafe fn fastfall_helper(fighter: &mut L2CFighterCommon) {
     }
 }
 
+pub unsafe fn fastfall_whenever_helper(fighter: &mut L2CFighterCommon) {
+    let dive_cont_value = WorkModule::get_param_float(fighter.module_accessor, hash40("common"), hash40("dive_cont_value"));
+    let dive_flick = WorkModule::get_param_int(fighter.module_accessor, hash40("common"), hash40("dive_flick_frame_value"));
+    if fighter.global_table[0x1B].get_f32() < dive_cont_value // This is Stick Y in the Global Table
+        && fighter.global_table[0x1D].get_i32() < dive_flick { // This is the Flick Y value in the Global Table
+            WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_WORK_ID_FLAG_RESERVE_DIVE);
+            WorkModule::on_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_REQUEST_DIVE_EFFECT);
+        }
+}
+
 
 //determines who cannot z-nair
 unsafe fn can_z_nair(fighter: &mut L2CFighterCommon) -> bool {
@@ -64,6 +74,7 @@ pub unsafe fn escape_air_subtransition(fighter: &mut L2CFighterCommon) -> L2CVal
     }
     original!()(fighter)
 }
+
 
 //stop buffering dodges when landing
 #[skyline::hook(replace = smash::lua2cpp::L2CFighterCommon_status_Landing_MainSub)]
@@ -236,21 +247,8 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
             );
         }
         
-        //Shield dropping through platforms using the taunt button
-        if [*FIGHTER_STATUS_KIND_GUARD, *FIGHTER_STATUS_KIND_GUARD_DAMAGE, *FIGHTER_STATUS_KIND_GUARD_ON].contains(&status) {
-            if GroundModule::is_passable_ground(fighter.module_accessor) {
-                if ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_HI) || ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_LW) || ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_L) || ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_R) && sticky <= 0.2 {
-                    GroundModule::pass_floor(fighter.module_accessor);
-                }
-            }
-            else {
-                if ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_HI) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_LW) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_L) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_R) {
-                    macros::EFFECT(fighter, Hash40::new("sys_kusudama"), Hash40::new("top"), 0, 28, 0, 0, 0, 0, 0.75, 0, 0, 0, 0, 0, 0, false); //confetti!
-                }
-            }
-        }
 
-        //salty confetti?
+        //salty confetti
         if 
             [*FIGHTER_STATUS_KIND_DAMAGE, 
             *FIGHTER_STATUS_KIND_DAMAGE_AIR, 
@@ -265,6 +263,21 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
             .contains(&status) {
             if ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_HI) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_LW) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_L) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_R) {
                 macros::EFFECT(fighter, Hash40::new("sys_kusudama"), Hash40::new("top"), 0, 28, 0, 0, 0, 0, 0.75, 0, 0, 0, 0, 0, 0, false); //confetti!
+            }
+        }
+
+
+        //Shield dropping through platforms using the taunt button
+        if [*FIGHTER_STATUS_KIND_GUARD, *FIGHTER_STATUS_KIND_GUARD_DAMAGE, *FIGHTER_STATUS_KIND_GUARD_ON].contains(&status) {
+            if GroundModule::is_passable_ground(fighter.module_accessor) {
+                if ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_HI) || ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_LW) || ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_L) || ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_R) && sticky <= 0.2 {
+                    GroundModule::pass_floor(fighter.module_accessor);
+                }
+            }
+            else {
+                if ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_HI) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_LW) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_L) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_R) {
+                    macros::EFFECT(fighter, Hash40::new("sys_kusudama"), Hash40::new("top"), 0, 28, 0, 0, 0, 0, 0.75, 0, 0, 0, 0, 0, 0, false); //confetti!
+                }
             }
         }
 
@@ -323,11 +336,7 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
             };
         };
 
-        //this disables jostle on pivot grabs
-        if [*FIGHTER_STATUS_KIND_CATCH_TURN].contains(&status) {
-            JostleModule::set_status(fighter.module_accessor, false);
-        }
-        
+
         //Shield after starting a dash
         if [*FIGHTER_STATUS_KIND_DASH, *FIGHTER_STATUS_KIND_TURN_DASH].contains(&status) {
             if MotionModule::frame(fighter.module_accessor) >= 4.0 {
@@ -345,6 +354,7 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
                 }
             }
         }
+
 
         //cancel Jab1 with Ftilt
         if MotionModule::motion_kind(fighter.module_accessor) == hash40("attack_11") {
@@ -407,12 +417,10 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
         }
 
 
-        //znair
-        /*if can_z_nair(fighter) && StatusModule::situation_kind(fighter.module_accessor) == SITUATION_KIND_AIR && [*FIGHTER_STATUS_KIND_JUMP, *FIGHTER_STATUS_KIND_JUMP_AERIAL, *FIGHTER_STATUS_KIND_FALL, *FIGHTER_STATUS_KIND_FALL_AERIAL, *FIGHTER_STATUS_KIND_DAMAGE_FALL].contains(&status) && ![*FIGHTER_STATUS_KIND_ATTACK_AIR].contains(&status){ 
-            if ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_SMASH) {
-                MotionModule::change_motion(fighter.module_accessor, Hash40::new("attack_air_n"), 0.0, 1.0, false, 0.0, false, false);
-            }
-        }*/
+        //this disables jostle on pivot grabs
+         if [*FIGHTER_STATUS_KIND_CATCH_TURN].contains(&status) {
+            JostleModule::set_status(fighter.module_accessor, false);
+        }
 
 
     }

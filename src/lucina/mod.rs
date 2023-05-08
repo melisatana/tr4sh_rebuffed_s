@@ -409,6 +409,8 @@ unsafe fn lucina_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 0.5);
+        macros::PLAY_SE(fighter, Hash40::new("se_lucina_special_n03"));
+        macros::EFFECT(fighter, Hash40::new("sys_smash_flash"), Hash40::new("sword1"), 0, 0, 10, 0, 0, 0, 0.8, 0, 0, 0, 0, 0, 0, true);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 11.0);
     if macros::is_excute(fighter) {

@@ -14,6 +14,7 @@ use smash::hash40;
 fn master_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
 
+
         println!("... :(");
 
         if DamageModule::damage(fighter.module_accessor, 0) >= 100.0 {
@@ -25,7 +26,7 @@ fn master_frame(fighter: &mut L2CFighterCommon) {
                 }
             }
 
-            //cancel Jab1 with Utilt
+            //cancel Jab1 with Usmash
             if MotionModule::motion_kind(fighter.module_accessor) == hash40("attack_11") {
                 if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false {
                     WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_HI4_START);
@@ -33,7 +34,7 @@ fn master_frame(fighter: &mut L2CFighterCommon) {
                 }
             }
 
-            //cancel Jab1 with Dtilt
+            //cancel Jab1 with Dsmash
             if MotionModule::motion_kind(fighter.module_accessor) == hash40("attack_11") {
                 if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false {
                     WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_LW4_START);
@@ -41,7 +42,7 @@ fn master_frame(fighter: &mut L2CFighterCommon) {
                 }
             }
 
-            //cancel Jab2 with Ftilt
+            //cancel Jab2 with Fsmash
             if MotionModule::motion_kind(fighter.module_accessor) == hash40("attack_12") {
                 if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false {
                     WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_S4_START);
@@ -57,7 +58,7 @@ fn master_frame(fighter: &mut L2CFighterCommon) {
                 }
             }
 
-            //cancel Jab2 with Dtilt
+            //cancel Jab2 with Dsmash
             if MotionModule::motion_kind(fighter.module_accessor) == hash40("attack_12") {
                 if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false {
                     WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_LW4_START);

@@ -931,7 +931,7 @@ unsafe fn link_arrow(fighter: &mut L2CAgentBase) {
 #[acmd_script( agent = "link_swordbeam", script = "game_fly", category = ACMD_GAME )]
 unsafe fn link_swordbeam(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.8, 140, 30, 0, 52, 2.8, 0.0, 0.5, -7.0, Some(0.0), Some(0.5), Some(7.0), 1.7, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 4, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_NONE);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.8, 140, 30, 0, 52, 2.8, 0.0, 0.5, -7.0, Some(0.0), Some(0.5), Some(7.0), 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 4, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_NONE);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 0.75);
     }
 }
