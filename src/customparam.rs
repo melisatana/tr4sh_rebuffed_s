@@ -23,6 +23,8 @@ use {
 	smashline::*,
 };
 
+use super::*;
+
 //BomaExt, helps with various things
 pub trait BomaExt {
     unsafe fn is_fighter(&mut self) -> bool;
@@ -53,7 +55,9 @@ pub static FLOAT_SEARCH_CODE: &[u8] = &[
     0x00, 0x1c, 0x40, 0xf9, 0x08, 0x00, 0x40, 0xf9, 0x03, 0x19, 0x40, 0xf9,
 ];
 
-pub static mut INT_OFFSET : usize = 0x4E5380;
+//pub static mut INT_OFFSET : usize = 0x4E5380;
+
+pub static mut INT_OFFSET: usize = 0x4DED80;
 
 pub static INT_SEARCH_CODE: &[u8] = &[
     0x00, 0x1c, 0x40, 0xf9, 0x08, 0x00, 0x40, 0xf9, 0x03, 0x11, 0x40, 0xf9,
@@ -394,13 +398,15 @@ pub fn install() {
         let text_ptr = getRegionAddress(Region::Text) as *const u8;
         let text_size = (getRegionAddress(Region::Rodata) as usize) - (text_ptr as usize);
         let text = std::slice::from_raw_parts(text_ptr, text_size);
-        if let Some(offset_float) = find_subsequence(text, FLOAT_SEARCH_CODE) {
-            FLOAT_OFFSET = offset_float;
+        if let Some(offset) = find_subsequence(text, FLOAT_SEARCH_CODE) {
+            FLOAT_OFFSET = offset;
         }
-        if let Some(offset_int) = find_subsequence(text, INT_SEARCH_CODE) {
-            INT_OFFSET = offset_int;
+        if let Some(offset) = find_subsequence(text, INT_SEARCH_CODE) {
+            INT_OFFSET = offset;
         }
     }
-	skyline::install_hooks!(get_param_float_replace, get_param_int_replace, offset_dump);
+	skyline::install_hooks!(get_param_float_replace);
+	skyline::install_hooks!(get_param_int_replace);
+	skyline::install_hooks!(offset_dump);
 }
 

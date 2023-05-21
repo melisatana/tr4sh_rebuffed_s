@@ -617,7 +617,7 @@ unsafe fn mariod_specialn_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 14.0);
     if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 1.111111111); //0.9x
+        macros::FT_MOTION_RATE(fighter, 1.17647058); //0.85x
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_MARIOD_GENERATE_ARTICLE_DRCAPSULE, false, -1);    
     }
 }    
@@ -639,7 +639,7 @@ unsafe fn mariod_specialairn_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 14.0);
     if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 1.111111111);
+        macros::FT_MOTION_RATE(fighter, 1.17647058); //0.85x
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_MARIOD_GENERATE_ARTICLE_DRCAPSULE, false, -1);    
     }
 }    

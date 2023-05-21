@@ -1049,8 +1049,8 @@ unsafe fn pichu_uptaunt_left_smash_script(fighter: &mut L2CAgentBase) {
 
     sv_animcmd::frame(fighter.lua_state_agent, 13.0);
     if macros::is_excute(fighter) {
-        macros::FT_ADD_DAMAGE(fighter, 4.1);
-        SELF_DAMAGE_METER[entry_id] -= 4.1;
+        macros::FT_ADD_DAMAGE(fighter, 3.0);
+        SELF_DAMAGE_METER[entry_id] -= 3.0;
     }
 }
 
@@ -1060,8 +1060,8 @@ unsafe fn pichu_uptaunt_right_smash_script(fighter: &mut L2CAgentBase) {
 
     sv_animcmd::frame(fighter.lua_state_agent, 13.0);
     if macros::is_excute(fighter) {
-        macros::FT_ADD_DAMAGE(fighter, 4.1);
-        SELF_DAMAGE_METER[entry_id] -= 4.1;
+        macros::FT_ADD_DAMAGE(fighter, 3.0);
+        SELF_DAMAGE_METER[entry_id] -= 3.0;
     }
 }
 

@@ -876,7 +876,7 @@ unsafe fn wolf_illusion_air(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "wolf", script = "game_specialhibound", category = ACMD_GAME )]
+#[acmd_script( agent = "wolf", script = "game_specialhihold", category = ACMD_GAME )]
 unsafe fn wolf_upb_start_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {

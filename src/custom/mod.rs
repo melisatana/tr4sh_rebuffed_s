@@ -37,9 +37,9 @@ pub unsafe fn fastfall_whenever_helper(fighter: &mut L2CFighterCommon) {
     let dive_flick = WorkModule::get_param_int(fighter.module_accessor, hash40("common"), hash40("dive_flick_frame_value"));
     if fighter.global_table[0x1B].get_f32() < dive_cont_value // This is Stick Y in the Global Table
         && fighter.global_table[0x1D].get_i32() < dive_flick { // This is the Flick Y value in the Global Table
-            WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_WORK_ID_FLAG_RESERVE_DIVE);
-            WorkModule::on_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_REQUEST_DIVE_EFFECT);
-        }
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_WORK_ID_FLAG_RESERVE_DIVE);
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_REQUEST_DIVE_EFFECT);
+    }
 }
 
 

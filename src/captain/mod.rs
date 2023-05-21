@@ -33,6 +33,10 @@ fn captain_frame(fighter: &mut L2CFighterCommon) {
         let status = StatusModule::status_kind(fighter.module_accessor);
         let sticky = ControlModule::get_stick_y(fighter.module_accessor);
 
+        if [*FIGHTER_STATUS_KIND_SPECIAL_N, *FIGHTER_CAPTAIN_STATUS_KIND_SPECIAL_N_TURN].contains(&status) {
+            crate::custom::fastfall_helper(fighter);
+        }
+
         if FALCON_NEUTRALSPECIAL_CANCOUNTER[entry_id] {
             if [*FIGHTER_STATUS_KIND_SPECIAL_N, *FIGHTER_CAPTAIN_STATUS_KIND_SPECIAL_N_TURN].contains(&status) {
                 if StopModule::is_hit(fighter.module_accessor) {
