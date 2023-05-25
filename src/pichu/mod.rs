@@ -76,6 +76,19 @@ fn pichu_frame(fighter: &mut L2CFighterCommon) {
             }
         }
 
+        if SELF_DAMAGE_METER[entry_id] <= -10.0 {
+            DamageModule::set_damage_mul(fighter.module_accessor, 0.85);
+        }
+        if SELF_DAMAGE_METER[entry_id] <= -20.0 {
+            DamageModule::set_damage_mul(fighter.module_accessor, 0.8);
+        }
+        if SELF_DAMAGE_METER[entry_id] <= -30.0 {
+            DamageModule::set_damage_mul(fighter.module_accessor, 0.75);
+        }
+        if SELF_DAMAGE_METER[entry_id] == 0.0 {
+            DamageModule::set_damage_mul(fighter.module_accessor, 1.0);
+        }
+
 
     }
 }

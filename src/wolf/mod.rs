@@ -880,9 +880,29 @@ unsafe fn wolf_illusion_air(fighter: &mut L2CAgentBase) {
 unsafe fn wolf_upb_start_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.666666667);
+        macros::FT_MOTION_RATE(fighter, 0.5);
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 15.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 16.0);
+    if macros::is_excute(fighter) {
+        macros::FT_MOTION_RATE(fighter, 1.0);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 18.0);
+    if macros::is_excute(fighter) {
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.0, 93, 10, 0, 50, 7.0, 0.0, 8.0, 1.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+    }
+    sv_animcmd::wait(fighter.lua_state_agent, 4.0);
+    if macros::is_excute(fighter) {
+        AttackModule::clear_all(fighter.module_accessor);
+    }
+}
+
+#[acmd_script( agent = "wolf", script = "game_specialhiholdair", category = ACMD_GAME )]
+unsafe fn wolf_upb_start_air_smash_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        macros::FT_MOTION_RATE(fighter, 0.5);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 1.0);
     }
@@ -1020,6 +1040,7 @@ pub fn install() {
         wolf_illusion_ground,
         wolf_illusion_air,
         wolf_upb_start_smash_script,
+        wolf_upb_start_air_smash_script,
         wolf_upb_end_smash_script,
         wolf_upb_end_ground_smash_script,
         wolf_downb_start_smash_script,

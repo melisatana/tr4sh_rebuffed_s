@@ -47,7 +47,7 @@ unsafe fn steve_dashattack(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
-        shield!(fighter, *MA_MSC_CMD_REFLECTOR, *COLLISION_KIND_REFLECTOR, 0, Hash40::new("top"), 5.0, 0, 9.2, 9.0, 0, 8.0, 8.5, 1.25 /*damage*/, 1.4 /*speed*/, 50, false, 1.2 /*life multiplier*/, *FIGHTER_REFLECTOR_GROUP_HOMERUNBAT);
+        shield!(fighter, *MA_MSC_CMD_REFLECTOR, *COLLISION_KIND_REFLECTOR, 0, Hash40::new("top"), 6.4, 0, 9.2, 9.0, 0, 8.0, 8.5, 1.25 /*damage*/, 1.4 /*speed*/, 50, false, 1.2 /*life multiplier*/, *FIGHTER_REFLECTOR_GROUP_HOMERUNBAT);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if WorkModule::get_int(fighter.module_accessor, *FIGHTER_PICKEL_INSTANCE_WORK_ID_INT_HAVE_CRAFT_WEAPON_MATERIAL_KIND) == *FIGHTER_PICKEL_MATERIAL_KIND_DIAMOND {

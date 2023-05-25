@@ -71,6 +71,8 @@ fn pfushigisou_frame(fighter: &mut L2CFighterCommon) {
             crate::pzenigame::SQUIRTLE_TORRENT[entry_id] = false;
             crate::pzenigame::SQUIRTLE_TORRENT_FRAME[entry_id] = 0;
         }
+
+        //DamageModule::set_weak_param(fighter.module_accessor, Hash40::new("collision_attr_fire"), 1.2);
         
     }
 }

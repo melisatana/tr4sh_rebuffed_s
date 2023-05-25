@@ -177,10 +177,10 @@ pub unsafe fn get_param_float_replace(module_accessor: u64, param_type: u64, par
 				}
 			}
 		}
-		if fighter_kind == *FIGHTER_KIND_PICHU {
-			if param_type == hash40("weight") {
-				if crate::pichu::SELF_DAMAGE_METER[entry_id] <= -5.0 {
-					return 95.0;
+		if fighter_kind == *FIGHTER_KIND_LUIGI {
+			if param_type == hash40("dive_speed_y") {
+				if crate::luigi::LUIGI_UPB_SUPERFAST_FALL[entry_id] {
+					return 4.5;
 				}
 			}
 		}
