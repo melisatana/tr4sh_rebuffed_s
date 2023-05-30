@@ -8,6 +8,8 @@ use smash::app::*;
 use smash::phx::Hash40;
 use smash_script::*;
 use smash::lib::L2CValue;
+use super::*;
+use crate::customparam::BomaExt;
 
 static DEBUG_ALLOW_MOMENTUM_JUMPS : bool = false;
 
@@ -60,7 +62,7 @@ unsafe fn can_z_nair(fighter: &mut L2CFighterCommon) -> bool {
     return true;
 }
 
-
+//z-nair code
 #[skyline::hook(replace = smash::lua2cpp::L2CFighterCommon_sub_transition_group_check_air_escape)]
 pub unsafe fn escape_air_subtransition(fighter: &mut L2CFighterCommon) -> L2CValue {
 
@@ -73,6 +75,38 @@ pub unsafe fn escape_air_subtransition(fighter: &mut L2CFighterCommon) -> L2CVal
         
     }
     original!()(fighter)
+}
+
+//=================================================================
+//== FighterStatusModuleImpl::set_fighter_status_data
+//=================================================================
+#[skyline::hook(replace=FighterStatusModuleImpl::set_fighter_status_data)]
+unsafe fn set_fighter_status_data_hook(boma: &mut BattleObjectModuleAccessor, arg2: bool, treaded_kind: i32, arg4: bool, arg5: bool, arg6: bool, log_mask_flag: u64, status_attr: u32, power_up_attack_bit: u32, arg10: u32) {
+    let id = WorkModule::get_int(boma, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+    let mut new_status_attr = status_attr;
+
+    if boma.is_fighter() {
+
+        // this handles turnaround special/b-reversible moves
+        if boma.kind() == *FIGHTER_KIND_MARIO && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW, *FIGHTER_MARIO_STATUS_KIND_SPECIAL_LW_SHOOT])
+        || boma.kind() == *FIGHTER_KIND_LINK && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW, *FIGHTER_LINK_STATUS_KIND_SPECIAL_LW_BLAST]) 
+        || boma.kind() == *FIGHTER_KIND_YOUNGLINK && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW]) 
+        || boma.kind() == *FIGHTER_KIND_TOONLINK && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW]) 
+        || boma.kind() == *FIGHTER_KIND_CLOUD && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW]) 
+        || boma.kind() == *FIGHTER_KIND_SIMON && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW]) 
+        || boma.kind() == *FIGHTER_KIND_RICHTER && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW]) 
+        || boma.kind() == *FIGHTER_KIND_CAPTAIN && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
+        || boma.kind() == *FIGHTER_KIND_GANON && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])  {
+            // if b-reverse flag does not already exist in status_attr bitmask
+            if status_attr & *FIGHTER_STATUS_ATTR_START_TURN as u32 == 0 {
+                // add b-reverse flag to status_attr bitmask
+                new_status_attr = status_attr + *FIGHTER_STATUS_ATTR_START_TURN as u32;
+            }
+        }
+
+    }
+
+    original!()(boma, arg2, treaded_kind, arg4, arg5, arg6, log_mask_flag, new_status_attr, power_up_attack_bit, arg10)
 }
 
 
@@ -89,6 +123,7 @@ pub unsafe fn status_landing_main_sub(fighter: &mut L2CFighterCommon) -> L2CValu
     }
     original!()(fighter)
 }
+
 
 
 //determines who cannot cancel jab1 into ftilt
@@ -510,6 +545,7 @@ pub fn install() {
         global_weapon_frame
     );
     skyline::install_hooks!(
+        set_fighter_status_data_hook,
         change_kinetic_hook,
         add_motion_2nd_hook
     );

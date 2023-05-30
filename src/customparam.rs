@@ -23,8 +23,6 @@ use {
 	smashline::*,
 };
 
-use super::*;
-
 //BomaExt, helps with various things
 pub trait BomaExt {
     unsafe fn is_fighter(&mut self) -> bool;
@@ -62,6 +60,9 @@ pub static mut INT_OFFSET: usize = 0x4DED80;
 pub static INT_SEARCH_CODE: &[u8] = &[
     0x00, 0x1c, 0x40, 0xf9, 0x08, 0x00, 0x40, 0xf9, 0x03, 0x11, 0x40, 0xf9,
 ];
+
+
+
 
 //Related to Param Edits
 fn find_subsequence(haystack: &[u8], needle: &[u8]) -> Option<usize> {

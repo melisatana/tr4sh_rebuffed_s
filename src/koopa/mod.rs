@@ -11,6 +11,8 @@ use smash_script::*;
 static mut KOOPA_SIDEB_RECHARGE_TIMER : [i32; 8] = [0; 8];
 static KOOPA_SIDEB_COOLDOWN : i32 = 240; 
 
+static mut KOOPA_UPB_GROUNDTOAIR : [bool; 8] = [false; 8];
+
 // A Once-Per-Fighter-Frame that only applies to Bowser
 #[fighter_frame( agent = FIGHTER_KIND_KOOPA )]
 fn koopa_frame(fighter: &mut L2CFighterCommon) {
@@ -921,8 +923,14 @@ unsafe fn koopa_sideb_landing_smash_script(fighter: &mut L2CAgentBase) {
 
 #[acmd_script( agent = "koopa", script = "game_specialhi", category = ACMD_GAME )]
 unsafe fn koopa_upb_smash_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 6.5, 6.5);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        KOOPA_UPB_GROUNDTOAIR[entry_id] = true;
     }
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
@@ -966,6 +974,12 @@ unsafe fn koopa_upb_smash_script(fighter: &mut L2CAgentBase) {
     
 #[acmd_script( agent = "koopa", script = "game_specialairhi", category = ACMD_GAME )]
 unsafe fn koopa_upb_air_smash_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        KOOPA_UPB_GROUNDTOAIR[entry_id] = false;
+    }
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_KOOPA_STATUS_SPECIAL_HI_FLAG4);
@@ -996,6 +1010,12 @@ unsafe fn koopa_upb_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_KOOPA_STATUS_SPECIAL_HI_FLAG4);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_KOOPA_STATUS_SPECIAL_HI_FLAG1);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 60.0);
+    if macros::is_excute(fighter) {
+        if KOOPA_UPB_GROUNDTOAIR[entry_id] {
+            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_FALL, false);
+        }
     }
 }
 

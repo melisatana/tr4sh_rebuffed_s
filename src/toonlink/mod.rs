@@ -11,6 +11,8 @@ use smash_script::*;
 //static mut TOONLINK_UPAIR_CANHOLD : [bool; 8] = [false; 8];
 static mut TOONLINK_UPAIR_ISHOLD : [bool; 8] = [false; 8];
 
+static mut TOONLINK_UPB_GROUNDTOAIR : [bool; 8] = [false; 8];
+
 // A Once-Per-Fighter-Frame that only applies to Toon Link
 #[fighter_frame( agent = FIGHTER_KIND_TOONLINK )]
 fn toonlink_frame(fighter: &mut L2CFighterCommon) {
@@ -866,9 +868,12 @@ unsafe fn boomerang_returning(fighter: &mut L2CAgentBase) {
 
 #[acmd_script( agent = "toonlink", script = "game_specialhi", category = ACMD_GAME )]
 unsafe fn toonlink_upb_smash_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.5);
+        TOONLINK_UPB_GROUNDTOAIR[entry_id] = true;
     }
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
@@ -912,6 +917,12 @@ unsafe fn toonlink_upb_smash_script(fighter: &mut L2CAgentBase) {
 
 #[acmd_script( agent = "toonlink", script = "game_specialairhi", category = ACMD_GAME )]
 unsafe fn toonlink_upb_air_smash_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+    
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        TOONLINK_UPB_GROUNDTOAIR[entry_id] = false;
+    }
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
         shield!(fighter, *MA_MSC_CMD_REFLECTOR, *COLLISION_KIND_REFLECTOR, 0, Hash40::new("top"), 6.8, 0, 6.5, 10.0, 0, 4.0, -5.5, 1.4, 1.25, 50, false, 1.5, *FIGHTER_REFLECTOR_GROUP_HOMERUNBAT);
@@ -968,6 +979,12 @@ unsafe fn toonlink_upb_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
         shield!(fighter, *MA_MSC_CMD_SHIELD_OFF, *COLLISION_KIND_REFLECTOR, 0, *FIGHTER_REFLECTOR_GROUP_HOMERUNBAT);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 60.0);
+    if macros::is_excute(fighter) {
+        if TOONLINK_UPB_GROUNDTOAIR[entry_id] {
+            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_FALL, false);
+        }
     }
 }
 

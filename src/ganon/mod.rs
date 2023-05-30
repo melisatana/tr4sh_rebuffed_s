@@ -12,6 +12,7 @@ static mut GANON_SLOW_DOWN_AIR : [bool; 8] = [false; 8];
 static mut GANON_SLOW_DOWN_AIR_IN_SLOW : [bool; 8] = [false; 8];
 static mut GANON_SLOW_DOWN_AIR_CAN_CANCEL : [bool; 8] = [false; 8];
 
+
 // A Once-Per-Fighter-Frame that only applies to Ganondorf
 #[fighter_frame( agent = FIGHTER_KIND_GANON )]
 fn ganon_frame(fighter: &mut L2CFighterCommon) {
@@ -1234,6 +1235,7 @@ unsafe fn ganon_downb_air_falling_script(fighter: &mut L2CAgentBase) {
     }
 }
     
+
 
 pub fn install() {
     smashline::install_agent_frames!(

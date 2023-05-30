@@ -13,6 +13,8 @@ static mut LINK_GLOWSTICK_STATUS_CURRENT : [i32; 8] = [0; 8];
 
 static mut LINK_FSMASH_CHARGE : [bool; 8] = [false; 8];
 
+static mut LINK_UPB_GROUNDTOAIR : [bool; 8] = [false; 8];
+
 // A Once-Per-Fighter-Frame that only applies to Link
 #[fighter_frame( agent = FIGHTER_KIND_LINK )]
 fn link_frame(fighter: &mut L2CFighterCommon) {
@@ -767,9 +769,12 @@ unsafe fn link_boomerang_return(fighter: &mut L2CAgentBase) {
 
 #[acmd_script( agent = "link", script = "game_specialhi", category = ACMD_GAME )]
 unsafe fn link_upb_smash_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0.0);
+        LINK_UPB_GROUNDTOAIR[entry_id] = true;
     }
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
@@ -799,6 +804,12 @@ unsafe fn link_upb_smash_script(fighter: &mut L2CAgentBase) {
 
 #[acmd_script( agent = "link", script = "game_specialairhi", category = ACMD_GAME )]
 unsafe fn link_upb_air_smash_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        LINK_UPB_GROUNDTOAIR[entry_id] = false;
+    }
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.0, 367, 100, 107, 0, 6.0, 0.0, 10.0, 14.5, Some(0.0), Some(10.0), Some(8.0), 1.0, 0.3, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
@@ -895,6 +906,12 @@ unsafe fn link_upb_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
         JostleModule::set_status(fighter.module_accessor, true);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 60.0);
+    if macros::is_excute(fighter) {
+        if LINK_UPB_GROUNDTOAIR[entry_id] {
+            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_FALL, false);
+        }
     }
 }
 

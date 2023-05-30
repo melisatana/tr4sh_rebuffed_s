@@ -9,11 +9,59 @@ use smashline::*;
 use smash_script::*;
 use smash::hash40;
 
+static mut YOUNGLINK_SPEEN : [bool; 8] = [false; 8];
+
+static mut YOUNGLINK_UPB_GROUNDTOAIR : [bool; 8] = [false; 8];
+
 // A Once-Per-Fighter-Frame that only applies to Young Link
 #[fighter_frame( agent = FIGHTER_KIND_YOUNGLINK )]
 fn younglink_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+        let status = StatusModule::status_kind(fighter.module_accessor);
+        let stickx = ControlModule::get_stick_x(fighter.module_accessor);
+        let lr = PostureModule::lr(fighter.module_accessor);
+        let stickx_directional = stickx * lr;
+
         println!("It'sa me, Link, hyaaaa!");
+
+
+
+        if YOUNGLINK_SPEEN[entry_id] {
+            GroundModule::correct(fighter.module_accessor, GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
+            JostleModule::set_status(fighter.module_accessor, false);
+            if stickx_directional >= 0.5 {
+                KineticModule::add_speed(fighter.module_accessor, &smash::phx::Vector3f{x: 0.3, y: 0.0, z: 0.0});
+                if KineticModule::get_sum_speed_x(fighter.module_accessor, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN) * lr > 0.95 {
+                    macros::SET_SPEED_EX(fighter, 0.95, 0.0, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
+                }
+            }
+            else if stickx_directional <= -0.5 {
+                KineticModule::add_speed(fighter.module_accessor, &smash::phx::Vector3f{x: -0.3, y: 0.0, z: 0.0});
+                if KineticModule::get_sum_speed_x(fighter.module_accessor, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN) * lr < -0.95 {
+                    macros::SET_SPEED_EX(fighter, -0.95, 0.0, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
+                }
+            }
+        }
+
+        if [
+            *FIGHTER_STATUS_KIND_DAMAGE, 
+            *FIGHTER_STATUS_KIND_DAMAGE_AIR, 
+            *FIGHTER_STATUS_KIND_DAMAGE_FLY, 
+            *FIGHTER_STATUS_KIND_DAMAGE_FLY_ROLL, 
+            *FIGHTER_STATUS_KIND_DAMAGE_FLY_METEOR, 
+            *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_D, 
+            *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_U, 
+            *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_LR, 
+            *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_JUMP_BOARD,
+            *FIGHTER_STATUS_KIND_WIN, 
+            *FIGHTER_STATUS_KIND_LOSE, 
+            *FIGHTER_STATUS_KIND_DEAD
+            ].contains(&status) || StatusModule::situation_kind(fighter.module_accessor) == *SITUATION_KIND_AIR || sv_information::is_ready_go() == false {
+            YOUNGLINK_SPEEN[entry_id] = false;
+        }
+
+
     }
 }
 
@@ -274,9 +322,12 @@ unsafe fn younglink_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 14.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("arml"), 7.9, 80, 55, 0, 60, 3.8, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("sword"), 7.9, 80, 55, 0, 60, 3.8, 1.3, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("sword"), 7.9, 80, 55, 0, 60, 3.6, 6.1, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("arml"), 7.9, 80, 63, 0, 40, 3.8, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("sword"), 7.9, 80, 63, 0, 40, 3.8, 1.3, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("sword"), 7.9, 80, 63, 0, 40, 3.6, 6.1, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 3.0, false);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 3.0, false);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 2, 3.0, false);
         AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
@@ -380,15 +431,23 @@ unsafe fn younglink_usmash_smash_script(fighter: &mut L2CAgentBase) {
 
 #[acmd_script( agent = "younglink", script = "game_attacklw4", category = ACMD_GAME )]
 unsafe fn younglink_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        MotionModule::set_rate(fighter.module_accessor, 2.0);
+    }
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
     }
+    sv_animcmd::frame(fighter.lua_state_agent, 8.0);
+    if macros::is_excute(fighter) {
+        MotionModule::set_rate(fighter.module_accessor, 1.0);
+    }
     sv_animcmd::frame(fighter.lua_state_agent, 9.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("sword"), 13.9, 30, 96, 0, 30, 3.4, 1.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("sword"), 13.9, 30, 96, 0, 30, 3.0, 5.7, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("arml"), 13.9, 30, 96, 0, 30, 3.4, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("sword"), 13.9, 30, 91, 0, 30, 3.4, 1.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("sword"), 13.9, 30, 91, 0, 30, 3.0, 5.7, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("arml"), 13.9, 30, 91, 0, 30, 3.4, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
         AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
@@ -860,34 +919,6 @@ unsafe fn fire_arrow(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink_bowarrow", script = "game_stick", category = ACMD_GAME )]
-unsafe fn fire_arrow_stick(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 2.0);
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.5, 77, 40, 0, 30, 3.4, 0.0, 0.0, 0.0, None, None, None, 1.1, 1.3, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, -0.5, 0.0, 35, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_OBJECT);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 4.0, false);
-    }
-}
-
-#[acmd_script( agent = "younglink_bowarrow", script = "effect_stick", category = ACMD_EFFECT )]
-unsafe fn fire_arrow_stick_effect(fighter: &mut L2CAgentBase) {
-    if macros::is_excute(fighter) {
-        macros::EFFECT_FOLLOW(fighter, Hash40::new("younglink_arrow_trace"), Hash40::new("top"), 0, 0, -11, 0, 0, 0, 1, true);
-        macros::EFFECT_FOLLOW(fighter, Hash40::new("younglink_arrow"), Hash40::new("top"), 0, -0.5, -1, 0, 0, 0, 1, true);
-        macros::EFFECT(fighter, Hash40::new("younglink_arrow_hit"), Hash40::new("top"), 0, -0.3, -1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
-        macros::EFFECT_FOLLOW(fighter, Hash40::new("younglink_arrow_max"), Hash40::new("top"), 0, -0.3, -1, 0, 0, 0, 1.5, true);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-    if macros::is_excute(fighter) {
-        //macros::EFFECT_OFF(fighter, *EFFECT_SUB_ATTRIBUTE_FOLLOW, true);
-        macros::EFFECT_FOLLOW(fighter, Hash40::new("younglink_arrow_fire"), Hash40::new("top"), 0, 0, -4, 0, 0, 0, 1, false);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 358.0);
-    if macros::is_excute(fighter) {
-        macros::EFFECT(fighter, Hash40::new("sys_erace_smoke"), Hash40::new("top"), 0, 0, -7, 0, 0, 0, 0.9, 0, 0, 0, 0, 0, 0, true);
-    }
-}
-
 #[acmd_script( agent = "younglink", script = "game_specials1", category = ACMD_GAME )]
 unsafe fn younglink_sideb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -960,8 +991,36 @@ unsafe fn boomerang_returning(fighter: &mut L2CAgentBase) {
     }
 }
 
+#[acmd_script( agent = "younglink", script = "game_specialhistart", category = ACMD_GAME )]
+unsafe fn younglink_upb_start_smash_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        YOUNGLINK_SPEEN[entry_id] = false;
+    }
+}
+
+#[acmd_script( agent = "younglink", script = "game_specialhihold", category = ACMD_GAME )]
+unsafe fn younglink_upb_hold_smash_script(fighter: &mut L2CAgentBase) {
+    if macros::is_excute(fighter) {
+        damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_DAMAGE_POWER, 8.5);
+    }
+}
+
 #[acmd_script( agent = "younglink", script = "game_specialhi", category = ACMD_GAME )]
 unsafe fn younglink_upb_smash_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_NORMAL, 0);
+        YOUNGLINK_UPB_GROUNDTOAIR[entry_id] = true;
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 3.0);
+    if macros::is_excute(fighter) {
+        YOUNGLINK_SPEEN[entry_id] = true ;
+    }
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("sword"), 1.2, 173, 100, 55, 0, 3.5, 2.2, 0.0, 1.0, None, None, None, 0.4, 0.5, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, true, 0, 0.0, 4, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
@@ -980,6 +1039,7 @@ unsafe fn younglink_upb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 46.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
+        YOUNGLINK_SPEEN[entry_id] = false ;
     }
     sv_animcmd::frame(fighter.lua_state_agent, 66.0);
     if macros::is_excute(fighter) {
@@ -989,6 +1049,12 @@ unsafe fn younglink_upb_smash_script(fighter: &mut L2CAgentBase) {
 
 #[acmd_script( agent = "younglink", script = "game_specialairhi", category = ACMD_GAME )]
 unsafe fn younglink_upb_air_smash_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        YOUNGLINK_UPB_GROUNDTOAIR[entry_id] = false;
+    }
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.0, 80, 100, 110, 0, 4.0, 0.0, 5.5, 11.5, Some(0.0), Some(5.5), Some(7.5), 1.0, 0.3, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
@@ -1074,6 +1140,12 @@ unsafe fn younglink_upb_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
         JostleModule::set_status(fighter.module_accessor, true);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 60.0);
+    if macros::is_excute(fighter) {
+        if YOUNGLINK_UPB_GROUNDTOAIR[entry_id] {
+            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_FALL, false);
+        }
     }
     sv_animcmd::frame(fighter.lua_state_agent, 66.0);
     if macros::is_excute(fighter) {
@@ -1179,14 +1251,14 @@ pub fn install() {
         younglink_uthrow_smash_script,
         younglink_dthrow_smash_script,
         fire_arrow,
-        fire_arrow_stick,
-        fire_arrow_stick_effect,
         younglink_sideb_smash_script,
         younglink_sideb_air_smash_script,
         younglink_sideb_catch_smash_script,
         younglink_sideb_catch_air_smash_script,
         boomerang_thrown,
         boomerang_returning,
+        younglink_upb_start_smash_script,
+        younglink_upb_hold_smash_script,
         younglink_upb_smash_script,
         younglink_upb_air_smash_script,
         younglink_downtaunt_left_smash_script,
