@@ -12,7 +12,9 @@ use smash_script::*;
 #[fighter_frame( agent = FIGHTER_KIND_GAOGAEN )]
 fn gaogaen_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+
         println!("It'sa me, Incineroar, grawwwwww!!");
+        
     }
 }
 

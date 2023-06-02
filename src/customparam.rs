@@ -23,6 +23,8 @@ use {
 	smashline::*,
 };
 
+use smash2;
+
 //BomaExt, helps with various things
 pub trait BomaExt {
     unsafe fn is_fighter(&mut self) -> bool;
@@ -276,10 +278,25 @@ pub unsafe fn get_param_float_replace(module_accessor: u64, param_type: u64, par
 				}
 			}
     	}
-		if fighter_kind == *FIGHTER_KIND_EFLAME {
-			if param_type == hash40("weight") {
-				if crate::eflame::PYRA_FTHROW_ARMOR[entry_id] {
-					return 120.0;
+		if fighter_kind == *FIGHTER_KIND_ELIGHT {
+			if param_type == hash40("dash_speed") {
+				if crate::elight::MYTHRA_UTHROW_SPEED[entry_id] {
+					return 2.45;
+				}
+			}
+			if param_type == hash40("run_speed_max") {
+				if crate::elight::MYTHRA_UTHROW_SPEED[entry_id] {
+					return 2.41;
+				}
+			}
+			if param_type == hash40("run_accel_add") {
+				if crate::elight::MYTHRA_UTHROW_SPEED[entry_id] {
+					return 0.1;
+				}
+			}
+			if param_type == hash40("air_speed_x_stable") {
+				if crate::elight::MYTHRA_UTHROW_SPEED[entry_id] {
+					return 1.28;
 				}
 			}
 		}

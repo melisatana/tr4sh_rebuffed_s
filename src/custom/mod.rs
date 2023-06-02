@@ -14,6 +14,7 @@ use crate::customparam::BomaExt;
 static DEBUG_ALLOW_MOMENTUM_JUMPS : bool = false;
 
 
+//pub static mut CAN_HITFALL : [bool; 8] = [false; 8] ;
 
 
 //handles whether or not you can fast fall, thanks WuBoy
@@ -34,6 +35,7 @@ pub unsafe fn fastfall_helper(fighter: &mut L2CFighterCommon) {
     }
 }
 
+//same as the helper above, but fastfalling is unrestricted by y speed
 pub unsafe fn fastfall_whenever_helper(fighter: &mut L2CFighterCommon) {
     let dive_cont_value = WorkModule::get_param_float(fighter.module_accessor, hash40("common"), hash40("dive_cont_value"));
     let dive_flick = WorkModule::get_param_int(fighter.module_accessor, hash40("common"), hash40("dive_flick_frame_value"));
@@ -43,6 +45,9 @@ pub unsafe fn fastfall_whenever_helper(fighter: &mut L2CFighterCommon) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_REQUEST_DIVE_EFFECT);
     }
 }
+
+
+
 
 
 //determines who cannot z-nair
@@ -89,14 +94,32 @@ unsafe fn set_fighter_status_data_hook(boma: &mut BattleObjectModuleAccessor, ar
 
         // this handles turnaround special/b-reversible moves
         if boma.kind() == *FIGHTER_KIND_MARIO && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW, *FIGHTER_MARIO_STATUS_KIND_SPECIAL_LW_SHOOT])
+        || boma.kind() == *FIGHTER_KIND_DONKEY && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_N])
         || boma.kind() == *FIGHTER_KIND_LINK && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW, *FIGHTER_LINK_STATUS_KIND_SPECIAL_LW_BLAST]) 
+        || boma.kind() == *FIGHTER_KIND_KIRBY && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_S])
+
+        || boma.kind() == *FIGHTER_KIND_CAPTAIN && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
+        || boma.kind() == *FIGHTER_KIND_GANON && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_YOUNGLINK && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW]) 
+        || boma.kind() == *FIGHTER_KIND_MARTH && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
+        || boma.kind() == *FIGHTER_KIND_LUCINA && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
+        || boma.kind() == *FIGHTER_KIND_ROY && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
+        || boma.kind() == *FIGHTER_KIND_CHROM && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
+
         || boma.kind() == *FIGHTER_KIND_TOONLINK && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW]) 
+        || boma.kind() == *FIGHTER_KIND_IKE && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
+
+        || boma.kind() == *FIGHTER_KIND_MIIFIGHTER && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
+        || boma.kind() == *FIGHTER_KIND_MIISWORDSMAN && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
+        || boma.kind() == *FIGHTER_KIND_GEKKOUGA && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_CLOUD && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW]) 
+        || boma.kind() == *FIGHTER_KIND_KAMUI && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
+
         || boma.kind() == *FIGHTER_KIND_SIMON && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW]) 
         || boma.kind() == *FIGHTER_KIND_RICHTER && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW]) 
-        || boma.kind() == *FIGHTER_KIND_CAPTAIN && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
-        || boma.kind() == *FIGHTER_KIND_GANON && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])  {
+        || boma.kind() == *FIGHTER_KIND_TRAIL && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
+        || boma.kind() == *FIGHTER_KIND_EDGE && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
+        {
             // if b-reverse flag does not already exist in status_attr bitmask
             if status_attr & *FIGHTER_STATUS_ATTR_START_TURN as u32 == 0 {
                 // add b-reverse flag to status_attr bitmask
@@ -266,6 +289,7 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
         let sticky = ControlModule::get_stick_y(module_accessor);
         let lr = PostureModule::lr(module_accessor);
         let stickx_directional = stickx * lr;
+        //let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         
         if StatusModule::is_situation_changed(module_accessor) {
             let situation_kind = &format!("{}", StatusModule::situation_kind(module_accessor));
@@ -444,6 +468,13 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
         if [*FIGHTER_STATUS_KIND_LANDING_ATTACK_AIR, *FIGHTER_STATUS_KIND_LANDING, *FIGHTER_STATUS_KIND_LANDING_LIGHT, *FIGHTER_STATUS_KIND_LANDING_FALL_SPECIAL, *FIGHTER_STATUS_KIND_APPEAL].contains(&status) {
             GroundModule::correct(fighter.module_accessor, GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
         }
+
+        //hitfalling??
+        /*(if status == *FIGHTER_STATUS_KIND_ATTACK_AIR && CAN_HITFALL[entry_id] {
+            if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false {
+                fastfall_whenever_helper(fighter);
+            }
+        }*/
 
 
         //fastfall in tumble
