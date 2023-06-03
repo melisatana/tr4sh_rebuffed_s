@@ -26,18 +26,15 @@ static mut LUCINA_SIDESPECIAL_SHOULDEND : [bool; 8] = [false; 8];
 static mut LUCINA_SIDESPECIAL_ISEND : [bool; 8] = [false; 8];
 static mut LUCINA_SIDESPECIAL_WASUSED : [bool; 8] = [false; 8];
 
-static mut LUCINA_SLOW_DOWNSPECIAL : [bool; 8] = [false; 8];
-static mut LUCINA_SLOW_DOWNSPECIAL_IN_SLOW : [bool; 8] = [false; 8];
-static mut LUCINA_SLOW_DOWNSPECIAL_CAN_CANCEL : [bool; 8] = [false; 8];
-static mut LUCINA_SLOW_DOWNSPECIAL_DO_KILL_COUNTER : [bool; 8] = [false; 8];
-static mut LUCINA_SLOW_DOWNSPECIAL_EFFECT_TIMER : [i32; 8] = [-1; 8];
-
 static LUCINA_SMASH_TELEPORT_SPEED : f32 = 4.0;
 static LUCINA_AERIAL_TELEPORT_DISTANCE : f32 = 50.0;
 static LUCINA_TELEPORT_OVERHEAT_MAX : i32 = 720;
 static LUCINA_TELEPORT_OVERHEAT_PER_TELEPORT : i32 = 300;
 static LUCINA_TELEPORT_OVERHEAT_PER_SIDESPECIAL_TELEPORT : i32 = 60;
 static LUCINA_TELEPORT_COOLDOWN : i32 = 600;
+
+static mut LUCINA_DOWNB_FREETELEPORT_TIMER : [i32; 8] = [0; 8];
+static LUCINA_DOWNB_FREETELEPORT_MAX_TIME : i32 = 720;
 
 unsafe fn set_dashattack_hitbox(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
@@ -77,7 +74,9 @@ unsafe fn end_smashattack_teleport(fighter: &mut L2CAgentBase) {
     VisibilityModule::set_whole(fighter.module_accessor, true);
     macros::SET_SPEED_EX(fighter, 0, 0, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
 
-    LUCINA_TELEPORT_OVERHEAT_COUNT[entry_id] += LUCINA_TELEPORT_OVERHEAT_PER_TELEPORT;
+    if LUCINA_DOWNB_FREETELEPORT_TIMER[entry_id] < 1 {
+        LUCINA_TELEPORT_OVERHEAT_COUNT[entry_id] += LUCINA_TELEPORT_OVERHEAT_PER_TELEPORT;
+    }
     if LUCINA_TELEPORT_OVERHEAT_COUNT[entry_id] >= LUCINA_TELEPORT_OVERHEAT_MAX {
         LUCINA_TELEPORT_OVERHEAT_COUNT[entry_id] = 0;
         LUCINA_TELEPORT_COOLDOWN_TIMER[entry_id] = LUCINA_TELEPORT_COOLDOWN;
@@ -168,7 +167,9 @@ unsafe fn end_aerial_teleport(fighter: &mut L2CAgentBase) {
     macros::SET_SPEED_EX(fighter, 0, 0, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
     MotionModule::set_rate(fighter.module_accessor, 1.0);
 
-    LUCINA_TELEPORT_OVERHEAT_COUNT[entry_id] += LUCINA_TELEPORT_OVERHEAT_PER_TELEPORT;
+    if LUCINA_DOWNB_FREETELEPORT_TIMER[entry_id] < 1 {
+        LUCINA_TELEPORT_OVERHEAT_COUNT[entry_id] += LUCINA_TELEPORT_OVERHEAT_PER_TELEPORT;
+    }
     if LUCINA_TELEPORT_OVERHEAT_COUNT[entry_id] >= LUCINA_TELEPORT_OVERHEAT_MAX {
         LUCINA_TELEPORT_OVERHEAT_COUNT[entry_id] = 0;
         LUCINA_TELEPORT_COOLDOWN_TIMER[entry_id] = LUCINA_TELEPORT_COOLDOWN;
@@ -220,7 +221,9 @@ unsafe fn end_sidespecial_teleport(fighter: &mut L2CAgentBase) {
     MotionModule::set_rate(fighter.module_accessor, 1.0);
     LUCINA_SIDESPECIAL_WASUSED[entry_id] = true;
 
-    LUCINA_TELEPORT_OVERHEAT_COUNT[entry_id] += LUCINA_TELEPORT_OVERHEAT_PER_SIDESPECIAL_TELEPORT;
+    if LUCINA_DOWNB_FREETELEPORT_TIMER[entry_id] < 1 {
+        LUCINA_TELEPORT_OVERHEAT_COUNT[entry_id] += LUCINA_TELEPORT_OVERHEAT_PER_SIDESPECIAL_TELEPORT;
+    }
     if LUCINA_TELEPORT_OVERHEAT_COUNT[entry_id] >= LUCINA_TELEPORT_OVERHEAT_MAX {
         LUCINA_TELEPORT_OVERHEAT_COUNT[entry_id] = 0;
         LUCINA_TELEPORT_COOLDOWN_TIMER[entry_id] = LUCINA_TELEPORT_COOLDOWN;
@@ -228,6 +231,16 @@ unsafe fn end_sidespecial_teleport(fighter: &mut L2CAgentBase) {
         macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_rocketbelt_smoke"), Hash40::new("haver"), 0, 0, 0, 0, 0, 0, 1.5, false);
         macros::FT_ADD_DAMAGE(fighter, 10.0);
         LUCINA_SIDESPECIAL_SHOULDEND[entry_id] = true;
+    }
+}
+
+unsafe fn heal_helper(fighter: &mut L2CAgentBase, heal_amount: f32) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
+    if LUCINA_DOWNB_FREETELEPORT_TIMER[entry_id] > 0 && AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) {
+        DamageModule::heal(fighter.module_accessor, heal_amount * -1.0, 0);
+        macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_recovery"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
+        macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
     }
 }
 
@@ -243,6 +256,7 @@ fn lucina_frame(fighter: &mut L2CFighterCommon) {
         if sv_information::is_ready_go() == false || [*FIGHTER_STATUS_KIND_WIN, *FIGHTER_STATUS_KIND_LOSE, *FIGHTER_STATUS_KIND_DEAD].contains(&status) {
 			LUCINA_TELEPORT_COOLDOWN_TIMER[entry_id] = 0;
             LUCINA_TELEPORT_OVERHEAT_COUNT[entry_id] = 0;
+            LUCINA_DOWNB_FREETELEPORT_TIMER[entry_id] = 0;
             LUCINA_SIDESPECIAL_WASUSED[entry_id] = false;
 		}
 
@@ -333,38 +347,15 @@ fn lucina_frame(fighter: &mut L2CFighterCommon) {
             }
         }
 
-        if [*FIGHTER_STATUS_KIND_SPECIAL_LW, *FIGHTER_MARTH_STATUS_KIND_SPECIAL_LW_HIT].contains(&status) {
-            if LUCINA_SLOW_DOWNSPECIAL[entry_id] && LUCINA_SLOW_DOWNSPECIAL_CAN_CANCEL[entry_id] && ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_SPECIAL) == false {
-                LUCINA_SLOW_DOWNSPECIAL[entry_id] = false;
-                if LUCINA_SLOW_DOWNSPECIAL_IN_SLOW[entry_id] {
-                    MotionModule::set_rate(fighter.module_accessor, 1.0);
-                    LUCINA_SLOW_DOWNSPECIAL_DO_KILL_COUNTER[entry_id] = true;
-                    LUCINA_SLOW_DOWNSPECIAL_EFFECT_TIMER[entry_id] = -1;
-                    macros::FLASH(fighter, 1.0, 0.0, 1.0, 0.9);
-                    macros::EFFECT(fighter, Hash40::new("lucina_counter_flash"), Hash40::new("top"), 0, 11, 3, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
-                }
-            }
-            if LUCINA_SLOW_DOWNSPECIAL_EFFECT_TIMER[entry_id] >= 0 {
-                LUCINA_SLOW_DOWNSPECIAL_EFFECT_TIMER[entry_id] += 1;
-                if LUCINA_SLOW_DOWNSPECIAL_EFFECT_TIMER[entry_id] == 2 {
-                    macros::FLASH(fighter, 0.7, 0.7, 0.7, 0.5);
-                }
-                else if LUCINA_SLOW_DOWNSPECIAL_EFFECT_TIMER[entry_id] == 4 {
-                    macros::FLASH(fighter, 0.67, 0, 0.78, 0.31);
-                }
-                else if LUCINA_SLOW_DOWNSPECIAL_EFFECT_TIMER[entry_id] == 6 {
-                    macros::COL_NORMAL(fighter);
-                    LUCINA_SLOW_DOWNSPECIAL_EFFECT_TIMER[entry_id] = 0;
-                }
+        if LUCINA_DOWNB_FREETELEPORT_TIMER[entry_id] > 0 {
+            LUCINA_DOWNB_FREETELEPORT_TIMER[entry_id] -= 1;
+            if LUCINA_DOWNB_FREETELEPORT_TIMER[entry_id] % 10 == 0 {
+                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_damage_aura"), Hash40::new("top"), 0, 8.5, 0, 0, 0, 0, 2.0, true);
+                macros::LAST_EFFECT_SET_COLOR(fighter, 10.0, 0.6, 1.0);
             }
         }
-        else {
-            LUCINA_SLOW_DOWNSPECIAL[entry_id] = false;
-            LUCINA_SLOW_DOWNSPECIAL_CAN_CANCEL[entry_id] = false;
-            LUCINA_SLOW_DOWNSPECIAL_IN_SLOW[entry_id] = false;
-            LUCINA_SLOW_DOWNSPECIAL_DO_KILL_COUNTER[entry_id] = false;
-            LUCINA_SLOW_DOWNSPECIAL_EFFECT_TIMER[entry_id] = -1;
-        }
+
+
     }
 }
 
@@ -399,6 +390,7 @@ unsafe fn lucina_jab2_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
         MotionModule::set_rate(fighter.module_accessor, 1.1);
+        heal_helper(fighter, 1.24);
     }
 }
 
@@ -443,6 +435,7 @@ unsafe fn lucina_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) {
             CancelModule::enable_cancel(fighter.module_accessor);
+            heal_helper(fighter, 2.3);
         }
         MotionModule::set_rate(fighter.module_accessor, 0.8);
     }
@@ -463,6 +456,7 @@ unsafe fn lucina_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
         MotionModule::set_rate(fighter.module_accessor, 1.15);
+        heal_helper(fighter, 2.28);
     }
 }
 
@@ -493,6 +487,7 @@ unsafe fn lucina_utilt_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
         MotionModule::set_rate(fighter.module_accessor, 1.4);
+        heal_helper(fighter, 1.58);
     }
 }
 
@@ -510,6 +505,7 @@ unsafe fn lucina_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
         MotionModule::set_rate(fighter.module_accessor, 1.2);
+        heal_helper(fighter, 1.9);
     }
 }
 
@@ -546,6 +542,7 @@ unsafe fn lucina_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 14.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
+        heal_helper(fighter, 3.64);
         if LUCINA_SMASH_IS_TELEPORT[entry_id] && AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false {
             MotionModule::set_rate(fighter.module_accessor, 0.8);
             LUCINA_SMASH_IS_TELEPORT[entry_id] = false;
@@ -588,6 +585,7 @@ unsafe fn lucina_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
         AttackModule::clear(fighter.module_accessor, 0, false);
+        heal_helper(fighter, 3.1);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
@@ -652,6 +650,7 @@ unsafe fn lucina_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
+        heal_helper(fighter, 2.7);
         if LUCINA_SMASH_IS_TELEPORT[entry_id] && AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false {
             MotionModule::set_rate(fighter.module_accessor, 0.8);
             LUCINA_SMASH_IS_TELEPORT[entry_id] = false;
@@ -684,6 +683,7 @@ unsafe fn lucina_nair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
         MotionModule::set_rate(fighter.module_accessor, 1.25);
+        heal_helper(fighter, 2.56);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 42.0);
     if macros::is_excute(fighter) {
@@ -724,6 +724,7 @@ unsafe fn lucina_fair_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::wait(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
+        heal_helper(fighter, 2.44);
         AttackModule::clear_all(fighter.module_accessor);
         MotionModule::set_rate(fighter.module_accessor, 1.4);
         LUCINA_AERIAL_IS_TELEPORT[entry_id] = false;
@@ -768,6 +769,7 @@ unsafe fn lucina_bair_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::wait(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
+        heal_helper(fighter, 2.64);
         AttackModule::clear_all(fighter.module_accessor);
         MotionModule::set_rate(fighter.module_accessor, 1.3);
         LUCINA_AERIAL_IS_TELEPORT[entry_id] = false;
@@ -815,6 +817,7 @@ unsafe fn lucina_uair_smash_script(fighter: &mut L2CAgentBase) {
         AttackModule::clear_all(fighter.module_accessor);
         MotionModule::set_rate(fighter.module_accessor, 1.4);
         LUCINA_AERIAL_IS_TELEPORT[entry_id] = false;
+        heal_helper(fighter, 2.54);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 37.0);
     if macros::is_excute(fighter) {
@@ -867,6 +870,7 @@ unsafe fn lucina_dair_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
+        heal_helper(fighter, 2.9);
         AttackModule::clear_all(fighter.module_accessor);
         MotionModule::set_rate(fighter.module_accessor, 1.75);   
         LUCINA_AERIAL_IS_TELEPORT[entry_id] = false;
@@ -2332,46 +2336,19 @@ unsafe fn lucina_upb_air_effect_smash_script(fighter: &mut L2CAgentBase) {
 unsafe fn lucina_downb_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
-    sv_animcmd::frame(fighter.lua_state_agent, 4.0);
-    if macros::is_excute(fighter) {
-        LUCINA_SLOW_DOWNSPECIAL[entry_id] = true;
-        LUCINA_SLOW_DOWNSPECIAL_CAN_CANCEL[entry_id] = true;
-        LUCINA_SLOW_DOWNSPECIAL_DO_KILL_COUNTER[entry_id] = false;
-    }
-
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_MARTH_STATUS_SPECIAL_LW_FLAG_SHIELD);
-        LUCINA_SLOW_DOWNSPECIAL_EFFECT_TIMER[entry_id] = 0;
-        if LUCINA_SLOW_DOWNSPECIAL[entry_id] {
-            LUCINA_SLOW_DOWNSPECIAL_IN_SLOW[entry_id] = true;
-            MotionModule::set_rate(fighter.module_accessor, 0.011111);
-        }
-        else {
-            MotionModule::set_rate(fighter.module_accessor, 0.05);
-        }
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 7.0);
-    if macros::is_excute(fighter) {
-        if LUCINA_SLOW_DOWNSPECIAL_DO_KILL_COUNTER[entry_id] == false {
-            WorkModule::off_flag(fighter.module_accessor, *FIGHTER_MARTH_STATUS_SPECIAL_LW_FLAG_SHIELD);
-            LUCINA_SLOW_DOWNSPECIAL_EFFECT_TIMER[entry_id] = 0;
-        }
-        MotionModule::set_rate(fighter.module_accessor, 1.0);
-        LUCINA_SLOW_DOWNSPECIAL_IN_SLOW[entry_id] = false;
-        LUCINA_SLOW_DOWNSPECIAL_CAN_CANCEL[entry_id] = false;
-    }
-    sv_animcmd::wait(fighter.lua_state_agent, 2.0);
-    if macros::is_excute(fighter) {
-        if LUCINA_SLOW_DOWNSPECIAL_DO_KILL_COUNTER[entry_id] {
+    if LUCINA_TELEPORT_COOLDOWN_TIMER[entry_id] > 0 {
+        sv_animcmd::frame(fighter.lua_state_agent, 10.0);
+        if macros::is_excute(fighter) {
             WorkModule::off_flag(fighter.module_accessor, *FIGHTER_MARTH_STATUS_SPECIAL_LW_FLAG_SHIELD);
         }
-        for _ in 0..30 {
-            if macros::is_excute(fighter) {
-                MotionModule::set_rate(fighter.module_accessor, 1.3);
-            }
-            sv_animcmd::wait(fighter.lua_state_agent, 2.0);
-        }
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 20.0);
+    if macros::is_excute(fighter) {
+        WorkModule::off_flag(fighter.module_accessor, *FIGHTER_MARTH_STATUS_SPECIAL_LW_FLAG_SHIELD);
     }
 }
 
@@ -2382,42 +2359,45 @@ unsafe fn lucina_downb_effect_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         macros::EFFECT(fighter, Hash40::new("lucina_counter_flash"), Hash40::new("top"), 0, 11, 3, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
-        macros::FLASH(fighter, 1, 1, 0.5, 0.75);
+        macros::FLASH(fighter, 1, 1, 1, 0.75);
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 7.0);
-    {
-        if LUCINA_SLOW_DOWNSPECIAL_DO_KILL_COUNTER[entry_id] == false {
+    if LUCINA_TELEPORT_COOLDOWN_TIMER[entry_id] > 0 {
+        sv_animcmd::frame(fighter.lua_state_agent, 4.0);
+        if macros::is_excute(fighter) {
             macros::COL_NORMAL(fighter);
         }
     }
-    sv_animcmd::wait(fighter.lua_state_agent, 2.0);
-    if macros::is_excute(fighter) {
-        if LUCINA_SLOW_DOWNSPECIAL_DO_KILL_COUNTER[entry_id] {
-            macros::COL_NORMAL(fighter);
+    else {
+        sv_animcmd::wait(fighter.lua_state_agent, 1.0);
+        for _ in 0..4 {
+            if macros::is_excute(fighter) {
+                macros::FLASH(fighter, 0.7, 0.7, 0.7, 0.5);
+            }
+            sv_animcmd::wait(fighter.lua_state_agent, 2.0);
+            if macros::is_excute(fighter) {
+                macros::FLASH(fighter, 0.67, 0, 0.78, 0.31);
+            }
+            sv_animcmd::wait(fighter.lua_state_agent, 2.0);
+            if macros::is_excute(fighter) {
+                macros::COL_NORMAL(fighter);
+            }
+            sv_animcmd::wait(fighter.lua_state_agent, 2.0);
         }
     }
+    
 }
 
 #[acmd_script( agent = "lucina", script = "game_speciallwhit", category = ACMD_GAME )]
 unsafe fn lucina_downb_hit_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
-    if macros::is_excute(fighter) {
-        LUCINA_SLOW_DOWNSPECIAL_EFFECT_TIMER[entry_id] = 0;
-        LUCINA_SLOW_DOWNSPECIAL[entry_id] = false;
-        LUCINA_SLOW_DOWNSPECIAL_CAN_CANCEL[entry_id] = false;
-        LUCINA_SLOW_DOWNSPECIAL_IN_SLOW[entry_id] = false;
-        if LUCINA_SLOW_DOWNSPECIAL_DO_KILL_COUNTER[entry_id] {
-            macros::FLASH(fighter, 1.0, 0.0, 1.0, 0.9);
-        }
-    }
 
-    sv_animcmd::frame(fighter.lua_state_agent, 5.0);
-    if macros::is_excute(fighter) {
-        if LUCINA_SLOW_DOWNSPECIAL_DO_KILL_COUNTER[entry_id] {
-            macros::ATTACK(fighter, 0, 0, Hash40::new("sword1"), 8.0, 361, 60, 0, 90, 5.0, 1.0, 0.0, 1.5, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_death"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_SWORD);
-            macros::ATTACK(fighter, 1, 0, Hash40::new("armr"), 8.0, 361, 60, 0, 90, 5.0, 0.0, 0.0, 0.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_death"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_SWORD);
-            macros::ATTACK(fighter, 2, 0, Hash40::new("colonells"), 8.0, 361, 60, 0, 90, 5.0, 0.0, 0.0, 0.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_death"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_SWORD);
-            macros::ATTACK(fighter, 3, 0, Hash40::new("sword1"), 8.0, 361, 60, 0, 90, 5.0, 1.0, 0.0, 7.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_death"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_SWORD);
+    if LUCINA_TELEPORT_COOLDOWN_TIMER[entry_id] > 0 {
+        sv_animcmd::frame(fighter.lua_state_agent, 5.0);
+        if macros::is_excute(fighter) {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("sword1"), 15.0, 361, 100, 0, 100, 5.0, 1.0, 0.0, 1.5, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_death"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_SWORD);
+            macros::ATTACK(fighter, 1, 0, Hash40::new("armr"), 15.0, 361, 100, 0, 100, 5.0, 0.0, 0.0, 0.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_death"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_SWORD);
+            macros::ATTACK(fighter, 2, 0, Hash40::new("colonells"), 15.0, 361, 100, 0, 100, 5.0, 0.0, 0.0, 0.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_death"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_SWORD);
+            macros::ATTACK(fighter, 3, 0, Hash40::new("sword1"), 15.0, 361, 100, 0, 100, 5.0, 1.0, 0.0, 7.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_death"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_SWORD);
             AttackModule::set_force_reaction(fighter.module_accessor, 0, true, false);
             AttackModule::set_force_reaction(fighter.module_accessor, 1, true, false);
             AttackModule::set_force_reaction(fighter.module_accessor, 2, true, false);
@@ -2425,73 +2405,62 @@ unsafe fn lucina_downb_hit_smash_script(fighter: &mut L2CAgentBase) {
             AttackModule::set_optional_hit_sound(fighter.module_accessor, 0, Hash40::new("se_lucina_criticalhit"));
             AttackModule::set_optional_hit_sound(fighter.module_accessor, 1, Hash40::new("se_lucina_criticalhit"));
             AttackModule::set_optional_hit_sound(fighter.module_accessor, 2, Hash40::new("se_lucina_criticalhit"));
-            AttackModule::set_optional_hit_sound(fighter.module_accessor, 3, Hash40::new("se_lucina_criticalhit"));
+            AttackModule::set_optional_hit_sound(fighter.module_accessor, 3, Hash40::new("se_lucina_criticalhit"));   
         }
-        else {
-            macros::ATTACK(fighter, 0, 0, Hash40::new("sword1"), 8.0, 361, 50, 0, 95, 5.0, 1.0, 0.0, 1.5, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_SWORD);
-            macros::ATTACK(fighter, 1, 0, Hash40::new("armr"), 8.0, 361, 50, 0, 95, 5.0, 0.0, 0.0, 0.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_SWORD);
-            macros::ATTACK(fighter, 2, 0, Hash40::new("colonells"), 8.0, 361, 50, 0, 95, 5.0, 0.0, 0.0, 0.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_SWORD);
-            macros::ATTACK(fighter, 3, 0, Hash40::new("sword1"), 8.0, 361, 50, 0, 95, 5.0, 1.0, 0.0, 7.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_SWORD);
+        sv_animcmd::frame(fighter.lua_state_agent, 8.0);
+        if macros::is_excute(fighter) {
+            AttackModule::clear_all(fighter.module_accessor);
+        }
+    }
+    else {
+        sv_animcmd::frame(fighter.lua_state_agent, 5.0);
+        if macros::is_excute(fighter) {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("sword1"), 8.0, 361, 10, 0, 100, 5.0, 1.0, 0.0, 1.5, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_SWORD);
+            macros::ATTACK(fighter, 1, 0, Hash40::new("armr"), 8.0, 361, 10, 0, 100, 5.0, 0.0, 0.0, 0.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_SWORD);
+            macros::ATTACK(fighter, 2, 0, Hash40::new("colonells"), 8.0, 361, 10, 0, 100, 5.0, 0.0, 0.0, 0.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_SWORD);
+            macros::ATTACK(fighter, 3, 0, Hash40::new("sword1"), 8.0, 361, 10, 0, 100, 5.0, 1.0, 0.0, 7.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_SWORD);
             AttackModule::set_force_reaction(fighter.module_accessor, 0, true, false);
             AttackModule::set_force_reaction(fighter.module_accessor, 1, true, false);
             AttackModule::set_force_reaction(fighter.module_accessor, 2, true, false);
             AttackModule::set_force_reaction(fighter.module_accessor, 3, true, false);
         }
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 8.0);
-    if macros::is_excute(fighter) {
-        AttackModule::clear_all(fighter.module_accessor);
-        MotionModule::set_rate(fighter.module_accessor, 1.3);
-        if LUCINA_SLOW_DOWNSPECIAL_DO_KILL_COUNTER[entry_id] {
-            macros::COL_NORMAL(fighter);
+        if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_MARTH_STATUS_SPECIAL_LW_FLAG_SPECIAL_EFFECT) {
+            if macros::is_excute(fighter) {
+                AttackModule::set_optional_hit_sound(fighter.module_accessor, 0, Hash40::new("se_lucina_criticalhit"));
+                AttackModule::set_optional_hit_sound(fighter.module_accessor, 1, Hash40::new("se_lucina_criticalhit"));
+                AttackModule::set_optional_hit_sound(fighter.module_accessor, 2, Hash40::new("se_lucina_criticalhit"));
+                AttackModule::set_optional_hit_sound(fighter.module_accessor, 3, Hash40::new("se_lucina_criticalhit"));
+            }
+        }
+        sv_animcmd::frame(fighter.lua_state_agent, 8.0);
+        if macros::is_excute(fighter) {
+            AttackModule::clear_all(fighter.module_accessor);
+            if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) {
+                LUCINA_DOWNB_FREETELEPORT_TIMER[entry_id] = LUCINA_DOWNB_FREETELEPORT_MAX_TIME;
+                LUCINA_TELEPORT_OVERHEAT_COUNT[entry_id] = 0;
+            }
         }
     }
+    
 }
 
 #[acmd_script( agent = "lucina", script = "game_specialairlw", category = ACMD_GAME )]
 unsafe fn lucina_downb_air_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
-    sv_animcmd::frame(fighter.lua_state_agent, 4.0);
-    if macros::is_excute(fighter) {
-        LUCINA_SLOW_DOWNSPECIAL[entry_id] = true;
-        LUCINA_SLOW_DOWNSPECIAL_CAN_CANCEL[entry_id] = true;
-        LUCINA_SLOW_DOWNSPECIAL_DO_KILL_COUNTER[entry_id] = false;
-    }
-
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_MARTH_STATUS_SPECIAL_LW_FLAG_SHIELD);
-        LUCINA_SLOW_DOWNSPECIAL_EFFECT_TIMER[entry_id] = 0;
-        if LUCINA_SLOW_DOWNSPECIAL[entry_id] {
-            LUCINA_SLOW_DOWNSPECIAL_IN_SLOW[entry_id] = true;
-            MotionModule::set_rate(fighter.module_accessor, 0.011111);
-        }
-        else {
-            MotionModule::set_rate(fighter.module_accessor, 0.05);
-        }
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 7.0);
-    if macros::is_excute(fighter) {
-        if LUCINA_SLOW_DOWNSPECIAL_DO_KILL_COUNTER[entry_id] == false {
-            WorkModule::off_flag(fighter.module_accessor, *FIGHTER_MARTH_STATUS_SPECIAL_LW_FLAG_SHIELD);
-            LUCINA_SLOW_DOWNSPECIAL_EFFECT_TIMER[entry_id] = 0;
-        }
-        MotionModule::set_rate(fighter.module_accessor, 1.0);
-        LUCINA_SLOW_DOWNSPECIAL_IN_SLOW[entry_id] = false;
-        LUCINA_SLOW_DOWNSPECIAL_CAN_CANCEL[entry_id] = false;
-    }
-    sv_animcmd::wait(fighter.lua_state_agent, 2.0);
-    if macros::is_excute(fighter) {
-        if LUCINA_SLOW_DOWNSPECIAL_DO_KILL_COUNTER[entry_id] {
+    if LUCINA_TELEPORT_COOLDOWN_TIMER[entry_id] > 0 {
+        sv_animcmd::frame(fighter.lua_state_agent, 10.0);
+        if macros::is_excute(fighter) {
             WorkModule::off_flag(fighter.module_accessor, *FIGHTER_MARTH_STATUS_SPECIAL_LW_FLAG_SHIELD);
         }
-        for _ in 0..30 {
-            if macros::is_excute(fighter) {
-                MotionModule::set_rate(fighter.module_accessor, 1.3);
-            }
-            sv_animcmd::wait(fighter.lua_state_agent, 2.0);
-        }
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 20.0);
+    if macros::is_excute(fighter) {
+        WorkModule::off_flag(fighter.module_accessor, *FIGHTER_MARTH_STATUS_SPECIAL_LW_FLAG_SHIELD);
     }
 }
 
@@ -2502,18 +2471,29 @@ unsafe fn lucina_downb_air_effect_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         macros::EFFECT(fighter, Hash40::new("lucina_counter_flash"), Hash40::new("top"), 0, 11, 3, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
-        macros::FLASH(fighter, 1, 1, 0.5, 0.75);
+        macros::FLASH(fighter, 1, 1, 1, 0.75);
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 7.0);
-    {
-        if LUCINA_SLOW_DOWNSPECIAL_DO_KILL_COUNTER[entry_id] == false {
+    if LUCINA_TELEPORT_COOLDOWN_TIMER[entry_id] > 0 {
+        sv_animcmd::frame(fighter.lua_state_agent, 4.0);
+        if macros::is_excute(fighter) {
             macros::COL_NORMAL(fighter);
         }
     }
-    sv_animcmd::wait(fighter.lua_state_agent, 2.0);
-    if macros::is_excute(fighter) {
-        if LUCINA_SLOW_DOWNSPECIAL_DO_KILL_COUNTER[entry_id] {
-            macros::COL_NORMAL(fighter);
+    else {
+        sv_animcmd::wait(fighter.lua_state_agent, 1.0);
+        for _ in 0..4 {
+            if macros::is_excute(fighter) {
+                macros::FLASH(fighter, 0.7, 0.7, 0.7, 0.5);
+            }
+            sv_animcmd::wait(fighter.lua_state_agent, 2.0);
+            if macros::is_excute(fighter) {
+                macros::FLASH(fighter, 0.67, 0, 0.78, 0.31);
+            }
+            sv_animcmd::wait(fighter.lua_state_agent, 2.0);
+            if macros::is_excute(fighter) {
+                macros::COL_NORMAL(fighter);
+            }
+            sv_animcmd::wait(fighter.lua_state_agent, 2.0);
         }
     }
 }
@@ -2521,23 +2501,14 @@ unsafe fn lucina_downb_air_effect_smash_script(fighter: &mut L2CAgentBase) {
 #[acmd_script( agent = "lucina", script = "game_specialairlwhit", category = ACMD_GAME )]
 unsafe fn lucina_downb_hit_air_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
-    if macros::is_excute(fighter) {
-        LUCINA_SLOW_DOWNSPECIAL_EFFECT_TIMER[entry_id] = 0;
-        LUCINA_SLOW_DOWNSPECIAL[entry_id] = false;
-        LUCINA_SLOW_DOWNSPECIAL_CAN_CANCEL[entry_id] = false;
-        LUCINA_SLOW_DOWNSPECIAL_IN_SLOW[entry_id] = false;
-        if LUCINA_SLOW_DOWNSPECIAL_DO_KILL_COUNTER[entry_id] {
-            macros::FLASH(fighter, 1.0, 0.0, 1.0, 0.9);
-        }
-    }
 
-    sv_animcmd::frame(fighter.lua_state_agent, 5.0);
-    if macros::is_excute(fighter) {
-        if LUCINA_SLOW_DOWNSPECIAL_DO_KILL_COUNTER[entry_id] {
-            macros::ATTACK(fighter, 0, 0, Hash40::new("sword1"), 8.0, 361, 60, 0, 90, 5.0, 1.0, 0.0, 1.5, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_death"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_SWORD);
-            macros::ATTACK(fighter, 1, 0, Hash40::new("armr"), 8.0, 361, 60, 0, 90, 5.0, 0.0, 0.0, 0.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_death"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_SWORD);
-            macros::ATTACK(fighter, 2, 0, Hash40::new("colonells"), 8.0, 361, 60, 0, 90, 5.0, 0.0, 0.0, 0.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_death"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_SWORD);
-            macros::ATTACK(fighter, 3, 0, Hash40::new("sword1"), 8.0, 361, 60, 0, 90, 5.0, 1.0, 0.0, 7.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_death"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_SWORD);
+    if LUCINA_TELEPORT_COOLDOWN_TIMER[entry_id] > 0 {
+        sv_animcmd::frame(fighter.lua_state_agent, 5.0);
+        if macros::is_excute(fighter) {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("sword1"), 15.0, 361, 100, 0, 100, 5.0, 1.0, 0.0, 1.5, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_death"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_SWORD);
+            macros::ATTACK(fighter, 1, 0, Hash40::new("armr"), 15.0, 361, 100, 0, 100, 5.0, 0.0, 0.0, 0.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_death"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_SWORD);
+            macros::ATTACK(fighter, 2, 0, Hash40::new("colonells"), 15.0, 361, 100, 0, 100, 5.0, 0.0, 0.0, 0.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_death"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_SWORD);
+            macros::ATTACK(fighter, 3, 0, Hash40::new("sword1"), 15.0, 361, 100, 0, 100, 5.0, 1.0, 0.0, 7.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_death"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_SWORD);
             AttackModule::set_force_reaction(fighter.module_accessor, 0, true, false);
             AttackModule::set_force_reaction(fighter.module_accessor, 1, true, false);
             AttackModule::set_force_reaction(fighter.module_accessor, 2, true, false);
@@ -2545,28 +2516,46 @@ unsafe fn lucina_downb_hit_air_smash_script(fighter: &mut L2CAgentBase) {
             AttackModule::set_optional_hit_sound(fighter.module_accessor, 0, Hash40::new("se_lucina_criticalhit"));
             AttackModule::set_optional_hit_sound(fighter.module_accessor, 1, Hash40::new("se_lucina_criticalhit"));
             AttackModule::set_optional_hit_sound(fighter.module_accessor, 2, Hash40::new("se_lucina_criticalhit"));
-            AttackModule::set_optional_hit_sound(fighter.module_accessor, 3, Hash40::new("se_lucina_criticalhit"));
+            AttackModule::set_optional_hit_sound(fighter.module_accessor, 3, Hash40::new("se_lucina_criticalhit"));   
         }
-        else {
-            macros::ATTACK(fighter, 0, 0, Hash40::new("sword1"), 8.0, 361, 50, 0, 95, 5.0, 1.0, 0.0, 1.5, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_SWORD);
-            macros::ATTACK(fighter, 1, 0, Hash40::new("armr"), 8.0, 361, 50, 0, 95, 5.0, 0.0, 0.0, 0.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_SWORD);
-            macros::ATTACK(fighter, 2, 0, Hash40::new("colonells"), 8.0, 361, 50, 0, 95, 5.0, 0.0, 0.0, 0.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_SWORD);
-            macros::ATTACK(fighter, 3, 0, Hash40::new("sword1"), 8.0, 361, 50, 0, 95, 5.0, 1.0, 0.0, 7.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_SWORD);
+        sv_animcmd::frame(fighter.lua_state_agent, 8.0);
+        if macros::is_excute(fighter) {
+            AttackModule::clear_all(fighter.module_accessor);
+        }
+    }
+    else {
+        sv_animcmd::frame(fighter.lua_state_agent, 5.0);
+        if macros::is_excute(fighter) {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("sword1"), 8.0, 361, 10, 0, 100, 5.0, 1.0, 0.0, 1.5, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_SWORD);
+            macros::ATTACK(fighter, 1, 0, Hash40::new("armr"), 8.0, 361, 10, 0, 100, 5.0, 0.0, 0.0, 0.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_SWORD);
+            macros::ATTACK(fighter, 2, 0, Hash40::new("colonells"), 8.0, 361, 10, 0, 100, 5.0, 0.0, 0.0, 0.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_SWORD);
+            macros::ATTACK(fighter, 3, 0, Hash40::new("sword1"), 8.0, 361, 10, 0, 100, 5.0, 1.0, 0.0, 7.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_SWORD);
             AttackModule::set_force_reaction(fighter.module_accessor, 0, true, false);
             AttackModule::set_force_reaction(fighter.module_accessor, 1, true, false);
             AttackModule::set_force_reaction(fighter.module_accessor, 2, true, false);
             AttackModule::set_force_reaction(fighter.module_accessor, 3, true, false);
         }
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 8.0);
-    if macros::is_excute(fighter) {
-        AttackModule::clear_all(fighter.module_accessor);
-        MotionModule::set_rate(fighter.module_accessor, 1.3);
-        if LUCINA_SLOW_DOWNSPECIAL_DO_KILL_COUNTER[entry_id] {
-            macros::COL_NORMAL(fighter);
+        if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_MARTH_STATUS_SPECIAL_LW_FLAG_SPECIAL_EFFECT) {
+            if macros::is_excute(fighter) {
+                AttackModule::set_optional_hit_sound(fighter.module_accessor, 0, Hash40::new("se_lucina_criticalhit"));
+                AttackModule::set_optional_hit_sound(fighter.module_accessor, 1, Hash40::new("se_lucina_criticalhit"));
+                AttackModule::set_optional_hit_sound(fighter.module_accessor, 2, Hash40::new("se_lucina_criticalhit"));
+                AttackModule::set_optional_hit_sound(fighter.module_accessor, 3, Hash40::new("se_lucina_criticalhit"));
+            }
+        }
+        sv_animcmd::frame(fighter.lua_state_agent, 8.0);
+        if macros::is_excute(fighter) {
+            AttackModule::clear_all(fighter.module_accessor);
+            if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) {
+                LUCINA_DOWNB_FREETELEPORT_TIMER[entry_id] = LUCINA_DOWNB_FREETELEPORT_MAX_TIME;
+                LUCINA_TELEPORT_OVERHEAT_COUNT[entry_id] = 0;
+            }
         }
     }
 }
+
+
+
 
 pub fn install() {
     smashline::install_agent_frames!(

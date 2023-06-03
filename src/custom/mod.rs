@@ -469,8 +469,8 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
             GroundModule::correct(fighter.module_accessor, GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
         }
 
-        //hitfalling??
-        /*(if status == *FIGHTER_STATUS_KIND_ATTACK_AIR && CAN_HITFALL[entry_id] {
+        //hitfalling????????????????????
+        /*if status == *FIGHTER_STATUS_KIND_ATTACK_AIR {
             if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false {
                 fastfall_whenever_helper(fighter);
             }
