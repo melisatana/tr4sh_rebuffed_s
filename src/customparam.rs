@@ -23,7 +23,7 @@ use {
 	smashline::*,
 };
 
-use smash2;
+//use smash2;
 
 //BomaExt, helps with various things
 pub trait BomaExt {
@@ -278,6 +278,78 @@ pub unsafe fn get_param_float_replace(module_accessor: u64, param_type: u64, par
 				}
 			}
     	}
+		if fighter_kind == *FIGHTER_KIND_GAOGAEN {
+			if param_type == hash40("param_special_n") {
+				if param_hash == hash40("special_n_speed_x_max") {
+					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 5 {
+						return 1.75;
+					}
+					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 4 {
+						return 1.5;
+					}
+					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 3 {
+						return 1.25;
+					}
+					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 2 {
+						return 1.0;
+					}
+					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 1 {
+						return 0.75;
+					}
+				}
+				if param_hash == hash40("special_n_stick_accel_x") {
+					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 5 {
+						return 0.1;
+					}
+					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 4 {
+						return 0.095;
+					}
+					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 3 {
+						return 0.09;
+					}
+					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 2 {
+						return 0.085;
+					}
+					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 1 {
+						return 0.08;
+					}
+				}
+				if param_hash == hash40("special_air_n_speed_x_max") {
+					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 5 {
+						return 1.75;
+					}
+					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 4 {
+						return 1.5;
+					}
+					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 3 {
+						return 1.25;
+					}
+					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 2 {
+						return 1.0;
+					}
+					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 1 {
+						return 0.75;
+					}
+				}
+				if param_hash == hash40("special_air_n_stick_accel_x") {
+					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 5 {
+						return 0.1;
+					}
+					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 4 {
+						return 0.095;
+					}
+					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 3 {
+						return 0.09;
+					}
+					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 2 {
+						return 0.085;
+					}
+					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 1 {
+						return 0.08;
+					}
+				}
+			}
+		}
 		if fighter_kind == *FIGHTER_KIND_ELIGHT {
 			if param_type == hash40("dash_speed") {
 				if crate::elight::MYTHRA_UTHROW_SPEED[entry_id] {

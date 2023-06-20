@@ -39,6 +39,13 @@ fn koopa_frame(fighter: &mut L2CFighterCommon) {
                 GroundModule::set_passable_check(fighter.module_accessor, false);
             }
         }
+
+        if status == *FIGHTER_STATUS_KIND_ATTACK_S4_HOLD {
+            if (ControlModule::get_stick_x(fighter.module_accessor) >= 0.5 && PostureModule::lr(fighter.module_accessor) <= -0.5) || (ControlModule::get_stick_x(fighter.module_accessor) <= -0.5 && PostureModule::lr(fighter.module_accessor) >= 0.5) {
+                PostureModule::reverse_lr(fighter.module_accessor);
+                PostureModule::update_rot_y_lr(fighter.module_accessor);
+            }
+        }
     }
 }
 

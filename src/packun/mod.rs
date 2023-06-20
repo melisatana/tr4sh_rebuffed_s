@@ -869,6 +869,80 @@ unsafe fn spikeball_shoot(fighter: &mut L2CAgentBase) {
     }
 }
 
+#[acmd_script( agent = "packun", script = "game_specialsshoot", category = ACMD_GAME )]
+unsafe fn packun_sideb_shoot_smash_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    macros::FT_MOTION_RATE(fighter, 0.75);
+    if macros::is_excute(fighter) {
+        FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 10.0, 3.0);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 2.0);
+    //if(methodlib::L2CValue::operator==(lib::L2CValueconst&)const(false, false)){
+    if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_PACKUN_STATUS_SPECIAL_S_FLAG_FAILURE) {
+        if macros::is_excute(fighter) {
+            shield!(fighter, *MA_MSC_CMD_REFLECTOR, *COLLISION_KIND_REFLECTOR, 0, Hash40::new("top"), 7.0, 0, 10.0, 15.0, 0, 4.0, 15.0, 1.5, 2.0, 50, false, 1.0, *FIGHTER_REFLECTOR_GROUP_HOMERUNBAT);
+            //macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 0.0, 18, 100, 30, 0, 5.0, 0.0, 7.0, 7.0, Some(0.0), Some(7.0), Some(10.0), 0.0, 0.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, f32::NAN, 0.0, 0, false, false, true, true, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
+        }
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 10.0);
+    //if(methodlib::L2CValue::operator==(lib::L2CValueconst&)const(false, false)) {
+    if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_PACKUN_STATUS_SPECIAL_S_FLAG_FAILURE) == false {
+        if macros::is_excute(fighter) {
+            ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_PACKUN_GENERATE_ARTICLE_POISONBREATH, false, -1);
+        }
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 21.0);
+    macros::FT_MOTION_RATE(fighter, 0.9);
+    if macros::is_excute(fighter) {
+        FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 5.0, 5.0);
+        //AttackModule::clear_all(fighter.module_accessor);
+        shield!(fighter, *MA_MSC_CMD_SHIELD_OFF, *COLLISION_KIND_REFLECTOR, 0, *FIGHTER_REFLECTOR_GROUP_HOMERUNBAT);
+    }
+    sv_animcmd::wait(fighter.lua_state_agent, 10.0);
+    if macros::is_excute(fighter) {
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_PACKUN_STATUS_SPECIAL_S_FLAG_CHANGE_KINETIC);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 20.0);
+    macros::FT_MOTION_RATE(fighter, 0.55);
+}
+
+#[acmd_script( agent = "packun", script = "game_specialairsshoot", category = ACMD_GAME )]
+unsafe fn packun_sideb_shoot_air_smash_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    macros::FT_MOTION_RATE(fighter, 0.75);
+    if macros::is_excute(fighter) {
+        FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 10.0, 3.0);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 2.0);
+    //if(methodlib::L2CValue::operator==(lib::L2CValueconst&)const(false, false)){
+    if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_PACKUN_STATUS_SPECIAL_S_FLAG_FAILURE) {
+        if macros::is_excute(fighter) {
+            shield!(fighter, *MA_MSC_CMD_REFLECTOR, *COLLISION_KIND_REFLECTOR, 0, Hash40::new("top"), 7.0, 0, 10.0, 15.0, 0, 4.0, 15.0, 1.5, 2.0, 50, false, 1.0, *FIGHTER_REFLECTOR_GROUP_HOMERUNBAT);
+            //macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 0.0, 18, 100, 30, 0, 5.0, 0.0, 7.0, 7.0, Some(0.0), Some(7.0), Some(10.0), 0.0, 0.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, f32::NAN, 0.0, 0, false, false, true, true, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
+        }
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 10.0);
+    //if(methodlib::L2CValue::operator==(lib::L2CValueconst&)const(false, false)) {
+    if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_PACKUN_STATUS_SPECIAL_S_FLAG_FAILURE) == false {
+        if macros::is_excute(fighter) {
+            ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_PACKUN_GENERATE_ARTICLE_POISONBREATH, false, -1);
+        }
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 21.0);
+    macros::FT_MOTION_RATE(fighter, 0.9);
+    if macros::is_excute(fighter) {
+        FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 5.0, 5.0);
+        //AttackModule::clear_all(fighter.module_accessor);
+        shield!(fighter, *MA_MSC_CMD_SHIELD_OFF, *COLLISION_KIND_REFLECTOR, 0, *FIGHTER_REFLECTOR_GROUP_HOMERUNBAT);
+    }
+    sv_animcmd::wait(fighter.lua_state_agent, 10.0);
+    if macros::is_excute(fighter) {
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_PACKUN_STATUS_SPECIAL_S_FLAG_CHANGE_KINETIC);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 20.0);
+    macros::FT_MOTION_RATE(fighter, 0.55);
+}
+
 #[acmd_script( agent = "packun_poisonbreath", script = "game_start", category = ACMD_GAME )]
 unsafe fn poison_start(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
@@ -953,6 +1027,8 @@ pub fn install() {
         spikeball_start_air,
         spikeball_wait,
         spikeball_shoot,
+        packun_sideb_shoot_smash_script,
+        packun_sideb_shoot_air_smash_script,
         poison_start,
         poison_start_max,
         poison_shoot,

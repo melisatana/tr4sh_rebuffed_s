@@ -7,6 +7,7 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
+use smash::hash40;
 
 static mut BANJO_SLOW_FORWARD_AIR : [bool; 8] = [false; 8];
 static mut BANJO_SLOW_FORWARD_AIR_IN_SLOW : [bool; 8] = [false; 8];
@@ -457,16 +458,33 @@ unsafe fn banjo_dtilt(fighter: &mut L2CAgentBase) {
 
 #[acmd_script( agent = "buddy", script = "game_attacks4", category = ACMD_GAME )]
 unsafe fn banjo_fsmash(fighter: &mut L2CAgentBase) {
-    if macros::is_excute(fighter) {
-        ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_BUDDY_GENERATE_ARTICLE_PARTNER, false, 0);
-        ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_BUDDY_GENERATE_ARTICLE_PARTNER, Hash40::new("attack_s4s"), false, 0.0);
+    let rand_num = smash::app::sv_math::rand(hash40("fighter"), 5);
+
+    if rand_num == 0 {
+        if macros::is_excute(fighter) {
+            ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_BUDDY_GENERATE_ARTICLE_PARTNER, false, 0);
+            ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_BUDDY_GENERATE_ARTICLE_PARTNER, Hash40::new("attack_s4_s"), false, 0.0);
+        }
+        sv_animcmd::frame(fighter.lua_state_agent, 10.0);
+        sv_animcmd::execute(fighter.lua_state_agent, 10.0);
+        //execute(10);
+        if macros::is_excute(fighter) {
+            WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
+            ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_BUDDY_GENERATE_ARTICLE_PARTNER, Hash40::new("attack_s4_s"), true, WorkModule::get_float(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_WORK_FLOAT_SMASH_RESTART_FRAME));
+        }
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 10.0);
-    sv_animcmd::execute(fighter.lua_state_agent, 10.0);
-    //execute(10);
-    if macros::is_excute(fighter) {
-        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
-        ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_BUDDY_GENERATE_ARTICLE_PARTNER, Hash40::new("attack_s4s"), true, WorkModule::get_float(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_WORK_FLOAT_SMASH_RESTART_FRAME));
+    else {
+        if macros::is_excute(fighter) {
+            ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_BUDDY_GENERATE_ARTICLE_PARTNER, false, 0);
+            ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_BUDDY_GENERATE_ARTICLE_PARTNER, Hash40::new("attack_s4s"), false, 0.0);
+        }
+        sv_animcmd::frame(fighter.lua_state_agent, 10.0);
+        sv_animcmd::execute(fighter.lua_state_agent, 10.0);
+        //execute(10);
+        if macros::is_excute(fighter) {
+            WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
+            ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_BUDDY_GENERATE_ARTICLE_PARTNER, Hash40::new("attack_s4s"), true, WorkModule::get_float(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_WORK_FLOAT_SMASH_RESTART_FRAME));
+        }
     }
     sv_animcmd::frame(fighter.lua_state_agent, 18.0);
     if macros::is_excute(fighter) {

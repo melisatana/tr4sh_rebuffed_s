@@ -97,9 +97,11 @@ mod popo;
 mod ridley;
 mod miienemyf;
 mod miienemys;
+mod miienemyg;
+//mod koopag;
 
 
-#[skyline::main(name = "smashline_test")]
+#[skyline::main(name = "tr4sh_rebuffed")]
 pub fn main() {
     
     custom::install();
@@ -194,7 +196,9 @@ pub fn main() {
     ridley::install();
     miienemyf::install();
     miienemys::install();
+    miienemyg::install();
     customparam::install();
+    //koopag::install();
 
 
 }

@@ -1172,16 +1172,9 @@ unsafe fn younglink_downtaunt_left_smash_script(fighter: &mut L2CAgentBase) {
     else {
         sv_animcmd::frame(fighter.lua_state_agent, 58.0);
         if macros::is_excute(fighter) {
-            if DamageModule::damage(fighter.module_accessor, 0) < 1.4 {
-                DamageModule::add_damage(fighter.module_accessor, -1.0 * DamageModule::damage(fighter.module_accessor, 0), 0);
-                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_recovery"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
-                macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
-            }
-            else {
-                DamageModule::add_damage(fighter.module_accessor, -1.4, 0);
-                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_recovery"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
-                macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
-            }
+            DamageModule::heal(fighter.module_accessor, -1.4, 0);
+            macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_recovery"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
+            macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
         }
     }
 }
@@ -1205,16 +1198,9 @@ unsafe fn younglink_downtaunt_right_smash_script(fighter: &mut L2CAgentBase) {
     else {
         sv_animcmd::frame(fighter.lua_state_agent, 58.0);
         if macros::is_excute(fighter) {
-            if DamageModule::damage(fighter.module_accessor, 0) < 1.4 {
-                DamageModule::add_damage(fighter.module_accessor, -1.0 * DamageModule::damage(fighter.module_accessor, 0), 0);
-                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_recovery"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
-                macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
-            }
-            else {
-                DamageModule::add_damage(fighter.module_accessor, -1.4, 0);
-                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_recovery"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
-                macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
-            }
+            DamageModule::heal(fighter.module_accessor, -1.4, 0);
+            macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_recovery"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
+            macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
         }
     }
 }

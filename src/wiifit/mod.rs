@@ -23,15 +23,11 @@ fn wiifit_frame(fighter: &mut L2CFighterCommon) {
         if [*FIGHTER_STATUS_KIND_SQUAT_WAIT].contains(&status) {
             WIIFIT_SQUAT_FRAME[entry_id] += 1 ;
             if WIIFIT_SQUAT_FRAME[entry_id] == 120 || WIIFIT_SQUAT_STATUS_CURRENT[entry_id] != status {
-                if DamageModule::damage(fighter.module_accessor, 0) < 0.2 {
-                    DamageModule::add_damage(fighter.module_accessor, -1.0 * DamageModule::damage(fighter.module_accessor, 0), 0);
-                    macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
-                }
-                else {
-                    DamageModule::add_damage(fighter.module_accessor, -0.2, 0);
-                    macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
-                }
+                DamageModule::heal(fighter.module_accessor, -0.5, 0);
+                macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
+                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_recovery"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
                 WIIFIT_SQUAT_FRAME[entry_id] = 0 ;
+                
             }
             WIIFIT_SQUAT_STATUS_CURRENT[entry_id] = status ;
             

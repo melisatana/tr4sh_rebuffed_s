@@ -21,6 +21,8 @@ fn ken_frame(fighter: &mut L2CFighterCommon) {
                 CancelModule::enable_cancel(fighter.module_accessor);
             }
         }
+
+
     }
 }
 

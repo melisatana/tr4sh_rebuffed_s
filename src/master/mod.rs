@@ -403,16 +403,9 @@ unsafe fn master_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) {
-            if DamageModule::damage(fighter.module_accessor, 0) < 7.2 {
-                DamageModule::add_damage(fighter.module_accessor, -1.0 * DamageModule::damage(fighter.module_accessor, 0), 0);
-                macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
-                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_recovery"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
-            }
-            else {
-                DamageModule::add_damage(fighter.module_accessor, -7.2, 0);
-                macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
-                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_recovery"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
-            }
+            DamageModule::heal(fighter.module_accessor, -7.2, 0);
+            macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
+            macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_recovery"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
         }
         AttackModule::clear_all(fighter.module_accessor);
         MotionModule::set_rate(fighter.module_accessor, 1.04);
@@ -455,16 +448,9 @@ unsafe fn master_fsmash2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) {
-            if DamageModule::damage(fighter.module_accessor, 0) < 7.2 {
-                DamageModule::add_damage(fighter.module_accessor, -1.0 * DamageModule::damage(fighter.module_accessor, 0), 0);
-                macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
-                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_recovery"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
-            }
-            else {
-                DamageModule::add_damage(fighter.module_accessor, -7.2, 0);
-                macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
-                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_recovery"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
-            }
+            DamageModule::heal(fighter.module_accessor, -7.2, 0);
+            macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
+            macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_recovery"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
         }
         AttackModule::clear_all(fighter.module_accessor);
         MotionModule::set_rate(fighter.module_accessor, 1.04);
@@ -507,16 +493,9 @@ unsafe fn master_fsmash3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) {
-            if DamageModule::damage(fighter.module_accessor, 0) < 7.2 {
-                DamageModule::add_damage(fighter.module_accessor, -1.0 * DamageModule::damage(fighter.module_accessor, 0), 0);
-                macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
-                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_recovery"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
-            }
-            else {
-                DamageModule::add_damage(fighter.module_accessor, -7.2, 0);
-                macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
-                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_recovery"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
-            }
+            DamageModule::heal(fighter.module_accessor, -7.2, 0);
+            macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
+            macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_recovery"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
         }
         AttackModule::clear_all(fighter.module_accessor);
         MotionModule::set_rate(fighter.module_accessor, 1.04);
@@ -581,13 +560,8 @@ unsafe fn master_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 30.0);
     if macros::is_excute(fighter) {
         if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) {
-            if DamageModule::damage(fighter.module_accessor, 0) < 5.3 {
-                DamageModule::add_damage(fighter.module_accessor, -1.0 * DamageModule::damage(fighter.module_accessor, 0), 0);
-                macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
-                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_recovery"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
-            }
-            else {
-                DamageModule::add_damage(fighter.module_accessor, -5.3, 0);
+            if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) {
+                DamageModule::heal(fighter.module_accessor, -5.3, 0);
                 macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
                 macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_recovery"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
             }
@@ -644,13 +618,8 @@ unsafe fn master_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) {
-            if DamageModule::damage(fighter.module_accessor, 0) < 8.6 {
-                DamageModule::add_damage(fighter.module_accessor, -1.0 * DamageModule::damage(fighter.module_accessor, 0), 0);
-                macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
-                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_recovery"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
-            }
-            else {
-                DamageModule::add_damage(fighter.module_accessor, -8.6, 0);
+            if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) {
+                DamageModule::heal(fighter.module_accessor, -8.6, 0);
                 macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
                 macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_recovery"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
             }

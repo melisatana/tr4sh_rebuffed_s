@@ -8,7 +8,7 @@ use smash::app::*;
 use smash::phx::Hash40;
 use smash_script::*;
 use smash::lib::L2CValue;
-use super::*;
+//use super::*;
 use crate::customparam::BomaExt;
 
 static DEBUG_ALLOW_MOMENTUM_JUMPS : bool = false;
@@ -47,9 +47,6 @@ pub unsafe fn fastfall_whenever_helper(fighter: &mut L2CFighterCommon) {
 }
 
 
-
-
-
 //determines who cannot z-nair
 unsafe fn can_z_nair(fighter: &mut L2CFighterCommon) -> bool {
     let fighter_kind = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_KIND);
@@ -82,6 +79,30 @@ pub unsafe fn escape_air_subtransition(fighter: &mut L2CFighterCommon) -> L2CVal
     original!()(fighter)
 }
 
+//down B in shield?
+/*#[skyline::hook(replace = smash::lua2cpp::L2CFighterCommon_status_Guard_Main)]
+pub unsafe fn guard_status(fighter: &mut L2CFighterCommon) -> L2CValue {
+
+    //let boma = smash::app::sv_system::battle_object_module_accessor(fighter.lua_state_agent);
+
+    let attack_lw4_stick_y = WorkModule::get_param_float(fighter.module_accessor, hash40("common"), hash40("attack_lw4_stick_y"));
+    let attack_lw4_flick_frame = WorkModule::get_param_int(fighter.module_accessor, hash40("common"), hash40("attack_lw4_flick_y"));
+
+
+    if fighter.global_table[0x1B].get_f32() < attack_lw4_stick_y// This is Stick Y in the Global Table
+        && fighter.global_table[0x1D].get_i32() < attack_lw4_flick_frame { // This is the Flick Y value in the Global Table
+
+    if ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_SPECIAL) {
+            WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_LW);
+            fighter.sub_transition_group_check_ground_special();
+            return false.into();
+        }
+    
+    }
+    original!()(fighter)
+}*/
+
+
 //=================================================================
 //== FighterStatusModuleImpl::set_fighter_status_data
 //=================================================================
@@ -97,6 +118,7 @@ unsafe fn set_fighter_status_data_hook(boma: &mut BattleObjectModuleAccessor, ar
         || boma.kind() == *FIGHTER_KIND_DONKEY && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_N])
         || boma.kind() == *FIGHTER_KIND_LINK && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW, *FIGHTER_LINK_STATUS_KIND_SPECIAL_LW_BLAST]) 
         || boma.kind() == *FIGHTER_KIND_KIRBY && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_S])
+        || boma.kind() == *FIGHTER_KIND_PURIN && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_N, *FIGHTER_STATUS_KIND_SPECIAL_HI, *FIGHTER_STATUS_KIND_SPECIAL_LW])
 
         || boma.kind() == *FIGHTER_KIND_CAPTAIN && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_GANON && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
@@ -105,18 +127,25 @@ unsafe fn set_fighter_status_data_hook(boma: &mut BattleObjectModuleAccessor, ar
         || boma.kind() == *FIGHTER_KIND_LUCINA && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_ROY && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_CHROM && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
+        || boma.kind() == *FIGHTER_KIND_MEWTWO && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
 
         || boma.kind() == *FIGHTER_KIND_TOONLINK && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW]) 
         || boma.kind() == *FIGHTER_KIND_IKE && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
+        || boma.kind() == *FIGHTER_KIND_DEDEDE && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_S])
+        || boma.kind() == *FIGHTER_KIND_PZENIGAME && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_N])
+
 
         || boma.kind() == *FIGHTER_KIND_MIIFIGHTER && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_MIISWORDSMAN && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_GEKKOUGA && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
+        || boma.kind() == *FIGHTER_KIND_PALUTENA && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_CLOUD && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW]) 
         || boma.kind() == *FIGHTER_KIND_KAMUI && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
 
         || boma.kind() == *FIGHTER_KIND_SIMON && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW]) 
-        || boma.kind() == *FIGHTER_KIND_RICHTER && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW]) 
+        || boma.kind() == *FIGHTER_KIND_RICHTER && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
+        || boma.kind() == *FIGHTER_KIND_GAOGAEN && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
+        || boma.kind() == *FIGHTER_KIND_BRAVE && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_HI, *FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_TRAIL && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_EDGE && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
         {
@@ -136,6 +165,7 @@ unsafe fn set_fighter_status_data_hook(boma: &mut BattleObjectModuleAccessor, ar
 //stop buffering dodges when landing
 #[skyline::hook(replace = smash::lua2cpp::L2CFighterCommon_status_Landing_MainSub)]
 pub unsafe fn status_landing_main_sub(fighter: &mut L2CFighterCommon) -> L2CValue {
+    
     
     let boma = smash::app::sv_system::battle_object_module_accessor(fighter.lua_state_agent);
 
@@ -462,19 +492,11 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
                 fighter.sub_transition_group_check_ground_attack();
             }
         }
-
         
         //global ledge cancelling on aerial landings, light/heavy landing, special fall landings and taunts 
         if [*FIGHTER_STATUS_KIND_LANDING_ATTACK_AIR, *FIGHTER_STATUS_KIND_LANDING, *FIGHTER_STATUS_KIND_LANDING_LIGHT, *FIGHTER_STATUS_KIND_LANDING_FALL_SPECIAL, *FIGHTER_STATUS_KIND_APPEAL].contains(&status) {
             GroundModule::correct(fighter.module_accessor, GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
         }
-
-        //hitfalling????????????????????
-        /*if status == *FIGHTER_STATUS_KIND_ATTACK_AIR {
-            if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false {
-                fastfall_whenever_helper(fighter);
-            }
-        }*/
 
 
         //fastfall in tumble
@@ -484,9 +506,15 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
 
 
         //this disables jostle on pivot grabs
-         if [*FIGHTER_STATUS_KIND_CATCH_TURN].contains(&status) {
+        if [*FIGHTER_STATUS_KIND_CATCH_TURN].contains(&status) {
             JostleModule::set_status(fighter.module_accessor, false);
         }
+
+        //backdashes on non-FGCs have zero speed, allowing them to dashdance normally
+        if [*FIGHTER_STATUS_KIND_TURN_DASH].contains(&status) && MotionModule::frame(fighter.module_accessor) <= (1.0) {
+            macros::SET_SPEED_EX(fighter, 0.0, 0.0, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
+        }
+
 
 
     }
@@ -565,6 +593,7 @@ fn nro_hook(info: &skyline::nro::NroInfo) {
         skyline::install_hooks!(
             status_landing_main_sub,
             escape_air_subtransition
+            //guard_status
         );
     }
 }

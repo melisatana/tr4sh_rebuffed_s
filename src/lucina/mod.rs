@@ -244,7 +244,7 @@ unsafe fn heal_helper(fighter: &mut L2CAgentBase, heal_amount: f32) {
     }
 }
 
-// A Once-Per-Fighter-Frame that only applies to Marth
+// A Once-Per-Fighter-Frame that only applies to Marth (does he know)
 #[fighter_frame( agent = FIGHTER_KIND_LUCINA )]
 fn lucina_frame(fighter: &mut L2CFighterCommon) {
     unsafe {

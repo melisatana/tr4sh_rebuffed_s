@@ -212,7 +212,7 @@ unsafe fn donkey_dtilt_smash_script(fighter: &mut L2CAgentBase) {
 #[acmd_script( agent = "donkey", script = "game_attacks4charge", category = ACMD_GAME )]
 unsafe fn donkey_fsmash_charge_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_DAMAGE_POWER, 11.0);
+        damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0.0);
     }
 }
 

@@ -31,8 +31,7 @@ fn luigi_frame(fighter: &mut L2CFighterCommon) {
             fighter.sub_transition_group_check_air_escape();
             fighter.sub_transition_group_check_ground_jump_mini_attack();
             fighter.sub_transition_group_check_ground_jump();
-            fighter.sub_transition_group_check_air_jump_aerial();
-            
+            fighter.sub_transition_group_check_air_jump_aerial();   
         }
 
         if [*FIGHTER_LUIGI_STATUS_KIND_SPECIAL_HI_DROP, *FIGHTER_LUIGI_STATUS_KIND_SPECIAL_HI_FALL].contains(&status) {

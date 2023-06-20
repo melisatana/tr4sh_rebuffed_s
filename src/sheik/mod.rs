@@ -58,7 +58,7 @@ fn sheik_frame(fighter: &mut L2CFighterCommon) {
             *FIGHTER_STATUS_KIND_CATCH_DASH,
             *FIGHTER_STATUS_KIND_CATCH_TURN,
             *FIGHTER_STATUS_KIND_CLIFF_ATTACK,
-            *FIGHTER_STATUS_KIND_SPECIAL_N,
+            *FIGHTER_SHEIK_STATUS_KIND_SPECIAL_N_SHOOT,
             *FIGHTER_STATUS_KIND_SPECIAL_HI,
             *FIGHTER_STATUS_KIND_SPECIAL_LW
         ].contains(&status) {
