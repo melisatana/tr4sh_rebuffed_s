@@ -64,6 +64,18 @@ unsafe fn can_z_nair(fighter: &mut L2CFighterCommon) -> bool {
     return true;
 }
 
+//dash dance handler, disables the code below for 0 momentum backdashes
+unsafe fn dashdance_handler(fighter: &mut L2CFighterCommon) -> bool {
+    let fighter_kind = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_KIND);
+
+    if [
+        *FIGHTER_KIND_SAMUSD
+    ].contains(&fighter_kind) {
+        return false;
+    }
+    return true;
+}
+
 //z-nair code
 #[skyline::hook(replace = smash::lua2cpp::L2CFighterCommon_sub_transition_group_check_air_escape)]
 pub unsafe fn escape_air_subtransition(fighter: &mut L2CFighterCommon) -> L2CValue {
@@ -79,28 +91,30 @@ pub unsafe fn escape_air_subtransition(fighter: &mut L2CFighterCommon) -> L2CVal
     original!()(fighter)
 }
 
-//down B in shield?
-/*#[skyline::hook(replace = smash::lua2cpp::L2CFighterCommon_status_Guard_Main)]
-pub unsafe fn guard_status(fighter: &mut L2CFighterCommon) -> L2CValue {
+//WuBor Code to not break shield on hold. Does not work for Jigglypuff or Shulk
+#[skyline::hook(replace = smash::lua2cpp::L2CFighterCommon_status_guard_main_common)]
+unsafe fn status_guard_main_common(fighter: &mut L2CFighterCommon) -> L2CValue {
+    // Shield Breaks no longer happen if you just hold Shield
 
-    //let boma = smash::app::sv_system::battle_object_module_accessor(fighter.lua_state_agent);
+    let fighter_kind = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_KIND);
+    let shield_hp = WorkModule::get_float(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLOAT_GUARD_SHIELD);
 
-    let attack_lw4_stick_y = WorkModule::get_param_float(fighter.module_accessor, hash40("common"), hash40("attack_lw4_stick_y"));
-    let attack_lw4_flick_frame = WorkModule::get_param_int(fighter.module_accessor, hash40("common"), hash40("attack_lw4_flick_y"));
-
-
-    if fighter.global_table[0x1B].get_f32() < attack_lw4_stick_y// This is Stick Y in the Global Table
-        && fighter.global_table[0x1D].get_i32() < attack_lw4_flick_frame { // This is the Flick Y value in the Global Table
-
-    if ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_SPECIAL) {
-            WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_LW);
-            fighter.sub_transition_group_check_ground_special();
-            return false.into();
-        }
-    
+    if shield_hp < 0.0 && (fighter_kind == *FIGHTER_KIND_PURIN || fighter_kind == *FIGHTER_KIND_SHULK) {
+        fighter.change_status(FIGHTER_STATUS_KIND_SHIELD_BREAK_FLY.into(), false.into());
+    return true.into();
     }
-    original!()(fighter)
-}*/
+    
+    if ControlModule::check_button_off(fighter.module_accessor, *CONTROL_PAD_BUTTON_GUARD) {
+        let min_frame = WorkModule::get_int(fighter.module_accessor, *FIGHTER_STATUS_GUARD_ON_WORK_INT_MIN_FRAME);
+        if min_frame <= 0 {
+            if fighter.global_table[0x16].get_i32() == *SITUATION_KIND_GROUND {
+                fighter.change_status(FIGHTER_STATUS_KIND_GUARD_OFF.into(), true.into());
+                return true.into();
+            }
+        }
+    }
+    false.into()
+}
 
 
 //=================================================================
@@ -131,13 +145,16 @@ unsafe fn set_fighter_status_data_hook(boma: &mut BattleObjectModuleAccessor, ar
 
         || boma.kind() == *FIGHTER_KIND_TOONLINK && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW]) 
         || boma.kind() == *FIGHTER_KIND_IKE && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
+        || boma.kind() == *FIGHTER_KIND_LUCARIO && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_DEDEDE && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_S])
         || boma.kind() == *FIGHTER_KIND_PZENIGAME && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_N])
+        || boma.kind() == *FIGHTER_KIND_SNAKE && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_HI])
 
 
         || boma.kind() == *FIGHTER_KIND_MIIFIGHTER && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_MIISWORDSMAN && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_GEKKOUGA && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
+        || boma.kind() == *FIGHTER_KIND_SHULK && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_PALUTENA && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_CLOUD && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW]) 
         || boma.kind() == *FIGHTER_KIND_KAMUI && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
@@ -145,6 +162,7 @@ unsafe fn set_fighter_status_data_hook(boma: &mut BattleObjectModuleAccessor, ar
         || boma.kind() == *FIGHTER_KIND_SIMON && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW]) 
         || boma.kind() == *FIGHTER_KIND_RICHTER && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_GAOGAEN && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
+        || boma.kind() == *FIGHTER_KIND_JACK && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_BRAVE && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_HI, *FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_TRAIL && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_EDGE && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
@@ -160,6 +178,7 @@ unsafe fn set_fighter_status_data_hook(boma: &mut BattleObjectModuleAccessor, ar
 
     original!()(boma, arg2, treaded_kind, arg4, arg5, arg6, log_mask_flag, new_status_attr, power_up_attack_bit, arg10)
 }
+
 
 
 //stop buffering dodges when landing
@@ -183,7 +202,6 @@ pub unsafe fn status_landing_main_sub(fighter: &mut L2CFighterCommon) -> L2CValu
 unsafe fn can_jab1_cancel_to_ftilt(fighter: &mut L2CFighterCommon) -> bool {
     let fighter_kind = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_KIND);
     if [
-        *FIGHTER_KIND_DONKEY, 
         *FIGHTER_KIND_TANTAN, 
         *FIGHTER_KIND_RYU, 
         *FIGHTER_KIND_KEN, 
@@ -336,6 +354,12 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
             );
         }
         
+        //momentum jumps (currently disabled)
+        if [*FIGHTER_STATUS_KIND_JUMP_SQUAT, *FIGHTER_STATUS_KIND_JUMP].contains(&status) && DEBUG_ALLOW_MOMENTUM_JUMPS 
+        && WorkModule::is_flag(module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_JUMP_NO_LIMIT) == false {
+            WorkModule::on_flag(module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_JUMP_NO_LIMIT);
+        };
+
 
         //salty confetti
         if 
@@ -359,12 +383,18 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
         //Shield dropping through platforms using the taunt button
         if [*FIGHTER_STATUS_KIND_GUARD, *FIGHTER_STATUS_KIND_GUARD_DAMAGE, *FIGHTER_STATUS_KIND_GUARD_ON].contains(&status) {
             if GroundModule::is_passable_ground(fighter.module_accessor) {
-                if ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_HI) || ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_LW) || ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_L) || ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_R) && sticky <= 0.2 {
+                if ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_HI) 
+                || ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_LW) 
+                || ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_L) 
+                || ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_R) && sticky <= 0.2 {
                     GroundModule::pass_floor(fighter.module_accessor);
                 }
             }
             else {
-                if ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_HI) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_LW) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_L) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_R) {
+                if ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_HI) 
+                || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_LW) 
+                || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_L) 
+                || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_R) {
                     macros::EFFECT(fighter, Hash40::new("sys_kusudama"), Hash40::new("top"), 0, 28, 0, 0, 0, 0, 0.75, 0, 0, 0, 0, 0, 0, false); //confetti!
                 }
             }
@@ -380,7 +410,11 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
         }
 
         //fall through platforms by holding down during an aerial
-        if [*FIGHTER_STATUS_KIND_ATTACK_AIR, *FIGHTER_TRAIL_STATUS_KIND_ATTACK_AIR_F, *FIGHTER_TRAIL_STATUS_KIND_ATTACK_AIR_N, *FIGHTER_BAYONETTA_STATUS_KIND_ATTACK_AIR_F].contains(&status) {
+        if [*FIGHTER_STATUS_KIND_ATTACK_AIR, 
+            *FIGHTER_TRAIL_STATUS_KIND_ATTACK_AIR_F, 
+            *FIGHTER_TRAIL_STATUS_KIND_ATTACK_AIR_N, 
+            *FIGHTER_BAYONETTA_STATUS_KIND_ATTACK_AIR_F
+            ].contains(&status) {
             if sticky <= -0.5 {
                 GroundModule::set_passable_check(fighter.module_accessor, true);
             }
@@ -388,12 +422,6 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
                 GroundModule::set_passable_check(fighter.module_accessor, false);
             }
         }
-
-        //momentum jumps (currently disabled)
-        if DEBUG_ALLOW_MOMENTUM_JUMPS && WorkModule::is_flag(module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_JUMP_NO_LIMIT) == false {
-            WorkModule::on_flag(module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_JUMP_NO_LIMIT);
-        };
-
 
         //DACUS (allows dash attacks to cancel into up smashes)
         if MotionModule::motion_kind(module_accessor) == hash40("attack_dash") && MotionModule::frame(module_accessor) <= (9.0) {
@@ -499,8 +527,8 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
         }
 
 
-        //fastfall in tumble
-        if [*FIGHTER_STATUS_KIND_DAMAGE_FALL].contains(&status) {
+        //fastfall in tumble and zair
+        if [*FIGHTER_STATUS_KIND_DAMAGE_FALL, *FIGHTER_STATUS_KIND_AIR_LASSO].contains(&status) {
             fastfall_helper(fighter);
         }
 
@@ -511,7 +539,7 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
         }
 
         //backdashes on non-FGCs have zero speed, allowing them to dashdance normally
-        if [*FIGHTER_STATUS_KIND_TURN_DASH].contains(&status) && MotionModule::frame(fighter.module_accessor) <= (1.0) {
+        if dashdance_handler(fighter) && [*FIGHTER_STATUS_KIND_TURN_DASH].contains(&status) && MotionModule::frame(fighter.module_accessor) <= (1.0) {
             macros::SET_SPEED_EX(fighter, 0.0, 0.0, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
         }
 
@@ -592,8 +620,8 @@ fn nro_hook(info: &skyline::nro::NroInfo) {
     if info.name == "common" {
         skyline::install_hooks!(
             status_landing_main_sub,
-            escape_air_subtransition
-            //guard_status
+            escape_air_subtransition,
+            status_guard_main_common
         );
     }
 }
@@ -609,5 +637,9 @@ pub fn install() {
         change_kinetic_hook,
         add_motion_2nd_hook
     );
+    /*skyline::install_status_scripts!(
+        guard_status
+    );*/
     skyline::nro::add_hook(nro_hook);
+    
 }

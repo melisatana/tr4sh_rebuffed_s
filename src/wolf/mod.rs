@@ -10,6 +10,8 @@ use smash_script::*;
 
 static mut WOLF_STRONG_BLASTER : [bool; 8] = [false; 8];
 
+static mut WOLF_SIDEB_WALLJUMP_COUNT : [i32; 8] = [0; 8];
+
 // A Once-Per-Fighter-Frame that only applies to Wolf
 #[fighter_frame( agent = FIGHTER_KIND_WOLF )]
 fn wolf_frame(fighter: &mut L2CFighterCommon) {
@@ -17,6 +19,12 @@ fn wolf_frame(fighter: &mut L2CFighterCommon) {
 
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
+        let touch_right = GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_RIGHT_SIDE as u32);
+        let touch_left = GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_LEFT_SIDE as u32);
+        let touch_side =  GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_SIDE as u32);
+        let stickx = ControlModule::get_stick_x(fighter.module_accessor);
+        let lr = PostureModule::lr(fighter.module_accessor);
+        let stickx_directional = stickx * lr;
 
         println!("It'sa me, Wolf, awooo!!");
 
@@ -43,6 +51,19 @@ fn wolf_frame(fighter: &mut L2CFighterCommon) {
             }
         }
 
+
+        if status == *FIGHTER_STATUS_KIND_SPECIAL_S && MotionModule::frame(fighter.module_accessor) >= (9.0) && WOLF_SIDEB_WALLJUMP_COUNT[entry_id] < 1 {
+            if touch_left || touch_right || touch_side {
+                if stickx_directional <= - 0.5 { 
+                    StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_WALL_JUMP, false);
+                }
+            }
+        }
+
+        if sv_information::is_ready_go() == false || [*FIGHTER_STATUS_KIND_WIN, *FIGHTER_STATUS_KIND_LOSE, *FIGHTER_STATUS_KIND_DEAD].contains(&status) || StatusModule::situation_kind(fighter.module_accessor) == SITUATION_KIND_GROUND  {
+			WOLF_SIDEB_WALLJUMP_COUNT[entry_id] = 0;
+		}
+
     }
 }
 
@@ -64,6 +85,17 @@ fn kirby_wolfhat_frame(fighter: &mut L2CFighterCommon) {
                     WOLF_STRONG_BLASTER[entry_id] = false;
                 }
             }
+        }
+    }
+}
+
+#[acmd_script( agent = "wolf", script = "game_passivewalljump", category = ACMD_GAME, low_priority )]
+unsafe fn wolf_walljump_smash_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
+    if macros::is_excute(fighter) {
+        if StatusModule::prev_status_kind(fighter.module_accessor, 0) == *FIGHTER_STATUS_KIND_SPECIAL_HI {
+            WOLF_SIDEB_WALLJUMP_COUNT[entry_id] += 1 ;
         }
     }
 }
@@ -1007,6 +1039,7 @@ pub fn install() {
         kirby_wolfhat_frame
     );
     smashline::install_acmd_scripts!(
+        wolf_walljump_smash_script,
         wolf_jab_smash_script,
         wolf_jab2_smash_script,
         wolf_jab3_smash_script,

@@ -11,6 +11,7 @@ use smash_script::*;
 
 static mut SZEROSUIT_DSMASH_CHARGE : [bool; 8] = [false; 8];
 
+
 // A Once-Per-Fighter-Frame that only applies to Zero Suit Samus
 #[fighter_frame( agent = FIGHTER_KIND_SZEROSUIT )]
 fn szerosuit_frame(fighter: &mut L2CFighterCommon) {
@@ -25,6 +26,19 @@ fn szerosuit_frame(fighter: &mut L2CFighterCommon) {
         }
 
 
+    }
+}
+
+#[fighter_frame( agent = FIGHTER_KIND_KIRBY )]
+fn kirby_zsshat_frame(fighter: &mut L2CFighterCommon) {
+    unsafe {
+
+        let status = StatusModule::status_kind(fighter.module_accessor);
+
+        if [*FIGHTER_KIRBY_STATUS_KIND_SZEROSUIT_SPECIAL_N, *FIGHTER_KIRBY_STATUS_KIND_SZEROSUIT_SPECIAL_N_SHOOT, *FIGHTER_KIRBY_STATUS_KIND_SZEROSUIT_SPECIAL_N_SHOOT_H].contains(&status) {
+            crate::custom::fastfall_helper(fighter);
+        }
+        
     }
 }
 
@@ -900,7 +914,7 @@ unsafe fn paralyzer_projectile_big(fighter: &mut L2CAgentBase) {
 unsafe fn szerosuit_sideb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.7142857);
+        macros::FT_MOTION_RATE(fighter, 0.7142858);
         ArticleModule::set_rate(fighter.module_accessor, *FIGHTER_SZEROSUIT_GENERATE_ARTICLE_WHIP2, 1.4);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 21.0);
@@ -1303,7 +1317,8 @@ unsafe fn szerosuit_downb_kick_landing_smash_script(fighter: &mut L2CAgentBase) 
 
 pub fn install() {
     smashline::install_agent_frames!(
-        szerosuit_frame
+        szerosuit_frame,
+        kirby_zsshat_frame
     );
     smashline::install_acmd_scripts!(
         szerosuit_jab_smash_script,

@@ -207,8 +207,7 @@ unsafe fn palutena_jab00end_smash_script(fighter: &mut L2CAgentBase) {
 unsafe fn palutena_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
-    PALUTENA_DASHATTACK_FUNNY_SHIELD[entry_id] = false ;
-    PALUTENA_DASHATTACK_FUNNY_SHIELD_TIMER[entry_id] = 0 ;
+
     if PALUTENA_DASHATTACK_FUNNY_SHIELD_IS_HIT[entry_id] {
         PALUTENA_DASHATTACK_FUNNY_SHIELD[entry_id] = true ;
         PALUTENA_DASHATTACK_FUNNY_SHIELD_IS_HIT[entry_id] = false ;
@@ -251,6 +250,12 @@ unsafe fn palutena_dashattack_smash_script(fighter: &mut L2CAgentBase) {
             PALUTENA_DASHATTACK_FUNNY_SHIELD_IS_HIT[entry_id] = true ;
             PALUTENA_DASHATTACK_FUNNY_SHIELD_TIMER[entry_id] = 600 ;
             macros::PLAY_SE(fighter, Hash40::new("se_common_fire_s_damage"))
+        }
+        else {
+            if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == true && PALUTENA_DASHATTACK_FUNNY_SHIELD[entry_id] {
+                PALUTENA_DASHATTACK_FUNNY_SHIELD[entry_id] = false ;
+                PALUTENA_DASHATTACK_FUNNY_SHIELD_TIMER[entry_id] = 0 ;
+            }
         }
     }
 }

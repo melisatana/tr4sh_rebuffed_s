@@ -11,19 +11,52 @@ use smash_script::*;
 
 pub static mut DR_SLOW_PILL : [bool; 8] = [false; 8];
 
+static mut DR_UPB_WALLJUMP_COUNT : [i32; 8] = [0; 8];
+
 // A Once-Per-Fighter-Frame that only applies to Dr. Mario
 #[fighter_frame( agent = FIGHTER_KIND_MARIOD )]
 fn mariod_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
         let status = StatusModule::status_kind(fighter.module_accessor);
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+        let touch_right = GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_RIGHT_SIDE as u32);
+        let touch_left = GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_LEFT_SIDE as u32);
+        let touch_side =  GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_SIDE as u32);
+        let stickx = ControlModule::get_stick_x(fighter.module_accessor);
+        let lr = PostureModule::lr(fighter.module_accessor);
+        let stickx_directional = stickx * lr;
 
         println!("It'sa me, Mario, wahoooooooo!");
 
+
         if sv_information::is_ready_go() == false || [*FIGHTER_STATUS_KIND_WIN, *FIGHTER_STATUS_KIND_LOSE, *FIGHTER_STATUS_KIND_DEAD].contains(&status) {
             DR_SLOW_PILL[entry_id] = false;
+            DR_UPB_WALLJUMP_COUNT[entry_id] = 0 ;
         }
 
+        if status == *FIGHTER_STATUS_KIND_SPECIAL_HI && MotionModule::frame(fighter.module_accessor) >= (9.0) && DR_UPB_WALLJUMP_COUNT[entry_id] < 2 {
+            if touch_left || touch_right || touch_side {
+                if stickx_directional <= - 0.5 { 
+                    StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_WALL_JUMP, false);
+                }
+            }
+        }
+
+        if StatusModule::situation_kind(fighter.module_accessor) == SITUATION_KIND_GROUND  {
+			DR_UPB_WALLJUMP_COUNT[entry_id] = 0;
+		}
+
+    }
+}
+
+#[acmd_script( agent = "mariod", script = "game_passivewalljump", category = ACMD_GAME, low_priority )]
+unsafe fn mariod_walljump_smash_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
+    if macros::is_excute(fighter) {
+        if StatusModule::prev_status_kind(fighter.module_accessor, 0) == *FIGHTER_STATUS_KIND_SPECIAL_HI {
+            DR_UPB_WALLJUMP_COUNT[entry_id] += 1 ;
+        }
     }
 }
 
@@ -841,8 +874,8 @@ unsafe fn mariod_downb_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 40.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 20.0, 45, 94, 0, 80, 6.8, 0.0, 12.0, 6.0, Some(0.0), Some(12.0), Some(-6.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_BODY);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 20.0, 45, 94, 0, 80, 6.4, 0.0, 4.0, 2.5, Some(0.0), Some(4.0), Some(-2.5), 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_BODY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 22.0, 45, 87, 0, 75, 6.8, 0.0, 12.0, 6.0, Some(0.0), Some(12.0), Some(-6.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_BODY);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 22.0, 45, 87, 0, 75, 6.4, 0.0, 4.0, 2.5, Some(0.0), Some(4.0), Some(-2.5), 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_BODY);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 0.85);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 1, 0.85);
     }
@@ -879,8 +912,8 @@ unsafe fn mariod_downb_air_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 40.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 20.0, 45, 94, 0, 80, 6.8, 0.0, 12.0, 6.0, Some(0.0), Some(12.0), Some(-6.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_BODY);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 20.0, 45, 94, 0, 80, 6.4, 0.0, 4.0, 2.5, Some(0.0), Some(4.0), Some(-2.5), 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_BODY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 22.0, 45, 87, 0, 75, 6.8, 0.0, 12.0, 6.0, Some(0.0), Some(12.0), Some(-6.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_BODY);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 22.0, 45, 87, 0, 75, 6.4, 0.0, 4.0, 2.5, Some(0.0), Some(4.0), Some(-2.5), 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_BODY);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 0.85);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 1, 0.85);
     }
@@ -897,6 +930,7 @@ pub fn install() {
         mariod_frame,
     );
     smashline::install_acmd_scripts!(
+        mariod_walljump_smash_script,
         mariod_jab_smash_script,
         mariod_jab2_smash_script,
         mariod_jab3_smash_script,

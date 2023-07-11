@@ -1164,7 +1164,7 @@ unsafe fn chrom_downb_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_specials2hi", category = ACMD_GAME )]
+/*#[acmd_script( agent = "chrom", script = "game_specials2hi", category = ACMD_GAME )]
 unsafe fn chrom_sideb_2_hi_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
@@ -1470,7 +1470,7 @@ unsafe fn chrom_sideb_4_airlw_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
     }
-}
+}*/
 
 pub fn install() {
     smashline::install_agent_frames!(
@@ -1523,16 +1523,16 @@ pub fn install() {
         chrom_downb_air_counter_smash_script,
         chrom_downb_smash_script,
         chrom_downb_air_smash_script,
-        chrom_sideb_2_hi_smash_script,
-        chrom_sideb_2_airhi_smash_script,
-        chrom_sideb_3_hi_smash_script,
-        chrom_sideb_3_airhi_smash_script,
-        chrom_sideb_3_lw_smash_script,
-        chrom_sideb_3_airlw_smash_script,
-        chrom_sideb_4_hi_smash_script,
-        chrom_sideb_4_airhi_smash_script,
-        chrom_sideb_4_lw_smash_script,
-        chrom_sideb_4_airlw_smash_script
+        //chrom_sideb_2_hi_smash_script,
+        //chrom_sideb_2_airhi_smash_script,
+        //chrom_sideb_3_hi_smash_script,
+        //chrom_sideb_3_airhi_smash_script,
+        //chrom_sideb_3_lw_smash_script,
+        //chrom_sideb_3_airlw_smash_script,
+        //chrom_sideb_4_hi_smash_script,
+        //chrom_sideb_4_airhi_smash_script,
+        //chrom_sideb_4_lw_smash_script,
+        //chrom_sideb_4_airlw_smash_script
         
     );
 }

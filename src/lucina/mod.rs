@@ -2340,9 +2340,9 @@ unsafe fn lucina_downb_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_MARTH_STATUS_SPECIAL_LW_FLAG_SHIELD);
     }
-    if LUCINA_TELEPORT_COOLDOWN_TIMER[entry_id] > 0 {
-        sv_animcmd::frame(fighter.lua_state_agent, 10.0);
-        if macros::is_excute(fighter) {
+    sv_animcmd::frame(fighter.lua_state_agent, 10.0);
+    if macros::is_excute(fighter) {
+        if LUCINA_TELEPORT_COOLDOWN_TIMER[entry_id] > 0 {
             WorkModule::off_flag(fighter.module_accessor, *FIGHTER_MARTH_STATUS_SPECIAL_LW_FLAG_SHIELD);
         }
     }
@@ -2350,6 +2350,7 @@ unsafe fn lucina_downb_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_MARTH_STATUS_SPECIAL_LW_FLAG_SHIELD);
     }
+    
 }
 
 #[acmd_script( agent = "lucina", script = "effect_speciallw", category = ACMD_EFFECT )]
@@ -2361,28 +2362,26 @@ unsafe fn lucina_downb_effect_smash_script(fighter: &mut L2CAgentBase) {
         macros::EFFECT(fighter, Hash40::new("lucina_counter_flash"), Hash40::new("top"), 0, 11, 3, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
         macros::FLASH(fighter, 1, 1, 1, 0.75);
     }
-    if LUCINA_TELEPORT_COOLDOWN_TIMER[entry_id] > 0 {
-        sv_animcmd::frame(fighter.lua_state_agent, 4.0);
+    sv_animcmd::wait(fighter.lua_state_agent, 5.0);
+    if macros::is_excute(fighter) {
+        if LUCINA_TELEPORT_COOLDOWN_TIMER[entry_id] > 0 {
+        macros::COL_NORMAL(fighter);
+        }
+    }
+    sv_animcmd::wait(fighter.lua_state_agent, 1.0);
+    for _ in 0..4 {
+        if macros::is_excute(fighter) {
+            macros::FLASH(fighter, 0.7, 0.7, 0.7, 0.5);
+        }
+        sv_animcmd::wait(fighter.lua_state_agent, 2.0);
+        if macros::is_excute(fighter) {
+            macros::FLASH(fighter, 0.67, 0, 0.78, 0.31);
+        }
+        sv_animcmd::wait(fighter.lua_state_agent, 2.0);
         if macros::is_excute(fighter) {
             macros::COL_NORMAL(fighter);
         }
-    }
-    else {
-        sv_animcmd::wait(fighter.lua_state_agent, 1.0);
-        for _ in 0..4 {
-            if macros::is_excute(fighter) {
-                macros::FLASH(fighter, 0.7, 0.7, 0.7, 0.5);
-            }
-            sv_animcmd::wait(fighter.lua_state_agent, 2.0);
-            if macros::is_excute(fighter) {
-                macros::FLASH(fighter, 0.67, 0, 0.78, 0.31);
-            }
-            sv_animcmd::wait(fighter.lua_state_agent, 2.0);
-            if macros::is_excute(fighter) {
-                macros::COL_NORMAL(fighter);
-            }
-            sv_animcmd::wait(fighter.lua_state_agent, 2.0);
-        }
+        sv_animcmd::wait(fighter.lua_state_agent, 2.0);
     }
     
 }
@@ -2424,14 +2423,6 @@ unsafe fn lucina_downb_hit_smash_script(fighter: &mut L2CAgentBase) {
             AttackModule::set_force_reaction(fighter.module_accessor, 2, true, false);
             AttackModule::set_force_reaction(fighter.module_accessor, 3, true, false);
         }
-        if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_MARTH_STATUS_SPECIAL_LW_FLAG_SPECIAL_EFFECT) {
-            if macros::is_excute(fighter) {
-                AttackModule::set_optional_hit_sound(fighter.module_accessor, 0, Hash40::new("se_lucina_criticalhit"));
-                AttackModule::set_optional_hit_sound(fighter.module_accessor, 1, Hash40::new("se_lucina_criticalhit"));
-                AttackModule::set_optional_hit_sound(fighter.module_accessor, 2, Hash40::new("se_lucina_criticalhit"));
-                AttackModule::set_optional_hit_sound(fighter.module_accessor, 3, Hash40::new("se_lucina_criticalhit"));
-            }
-        }
         sv_animcmd::frame(fighter.lua_state_agent, 8.0);
         if macros::is_excute(fighter) {
             AttackModule::clear_all(fighter.module_accessor);
@@ -2452,15 +2443,15 @@ unsafe fn lucina_downb_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_MARTH_STATUS_SPECIAL_LW_FLAG_SHIELD);
     }
-    if LUCINA_TELEPORT_COOLDOWN_TIMER[entry_id] > 0 {
-        sv_animcmd::frame(fighter.lua_state_agent, 10.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 10.0);
+    if macros::is_excute(fighter) {
+        if LUCINA_TELEPORT_COOLDOWN_TIMER[entry_id] > 0 {
+            WorkModule::off_flag(fighter.module_accessor, *FIGHTER_MARTH_STATUS_SPECIAL_LW_FLAG_SHIELD);
+        }
+        sv_animcmd::frame(fighter.lua_state_agent, 20.0);
         if macros::is_excute(fighter) {
             WorkModule::off_flag(fighter.module_accessor, *FIGHTER_MARTH_STATUS_SPECIAL_LW_FLAG_SHIELD);
         }
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 20.0);
-    if macros::is_excute(fighter) {
-        WorkModule::off_flag(fighter.module_accessor, *FIGHTER_MARTH_STATUS_SPECIAL_LW_FLAG_SHIELD);
     }
 }
 
@@ -2473,28 +2464,26 @@ unsafe fn lucina_downb_air_effect_smash_script(fighter: &mut L2CAgentBase) {
         macros::EFFECT(fighter, Hash40::new("lucina_counter_flash"), Hash40::new("top"), 0, 11, 3, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
         macros::FLASH(fighter, 1, 1, 1, 0.75);
     }
-    if LUCINA_TELEPORT_COOLDOWN_TIMER[entry_id] > 0 {
-        sv_animcmd::frame(fighter.lua_state_agent, 4.0);
+    sv_animcmd::wait(fighter.lua_state_agent, 5.0);
+    if macros::is_excute(fighter) {
+        if LUCINA_TELEPORT_COOLDOWN_TIMER[entry_id] > 0 {
+        macros::COL_NORMAL(fighter);
+        }
+    }
+    sv_animcmd::wait(fighter.lua_state_agent, 1.0);
+    for _ in 0..4 {
+        if macros::is_excute(fighter) {
+            macros::FLASH(fighter, 0.7, 0.7, 0.7, 0.5);
+        }
+        sv_animcmd::wait(fighter.lua_state_agent, 2.0);
+        if macros::is_excute(fighter) {
+            macros::FLASH(fighter, 0.67, 0, 0.78, 0.31);
+        }
+        sv_animcmd::wait(fighter.lua_state_agent, 2.0);
         if macros::is_excute(fighter) {
             macros::COL_NORMAL(fighter);
         }
-    }
-    else {
-        sv_animcmd::wait(fighter.lua_state_agent, 1.0);
-        for _ in 0..4 {
-            if macros::is_excute(fighter) {
-                macros::FLASH(fighter, 0.7, 0.7, 0.7, 0.5);
-            }
-            sv_animcmd::wait(fighter.lua_state_agent, 2.0);
-            if macros::is_excute(fighter) {
-                macros::FLASH(fighter, 0.67, 0, 0.78, 0.31);
-            }
-            sv_animcmd::wait(fighter.lua_state_agent, 2.0);
-            if macros::is_excute(fighter) {
-                macros::COL_NORMAL(fighter);
-            }
-            sv_animcmd::wait(fighter.lua_state_agent, 2.0);
-        }
+        sv_animcmd::wait(fighter.lua_state_agent, 2.0);
     }
 }
 
@@ -2534,14 +2523,6 @@ unsafe fn lucina_downb_hit_air_smash_script(fighter: &mut L2CAgentBase) {
             AttackModule::set_force_reaction(fighter.module_accessor, 1, true, false);
             AttackModule::set_force_reaction(fighter.module_accessor, 2, true, false);
             AttackModule::set_force_reaction(fighter.module_accessor, 3, true, false);
-        }
-        if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_MARTH_STATUS_SPECIAL_LW_FLAG_SPECIAL_EFFECT) {
-            if macros::is_excute(fighter) {
-                AttackModule::set_optional_hit_sound(fighter.module_accessor, 0, Hash40::new("se_lucina_criticalhit"));
-                AttackModule::set_optional_hit_sound(fighter.module_accessor, 1, Hash40::new("se_lucina_criticalhit"));
-                AttackModule::set_optional_hit_sound(fighter.module_accessor, 2, Hash40::new("se_lucina_criticalhit"));
-                AttackModule::set_optional_hit_sound(fighter.module_accessor, 3, Hash40::new("se_lucina_criticalhit"));
-            }
         }
         sv_animcmd::frame(fighter.lua_state_agent, 8.0);
         if macros::is_excute(fighter) {
@@ -2625,6 +2606,6 @@ pub fn install() {
         lucina_downb_hit_smash_script,
         lucina_downb_air_smash_script,
         lucina_downb_air_effect_smash_script,
-        lucina_downb_hit_air_smash_script,
+        lucina_downb_hit_air_smash_script
     );
 }

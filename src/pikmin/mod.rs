@@ -37,6 +37,9 @@ fn pikmin_frame(fighter: &mut L2CFighterCommon) {
                 }
             }
         }
+
+
+
     }
 }
 

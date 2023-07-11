@@ -7,6 +7,7 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
+use smash::hash40;
 
 static mut GANON_SLOW_DOWN_AIR : [bool; 8] = [false; 8];
 static mut GANON_SLOW_DOWN_AIR_IN_SLOW : [bool; 8] = [false; 8];
@@ -20,6 +21,8 @@ fn ganon_frame(fighter: &mut L2CFighterCommon) {
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
         let sticky = ControlModule::get_stick_y(fighter.module_accessor);
+        let motion_kind = MotionModule::motion_kind(fighter.module_accessor);
+        let frame = MotionModule::frame(fighter.module_accessor);
 
         println!("It'sa me, Ganondorf, squeeeeee!! (cuz he's a pigman)");
 
@@ -49,6 +52,23 @@ fn ganon_frame(fighter: &mut L2CFighterCommon) {
                 GroundModule::set_passable_check(fighter.module_accessor, false);
             }
         }
+
+
+        if motion_kind == hash40("appeal_hi_r") {
+            if ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_HI) {
+                if frame == 25.0 {
+                    MotionModule::change_motion(fighter.module_accessor, Hash40::new("appeal_hi_l"), 12.0, 1.0, false, 0.0, false, false);
+                }
+            }
+        }
+        if motion_kind == hash40("appeal_hi_l") {
+            if ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_HI) {
+                if frame == 25.0 {
+                    MotionModule::change_motion(fighter.module_accessor, Hash40::new("appeal_hi_l"), 12.0, 1.0, false, 0.0, false, false);
+                }
+            }
+        }
+
 
 
     }
