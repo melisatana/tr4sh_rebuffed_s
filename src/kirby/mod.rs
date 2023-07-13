@@ -1171,7 +1171,7 @@ unsafe fn kirby_upb_rise_smash_script(fighter: &mut L2CAgentBase) {
         sv_animcmd::frame(fighter.lua_state_agent, 1.0);
         if macros::is_excute(fighter) {
             macros::FT_MOTION_RATE(fighter, 1.4953731);
-            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 17.3, 70, 90, 0, 80, 8.6, 0.0, 8.5, 12.0, None, None, None, 1.3, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 6, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 17.3, 70, 90, 0, 80, 8.6, 0.0, 8.5, 12.0, None, None, None, 1.3, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
             macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 1.4);
         }
         sv_animcmd::frame(fighter.lua_state_agent, 6.0);

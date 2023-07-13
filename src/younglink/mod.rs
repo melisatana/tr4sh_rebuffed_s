@@ -1177,23 +1177,6 @@ unsafe fn younglink_upb_air_smash_script(fighter: &mut L2CAgentBase) {
 
 #[acmd_script( agent = "younglink", script = "game_speciallw", category = ACMD_GAME )]
 unsafe fn younglink_downb_smash_script(fighter: &mut L2CAgentBase) {
-    //let rand_num = smash::app::sv_math::rand(hash40("fighter"), 19);
-
-    /*sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-    macros::FT_MOTION_RATE(fighter, 0.66666667);
-    sv_animcmd::frame(fighter.lua_state_agent, 17.0);
-    if macros::is_excute(fighter) {
-        if rand_num == 0 {
-            ItemModule::have_item(fighter.module_accessor, ItemKind(*ITEM_KIND_DEKU), 0, 0, false, false);
-        }
-        else if rand_num == 1 {
-            ItemModule::have_item(fighter.module_accessor, ItemKind(*ITEM_KIND_BOMBCHU), 0, 0, false, false);
-        }
-        else {
-            WorkModule::on_flag(fighter.module_accessor, *FIGHTER_LINK_STATUS_WORK_ID_FLAG_BOMB_GENERATE_LINKBOMB);
-        }
-        
-    }*/
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     macros::FT_MOTION_RATE(fighter, 0.66666667);
     sv_animcmd::frame(fighter.lua_state_agent, 17.0);

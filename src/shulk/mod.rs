@@ -40,9 +40,10 @@ fn shulk_frame(fighter: &mut L2CFighterCommon) {
             *FIGHTER_STATUS_KIND_ATTACK_S4,
             *FIGHTER_STATUS_KIND_ATTACK_HI4,
             *FIGHTER_STATUS_KIND_ATTACK_LW4,
-            *FIGHTER_STATUS_KIND_ATTACK_AIR
+            *FIGHTER_STATUS_KIND_ATTACK_AIR,
+            *FIGHTER_SHULK_STATUS_KIND_SPECIAL_LW_ATTACK
         ].contains(&status) {
-            if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false {
+            if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) /*&& AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false*/ {
                 if ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_SPECIAL) && (sticky == 0.0 && stickx == 0.0) {
                     StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_SPECIAL_N, false);
                     WorkModule::on_flag(fighter.module_accessor, *FIGHTER_SHULK_INSTANCE_WORK_ID_FLAG_SPECIAL_N_SELECT);
@@ -58,6 +59,41 @@ fn shulk_frame(fighter: &mut L2CFighterCommon) {
 
     }
 }
+
+#[fighter_frame( agent = FIGHTER_KIND_KIRBY )]
+fn kirby_shulkhat_frame(fighter: &mut L2CFighterCommon) {
+    unsafe {
+
+        let status = StatusModule::status_kind(fighter.module_accessor);
+        let sticky = ControlModule::get_stick_y(fighter.module_accessor);
+        let stickx = ControlModule::get_stick_x(fighter.module_accessor);
+
+        if [*FIGHTER_STATUS_KIND_ATTACK,
+            *FIGHTER_STATUS_KIND_ATTACK_100,
+            *FIGHTER_STATUS_KIND_ATTACK_DASH,
+            *FIGHTER_STATUS_KIND_ATTACK_S3,
+            *FIGHTER_STATUS_KIND_ATTACK_HI3,
+            *FIGHTER_STATUS_KIND_ATTACK_LW3,
+            *FIGHTER_STATUS_KIND_ATTACK_S4,
+            *FIGHTER_STATUS_KIND_ATTACK_HI4,
+            *FIGHTER_STATUS_KIND_ATTACK_LW4,
+            *FIGHTER_STATUS_KIND_ATTACK_AIR
+        ].contains(&status) && WorkModule::get_int(fighter.module_accessor, *FIGHTER_KIRBY_INSTANCE_WORK_ID_INT_COPY_CHARA) == *FIGHTER_KIND_SHULK {
+            if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) /*&& AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false*/ {
+                if ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_SPECIAL) && (sticky == 0.0 && stickx == 0.0) {
+                    StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_SPECIAL_N, false);
+                    WorkModule::on_flag(fighter.module_accessor, *FIGHTER_SHULK_INSTANCE_WORK_ID_FLAG_SPECIAL_N_SELECT);
+                    WorkModule::on_flag(fighter.module_accessor, *FIGHTER_SHULK_INSTANCE_WORK_ID_FLAG_SPECIAL_N_CIRCLE_MENU);
+                    if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_SHULK_INSTANCE_WORK_ID_FLAG_SPECIAL_N_SELECT) {
+                        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_SHULK_INSTANCE_WORK_ID_FLAG_SPECIAL_N_SHOW_CIRCLE_MENU_GAUGE);
+                    }
+
+                }
+            }
+        }
+    }
+}
+
 
 #[acmd_script( agent = "shulk", script = "game_justshieldoff", category = ACMD_GAME )]
 unsafe fn shulk_parry_script(fighter: &mut L2CAgentBase) {
@@ -1389,7 +1425,8 @@ unsafe fn shulk_downtaunt_right(fighter: &mut L2CAgentBase) {
 
 pub fn install() {
     smashline::install_agent_frames!(
-        shulk_frame
+        shulk_frame,
+        kirby_shulkhat_frame
     );
     smashline::install_acmd_scripts!(
         shulk_parry_script,
