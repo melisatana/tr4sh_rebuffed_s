@@ -33,7 +33,7 @@ fn mewtwo_frame(fighter: &mut L2CFighterCommon) {
         println!("It'sa me, Mewtwo, bwbwbwbwbwwbqwbwbwb!!");
 
 
-        if [*FIGHTER_STATUS_KIND_ATTACK_S4_HOLD].contains(&status) {
+        if [*FIGHTER_STATUS_KIND_ATTACK_S4_HOLD, *FIGHTER_STATUS_KIND_ATTACK_HI4_HOLD, *FIGHTER_STATUS_KIND_ATTACK_LW4_HOLD].contains(&status) {
             GroundModule::correct(fighter.module_accessor, GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
             JostleModule::set_status(fighter.module_accessor, false);
             if stickx_directional >= 0.5 {
@@ -96,6 +96,7 @@ fn mewtwo_frame(fighter: &mut L2CFighterCommon) {
                 AttackModule::clear(fighter.module_accessor, 7, false);
             }
         }
+        
     }
 }
 

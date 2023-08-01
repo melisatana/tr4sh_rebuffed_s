@@ -10,11 +10,14 @@ use smash_script::*;
 
 static mut SNAKE_FSMASH_FULLCHARGE: [bool; 8] = [false; 8];
 
+
 // A Once-Per-Fighter-Frame that only applies to Snake
 #[fighter_frame( agent = FIGHTER_KIND_SNAKE )]
 fn snake_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+    
         println!("It'sa me, Snake, tasty!!");
+
     }
 }
 
@@ -300,7 +303,7 @@ unsafe fn snake_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_SNAKE_GENERATE_ARTICLE_TRENCHMORTAR, false, -1);
-        ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_SNAKE_GENERATE_ARTICLE_TRENCHMORTAR, Hash40::new("start"), false, 0.0);
+        ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_SNAKE_GENERATE_ARTICLE_TRENCHMORTAR, Hash40::new("start"), false, -1.0);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
@@ -323,7 +326,7 @@ unsafe fn snake_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 30.0);
     if macros::is_excute(fighter) {
-        ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_SNAKE_GENERATE_ARTICLE_TRENCHMORTAR, Hash40::new("shoot"), false, 0.0);
+        ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_SNAKE_GENERATE_ARTICLE_TRENCHMORTAR, Hash40::new("shoot"), false, -1.0);
         MotionModule::set_rate(fighter.module_accessor, 0.9);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 57.0);

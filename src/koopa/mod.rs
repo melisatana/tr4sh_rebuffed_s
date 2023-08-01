@@ -30,6 +30,9 @@ fn koopa_frame(fighter: &mut L2CFighterCommon) {
                 macros::LAST_EFFECT_SET_COLOR(fighter, 2.5, 2.5, 1.0);
             }
         }
+        if sv_information::is_ready_go() == false || [*FIGHTER_STATUS_KIND_WIN, *FIGHTER_STATUS_KIND_LOSE, *FIGHTER_STATUS_KIND_DEAD].contains(&status) {
+			KOOPA_SIDEB_RECHARGE_TIMER[entry_id] = 0;
+		}
 
         if [*FIGHTER_KOOPA_STATUS_KIND_SPECIAL_LW_G, *FIGHTER_KOOPA_STATUS_KIND_SPECIAL_LW_A].contains(&status) {
             if sticky <= -0.5 {

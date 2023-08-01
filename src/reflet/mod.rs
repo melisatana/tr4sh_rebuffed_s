@@ -23,8 +23,13 @@ fn reflet_frame(fighter: &mut L2CFighterCommon) {
 
         println!("It'sa me, Robbin', your house");
 
+        //puts away the Levin Sword when the shield button or a taunt button is pressed while in midair
         if StatusModule::situation_kind(fighter.module_accessor) == SITUATION_KIND_AIR { 
-            if ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_GUARD) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_HI) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_LW) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_L) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_R) {
+            if ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_GUARD) 
+            || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_HI) 
+            || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_LW) 
+            || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_L) 
+            || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_R) {
                 WorkModule::off_flag(fighter.module_accessor, *FIGHTER_REFLET_INSTANCE_WORK_ID_FLAG_THUNDER_SWORD_ON);
                 VisibilityModule::set_int64(fighter.module_accessor, Hash40::new("sword").hash as i64, Hash40::new("sword_normal").hash as i64);
                 macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_smash_flash"), Hash40::new("sword"), 0, 0.0, 0, 0, 0, 0, 0.8, true);
@@ -1346,20 +1351,8 @@ unsafe fn reflet_neutralb_thoron_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "reflet", script = "game_specials", category = ACMD_GAME )]
+#[acmd_script( agent = "reflet", scripts = ["game_specials", "game_specialairs"], category = ACMD_GAME, low_priority )]
 unsafe fn reflet_sideb_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.84);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 17.0);
-    if macros::is_excute(fighter) {
-        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_REFLET_STATUS_SPECIAL_S_FLAG_TRY);
-    }
-}
-
-#[acmd_script( agent = "reflet", script = "game_specialairs", category = ACMD_GAME )]
-unsafe fn reflet_sideb_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.84);
@@ -1520,7 +1513,6 @@ pub fn install() {
         reflet_neutralb_thoron_smash_script,
         reflet_neutralb_thoron_air_smash_script,
         reflet_sideb_smash_script,
-        reflet_sideb_air_smash_script,
         arcfire_projectile,
         arcfire_pillar,
         arcfire_pillar2,

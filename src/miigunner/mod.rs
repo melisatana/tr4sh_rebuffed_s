@@ -758,7 +758,7 @@ unsafe fn laserblaze_projectile(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "miigunner", script = "game_specialn3start", category = ACMD_GAME )]
+#[acmd_script( agent = "miigunner", scripts = ["game_specialn3start", "game_specialairn3start"], category = ACMD_GAME, low_priority )]
 unsafe fn miigunner_neutralb_grenade_start_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
@@ -766,31 +766,11 @@ unsafe fn miigunner_neutralb_grenade_start_smash_script(fighter: &mut L2CAgentBa
     }
 }
 
-#[acmd_script( agent = "miigunner", script = "game_specialairn3start", category = ACMD_GAME )]
-unsafe fn miigunner_neutralb_grenade_start_air_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.5);
-    }
-}
-
-#[acmd_script( agent = "miigunner", script = "game_specialn3end", category = ACMD_GAME )]
+#[acmd_script( agent = "miigunner", scripts = ["game_specialn3end", "game_specialairn3end"], category = ACMD_GAME, low_priority )]
 unsafe fn miigunner_neutralb_grenade_end_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
-        ArticleModule::generate_article_enable(fighter.module_accessor, *FIGHTER_MIIGUNNER_GENERATE_ARTICLE_GRENADELAUNCHER, false, 0);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 2.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 1.333333333);
-    }
-}
-
-#[acmd_script( agent = "miigunner", script = "game_specialairn3end", category = ACMD_GAME )]
-unsafe fn miigunner_neutralb_grenade_end_air_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-    if macros::is_excute(fighter) {
-        ArticleModule::generate_article_enable(fighter.module_accessor, *FIGHTER_MIIGUNNER_GENERATE_ARTICLE_GRENADELAUNCHER, false, 0);
+        ArticleModule::generate_article_enable(fighter.module_accessor, *FIGHTER_MIIGUNNER_GENERATE_ARTICLE_GRENADELAUNCHER, false, -1);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
@@ -810,23 +790,26 @@ unsafe fn grenade_moving(fighter: &mut L2CAgentBase) {
 unsafe fn grenade_exploding(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         VisibilityModule::set_whole(fighter.module_accessor, false);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.5, 160, 9, 0, 29, 7.0, 0.0, 0.0, 0.0, None, None, None, 0.3, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, -0.2, 0.0, 5, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_BOMB);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 10.8, 101, 133, 0, 43, 10.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 2, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_BOMB);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         macros::AREA_WIND_2ND_RAD(fighter, 0, 1, 0.02, 1000, 1, 0, 0, 18);
     }
+    sv_animcmd::frame(fighter.lua_state_agent, 4.0);
+    if macros::is_excute(fighter) {
+        notify_event_msc_cmd!(fighter, Hash40::new_raw(0x199c462b5d));
+    }
     sv_animcmd::frame(fighter.lua_state_agent, 11.0);
     if macros::is_excute(fighter) {
         AreaModule::erase_wind(fighter.module_accessor, 0);
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 18.0);
+}
+
+#[acmd_script( agent = "miigunner_grenadelauncher", script = "effect_explode", category = ACMD_EFFECT, low_priority )]
+unsafe fn grenade_exploding_effect(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 1, Hash40::new("top"), 8.8, 100, 121, 0, 20, 10.0, 0.0, 0.0, 0.0, None, None, None, 0.8, 0.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, -1, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_BOMB);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 19.0);
-    if macros::is_excute(fighter) {
-        notify_event_msc_cmd!(fighter, Hash40::new_raw(0x199c462b5d));
+        macros::EFFECT(fighter, Hash40::new("sys_bomb_a"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 0.8, 0, 0, 0, 0, 0, 0, true);
     }
 }
 
@@ -1107,11 +1090,10 @@ pub fn install() {
         miigunner_neutralb_laserblaze_end_smash_script,
         laserblaze_projectile,
         miigunner_neutralb_grenade_start_smash_script,
-        miigunner_neutralb_grenade_start_air_smash_script,
         miigunner_neutralb_grenade_end_smash_script,
-        miigunner_neutralb_grenade_end_air_smash_script,
         grenade_moving,
         grenade_exploding,
+        grenade_exploding_effect,
         miigunner_sideb_flamepillar_smash_script,
         miigunner_sideb_flamepillar_air_smash_script,
         flamepillar_projectile,

@@ -32,6 +32,9 @@ fn krool_frame(fighter: &mut L2CFighterCommon) {
                 macros::LAST_EFFECT_SET_COLOR(fighter, 2.5, 2.5, 1.0);
             }   
         }
+        if sv_information::is_ready_go() == false || [*FIGHTER_STATUS_KIND_WIN, *FIGHTER_STATUS_KIND_LOSE, *FIGHTER_STATUS_KIND_DEAD].contains(&status) {
+			KROOL_DTHROW_BURY_RECHARGE_TIMER[entry_id] = 0;
+		}
 
         if KROOL_SLOW_USMASH[entry_id] && status == *FIGHTER_STATUS_KIND_ATTACK_HI4 && KROOL_SLOW_USMASH_CAN_CANCEL[entry_id] && ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_ATTACK) == false {
             KROOL_SLOW_USMASH[entry_id] = false;

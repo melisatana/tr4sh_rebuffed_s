@@ -55,9 +55,9 @@ pub static FLOAT_SEARCH_CODE: &[u8] = &[
     0x00, 0x1c, 0x40, 0xf9, 0x08, 0x00, 0x40, 0xf9, 0x03, 0x19, 0x40, 0xf9,
 ];
 
-//pub static mut INT_OFFSET : usize = 0x4E5380;
+pub static mut INT_OFFSET : usize = 0x4E5380;
 
-pub static mut INT_OFFSET: usize = 0x4DED80;
+//pub static mut INT_OFFSET: usize = 0x4DED80;
 
 pub static INT_SEARCH_CODE: &[u8] = &[
     0x00, 0x1c, 0x40, 0xf9, 0x08, 0x00, 0x40, 0xf9, 0x03, 0x11, 0x40, 0xf9,
@@ -422,7 +422,7 @@ pub unsafe fn get_param_float_replace(module_accessor: u64, param_type: u64, par
 			}
 		}
 		if fighter_kind == *WEAPON_KIND_REFLET_GIGAFIRE {
-			if param_type ==hash40("param_gigafire") {
+			if param_type == hash40("param_gigafire") {
 				if param_hash == hash40("shoot_angle") {
 					if crate::reflet::REFLET_SIDEB_DOWN_ANGLE[entry_id] {
 						return 50.0;
@@ -433,6 +433,9 @@ pub unsafe fn get_param_float_replace(module_accessor: u64, param_type: u64, par
 				}
 			}
 		}
+		
+
+		
 	}
 	
 	original!()(module_accessor, param_type, param_hash)
@@ -460,9 +463,9 @@ pub unsafe fn get_param_int_replace(module_accessor: u64, param_type: u64, param
 		if fighter_kind == *WEAPON_KIND_MARIO_FIREBALL {
 			if param_type == hash40("param_fireball") {
 				if param_hash == hash40("life") {
-					//if crate::mario::MARIO_GIANT_FIREBALL[entry_id] {
+					if crate::mario::MARIO_GIANT_FIREBALL[entry_id] {
 						return 240;
-					//}
+					}
 				}
 				if param_hash == hash40("is_penetration") {
 					if crate::mario::MARIO_GIANT_FIREBALL[entry_id] {
@@ -491,9 +494,9 @@ pub fn install() {
         if let Some(offset) = find_subsequence(text, FLOAT_SEARCH_CODE) {
             FLOAT_OFFSET = offset;
         }
-        if let Some(offset) = find_subsequence(text, INT_SEARCH_CODE) {
+        /*if let Some(offset) = find_subsequence(text, INT_SEARCH_CODE) {
             INT_OFFSET = offset;
-        }
+        }*/
     }
 	skyline::install_hooks!(get_param_float_replace);
 	skyline::install_hooks!(get_param_int_replace);

@@ -20,6 +20,9 @@ fn peach_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
+        let touch_right = GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_RIGHT_SIDE as u32);
+        let touch_left = GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_LEFT_SIDE as u32);
+        let touch_side =  GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_SIDE as u32);
 
         println!("It'sa me, Peach, Peachy!");
 
@@ -40,6 +43,13 @@ fn peach_frame(fighter: &mut L2CFighterCommon) {
             PEACH_SIDEB_POWER_TIMER[entry_id] = 0;
         }
 
+        if status == *FIGHTER_PEACH_STATUS_KIND_SPECIAL_S_JUMP {
+            if PEACH_SIDEB_POWER_TIMER[entry_id] > 0 {
+                if touch_left || touch_right || touch_side {
+                    StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_PEACH_STATUS_KIND_SPECIAL_S_HIT_END, false);
+                }
+            }
+        }
 
 
     }
@@ -315,7 +325,7 @@ unsafe fn peach_nair_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 20.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
-        MotionModule::set_rate(fighter.module_accessor, 1.4);
+        MotionModule::set_rate(fighter.module_accessor, 1.5);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 36.0);
     if macros::is_excute(fighter) {

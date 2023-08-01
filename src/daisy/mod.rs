@@ -28,6 +28,9 @@ fn daisy_frame(fighter: &mut L2CFighterCommon) {
             
             }
         }
+        if sv_information::is_ready_go() == false || [*FIGHTER_STATUS_KIND_WIN, *FIGHTER_STATUS_KIND_LOSE, *FIGHTER_STATUS_KIND_DEAD].contains(&status) {
+			DAISY_DOWNSPECIAL_SATURN_RECHARGE_TIMER[entry_id] = 0;
+		}
 
         if [*FIGHTER_PEACH_STATUS_KIND_SPECIAL_N_HIT].contains(&status) {
             macros::SET_SPEED_EX(fighter, 0.0, -0.2, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
