@@ -12,6 +12,14 @@ pub static mut SELF_DAMAGE_METER : [f32; 8] = [0.0; 8]; //total stored self-dama
 static mut SELF_DAMAGE_FRAME : [i32; 8] = [0; 8]; //for effect frames
 static mut SELF_DAMAGE_FRAME_CURRENT_STATUS : [i32; 8] = [0; 8]; //for effect frames
 static mut PICHU_NEUTRALSPECIAL_FROMGROUND : [bool; 8] = [false; 8]; //if neutral special was started on the ground
+static mut PICHU_SELF_DAMAGE_GRACE : [i32; 8] = [0; 8];
+
+static PICHU_GRACE_FRAMES : i32 = 60;
+
+static PICHU_CHARGE_LV1 : f32 = -5.0;
+static PICHU_CHARGE_LV2 : f32 = -10.0;
+static PICHU_CHARGE_LV3 : f32 = -20.0;
+static PICHU_CHARGE_LV4 : f32 = -30.0;
 
 // A Once-Per-Fighter-Frame that only applies to Pichu. Neat!
 #[fighter_frame( agent = FIGHTER_KIND_PICHU )]
@@ -20,11 +28,31 @@ fn pichu_frame(fighter: &mut L2CFighterCommon) {
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
 
-        if sv_information::is_ready_go() == false || [*FIGHTER_STATUS_KIND_WIN, *FIGHTER_STATUS_KIND_LOSE, *FIGHTER_STATUS_KIND_DEAD, *FIGHTER_STATUS_KIND_DAMAGE, *FIGHTER_STATUS_KIND_DAMAGE_AIR, *FIGHTER_STATUS_KIND_DAMAGE_FLY, *FIGHTER_STATUS_KIND_DAMAGE_FALL, *FIGHTER_STATUS_KIND_DAMAGE_SONG, *FIGHTER_STATUS_KIND_DAMAGE_SLEEP, *FIGHTER_STATUS_KIND_DAMAGE_FLY_ROLL, *FIGHTER_STATUS_KIND_DAMAGE_SONG_FALL, *FIGHTER_STATUS_KIND_DAMAGE_FLY_METEOR, *FIGHTER_STATUS_KIND_DAMAGE_SLEEP_FALL, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_D, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_U, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_LR, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_JUMP_BOARD, *FIGHTER_STATUS_KIND_ICE].contains(&status) {
+        if sv_information::is_ready_go() == false || 
+        [*FIGHTER_STATUS_KIND_WIN, *FIGHTER_STATUS_KIND_LOSE, *FIGHTER_STATUS_KIND_DEAD].contains(&status) {
 			SELF_DAMAGE_METER[entry_id] = 0.0;
             SELF_DAMAGE_FRAME[entry_id] = 0;
+            PICHU_SELF_DAMAGE_GRACE[entry_id] = 0;
             PICHU_NEUTRALSPECIAL_FROMGROUND[entry_id] = false;
 		};
+
+        if ![*FIGHTER_STATUS_KIND_GUARD, *FIGHTER_STATUS_KIND_GUARD_DAMAGE, *FIGHTER_STATUS_KIND_GUARD_OFF, *FIGHTER_STATUS_KIND_GUARD_ON].contains(&status) && StopModule::is_hit(fighter.module_accessor) && PICHU_SELF_DAMAGE_GRACE[entry_id] <= 0 {
+            if SELF_DAMAGE_METER[entry_id] <= PICHU_CHARGE_LV4 {
+                SELF_DAMAGE_METER[entry_id] = PICHU_CHARGE_LV3;
+                PICHU_SELF_DAMAGE_GRACE[entry_id] = PICHU_GRACE_FRAMES;
+            }
+            else if SELF_DAMAGE_METER[entry_id] <= PICHU_CHARGE_LV3 {
+                SELF_DAMAGE_METER[entry_id] = PICHU_CHARGE_LV2;
+                PICHU_SELF_DAMAGE_GRACE[entry_id] = PICHU_GRACE_FRAMES;
+            }
+            else if SELF_DAMAGE_METER[entry_id] <= PICHU_CHARGE_LV2 {
+                SELF_DAMAGE_METER[entry_id] = PICHU_CHARGE_LV1;
+                PICHU_SELF_DAMAGE_GRACE[entry_id] = PICHU_GRACE_FRAMES;
+            }
+            else {
+                SELF_DAMAGE_METER[entry_id] = 0.0;
+            }
+        }
 
         if status == *FIGHTER_STATUS_KIND_SPECIAL_N && StatusModule::situation_kind(fighter.module_accessor) == *SITUATION_KIND_GROUND && MotionModule::frame(fighter.module_accessor) < 2.0 {
             
@@ -47,20 +75,20 @@ fn pichu_frame(fighter: &mut L2CFighterCommon) {
         SELF_DAMAGE_FRAME[entry_id] += 1;
         if SELF_DAMAGE_FRAME[entry_id] == 9000 || SELF_DAMAGE_FRAME_CURRENT_STATUS[entry_id] != status {
             SELF_DAMAGE_FRAME[entry_id] = 0 ;
-            if SELF_DAMAGE_METER[entry_id] <= -30.0 {
+            if SELF_DAMAGE_METER[entry_id] <= PICHU_CHARGE_LV4 {
                 macros::EFFECT_FOLLOW(fighter, Hash40::new("pichu_elec2"), Hash40::new("top"), 0, 4, 0, 0, 0, 0, 2.0, true);
                 macros::LAST_EFFECT_SET_COLOR(fighter, 5.0, 0.5, 2.5);
             }
-            else if SELF_DAMAGE_METER[entry_id] <= -20.0 {
+            else if SELF_DAMAGE_METER[entry_id] <= PICHU_CHARGE_LV3 {
                 macros::EFFECT_FOLLOW(fighter, Hash40::new("pichu_elec2"), Hash40::new("top"), 0, 4, 0, 0, 0, 0, 1.8, true);
                 macros::LAST_EFFECT_SET_COLOR(fighter, 8.0, 1.5, 0.5);
             }
-            else if SELF_DAMAGE_METER[entry_id] <= -10.0 {
+            else if SELF_DAMAGE_METER[entry_id] <= PICHU_CHARGE_LV2 {
                 macros::EFFECT_FOLLOW(fighter, Hash40::new("pichu_elec2"), Hash40::new("top"), 0, 4, 0, 0, 0, 0, 1.5, true);
                 macros::LAST_EFFECT_SET_COLOR(fighter, 1.0, 3.0, 0.5);
             }
             else {
-                if SELF_DAMAGE_METER[entry_id] <= -5.0 {
+                if SELF_DAMAGE_METER[entry_id] <= PICHU_CHARGE_LV1 {
                     macros::EFFECT_FOLLOW(fighter, Hash40::new("pichu_elec2"), Hash40::new("top"), 0, 4, 0, 0, 0, 0, 1.2, true);
                 }
             }
@@ -69,26 +97,38 @@ fn pichu_frame(fighter: &mut L2CFighterCommon) {
 
 
         if [*FIGHTER_PIKACHU_STATUS_KIND_SPECIAL_HI_WARP].contains(&status) {
-            if SELF_DAMAGE_METER[entry_id] <= -10.0 {
+            if SELF_DAMAGE_METER[entry_id] <= PICHU_CHARGE_LV2 {
                 if ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_ATTACK) {
                     StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_PIKACHU_STATUS_KIND_SPECIAL_LW_HIT, false);
                 }
             }
         }
 
-        if SELF_DAMAGE_METER[entry_id] <= -10.0 {
-            DamageModule::set_damage_mul(fighter.module_accessor, 0.85);
-        }
-        if SELF_DAMAGE_METER[entry_id] <= -20.0 {
-            DamageModule::set_damage_mul(fighter.module_accessor, 0.8);
-        }
-        if SELF_DAMAGE_METER[entry_id] <= -30.0 {
+        if SELF_DAMAGE_METER[entry_id] <= PICHU_CHARGE_LV4 {
             DamageModule::set_damage_mul(fighter.module_accessor, 0.75);
         }
-        if SELF_DAMAGE_METER[entry_id] == 0.0 {
+        else if SELF_DAMAGE_METER[entry_id] <= PICHU_CHARGE_LV3 {
+            DamageModule::set_damage_mul(fighter.module_accessor, 0.8);
+        }
+        else if SELF_DAMAGE_METER[entry_id] <= PICHU_CHARGE_LV2 {
+            DamageModule::set_damage_mul(fighter.module_accessor, 0.85);
+        }
+        else {
             DamageModule::set_damage_mul(fighter.module_accessor, 1.0);
         }
 
+        if PICHU_SELF_DAMAGE_GRACE[entry_id] > 0 {
+            PICHU_SELF_DAMAGE_GRACE[entry_id] -= 1;
+        }
+
+        let touch_right = GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_RIGHT_SIDE as u32);
+        let touch_left = GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_LEFT_SIDE as u32);
+        let touch_side =  GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_SIDE as u32);
+        if status == *FIGHTER_PIKACHU_STATUS_KIND_SPECIAL_S_ATTACK {
+            if touch_left || touch_right || touch_side {
+                StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_LR, true);
+            }
+        }
 
     }
 }
@@ -837,7 +877,7 @@ unsafe fn pichu_sidespecial(fighter: &mut L2CAgentBase) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_PIKACHU_STATUS_WORK_ID_FLAG_SKULL_BASH_ATTACK_TRIGGER);
         macros::FT_ADD_DAMAGE(fighter, 1.5);
         SELF_DAMAGE_METER[entry_id] -= 1.5;
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.0, 361, 90, 0, 15, 3.2, 0.0, 3.3, 4.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 9, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_HEAD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.0, 361, 90, 0, 15, 5.0, 0.0, 3.3, 4.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 9, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_HEAD);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_PIKACHU_STATUS_WORK_ID_FLAG_SKULL_BASH_CALC_ATTACK_POWER);
         AttackModule::set_attack_keep_rumble(fighter.module_accessor, 0, true);
     }
@@ -937,21 +977,21 @@ unsafe fn pichu_upspecial_air_2(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_speciallwhit", category = ACMD_GAME )]
+#[acmd_script( agent = "pichu", scripts = ["game_speciallwhit", "game_specialairlwhit"], category = ACMD_GAME, low_priority )]
 unsafe fn pichu_downspecial_hit(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     let thunder_damage;
 
-    if SELF_DAMAGE_METER[entry_id] <= -30.0 {
+    if SELF_DAMAGE_METER[entry_id] <= PICHU_CHARGE_LV4 {
         thunder_damage = 50.0;
     }
-    else if SELF_DAMAGE_METER[entry_id] <= -20.0 {
+    else if SELF_DAMAGE_METER[entry_id] <= PICHU_CHARGE_LV3 {
         thunder_damage = 33.0;
     }
-    else if SELF_DAMAGE_METER[entry_id] <= -10.0 {
+    else if SELF_DAMAGE_METER[entry_id] <= PICHU_CHARGE_LV2 {
         thunder_damage = 24.0;
     }
-    else if SELF_DAMAGE_METER[entry_id] <= -5.0 {
+    else if SELF_DAMAGE_METER[entry_id] <= PICHU_CHARGE_LV1 {
         thunder_damage = 16.0;
     }
     else {
@@ -970,48 +1010,12 @@ unsafe fn pichu_downspecial_hit(fighter: &mut L2CAgentBase) {
             //KineticModule::add_speed(fighter.module_accessor, &smash::phx::Vector3f{x: 2.0, y: 2.0, z: 0.0});
         }
         SELF_DAMAGE_METER[entry_id] = 0.0;
+        PICHU_SELF_DAMAGE_GRACE[entry_id] = 0;
 
         macros::FT_MOTION_RATE(fighter, 1.25);
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_specialairlwhit", category = ACMD_GAME )]
-unsafe fn pichu_downspecial_air_hit(fighter: &mut L2CAgentBase) {
-    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
-    let thunder_damage;
-
-    if SELF_DAMAGE_METER[entry_id] <= -30.0 {
-        thunder_damage = 50.0;
-    }
-    else if SELF_DAMAGE_METER[entry_id] <= -20.0 {
-        thunder_damage = 33.0;
-    }
-    else if SELF_DAMAGE_METER[entry_id] <= -10.0 {
-        thunder_damage = 24.0;
-    }
-    else if SELF_DAMAGE_METER[entry_id] <= -5.0 {
-        thunder_damage = 16.0;
-    }
-    else {
-        thunder_damage = 11.0;
-    }
-
-    if macros::is_excute(fighter) {
-        //FT_ADD_DAMAGE(SelfDamage=3.5)
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), thunder_damage, 361, 91, 0, 58, 14.0, 0.0, 10.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 2, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_NONE);
-    }
-    sv_animcmd::wait(fighter.lua_state_agent, 5.0);
-    if macros::is_excute(fighter) {
-        AttackModule::clear_all(fighter.module_accessor);
-        if SELF_DAMAGE_METER[entry_id] < 0.0 && AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) {
-            DamageModule::add_damage(fighter.module_accessor, SELF_DAMAGE_METER[entry_id], 0);
-            //KineticModule::add_speed(fighter.module_accessor, &smash::phx::Vector3f{x: 2.0, y: 2.0, z: 0.0});
-        }
-        SELF_DAMAGE_METER[entry_id] = 0.0;
-
-        macros::FT_MOTION_RATE(fighter, 1.25);
-    }
-}
 
 #[acmd_script( agent = "pichu_dengekidama", script = "game_regular", category = ACMD_GAME )]
 unsafe fn pichu_thunderjolt(fighter: &mut L2CAgentBase) {
@@ -1120,7 +1124,6 @@ pub fn install() {
         pichu_upspecial_air_1,
         pichu_upspecial_air_2,
         pichu_downspecial_hit,
-        pichu_downspecial_air_hit,
         pichu_thunderjolt,
         pichu_thunderjolt_ground,
         pichu_thunder,

@@ -4,18 +4,10 @@ use smash::phx::Hash40;
 use smash::lib::lua_const::*;
 use smash::app::*;
 use smash::app::lua_bind::*;
-use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase, L2CFighterBase};
+use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 
-
-// A Once-Per-Fighter-Frame that only applies to Mii Enemy Gunner
-#[fighter_frame( agent = FIGHTER_KIND_MIIENEMYG )]
-fn miienemyg_frame(fighter: &mut L2CFighterCommon) {
-    unsafe {
-        println!("It'sa Mii!?!?!?");
-    }
-}
 
 #[acmd_script( agent = "miienemyg", script = "game_attack11", category = ACMD_GAME )]
 unsafe fn miienemyg_jab_smash_script(fighter: &mut L2CAgentBase) {
@@ -1604,9 +1596,6 @@ unsafe fn miienemyg_dair_smash_script(fighter: &mut L2CAgentBase) {
 
 
 pub fn install() {
-    smashline::install_agent_frames!(
-        miienemyg_frame
-    );
     smashline::install_acmd_scripts!(
         miienemyg_jab_smash_script,
         miienemyg_jab2_smash_script,

@@ -102,7 +102,7 @@ unsafe fn reflet_jab2_smash_script(fighter: &mut L2CAgentBase) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.5, 361, 25, 15, 25, 2.8, 0.0, 8.5, 8.0, Some(0.0), Some(8.5), Some(7.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 3.5, 180, 25, 15, 20, 3.5, 0.0, 8.5, 12.0, Some(0.0), Some(8.5), Some(7.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
         macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 3.5, 180, 20, 15, 20, 3.5, 0.0, 8.5, 14.5, Some(0.0), Some(8.5), Some(7.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 3.5, 361, 20, 10, 20, 3.5, 0.0, 8.5, 14.5, Some(0.0), Some(8.5), Some(7.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 3.5, 180, 20, 10, 20, 3.5, 0.0, 8.5, 14.5, Some(0.0), Some(8.5), Some(7.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 4.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 4.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 2, 4.0, false);
@@ -1319,7 +1319,7 @@ unsafe fn thoron_projectile(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "reflet", script = "game_specialntronstart", category = ACMD_GAME )]
+#[acmd_script( agent = "reflet", scripts = ["game_specialntronstart", "game_specialairntronstart"], category = ACMD_GAME, low_priority )]
 unsafe fn reflet_neutralb_thoron_start_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
@@ -1327,24 +1327,9 @@ unsafe fn reflet_neutralb_thoron_start_smash_script(fighter: &mut L2CAgentBase) 
     }
 }
 
-#[acmd_script( agent = "reflet", script = "game_specialairntronstart", category = ACMD_GAME )]
-unsafe fn reflet_neutralb_thoron_air_start_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.8);
-    }
-}
 
-#[acmd_script( agent = "reflet", script = "game_specialntronhold", category = ACMD_GAME )]
+#[acmd_script( agent = "reflet", scripts = ["game_specialntronhold", "game_specialairntronhold"], category = ACMD_GAME, low_priority )]
 unsafe fn reflet_neutralb_thoron_smash_script(fighter: &mut L2CAgentBase) {
-    if macros::is_excute(fighter) {
-        ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_REFLET_GENERATE_ARTICLE_THUNDER, false, -1);
-        macros::FT_MOTION_RATE(fighter, 0.75);
-    }
-}
-
-#[acmd_script( agent = "reflet", script = "game_specialairntronhold", category = ACMD_GAME )]
-unsafe fn reflet_neutralb_thoron_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_REFLET_GENERATE_ARTICLE_THUNDER, false, -1);
         macros::FT_MOTION_RATE(fighter, 0.75);
@@ -1434,27 +1419,8 @@ unsafe fn elwind_projectile_2(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "reflet", script = "game_speciallwstart", category = ACMD_GAME )]
+#[acmd_script( agent = "reflet", scripts = ["game_speciallwstart", "game_specialairlwstart"], category = ACMD_GAME, low_priority )]
 unsafe fn reflet_downb_start_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.6666666667);
-    }
-    sv_animcmd::wait(fighter.lua_state_agent, 20.0);
-    if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_REFLET_INSTANCE_WORK_ID_FLAG_SPECIAL_FAILURE) == false {
-        if macros::is_excute(fighter) {
-            macros::FT_MOTION_RATE(fighter, 3.33333333);
-            macros::CATCH(fighter, 0, Hash40::new("top"), 9.4, 0.0, 10.0, 14.0, None, None, None, *FIGHTER_STATUS_KIND_CATCHED_REFLET, *COLLISION_SITUATION_MASK_GA);
-        }
-    }
-    sv_animcmd::wait(fighter.lua_state_agent, 6.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.83333333);
-    }
-}
-
-#[acmd_script( agent = "reflet", script = "game_specialairlwstart", category = ACMD_GAME )]
-unsafe fn reflet_downb_start_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.6666666667);
@@ -1509,9 +1475,7 @@ pub fn install() {
         arcthunder_explode,
         thoron_projectile,
         reflet_neutralb_thoron_start_smash_script,
-        reflet_neutralb_thoron_air_start_smash_script,
         reflet_neutralb_thoron_smash_script,
-        reflet_neutralb_thoron_air_smash_script,
         reflet_sideb_smash_script,
         arcfire_projectile,
         arcfire_pillar,
@@ -1519,7 +1483,6 @@ pub fn install() {
         arcfire_explode,
         elwind_projectile_1,
         elwind_projectile_2,
-        reflet_downb_start_smash_script,
-        reflet_downb_start_air_smash_script
+        reflet_downb_start_smash_script
     );
 }

@@ -7,6 +7,76 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
+use smash::lib::L2CValue;
+
+
+
+/// determines the command inputs
+/// inputs divided into command normals (A) and command specials (B)
+/// NOTE: order is important! early order has higher priority
+/*pub unsafe extern "C" fn ken_check_special_command(fighter: &mut L2CFighterCommon) -> L2CValue {
+    let cat1 =  fighter.global_table[0x20].get_i32();
+    let cat4 = fighter.global_table[0x23].get_i32();
+    let is_special = fighter.is_cat_flag(FIGHTER_PAD_CMD_CAT1_FLAG_WALK);
+    let is_normal = fighter.is_cat_flag(
+        FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_N | 
+        FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_HI3 | 
+        FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_S3 | 
+        FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_LW3 | 
+        FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_HI4 | 
+        FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_S4 | 
+        FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_LW4
+    );
+
+    // shoryu
+    if is_special
+    && cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SPECIAL_HI_COMMAND != 0
+    && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_HI_COMMAND)
+    && fighter.sub_transition_term_id_cont_disguise(fighter.global_table[0x3A].clone()).get_bool() {
+        fighter.change_status(FIGHTER_RYU_STATUS_KIND_SPECIAL_HI_COMMAND.into(), true.into());
+        return true.into();
+    }
+
+    // hado
+    if is_special
+    && cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SPECIAL_N_COMMAND != 0
+    && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_N_COMMAND)
+    && fighter.sub_transition_term_id_cont_disguise(fighter.global_table[0x38].clone()).get_bool() {
+        fighter.change_status(FIGHTER_RYU_STATUS_KIND_SPECIAL_N_COMMAND.into(), true.into());
+        return true.into();
+    }
+
+    // tatsu
+    if is_special
+    && cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SPECIAL_S_COMMAND != 0
+    && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_S_COMMAND)
+    && fighter.sub_transition_term_id_cont_disguise(fighter.global_table[0x39].clone()).get_bool()
+    && FighterSpecializer_Ryu::check_special_air_s_command(fighter.module_accessor) {
+        fighter.change_status(FIGHTER_RYU_STATUS_KIND_SPECIAL_S_COMMAND.into(), true.into());
+        return true.into();
+    }
+
+    // roundhouse
+    if is_normal
+    && cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SPECIAL_N2_COMMAND != 0
+    && fighter.is_situation(*SITUATION_KIND_GROUND)
+    && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_N2_COMMAND) {
+        fighter.change_status(FIGHTER_RYU_STATUS_KIND_ATTACK_COMMAND2.into(), true.into());
+        return true.into();
+    }
+
+
+    // crescent kick
+    if is_normal
+    && cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_ATTACK_COMMAND1 != 0
+    && fighter.is_situation(*SITUATION_KIND_GROUND)
+    && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_COMMAND1) {
+        fighter.change_status(FIGHTER_RYU_STATUS_KIND_ATTACK_COMMAND1.into(), true.into());
+        return true.into();
+    }
+
+    false.into()
+}*/
 
 // A Once-Per-Fighter-Frame that only applies to Ken
 #[fighter_frame( agent = FIGHTER_KIND_KEN )]

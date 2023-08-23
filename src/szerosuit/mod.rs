@@ -817,6 +817,50 @@ unsafe fn szerosuit_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
+#[acmd_script( agent = "szerosuit", script = "game_aircatch", category = ACMD_GAME )]
+unsafe fn szerosuit_zair_smash_script(fighter: &mut L2CAgentBase) {
+    if macros::is_excute(fighter) {
+        ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_SZEROSUIT_GENERATE_ARTICLE_WHIP2, false, -1);
+        ArticleModule::set_visibility_whole(fighter.module_accessor, *FIGHTER_SZEROSUIT_GENERATE_ARTICLE_WHIP2, false, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_AIR_LASSO_FLAG_CHECK);
+    }
+    sv_animcmd::wait(fighter.lua_state_agent, 5.0);
+    if macros::is_excute(fighter) {
+        WorkModule::off_flag(fighter.module_accessor, *FIGHTER_STATUS_AIR_LASSO_FLAG_CHECK);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 9.0);
+    if macros::is_excute(fighter) {
+        ArticleModule::set_visibility_whole(fighter.module_accessor, *FIGHTER_SZEROSUIT_GENERATE_ARTICLE_WHIP2, true, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+        ArticleModule::change_status(fighter.module_accessor, *FIGHTER_SZEROSUIT_GENERATE_ARTICLE_WHIP2, *WEAPON_SZEROSUIT_WHIP2_STATUS_KIND_SHOOT, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+        macros::ATTACK(fighter, 0, 0, Hash40::new("throw"), 6.0, 82, 30, 0, 60, 3.3, 0.0, 0.0, 0.0, None, None, None, 0.7, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 4.0, false);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 10.0);
+    if macros::is_excute(fighter) {
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_AIR_LASSO_FLAG_LANDING);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 20.0);
+    if macros::is_excute(fighter) {
+        AttackModule::clear_all(fighter.module_accessor);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 24.0);
+    if macros::is_excute(fighter) {
+        ArticleModule::change_status_exist(fighter.module_accessor, *FIGHTER_SZEROSUIT_GENERATE_ARTICLE_WHIP2, *WEAPON_SZEROSUIT_WHIP2_STATUS_KIND_REWIND);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 35.0);
+    if macros::is_excute(fighter) {
+        ArticleModule::remove_exist(fighter.module_accessor, *FIGHTER_SZEROSUIT_GENERATE_ARTICLE_WHIP2, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 40.0);
+    if macros::is_excute(fighter) {
+        WorkModule::off_flag(fighter.module_accessor, *FIGHTER_STATUS_AIR_LASSO_FLAG_LANDING);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 50.0);
+    if macros::is_excute(fighter) {
+        CancelModule::enable_cancel(fighter.module_accessor);
+    }
+}
+
 #[acmd_script( agent = "szerosuit", script = "game_throwf", category = ACMD_GAME )]
 unsafe fn szerosuit_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
@@ -1250,57 +1294,8 @@ unsafe fn whip_sideb2_air(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "szerosuit", script = "game_specialhi", category = ACMD_GAME )]
+#[acmd_script( agent = "szerosuit", scripts = ["game_specialhi", "game_specialairhi"], category = ACMD_GAME, low_priority )]
 unsafe fn szerosuit_upb_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 4.0);
-    if macros::is_excute(fighter) {
-        macros::SA_SET(fighter, *SITUATION_KIND_AIR);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 1.5, 84, 100, 150, 0, 5.0, 0.0, 8.0, 5.0, None, None, None, 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
-        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_SUPER_JUMP_PUNCH_FLAG_REVERSE_LR);
-        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_SUPER_JUMP_PUNCH_FLAG_MOVE_TRANS);
-    }
-    sv_animcmd::wait(fighter.lua_state_agent, 1.0);
-    if macros::is_excute(fighter) {
-        AttackModule::clear_all(fighter.module_accessor);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 10.0);
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.6, 367, 100, 50, 0, 7.0, 0.0, 19.0, 5.5, None, None, None, 0.5, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 4, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_rush"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 15.0);
-    if macros::is_excute(fighter) {
-        notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 23.0);
-    if macros::is_excute(fighter) {
-        AttackModule::clear_all(fighter.module_accessor);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 26.0);
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 1, Hash40::new("top"), 1.6, 90, 100, 12, 0, 7.0, 0.0, 12.0, 10.0, None, None, None, 0.0, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 4, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_rush"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 1, 1, Hash40::new("top"), 1.6, 290, 100, 10, 0, 4.0, 0.0, 20.0, 5.5, None, None, None, 0.0, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 4, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_rush"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 27.0);
-    if macros::is_excute(fighter) {
-        AttackModule::clear_all(fighter.module_accessor);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 32.0);
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.6, 48, 150, 0, 50, 8.0, 0.0, 12.5, 11.0, Some(0.0), Some(12.0), Some(8.6), 2.5, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 4, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
-    }
-    sv_animcmd::wait(fighter.lua_state_agent, 2.0);
-    if macros::is_excute(fighter) {
-        AttackModule::clear_all(fighter.module_accessor);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 42.0);
-    if macros::is_excute(fighter) {
-        WorkModule::off_flag(fighter.module_accessor, *FIGHTER_STATUS_SUPER_JUMP_PUNCH_FLAG_MOVE_TRANS);
-        notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS_BOTH_SIDES);
-    }
-}
-
-#[acmd_script( agent = "szerosuit", script = "game_specialairhi", category = ACMD_GAME )]
-unsafe fn szerosuit_upb_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         macros::SA_SET(fighter, *SITUATION_KIND_AIR);
@@ -1418,6 +1413,7 @@ pub fn install() {
         szerosuit_grab_smash_script,
         szerosuit_grabd_smash_script,
         szerosuit_grabp_smash_script,
+        szerosuit_zair_smash_script,
         szerosuit_fthrow_smash_script,
         szerosuit_bthrow_smash_script,
         szerosuit_uthrow_smash_script,
@@ -1435,7 +1431,6 @@ pub fn install() {
         whip_sideb1_air,
         whip_sideb2_air,
         szerosuit_upb_smash_script,
-        szerosuit_upb_air_smash_script,
         szerosuit_downb_flip_smash_script,
         szerosuit_downb_kick_smash_script,
         szerosuit_downb_kick_landing_smash_script

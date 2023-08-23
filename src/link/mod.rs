@@ -15,6 +15,7 @@ static mut LINK_FSMASH_CHARGE : [bool; 8] = [false; 8];
 
 static mut LINK_UPB_GROUNDTOAIR : [bool; 8] = [false; 8];
 
+
 // A Once-Per-Fighter-Frame that only applies to Link
 #[fighter_frame( agent = FIGHTER_KIND_LINK )]
 fn link_frame(fighter: &mut L2CFighterCommon) {
@@ -32,6 +33,7 @@ fn link_frame(fighter: &mut L2CFighterCommon) {
             }
             LINK_GLOWSTICK_STATUS_CURRENT[entry_id] = status ;
         }
+
 
     }
 }

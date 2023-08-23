@@ -8,13 +8,6 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 
-// A Once-Per-Fighter-Frame that only applies to Mii Enemy Swordfighter
-#[fighter_frame( agent = FIGHTER_KIND_MIIENEMYS )]
-fn miienemys_frame(fighter: &mut L2CFighterCommon) {
-    unsafe {
-        println!("It'sa Mii!?!?!?!?");
-    }
-}
 
 #[acmd_script( agent = "miienemys", script = "game_attack11", category = ACMD_GAME )]
 unsafe fn miienemys_jab_smash_script(fighter: &mut L2CAgentBase) {
@@ -1370,9 +1363,6 @@ unsafe fn miienemys_dair_landing_smash_script(fighter: &mut L2CAgentBase) {
 }
 
 pub fn install() {
-    smashline::install_agent_frames!(
-        miienemys_frame
-    );
     smashline::install_acmd_scripts!(
         miienemys_jab_smash_script,
         miienemys_jab2_smash_script,

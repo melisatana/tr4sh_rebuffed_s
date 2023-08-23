@@ -1468,30 +1468,8 @@ unsafe fn pikmin_downb_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pikmin", script = "game_appeallwl", category = ACMD_GAME )]
-unsafe fn pikmin_downtaunt_left_smash_script(fighter: &mut L2CAgentBase) {
-    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
-
-    if macros::is_excute(fighter) {
-        if OLIMAR_TAUNT_CAN_SPEEDUP[entry_id] {
-            OLIMAR_TAUNT_SPEEDUP_LEVEL[entry_id] += 1;
-            if OLIMAR_TAUNT_SPEEDUP_LEVEL[entry_id] > OLIMAR_TAUNT_MAX_SPEEDUP_LEVEL {
-                OLIMAR_TAUNT_SPEEDUP_LEVEL[entry_id] = OLIMAR_TAUNT_MAX_SPEEDUP_LEVEL;
-            }
-            MotionModule::set_rate(fighter.module_accessor, 1.0 + ((OLIMAR_TAUNT_SPEEDUP_LEVEL[entry_id] as f32) / (OLIMAR_TAUNT_MAX_SPEEDUP_LEVEL as f32)));
-        }
-        OLIMAR_TAUNT_CAN_SPEEDUP[entry_id] = true;
-        println!("[olimar] taunt");
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 60.0);
-    if macros::is_excute(fighter) {
-        OLIMAR_TAUNT_CAN_SPEEDUP[entry_id] = false;
-        println!("[olimar] end taunt :(");
-    }
-}
-
-#[acmd_script( agent = "pikmin", script = "game_appeallwr", category = ACMD_GAME )]
-unsafe fn pikmin_downtaunt_right_smash_script(fighter: &mut L2CAgentBase) {
+#[acmd_script( agent = "pikmin", scripts = ["game_appeallwl", "game_appeallwr"], category = ACMD_GAME, low_priority )]
+unsafe fn pikmin_downtaunt_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -1597,8 +1575,7 @@ pub fn install() {
         purple_sideb_thrown,
         pikmin_downb_smash_script,
         pikmin_downb_air_smash_script,
-        pikmin_downtaunt_left_smash_script,
-        pikmin_downtaunt_right_smash_script
+        pikmin_downtaunt_smash_script
 
     );
 }

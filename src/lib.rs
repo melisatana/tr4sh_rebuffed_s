@@ -6,6 +6,7 @@
 
 pub mod custom;
 pub mod customparam;
+pub mod consts;
 mod mario;
 mod mariod;
 mod donkey;

@@ -15,9 +15,19 @@ fn steve_frame(fighter: &mut L2CFighterCommon) {
         //let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
 
-        println!("It's a me, steve, *vibe check*!");
+        println!("*vibe check*");
 
-        if [*FIGHTER_STATUS_KIND_DAMAGE, *FIGHTER_STATUS_KIND_DAMAGE_AIR, *FIGHTER_STATUS_KIND_DAMAGE_FLY, *FIGHTER_STATUS_KIND_DAMAGE_FLY_ROLL, *FIGHTER_STATUS_KIND_DAMAGE_FLY_METEOR, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_D, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_U, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_LR, *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_JUMP_BOARD].contains(&status){
+        if 
+        [*FIGHTER_STATUS_KIND_DAMAGE, 
+        *FIGHTER_STATUS_KIND_DAMAGE_AIR, 
+        *FIGHTER_STATUS_KIND_DAMAGE_FLY, 
+        *FIGHTER_STATUS_KIND_DAMAGE_FLY_ROLL, 
+        *FIGHTER_STATUS_KIND_DAMAGE_FLY_METEOR, 
+        *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_D, 
+        *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_U, 
+        *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_LR, 
+        *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_JUMP_BOARD
+        ].contains(&status){
             if WorkModule::get_float(fighter.module_accessor, *FIGHTER_STATUS_DAMAGE_WORK_FLOAT_REACTION_FRAME) > 0.1 {
                 macros::FLASH(fighter, 0.65, 0.25, 1, 0.55);
             }
@@ -898,6 +908,12 @@ unsafe fn steve_fair(fighter: &mut L2CAgentBase) {
             AttackModule::clear_all(fighter.module_accessor);
         }
     }
+    sv_animcmd::frame(fighter.lua_state_agent, 15.0);
+    if macros::is_excute(fighter) {
+        if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) {
+            CancelModule::enable_cancel(fighter.module_accessor);
+        }
+    }
     sv_animcmd::frame(fighter.lua_state_agent, 20.0);
     if macros::is_excute(fighter) {
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -1046,6 +1062,12 @@ unsafe fn steve_bair(fighter: &mut L2CAgentBase) {
         sv_animcmd::wait(fighter.lua_state_agent, 6.0);
         if macros::is_excute(fighter) {
             AttackModule::clear_all(fighter.module_accessor);
+        }
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 19.0);
+    if macros::is_excute(fighter) {
+        if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) {
+            CancelModule::enable_cancel(fighter.module_accessor);
         }
     }
     sv_animcmd::frame(fighter.lua_state_agent, 20.0);
@@ -1232,6 +1254,12 @@ unsafe fn steve_uair(fighter: &mut L2CAgentBase) {
             AttackModule::clear_all(fighter.module_accessor);
             MotionModule::set_rate_partial(fighter.module_accessor, *FIGHTER_MOTION_PART_SET_KIND_UPPER_BODY, 0.65);
             //MotionModule::set_rate(fighter.module_accessor, 0.5);
+        }
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 12.0);
+    if macros::is_excute(fighter) {
+        if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) {
+            CancelModule::enable_cancel(fighter.module_accessor);
         }
     }
     sv_animcmd::frame(fighter.lua_state_agent, 13.0);

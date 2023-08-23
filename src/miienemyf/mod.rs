@@ -8,16 +8,6 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 
-// A Once-Per-Fighter-Frame that only applies to Fighting Mii Team Mii Brawler
-#[fighter_frame( agent = FIGHTER_KIND_MIIENEMYF )]
-fn miienemyf_frame(fighter: &mut L2CFighterCommon) {
-    unsafe {
-        
-        println!("It'sa Mii!?!?!?");
-
-
-    }
-}
 
 /*#[acmd_script( agent = "miienemyf", script = "game_attack11", category = ACMD_GAME )]
 unsafe fn miienemyf_jab_smash_script(fighter: &mut L2CAgentBase) {
@@ -1439,9 +1429,6 @@ unsafe fn miienemyf_dair_smash_script(fighter: &mut L2CAgentBase) {
 
 
 pub fn install() {
-    smashline::install_agent_frames!(
-        miienemyf_frame
-    );
     smashline::install_acmd_scripts!(
         //miienemyf_jab_smash_script,
         //miienemyf_jab2_smash_script,
