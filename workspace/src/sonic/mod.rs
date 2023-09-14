@@ -781,14 +781,14 @@ unsafe fn sonic_neutralb_homing_smash_script(fighter: &mut L2CAgentBase) {
     }
     if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_SONIC_STATUS_SPECIAL_N_HOMING_FLAG_IS_KIRBY) == false {
         if macros::is_excute(fighter) {
-            macros::ATTACK(fighter, 0, 0, Hash40::new("hip"), 11.0, 53, 110, 0, 35, 5.0, 0.5, 1.5, 0.0, Some(0.5), Some(1.5), Some(0.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, 6, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
+            macros::ATTACK(fighter, 0, 0, Hash40::new("hip"), 11.0, 53, 105, 0, 35, 5.0, 0.5, 1.5, 0.0, Some(0.5), Some(1.5), Some(0.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, 6, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
             macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 0.5);
             AttackModule::set_captured_same_time_attack(fighter.module_accessor, 0, true);
         }
     }
     else {
         if macros::is_excute(fighter) {
-            macros::ATTACK(fighter, 0, 0, Hash40::new("rot"), 11.0, 53, 110, 0, 35, 5.0, 0.5, 1.5, 0.0, Some(0.5), Some(1.5), Some(0.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, 6, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
+            macros::ATTACK(fighter, 0, 0, Hash40::new("rot"), 11.0, 53, 105, 0, 35, 5.0, 0.5, 1.5, 0.0, Some(0.5), Some(1.5), Some(0.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, 6, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
             macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 0.5);
             AttackModule::set_captured_same_time_attack(fighter.module_accessor, 0, true);
         }
@@ -920,7 +920,7 @@ unsafe fn sonic_downb_jump_smash_script(fighter: &mut L2CAgentBase) {
 #[acmd_script( agent = "sonic", scripts = ["game_appealsl", "game_appealsr"], category = ACMD_GAME, low_priority )]
 unsafe fn sonic_sidetaunt_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-    for _ in 0..60 {
+    for _ in 0..50 {
         if macros::is_excute(fighter) {
             macros::SET_SPEED_EX(fighter, -0.5, 0, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
         }
@@ -928,6 +928,80 @@ unsafe fn sonic_sidetaunt_script(fighter: &mut L2CAgentBase) {
     }
 }
 
+#[acmd_script( agent = "sonic_supersonic", scripts = ["game_finalstart", "game_finalairstart"], category = ACMD_GAME, low_priority )]
+unsafe fn supersonic_start(fighter: &mut L2CAgentBase) {
+    if macros::is_excute(fighter) {
+        macros::WHOLE_HIT(fighter, *HIT_STATUS_INVINCIBLE);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.0, 80, 100, 0, 90, 22.0, 0.0, 7.5, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 50, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_NONE);
+        AttackModule::set_force_reaction(fighter.module_accessor, 0, true, false);
+        AttackModule::set_final_finish_cut_in(fighter.module_accessor, 0, true, true, -1.0, false);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 6.0);
+    if macros::is_excute(fighter) {
+        AttackModule::clear_all(fighter.module_accessor);
+    }
+}
+
+#[acmd_script( agent = "sonic_supersonic", script = "game_finalmove", category = ACMD_GAME, low_priority )]
+unsafe fn supersonic_move(fighter: &mut L2CAgentBase) {
+    if macros::is_excute(fighter) {
+        macros::WHOLE_HIT(fighter, *HIT_STATUS_INVINCIBLE);
+    }
+    if PostureModule::scale(fighter.module_accessor) >= 1.4 {
+        if macros::is_excute(fighter) {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.0, 70, 50, 0, 20, 9.0, 0.0, 11.0, 0.0, Some(0.0), Some(11.0), Some(-60.0), 0.0, 3.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 50, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_NONE);
+            AttackModule::set_force_reaction(fighter.module_accessor, 0, true, false);
+            AttackModule::set_final_finish_cut_in(fighter.module_accessor, 0, true, true, -1.0, false);
+            AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 5.0, false);
+        }
+    }
+    else if PostureModule::scale(fighter.module_accessor) <= 0.5 {
+        if macros::is_excute(fighter) {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.0, 70, 50, 0, 20, 12.0, 0.0, 11.0, 0.0, Some(0.0), Some(11.0), Some(-170.0), 0.0, 3.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 50, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_NONE);
+            AttackModule::set_force_reaction(fighter.module_accessor, 0, true, false);
+            AttackModule::set_final_finish_cut_in(fighter.module_accessor, 0, true, true, -1.0, false);
+            AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 5.0, false);
+        }
+    }
+    else {
+        if macros::is_excute(fighter) {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.0, 70, 50, 0, 20, 9.0, 0.0, 11.0, 0.0, Some(0.0), Some(11.0), Some(-80.0), 0.0, 3.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 50, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_NONE);
+            AttackModule::set_force_reaction(fighter.module_accessor, 0, true, false);
+            AttackModule::set_final_finish_cut_in(fighter.module_accessor, 0, true, true, -1.0, false);
+            AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 5.0, false);
+        }
+    }
+    if macros::is_excute(fighter) {
+        ControlModule::set_rumble(fighter.module_accessor, Hash40::new("rbkind_38_rush_sp"), 0, true, *BATTLE_OBJECT_ID_INVALID as u32);
+    }
+}
+
+#[acmd_script( agent = "sonic_supersonic", script = "game_finalmoveflashing", category = ACMD_GAME, low_priority )]
+unsafe fn supersonic_move_flashing(fighter: &mut L2CAgentBase) {
+    if macros::is_excute(fighter) {
+        macros::WHOLE_HIT(fighter, *HIT_STATUS_INVINCIBLE);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 9.0, 70, 145, 0, 80, 9.0, 0.0, 11.0, 0.0, Some(0.0), Some(11.0), Some(-80.0), 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 50, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_NONE);
+        AttackModule::set_force_reaction(fighter.module_accessor, 0, true, false);
+        AttackModule::set_final_finish_cut_in(fighter.module_accessor, 0, true, true, -1.0, false);
+    }
+}
+
+#[acmd_script( agent = "sonic_supersonic", scripts = ["game_finalend", "game_finalairend"], category = ACMD_GAME, low_priority )]
+unsafe fn supersonic_end(fighter: &mut L2CAgentBase) {
+    if macros::is_excute(fighter) {
+        macros::WHOLE_HIT(fighter, *HIT_STATUS_INVINCIBLE);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 16.0);
+    if macros::is_excute(fighter) {
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 10.0, 65, 90, 0, 90, 500.0, 0.0, 7.5, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 50, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_NONE);
+        AttackModule::set_force_reaction(fighter.module_accessor, 0, true, false);
+        AttackModule::set_final_finish_cut_in(fighter.module_accessor, 0, true, false, -1.0, false);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 19.0);
+    if macros::is_excute(fighter) {
+        AttackModule::clear_all(fighter.module_accessor);
+    }
+}
 
 pub fn install() {
     smashline::install_agent_frames!(
@@ -970,7 +1044,11 @@ pub fn install() {
         sonic_upb_smash_script,
         spring_falling,
         sonic_downb_jump_smash_script,
-        sonic_sidetaunt_script
+        sonic_sidetaunt_script,
+        supersonic_start,
+        supersonic_move,
+        supersonic_move_flashing,
+        supersonic_end
         
     );
 }

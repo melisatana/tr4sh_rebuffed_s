@@ -1382,6 +1382,7 @@ unsafe fn szerosuit_downb_kick_smash_script(fighter: &mut L2CAgentBase) {
 unsafe fn szerosuit_downb_kick_landing_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         PostureModule::reverse_lr(fighter.module_accessor);
+        GroundModule::correct(fighter.module_accessor, GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
     }
 }
 

@@ -46,6 +46,15 @@ fn luigi_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
+
+#[acmd_script( agent = "luigi", script = "game_stepjump", category = ACMD_GAME, low_priority )]
+unsafe fn luigi_stepjump_smash_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 5.0);
+    if macros::is_excute(fighter) {
+        StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_DAMAGE_FALL, false);
+    }
+}
+
 #[acmd_script( agent = "luigi", script = "game_attack11", category = ACMD_GAME )]
 unsafe fn luigi_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
@@ -1077,6 +1086,7 @@ pub fn install() {
         luigi_frame
     );
     smashline::install_acmd_scripts!(
+        luigi_stepjump_smash_script,
         luigi_jab_smash_script,
         luigi_jab2_smash_script,
         luigi_jab3_smash_script,

@@ -2015,7 +2015,6 @@ unsafe fn sora_upb_smash_script(fighter: &mut L2CAgentBase) {
 
 #[acmd_script( agent = "trail", scripts = ["game_appealhil", "game_appealhir"], category = ACMD_GAME, low_priority )]
 unsafe fn sora_uptaunt_smash_script(fighter: &mut L2CAgentBase) {
-
     //let rand_heal_value = [-0.5, -1.0, -1.5, -3.0];
     //let rng = smash::app::sv_math::rand(hash40("trail"), rand_heal_value.len() as i32);
     let rng = (-0.5 + smash::app::sv_math::randf(hash40("fighter"), 1.0 as f32) * -2.5) as f32;
@@ -2033,6 +2032,20 @@ unsafe fn sora_uptaunt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 40.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
+    }
+}
+
+#[acmd_script( agent = "trail", scripts = ["game_finalend", "game_finalairend", "game_finalendl", "game_finalairendl"], category = ACMD_GAME, low_priority )]
+unsafe fn sora_final_end(fighter: &mut L2CAgentBase) {
+    if macros::is_excute(fighter) {
+        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_TRAIL_FINAL, 0, 10.0, 39, 100, 0, 85, 0.0, 1.0, *ATTACK_LR_CHECK_POS, 0.0, true, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_BOMB, *ATTACK_REGION_NONE);
+        AttackModule::set_final_finish_cut_in(fighter.module_accessor, 0, true, false, -1.0, true);
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_VISUAL_SCENE_FLAG_ABS_SET);
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_TRAIL_STATUS_FINAL_FLAG_ABS_SET);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 30.0);
+    if macros::is_excute(fighter) {
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_VISUAL_SCENE_FLAG_END_EXIT);
     }
 }
 
@@ -2099,7 +2112,8 @@ pub fn install() {
         sora_sideb_2_smash_script,
         sora_sideb_3_smash_script,
         sora_upb_smash_script,
-        sora_uptaunt_smash_script
+        sora_uptaunt_smash_script,
+        sora_final_end
         
     );
 }

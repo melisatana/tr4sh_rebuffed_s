@@ -12,6 +12,11 @@ static mut LUCINA_DASHATTACK_HITBOX_ACTIVE : [bool; 8] = [false; 8];
 static mut LUCINA_DASHATTACK_HITBOX_X : [f32; 8] = [0.0; 8];
 static mut LUCINA_DASHATTACK_HITBOX_Y : [f32; 8] = [0.0; 8];
 
+
+static mut LUCINA_FS_HITBOX_ACTIVE : [bool; 8] = [false; 8];
+static mut LUCINA_FS_HITBOX_X : [f32; 8] = [0.0; 8];
+static mut LUCINA_FS_HITBOX_Y : [f32; 8] = [0.0; 8];
+
 static mut LUCINA_SMASH_TELEPORT_ACTIVE : [bool; 8] = [false; 8];
 static mut LUCINA_SMASH_IS_TELEPORT : [bool; 8] = [false; 8];
 
@@ -44,6 +49,17 @@ unsafe fn set_dashattack_hitbox(fighter: &mut L2CAgentBase) {
     
     macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.5, 70, 28, 0, 120, 6.0, 0.0, 8.0, 0.0, Some(0.0), Some(point_offset_y), Some(point_offset_x), 0.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
     AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 6.0, false);
+}
+
+unsafe fn set_fs_hitbox(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+    let point_offset_x = PostureModule::lr(fighter.module_accessor) * (LUCINA_FS_HITBOX_X[entry_id] - PostureModule::pos_x(fighter.module_accessor));
+    let point_offset_y = LUCINA_FS_HITBOX_Y[entry_id] - PostureModule::pos_y(fighter.module_accessor);
+    
+    macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 30.0, 361, 68, 0, 50, 19.0, 0.0, 8.0, 0.0, Some(0.0), Some(point_offset_y), Some(point_offset_x), 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_curse_poison"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_NONE);
+    AttackModule::set_poison_param(fighter.module_accessor, 0, 300, 20, 2.2, false);
+    AttackModule::set_force_reaction(fighter.module_accessor, 0, true, false);
+    AttackModule::set_final_finish_cut_in(fighter.module_accessor, 0, true, true, -1.0, false);
 }
 
 unsafe fn check_if_teleport_limit_reached(fighter: &mut L2CAgentBase) -> bool {
@@ -269,6 +285,16 @@ fn lucina_frame(fighter: &mut L2CFighterCommon) {
             else
             {
                 LUCINA_DASHATTACK_HITBOX_ACTIVE[entry_id] = false;
+            }
+        }
+
+        if LUCINA_FS_HITBOX_ACTIVE[entry_id] {
+            if status == *FIGHTER_MARTH_STATUS_KIND_FINAL_END {
+                set_fs_hitbox(fighter);
+            }
+            else
+            {
+                LUCINA_FS_HITBOX_ACTIVE[entry_id] = false;
             }
         }
         if LUCINA_SMASH_IS_TELEPORT[entry_id] {
@@ -2413,6 +2439,37 @@ unsafe fn lucina_downb_hit_smash_script(fighter: &mut L2CAgentBase) {
 }
 
 
+#[acmd_script( agent = "lucina", script = "game_finaldash", category = ACMD_GAME, low_priority )]
+unsafe fn lucina_final_dash(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
+    if macros::is_excute(fighter) {
+        macros::WHOLE_HIT(fighter, *HIT_STATUS_XLU);
+        macros::CAM_ZOOM_OUT(fighter);
+        LUCINA_FS_HITBOX_ACTIVE[entry_id] = false;
+        LUCINA_FS_HITBOX_X[entry_id] = PostureModule::pos_x(fighter.module_accessor);
+        LUCINA_FS_HITBOX_Y[entry_id] = PostureModule::pos_y(fighter.module_accessor) + 8.0;
+
+    }
+}
+
+#[acmd_script( agent = "lucina", scripts = ["game_finalend", "game_finalairend"], category = ACMD_GAME, low_priority )]
+unsafe fn lucina_final_attack(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
+    if macros::is_excute(fighter) {
+        macros::WHOLE_HIT(fighter, *HIT_STATUS_XLU);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 2.0);
+    if macros::is_excute(fighter) {
+        LUCINA_FS_HITBOX_ACTIVE[entry_id] = true;
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 6.0);
+    if macros::is_excute(fighter) {
+        AttackModule::clear_all(fighter.module_accessor);
+        LUCINA_FS_HITBOX_ACTIVE[entry_id] = false;
+    }
+}
 
 
 
@@ -2479,6 +2536,8 @@ pub fn install() {
         lucina_upb_effect_smash_script,
         lucina_downb_smash_script,
         lucina_downb_effect_smash_script,
-        lucina_downb_hit_smash_script
+        lucina_downb_hit_smash_script,
+        lucina_final_dash,
+        lucina_final_attack
     );
 }

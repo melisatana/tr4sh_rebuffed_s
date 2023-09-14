@@ -1,0 +1,36 @@
+{
+	"new-dir-files": {
+		"fighter/roy/c00": [
+			"fighter/roy/motion/body/c00/c01attacks3hi.nuanmb",
+			"fighter/roy/motion/body/c00/c01attacks3lw.nuanmb"
+		],
+		"fighter/roy/c01": [
+			"fighter/roy/motion/body/c01/c01attacks3hi.nuanmb",
+			"fighter/roy/motion/body/c01/c01attacks3lw.nuanmb"
+		],
+		"fighter/roy/c02": [
+			"fighter/roy/motion/body/c02/c01attacks3hi.nuanmb",
+			"fighter/roy/motion/body/c02/c01attacks3lw.nuanmb"
+		],
+		"fighter/roy/c03": [
+			"fighter/roy/motion/body/c03/c01attacks3hi.nuanmb",
+			"fighter/roy/motion/body/c03/c01attacks3lw.nuanmb"
+		],
+		"fighter/roy/c04": [
+			"fighter/roy/motion/body/c04/c01attacks3hi.nuanmb",
+			"fighter/roy/motion/body/c04/c01attacks3lw.nuanmb"
+		],
+		"fighter/roy/c05": [
+			"fighter/roy/motion/body/c05/c01attacks3hi.nuanmb",
+			"fighter/roy/motion/body/c05/c01attacks3lw.nuanmb"
+		],
+		"fighter/roy/c06": [
+			"fighter/roy/motion/body/c06/c01attacks3hi.nuanmb",
+			"fighter/roy/motion/body/c06/c01attacks3lw.nuanmb"
+		],
+		"fighter/roy/c07": [
+			"fighter/roy/motion/body/c07/c01attacks3hi.nuanmb",
+			"fighter/roy/motion/body/c07/c01attacks3lw.nuanmb"
+		]
+	}
+}

@@ -88,6 +88,15 @@ unsafe fn mario_walljump_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
+
+#[acmd_script( agent = "mario", script = "game_stepjump", category = ACMD_GAME, low_priority )]
+unsafe fn mario_stepjump_smash_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.5, 270, 80, 0, 50, 5.0, 0.0, 1.5, 0.0, None, None, None, 0.5, 2.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_bury"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+    }
+}
+
 #[acmd_script( agent = "mario", script = "game_attack11", category = ACMD_GAME )]
 unsafe fn mario_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
@@ -846,6 +855,7 @@ pub fn install() {
         kirby_mariohat_frame
     );
     smashline::install_acmd_scripts!(
+        mario_stepjump_smash_script,
         mario_walljump_smash_script,
         mario_dtilt_smash_script,
         mario_utilt_smash_script,

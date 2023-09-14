@@ -8,13 +8,29 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 
+static mut MARTH_FS_BUTTON_READY : [bool; 8] = [false; 8];
+static mut MARTH_FS_BUTTON_PRESS : [bool; 8] = [false; 8];
+
 // A Once-Per-Fighter-Frame that only applies to Marth
 #[fighter_frame( agent = FIGHTER_KIND_MARTH )]
 fn marth_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
-
+        let status = StatusModule::status_kind(fighter.module_accessor);
+        let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+        
         println!("It'sa me, Marth, *japanese*!");
 
+
+        if status == *FIGHTER_MARTH_STATUS_KIND_FINAL_DASH {
+            if MARTH_FS_BUTTON_READY[entry_id] && ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_SPECIAL) {
+                MARTH_FS_BUTTON_PRESS[entry_id] = true;
+            }
+        }
+
+        if sv_information::is_ready_go() == false || [*FIGHTER_STATUS_KIND_WIN, *FIGHTER_STATUS_KIND_LOSE, *FIGHTER_STATUS_KIND_DEAD].contains(&status) {
+			MARTH_FS_BUTTON_PRESS[entry_id] = false;
+            MARTH_FS_BUTTON_READY[entry_id] = false;
+		}
 
     }
 }
@@ -1438,6 +1454,58 @@ unsafe fn marth_uptaunt_right_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
+#[acmd_script( agent = "marth", script = "game_finaldash", category = ACMD_GAME, low_priority )]
+unsafe fn marth_final_dash(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
+    if macros::is_excute(fighter) {
+        macros::WHOLE_HIT(fighter, *HIT_STATUS_XLU);
+        macros::CAM_ZOOM_OUT(fighter);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("sword1"), 0.0, 361, 0, 0, 0, 10.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
+        MARTH_FS_BUTTON_READY[entry_id] = true;
+    }
+}
+
+#[acmd_script( agent = "marth", scripts = ["game_finalend", "game_finalairend"], category = ACMD_GAME, low_priority )]
+unsafe fn marth_final_attack(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
+    if macros::is_excute(fighter) {
+        macros::WHOLE_HIT(fighter, *HIT_STATUS_XLU);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        if MARTH_FS_BUTTON_PRESS[entry_id] {
+            sv_animcmd::frame(fighter.lua_state_agent, 2.0);
+            if macros::is_excute(fighter) {
+                macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 60.0, 361, 120, 0, 120, 18.0, 0.0, 8.0, 16.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
+                macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 60.0, 361, 120, 0, 120, 12.0, 0.0, 8.0, 9.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
+                AttackModule::set_force_reaction(fighter.module_accessor, 0, true, false);
+                AttackModule::set_force_reaction(fighter.module_accessor, 1, true, false);
+                AttackModule::set_final_finish_cut_in(fighter.module_accessor, 0, true, true, -1.0, false);
+                AttackModule::set_final_finish_cut_in(fighter.module_accessor, 1, true, true, -1.0, false);
+            }
+        }
+        else {
+            sv_animcmd::frame(fighter.lua_state_agent, 2.0);
+            if macros::is_excute(fighter) {
+                macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 40.0, 361, 47, 0, 60, 18.0, 0.0, 8.0, 16.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
+                macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 40.0, 361, 47, 0, 60, 12.0, 0.0, 8.0, 9.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
+                AttackModule::set_force_reaction(fighter.module_accessor, 0, true, false);
+                AttackModule::set_force_reaction(fighter.module_accessor, 1, true, false);
+                AttackModule::set_final_finish_cut_in(fighter.module_accessor, 0, true, true, -1.0, false);
+                AttackModule::set_final_finish_cut_in(fighter.module_accessor, 1, true, true, -1.0, false);
+            }
+        }
+    }   
+    sv_animcmd::frame(fighter.lua_state_agent, 6.0);
+    if macros::is_excute(fighter) {
+        AttackModule::clear_all(fighter.module_accessor);
+        MARTH_FS_BUTTON_PRESS[entry_id] = false;
+        MARTH_FS_BUTTON_READY[entry_id] = false;
+    }
+}
+
 pub fn install() {
     smashline::install_agent_frames!(
         marth_frame
@@ -1498,7 +1566,9 @@ pub fn install() {
         marth_sideb_4_airlw_smash_script,
         marth_upb_smash_script,
         marth_uptaunt_left_smash_script,
-        marth_uptaunt_right_smash_script
+        marth_uptaunt_right_smash_script,
+        marth_final_dash,
+        marth_final_attack
         
     );
 }

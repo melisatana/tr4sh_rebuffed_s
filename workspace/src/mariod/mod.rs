@@ -60,6 +60,13 @@ unsafe fn mariod_walljump_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
+#[acmd_script( agent = "mariod", script = "game_stepjump", category = ACMD_GAME, low_priority )]
+unsafe fn mariod_stepjump_smash_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.5, 270, 80, 0, 50, 5.0, 0.0, 1.5, 0.0, None, None, None, 0.5, 2.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_bury"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+    }
+}
 
 #[acmd_script( agent = "mariod", script = "game_attack11", category = ACMD_GAME )]
 unsafe fn mariod_jab_smash_script(fighter: &mut L2CAgentBase) {
@@ -766,12 +773,48 @@ unsafe fn mariod_downb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
+#[acmd_script( agent = "mariod_hugecapsule", script = "game_regular", category = ACMD_GAME, low_priority )]
+unsafe fn hugecapsule(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 60.0);
+    if macros::is_excute(fighter) {
+        ArticleModule::generate_article(fighter.module_accessor, *WEAPON_MARIOD_HUGECAPSULE_GENERATE_ARTICLE_DRCAPSULE, false, -1);
+        ArticleModule::generate_article(fighter.module_accessor, *WEAPON_MARIOD_HUGECAPSULE_GENERATE_ARTICLE_DRCAPSULE, false, -1);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("capsule1"), 40.0, 59, 55, 0, 75, 5.0, -30.0, 0.0, 1.0, Some(30.0), Some(0.0), Some(1.0), 0.6, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, f32::NAN, 0.0, 50, false, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_NONE);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 65.0);
+    if macros::is_excute(fighter) {
+        macros::ATTACK(fighter, 0, 0, Hash40::new("capsule1"), 40.0, 59, 55, 0, 75, 8.0, -30.0, 0.0, 1.0, Some(30.0), Some(0.0), Some(1.0), 0.6, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, f32::NAN, 0.0, 50, false, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_NONE);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 67.0);
+    if macros::is_excute(fighter) {
+        macros::ATTACK(fighter, 0, 0, Hash40::new("capsule1"), 40.0, 59, 55, 0, 75, 9.0, -30.0, 0.0, 6.0, Some(30.0), Some(0.0), Some(6.0), 0.6, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, f32::NAN, 0.0, 50, false, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_NONE);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("capsule1"), 40.0, 59, 55, 0, 75, 9.0, -30.0, 0.0, -6.0, Some(30.0), Some(0.0), Some(-6.0), 0.6, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, f32::NAN, 0.0, 50, false, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_NONE);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 74.0);
+    if macros::is_excute(fighter) {
+        macros::ATTACK(fighter, 2, 0, Hash40::new("capsule2"), 40.0, 59, 55, 0, 75, 4.0, -30.0, 0.0, 3.0, Some(30.0), Some(0.0), Some(3.0), 0.6, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, f32::NAN, 0.0, 50, false, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_NONE);
+        macros::ATTACK(fighter, 3, 0, Hash40::new("capsule2"), 40.0, 59, 55, 0, 75, 4.0, -30.0, 0.0, -3.0, Some(30.0), Some(0.0), Some(-3.0), 0.6, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, f32::NAN, 0.0, 50, false, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_NONE);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 110.0);
+    if macros::is_excute(fighter) {
+        macros::ATTACK(fighter, 0, 0, Hash40::new("capsule1"), 40.0, 59, 55, 0, 75, 16.0, -30.0, 0.0, 10.0, Some(30.0), Some(0.0), Some(10.0), 0.6, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, f32::NAN, 0.0, 50, false, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_NONE);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("capsule1"), 40.0, 59, 55, 0, 75, 16.0, -30.0, 0.0, -10.0, Some(30.0), Some(0.0), Some(-10.0), 0.6, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, f32::NAN, 0.0, 50, false, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_NONE);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("capsule2"), 40.0, 59, 55, 0, 75, 16.0, -30.0, 0.0, 10.0, Some(30.0), Some(0.0), Some(10.0), 0.6, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, f32::NAN, 0.0, 50, false, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_NONE);
+        macros::ATTACK(fighter, 3, 0, Hash40::new("capsule2"), 40.0, 59, 55, 0, 75, 16.0, -30.0, 0.0, -10.0, Some(30.0), Some(0.0), Some(-10.0), 0.6, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, f32::NAN, 0.0, 50, false, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_NONE);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 210.0);
+    if macros::is_excute(fighter) {
+        AttackModule::clear_all(fighter.module_accessor);
+        ArticleModule::remove(fighter.module_accessor, *WEAPON_MARIOD_HUGECAPSULE_GENERATE_ARTICLE_DRCAPSULE, smash::app::ArticleOperationTarget(0));
+    }
+}
 
 pub fn install() {
     smashline::install_agent_frames!(
         mariod_frame,
     );
     smashline::install_acmd_scripts!(
+        mariod_stepjump_smash_script,
         mariod_walljump_smash_script,
         mariod_jab_smash_script,
         mariod_jab2_smash_script,
@@ -801,7 +844,8 @@ pub fn install() {
         mariod_specials_smash_script,
         mariod_specialairs_smash_script,
         mariod_specialhi_smash_script,
-        mariod_downb_smash_script
+        mariod_downb_smash_script,
+        hugecapsule
         
     );
 }
