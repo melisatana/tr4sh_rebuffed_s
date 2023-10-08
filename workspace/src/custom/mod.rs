@@ -116,7 +116,7 @@ unsafe fn status_guard_main_common(fighter: &mut L2CFighterCommon) -> L2CValue {
     false.into()
 }
 
-
+// hdr code for b reverses
 //=================================================================
 //== FighterStatusModuleImpl::set_fighter_status_data
 //=================================================================
@@ -152,6 +152,7 @@ unsafe fn set_fighter_status_data_hook(boma: &mut BattleObjectModuleAccessor, ar
         || boma.kind() == *FIGHTER_KIND_SNAKE && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_HI])
 
 
+        || boma.kind() == *FIGHTER_KIND_MURABITO && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_LITTLEMAC && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_N, *FIGHTER_LITTLEMAC_STATUS_KIND_SPECIAL_N2, *FIGHTER_LITTLEMAC_STATUS_KIND_SPECIAL_N_START, *FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_MIIFIGHTER && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_N, *FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_MIISWORDSMAN && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
@@ -165,6 +166,7 @@ unsafe fn set_fighter_status_data_hook(boma: &mut BattleObjectModuleAccessor, ar
         || boma.kind() == *FIGHTER_KIND_SIMON && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW]) 
         || boma.kind() == *FIGHTER_KIND_RICHTER && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_GAOGAEN && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
+        || boma.kind() == *FIGHTER_KIND_KROOL && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_HI, *FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_JACK && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_BRAVE && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_HI, *FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_MASTER && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_S])
@@ -235,7 +237,6 @@ unsafe fn can_jab1_cancel_to_dtilt(fighter: &mut L2CFighterCommon) -> bool {
         *FIGHTER_KIND_DOLLY, 
         *FIGHTER_KIND_PACMAN, 
         *FIGHTER_KIND_ROBOT, 
-        *FIGHTER_KIND_TOONLINK, 
         *FIGHTER_KIND_RYU, 
         *FIGHTER_KIND_KEN
     ].contains(&fighter_kind) {
@@ -307,7 +308,6 @@ unsafe fn can_jab2_cancel_to_dtilt(fighter: &mut L2CFighterCommon) -> bool {
         *FIGHTER_KIND_DOLLY, 
         *FIGHTER_KIND_PACMAN, 
         *FIGHTER_KIND_ROBOT, 
-        *FIGHTER_KIND_TOONLINK, 
         *FIGHTER_KIND_SAMUS, 
         *FIGHTER_KIND_SAMUSD, 
         *FIGHTER_KIND_MARTH, 
@@ -381,7 +381,8 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
             *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_U, 
             *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_LR, 
             *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_JUMP_BOARD,
-            *FIGHTER_STATUS_KIND_FURAFURA]
+            *FIGHTER_STATUS_KIND_FURAFURA,
+            *FIGHTER_STATUS_KIND_ICE]
             .contains(&status) {
             if ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_HI) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_LW) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_L) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_R) {
                 macros::EFFECT(fighter, Hash40::new("sys_kusudama"), Hash40::new("top"), 0, 28, 0, 0, 0, 0, 0.75, 0, 0, 0, 0, 0, 0, false); //confetti!
@@ -437,16 +438,8 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
             }
         }
 
-        //perfect pivot
-        if MotionModule::motion_kind(module_accessor) == hash40("dash") && MotionModule::frame(module_accessor) <= (40.0) {
-            if stickx_directional < -0.25 { //-0.5
-                StatusModule::change_status_request_from_script(module_accessor, *FIGHTER_STATUS_KIND_TURN, true);
-                println!("Perfect pivot lets go!");
-            };
-        };
-
-        //perfect pivot on turndash
-        if MotionModule::motion_kind(module_accessor) == hash40("turn_dash") && MotionModule::frame(module_accessor) <= (40.0) {
+        //perfect pivot on dash/turndash
+        if (MotionModule::motion_kind(module_accessor) == hash40("dash") || MotionModule::motion_kind(module_accessor) == hash40("turn_dash")) && MotionModule::frame(module_accessor) <= (40.0) {
             if stickx_directional < -0.25 { //-0.5
                 StatusModule::change_status_request_from_script(module_accessor, *FIGHTER_STATUS_KIND_TURN, true);
                 println!("Perfect pivot lets go!");
@@ -593,6 +586,12 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
                 }
                 fighter.sub_transition_group_check_ground_attack();
             }
+        }
+
+        //being thrown forces an item drop
+
+        if status == *FIGHTER_STATUS_KIND_THROWN {
+            ItemModule::drop_item(fighter.module_accessor, 0.0, 0.0, 0);
         }
 
     }

@@ -48,6 +48,14 @@ fn pzenigame_frame(fighter: &mut L2CFighterCommon) {
             TRT_KNOCKBACK[entry_id] = 1.0;
         }
 
+        if [*FIGHTER_STATUS_KIND_SPECIAL_LW, 
+        *FIGHTER_STATUS_KIND_DOWN, 
+        *FIGHTER_STATUS_KIND_CAPTURE_WAIT,
+        *FIGHTER_STATUS_KIND_CAPTURE_PULLED, 
+        *FIGHTER_STATUS_KIND_CAPTURE_PULLED_YOSHI].contains(&status) {
+            WorkModule::set_int(fighter.module_accessor, 0, *FIGHTER_PZENIGAME_INSTANCE_WORK_ID_INT_SPECIAL_N_CHARGE);
+        }
+
     }
 }
 
@@ -110,7 +118,7 @@ unsafe fn pzenigame_dashattack_smash_script(fighter: &mut L2CAgentBase) {
 
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.3 * TRT_DAMAGE[entry_id], 60, 50, 0, 50, 4.2, 0.0, 5.5, 2.0, Some(0.0), Some(5.5), Some(3.8), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 1, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.3 * TRT_DAMAGE[entry_id], 60, 50, 0, 58, 4.2, 0.0, 5.5, 2.0, Some(0.0), Some(5.5), Some(3.8), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 1, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 1.2);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 10.0);
@@ -249,6 +257,14 @@ unsafe fn pzenigame_dtilt_smash_script(fighter: &mut L2CAgentBase) {
 unsafe fn pzenigame_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
+    let fullmouth_damage;
+
+    if WorkModule::get_int(fighter.module_accessor, *FIGHTER_PZENIGAME_INSTANCE_WORK_ID_INT_SPECIAL_N_CHARGE) == 75 {
+        fullmouth_damage = 16.8;
+    }
+    else {
+        fullmouth_damage = 15.8;
+    }
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     macros::FT_MOTION_RATE(fighter, 0.5);
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
@@ -259,9 +275,9 @@ unsafe fn pzenigame_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     macros::FT_MOTION_RATE(fighter, 1.0);
     sv_animcmd::frame(fighter.lua_state_agent, 20.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 15.8 * TRT_DAMAGE[entry_id], 361, 110 / TRT_KNOCKBACK[entry_id] as i32, 0, 35, 4.5, 0.0, 4.8, 7.8, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 15.8 * TRT_DAMAGE[entry_id], 361, 110 / TRT_KNOCKBACK[entry_id] as i32, 0, 35, 4.0, 0.0, 5.5, 13.2, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 15.8 * TRT_DAMAGE[entry_id], 361, 110 / TRT_KNOCKBACK[entry_id] as i32, 0, 35, 3.8, 0.0, 5.7, 17.8, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), fullmouth_damage * TRT_DAMAGE[entry_id], 361, 110 / TRT_KNOCKBACK[entry_id] as i32, 0, 35, 4.5, 0.0, 4.8, 7.8, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), fullmouth_damage * TRT_DAMAGE[entry_id], 361, 110 / TRT_KNOCKBACK[entry_id] as i32, 0, 35, 4.0, 0.0, 5.5, 13.2, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), fullmouth_damage * TRT_DAMAGE[entry_id], 361, 110 / TRT_KNOCKBACK[entry_id] as i32, 0, 35, 3.8, 0.0, 5.7, 17.8, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
@@ -278,6 +294,14 @@ unsafe fn pzenigame_fsmash_smash_script(fighter: &mut L2CAgentBase) {
 unsafe fn pzenigame_fsmash2_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
+    let fullmouth_damage;
+
+    if WorkModule::get_int(fighter.module_accessor, *FIGHTER_PZENIGAME_INSTANCE_WORK_ID_INT_SPECIAL_N_CHARGE) == 75 {
+        fullmouth_damage = 16.8;
+    }
+    else {
+        fullmouth_damage = 15.8;
+    }
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     macros::FT_MOTION_RATE(fighter, 0.5);
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
@@ -289,9 +313,9 @@ unsafe fn pzenigame_fsmash2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 20.0);
     if macros::is_excute(fighter) {
         
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 15.8 * TRT_DAMAGE[entry_id], 361, 110 / TRT_KNOCKBACK[entry_id] as i32, 0, 35, 4.5, 0.0, 6.8, 7.8, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 15.8 * TRT_DAMAGE[entry_id], 361, 110 / TRT_KNOCKBACK[entry_id] as i32, 0, 35, 4.0, 0.0, 8.0, 17.4, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 15.8 * TRT_DAMAGE[entry_id], 361, 110 / TRT_KNOCKBACK[entry_id] as i32, 0, 35, 3.8, 0.0, 8.9, 13.2, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), fullmouth_damage * TRT_DAMAGE[entry_id], 361, 110 / TRT_KNOCKBACK[entry_id] as i32, 0, 35, 4.5, 0.0, 6.8, 7.8, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), fullmouth_damage * TRT_DAMAGE[entry_id], 361, 110 / TRT_KNOCKBACK[entry_id] as i32, 0, 35, 4.0, 0.0, 8.0, 17.4, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), fullmouth_damage * TRT_DAMAGE[entry_id], 361, 110 / TRT_KNOCKBACK[entry_id] as i32, 0, 35, 3.8, 0.0, 8.9, 13.2, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
@@ -308,6 +332,14 @@ unsafe fn pzenigame_fsmash2_smash_script(fighter: &mut L2CAgentBase) {
 unsafe fn pzenigame_fsmash3_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
+    let fullmouth_damage;
+
+    if WorkModule::get_int(fighter.module_accessor, *FIGHTER_PZENIGAME_INSTANCE_WORK_ID_INT_SPECIAL_N_CHARGE) == 75 {
+        fullmouth_damage = 17.1;
+    }
+    else {
+        fullmouth_damage = 15.8;
+    }
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     macros::FT_MOTION_RATE(fighter, 0.5);
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
@@ -318,9 +350,9 @@ unsafe fn pzenigame_fsmash3_smash_script(fighter: &mut L2CAgentBase) {
     macros::FT_MOTION_RATE(fighter, 1.0);
     sv_animcmd::frame(fighter.lua_state_agent, 20.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 15.8 * TRT_DAMAGE[entry_id], 361, 110 / TRT_KNOCKBACK[entry_id] as i32, 0, 35, 4.2, 0.0, 3.5, 7.8, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 15.8 * TRT_DAMAGE[entry_id], 361, 110 / TRT_KNOCKBACK[entry_id] as i32, 0, 35, 3.6, 0.0, 3.3, 13.2, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 15.8 * TRT_DAMAGE[entry_id], 361, 110 / TRT_KNOCKBACK[entry_id] as i32, 0, 35, 3.4, 0.0, 3.0, 17.8, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), fullmouth_damage * TRT_DAMAGE[entry_id], 361, 110 / TRT_KNOCKBACK[entry_id] as i32, 0, 35, 4.2, 0.0, 3.5, 7.8, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), fullmouth_damage * TRT_DAMAGE[entry_id], 361, 110 / TRT_KNOCKBACK[entry_id] as i32, 0, 35, 3.6, 0.0, 3.3, 13.2, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), fullmouth_damage * TRT_DAMAGE[entry_id], 361, 110 / TRT_KNOCKBACK[entry_id] as i32, 0, 35, 3.4, 0.0, 3.0, 17.8, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
@@ -415,23 +447,41 @@ unsafe fn pzenigame_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     macros::FT_MOTION_RATE(fighter, 1.0);
     sv_animcmd::frame(fighter.lua_state_agent, 18.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.5 * TRT_DAMAGE[entry_id], 28, 90 / TRT_KNOCKBACK[entry_id] as i32, 0, 50, 4.2, 0.0, 4.0, 6.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 13.5 * TRT_DAMAGE[entry_id], 28, 90 / TRT_KNOCKBACK[entry_id] as i32, 0, 50, 4.0, 0.0, 3.8, 10.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 13.5 * TRT_DAMAGE[entry_id], 28, 90 / TRT_KNOCKBACK[entry_id] as i32, 0, 50, 3.8, 0.0, 3.5, 15.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
-        macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 13.5 * TRT_DAMAGE[entry_id], 28, 90 / TRT_KNOCKBACK[entry_id] as i32, 0, 50, 3.5, 0.0, 3.2, 19.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
-        AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
+        if WorkModule::get_int(fighter.module_accessor, *FIGHTER_PZENIGAME_INSTANCE_WORK_ID_INT_SPECIAL_N_CHARGE) == 75 {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.5 * TRT_DAMAGE[entry_id], 28, 90 / TRT_KNOCKBACK[entry_id] as i32, 0, 50, 4.7, 0.0, 4.0, 9.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
+            macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 13.5 * TRT_DAMAGE[entry_id], 28, 90 / TRT_KNOCKBACK[entry_id] as i32, 0, 50, 4.5, 0.0, 3.8, 13.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
+            macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 13.5 * TRT_DAMAGE[entry_id], 28, 90 / TRT_KNOCKBACK[entry_id] as i32, 0, 50, 4.3, 0.0, 3.5, 19.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
+            macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 13.5 * TRT_DAMAGE[entry_id], 28, 90 / TRT_KNOCKBACK[entry_id] as i32, 0, 50, 4.0, 0.0, 3.2, 24.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
+            AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
+        }
+        else {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.5 * TRT_DAMAGE[entry_id], 28, 90 / TRT_KNOCKBACK[entry_id] as i32, 0, 50, 4.2, 0.0, 4.0, 6.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
+            macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 13.5 * TRT_DAMAGE[entry_id], 28, 90 / TRT_KNOCKBACK[entry_id] as i32, 0, 50, 4.0, 0.0, 3.8, 10.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
+            macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 13.5 * TRT_DAMAGE[entry_id], 28, 90 / TRT_KNOCKBACK[entry_id] as i32, 0, 50, 3.8, 0.0, 3.5, 15.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
+            macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 13.5 * TRT_DAMAGE[entry_id], 28, 90 / TRT_KNOCKBACK[entry_id] as i32, 0, 50, 3.5, 0.0, 3.2, 19.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
+            AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
+        }
     }
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 24.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 25.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.5 * TRT_DAMAGE[entry_id], 28, 90 / TRT_KNOCKBACK[entry_id] as i32, 0, 50, 4.2, 0.0, 4.0, -6.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 13.5 * TRT_DAMAGE[entry_id], 28, 90 / TRT_KNOCKBACK[entry_id] as i32, 0, 50, 4.0, 0.0, 3.8, -10.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 13.5 * TRT_DAMAGE[entry_id], 28, 90 / TRT_KNOCKBACK[entry_id] as i32, 0, 50, 3.8, 0.0, 3.5, -15.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
-        macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 13.5 * TRT_DAMAGE[entry_id], 28, 90 / TRT_KNOCKBACK[entry_id] as i32, 0, 50, 3.5, 0.0, 3.2, -19.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
-        AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
+        if WorkModule::get_int(fighter.module_accessor, *FIGHTER_PZENIGAME_INSTANCE_WORK_ID_INT_SPECIAL_N_CHARGE) == 75 {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.5 * TRT_DAMAGE[entry_id], 28, 90 / TRT_KNOCKBACK[entry_id] as i32, 0, 50, 4.7, 0.0, 4.0, -9.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
+            macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 13.5 * TRT_DAMAGE[entry_id], 28, 90 / TRT_KNOCKBACK[entry_id] as i32, 0, 50, 4.5, 0.0, 3.8, -13.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
+            macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 13.5 * TRT_DAMAGE[entry_id], 28, 90 / TRT_KNOCKBACK[entry_id] as i32, 0, 50, 4.3, 0.0, 3.5, -19.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
+            macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 13.5 * TRT_DAMAGE[entry_id], 28, 90 / TRT_KNOCKBACK[entry_id] as i32, 0, 50, 4.0, 0.0, 3.2, -24.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
+            AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
+        }
+        else {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.5 * TRT_DAMAGE[entry_id], 28, 90 / TRT_KNOCKBACK[entry_id] as i32, 0, 50, 4.2, 0.0, 4.0, -6.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
+            macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 13.5 * TRT_DAMAGE[entry_id], 28, 90 / TRT_KNOCKBACK[entry_id] as i32, 0, 50, 4.0, 0.0, 3.8, -10.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
+            macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 13.5 * TRT_DAMAGE[entry_id], 28, 90 / TRT_KNOCKBACK[entry_id] as i32, 0, 50, 3.8, 0.0, 3.5, -15.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
+            macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 13.5 * TRT_DAMAGE[entry_id], 28, 90 / TRT_KNOCKBACK[entry_id] as i32, 0, 50, 3.5, 0.0, 3.2, -19.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_WATER);
+            AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
+        }
     }
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
@@ -440,6 +490,63 @@ unsafe fn pzenigame_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 27.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
+    }
+}
+
+#[acmd_script( agent = "pzenigame", script = "effect_attacklw4", category = ACMD_EFFECT, low_priority )]
+unsafe fn pzenigame_dsmash_effect_script(fighter: &mut L2CAgentBase) {
+    if macros::is_excute(fighter) {
+        macros::EFFECT(fighter, Hash40::new("sys_smash_flash"), Hash40::new("top"), 0, 2, 8, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 17.0);
+    if macros::is_excute(fighter) {
+        macros::EFFECT_FOLLOW(fighter, Hash40::new("pzenigame_mouth_water"), Hash40::new("head"), -0.5, 3, 0, -80, 0, 0, 0.7, true);
+    }
+    if PostureModule::lr(fighter.module_accessor) < 0.0 {
+        if macros::is_excute(fighter) {
+            if WorkModule::get_int(fighter.module_accessor, *FIGHTER_PZENIGAME_INSTANCE_WORK_ID_INT_SPECIAL_N_CHARGE) == 75 {
+                macros::EFFECT_FOLLOW(fighter, Hash40::new("pzenigame_water_cutter"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1.2, true);
+                macros::EFFECT_FOLLOW(fighter, Hash40::new("pzenigame_water_smash"), Hash40::new("top"), 0, 0.5, 0, 10, 180, 0, 1.2, true);
+            }
+            else {
+                macros::EFFECT_FOLLOW(fighter, Hash40::new("pzenigame_water_cutter"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
+                macros::EFFECT_FOLLOW(fighter, Hash40::new("pzenigame_water_smash"), Hash40::new("top"), 0, 0.5, 0, 10, 180, 0, 1, true);
+            }
+        }
+        sv_animcmd::frame(fighter.lua_state_agent, 19.0);
+        if macros::is_excute(fighter) {
+            macros::EFFECT_OFF_KIND(fighter, Hash40::new("pzenigame_water_smash"), false, false);
+        }
+        sv_animcmd::frame(fighter.lua_state_agent, 20.0);
+        if macros::is_excute(fighter) {
+            macros::LANDING_EFFECT(fighter, Hash40::new("sys_whirlwind_r"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
+            macros::LAST_EFFECT_SET_ALPHA(fighter, 0.6);
+        }
+    }
+    else {
+        if macros::is_excute(fighter) {
+            if WorkModule::get_int(fighter.module_accessor, *FIGHTER_PZENIGAME_INSTANCE_WORK_ID_INT_SPECIAL_N_CHARGE) == 75 {
+                macros::EFFECT_FOLLOW(fighter, Hash40::new("pzenigame_water_cutter_r"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1.2, true);
+                macros::EFFECT_FOLLOW(fighter, Hash40::new("pzenigame_water_smash_r"), Hash40::new("top"), 0, 0.5, 0, 10, 180, 0, 1.2, true);
+            }
+            else {
+                macros::EFFECT_FOLLOW(fighter, Hash40::new("pzenigame_water_cutter_r"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
+                macros::EFFECT_FOLLOW(fighter, Hash40::new("pzenigame_water_smash_r"), Hash40::new("top"), 0, 0.5, 0, 10, 180, 0, 1, true);
+            }
+        }
+        sv_animcmd::frame(fighter.lua_state_agent, 19.0);
+        if macros::is_excute(fighter) {
+            macros::EFFECT_OFF_KIND(fighter, Hash40::new("pzenigame_water_smash_r"), false, false);
+        }
+        sv_animcmd::frame(fighter.lua_state_agent, 20.0);
+        if macros::is_excute(fighter) {
+            macros::LANDING_EFFECT(fighter, Hash40::new("sys_whirlwind_l"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
+            macros::LAST_EFFECT_SET_ALPHA(fighter, 0.6);
+        }
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 34.0);
+    if macros::is_excute(fighter) {
+        macros::EFFECT_OFF_KIND(fighter, Hash40::new("pzenigame_mouth_water"), false, false);
     }
 }
 
@@ -473,8 +580,13 @@ unsafe fn pzenigame_fair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.9 * TRT_DAMAGE[entry_id], 47, 76, 0, 40, 4.0, 0.0, 5.0, 7.5, Some(0.0), Some(5.0), Some(7.5), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 7.9 * TRT_DAMAGE[entry_id], 47, 76, 0, 40, 5.5, 0.0, 5.0, 4.0, Some(0.0), Some(5.0), Some(4.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.9 * TRT_DAMAGE[entry_id], 47, 76, 0, 40, 4.0, 0.0, 5.0, 7.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 7.9 * TRT_DAMAGE[entry_id], 47, 76, 0, 40, 5.5, 0.0, 5.0, 4.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 7.9 * TRT_DAMAGE[entry_id], 77, 76, 0, 30, 4.4, 0.0, 5.0, 14.5, Some(0.0), Some(5.0), Some(17.5), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 2, 2.0, false);
+        macros::EFFECT_FOLLOW(fighter, Hash40::new("pzenigame_water_attack"), Hash40::new("top"), 0, 5.0, 16.5, 0, 0, 0, 1.0, true);
+        macros::LAST_EFFECT_SET_SCALE_W(fighter, 0.8, 1.0, 1.0);
+        macros::LAST_EFFECT_SET_RATE(fighter, 1.4);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
@@ -493,11 +605,20 @@ unsafe fn pzenigame_fair_smash_script(fighter: &mut L2CAgentBase) {
 
 #[acmd_script( agent = "pzenigame", script = "game_attackairb", category = ACMD_GAME )]
 unsafe fn pzenigame_bair_smash_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.2, 367, 15, 0, 25, 4.2, 0.0, 5.0, -5.0, None, None, None, 0.7, 0.5, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, true, 0, 0.0, 2, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_TAIL);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 1.2, 367, 15, 0, 25, 4.2, 0.0, 5.0, -9.0, None, None, None, 0.7, 0.5, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, true, 0, 0.0, 2, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_TAIL);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 12.2 * TRT_DAMAGE[entry_id], 361, 105 / TRT_KNOCKBACK[entry_id] as i32, 0, 25, 4.2, 0.0, 5.0, -20.0, None, None, None, 0.7, 0.5, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_WATER, *ATTACK_REGION_TAIL);
+        macros::EFFECT_FOLLOW(fighter, Hash40::new("pzenigame_mizuteppo_hit"), Hash40::new("top"), 0, 5.0, -20.0, 0, 0, 0, 1, true);
+    
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 8.0);
+    if macros::is_excute(fighter) {
+        AttackModule::clear(fighter.module_accessor, 2, false);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 15.0);
     if macros::is_excute(fighter) {
@@ -519,13 +640,6 @@ unsafe fn pzenigame_bair_smash_script(fighter: &mut L2CAgentBase) {
 #[acmd_script( agent = "pzenigame", script = "game_landingairb", category = ACMD_GAME )]
 unsafe fn pzenigame_bair_landing_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.0, 45, 140, 0, 50, 5.0, 0.0, 4.0, -5.0, Some(0.0), Some(4.0), Some(-7.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_NONE);
-    }
-    sv_animcmd::wait(fighter.lua_state_agent, 2.0);
-    if macros::is_excute(fighter) {
-        AttackModule::clear_all(fighter.module_accessor);
-    }
 }
 
 #[acmd_script( agent = "pzenigame", script = "game_attackairhi", category = ACMD_GAME )]
@@ -555,6 +669,8 @@ unsafe fn pzenigame_uair_smash_script(fighter: &mut L2CAgentBase) {
 
 #[acmd_script( agent = "pzenigame", script = "game_attackairlw", category = ACMD_GAME )]
 unsafe fn pzenigame_dair_smash_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -564,8 +680,16 @@ unsafe fn pzenigame_dair_smash_script(fighter: &mut L2CAgentBase) {
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 3.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 3.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 2, 3.0, false);
+        macros::ATTACK(fighter, 3, 1, Hash40::new("top"), 2.4 * TRT_DAMAGE[entry_id], 96, 100, 40, 40, 4.6, 0.0, -18.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_TAIL);
+        macros::EFFECT_FOLLOW(fighter, Hash40::new("pzenigame_water_attack"), Hash40::new("top"), 0, -17.0, 0.0, 0, 0, 167, 1.0, true);
+        macros::LAST_EFFECT_SET_SCALE_W(fighter, 1.2, 1.0, 1.0);
+        macros::LAST_EFFECT_SET_RATE(fighter, 1.4);
     }
-    sv_animcmd::wait(fighter.lua_state_agent, 15.0);
+    sv_animcmd::wait(fighter.lua_state_agent, 3.0);
+    if macros::is_excute(fighter) {
+        AttackModule::clear(fighter.module_accessor, 3, false);
+    }
+    sv_animcmd::wait(fighter.lua_state_agent, 12.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
     }
@@ -742,6 +866,12 @@ unsafe fn pzenigame_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
+#[acmd_script( agent = "pzenigame", scripts = ["game_specialnstart", "game_specialairnstart"], category = ACMD_GAME, low_priority )]
+unsafe fn pzenigame_neutralb_start_smash_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    macros::FT_MOTION_RATE(fighter, 0.8);
+}
+
 #[acmd_script( agent = "pzenigame_water", script = "game_regular", category = ACMD_GAME )]
 unsafe fn water_projectile(fighter: &mut L2CAgentBase) {
     let owner_module_accessor = &mut *sv_battle_object::module_accessor((WorkModule::get_int(fighter.module_accessor, *WEAPON_INSTANCE_WORK_ID_INT_LINK_OWNER)) as u32);
@@ -753,23 +883,21 @@ unsafe fn water_projectile(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_specialsstart", category = ACMD_GAME )]
+#[acmd_script( agent = "pzenigame", scripts = ["game_specialsstart", "game_specialairsstart"], category = ACMD_GAME, low_priority )]
 unsafe fn pzenigame_sideb_start_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.8);
+        if WorkModule::get_int(fighter.module_accessor, *FIGHTER_PZENIGAME_INSTANCE_WORK_ID_INT_SPECIAL_N_CHARGE) == 75 {
+            macros::FT_MOTION_RATE(fighter, 0.5);
+        }
+        else {
+            macros::FT_MOTION_RATE(fighter, 0.8);
+        }
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_specialairsstart", category = ACMD_GAME )]
-unsafe fn pzenigame_sideb_start_air_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.8);
-    }
-}
 
-#[acmd_script( agent = "pzenigame", script = "game_specials", category = ACMD_GAME )]
+#[acmd_script( agent = "pzenigame", scripts = ["game_specials", "game_specialairs"], category = ACMD_GAME, low_priority )]
 unsafe fn pzenigame_sideb_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
@@ -779,17 +907,7 @@ unsafe fn pzenigame_sideb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_specialairs", category = ACMD_GAME )]
-unsafe fn pzenigame_sideb_air_smash_script(fighter: &mut L2CAgentBase) {
-    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
-
-    if macros::is_excute(fighter) {
-        JostleModule::set_status(fighter.module_accessor, false);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("bust"), 9.0 * TRT_DAMAGE[entry_id], 35, 90, 0, 55, 3.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 60, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ZENIGAME_SHELLHIT, *ATTACK_REGION_BODY);
-    }
-}
-
-#[acmd_script( agent = "pzenigame", script = "game_specialhi", category = ACMD_GAME )]
+#[acmd_script( agent = "pzenigame", scripts = ["game_specialhi", "game_specialairhi"], category = ACMD_GAME, low_priority )]
 unsafe fn pzenigame_upb_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
@@ -828,44 +946,6 @@ unsafe fn pzenigame_upb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_specialairhi", category = ACMD_GAME )]
-unsafe fn pzenigame_upb_air_smash_script(fighter: &mut L2CAgentBase) {
-    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
-
-    sv_animcmd::frame(fighter.lua_state_agent, 2.0);
-    if macros::is_excute(fighter) {
-        macros::SA_SET(fighter, *SITUATION_KIND_AIR);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 4.0);
-    if macros::is_excute(fighter) {
-        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_SUPER_JUMP_PUNCH_FLAG_REVERSE_LR);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 6.0);
-    if macros::is_excute(fighter) {
-        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_SUPER_JUMP_PUNCH_FLAG_MOVE_TRANS);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 9.0);
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.5 * TRT_DAMAGE[entry_id], 367, 100, 40, 0, 9.0, 0.0, 1.0, 9.0, None, None, None, 0.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 5, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_WATER, *ATTACK_REGION_WATER);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 18.0);
-    if macros::is_excute(fighter) {
-        notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 42.0);
-    if macros::is_excute(fighter) {
-        AttackModule::clear_all(fighter.module_accessor);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 43.0);
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.5 * TRT_DAMAGE[entry_id], 55, 152, 0, 55, 10.0, 0.0, 1.0, 9.0, None, None, None, 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_WATER, *ATTACK_REGION_WATER);
-    }
-    sv_animcmd::wait(fighter.lua_state_agent, 2.0);
-    if macros::is_excute(fighter) {
-        AttackModule::clear_all(fighter.module_accessor);
-        notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS_BOTH_SIDES);
-    }
-}
 
 pub fn install() {
     smashline::install_agent_frames!(
@@ -886,6 +966,7 @@ pub fn install() {
         pzenigame_fsmash3_smash_script,
         pzenigame_usmash_smash_script,
         pzenigame_dsmash_smash_script,
+        pzenigame_dsmash_effect_script,
         pzenigame_nair_smash_script,
         pzenigame_fair_smash_script,
         pzenigame_bair_smash_script,
@@ -899,13 +980,11 @@ pub fn install() {
         pzenigame_bthrow_smash_script,
         pzenigame_uthrow_smash_script,
         pzenigame_dthrow_smash_script,
+        pzenigame_neutralb_start_smash_script,
         water_projectile,
         pzenigame_sideb_start_smash_script,
-        pzenigame_sideb_start_air_smash_script,
         pzenigame_sideb_smash_script,
-        pzenigame_sideb_air_smash_script,
-        pzenigame_upb_smash_script,
-        pzenigame_upb_air_smash_script
+        pzenigame_upb_smash_script
         
     );
 }

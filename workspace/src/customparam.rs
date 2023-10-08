@@ -198,6 +198,18 @@ pub unsafe fn get_param_float_replace(module_accessor: u64, param_type: u64, par
 					return 2.4;
 				}
 			}
+			if param_type == hash40("param_special_hi") {
+				if param_hash == hash40("pass_mul") {
+					if WorkModule::get_int(boma, *FIGHTER_PZENIGAME_INSTANCE_WORK_ID_INT_SPECIAL_N_CHARGE) == 75 {
+						return 1.25;
+					}
+				}
+				if param_hash == hash40("air_pass_mul") {
+					if WorkModule::get_int(boma, *FIGHTER_PZENIGAME_INSTANCE_WORK_ID_INT_SPECIAL_N_CHARGE) == 75 {
+						return 1.5;
+					}
+				}
+			}
 		}
 		if fighter_kind == *FIGHTER_KIND_SONIC {
 			if param_type == hash40("run_speed_max") {
@@ -211,7 +223,7 @@ pub unsafe fn get_param_float_replace(module_accessor: u64, param_type: u64, par
 					return 3.6;
 				}
 				if crate::sonic::SONIC_NEUTRALB_CURRENT_SPEEDUP_LEVEL[entry_id] == 4 {
-					return 3.95;
+					return 3.9;
 				}
 			}
 			if param_type == hash40("walk_speed_max") {
@@ -282,19 +294,19 @@ pub unsafe fn get_param_float_replace(module_accessor: u64, param_type: u64, par
 			if param_type == hash40("param_special_n") {
 				if param_hash == hash40("special_n_speed_x_max") {
 					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 5 {
-						return 1.75;
+						return 1.6;
 					}
 					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 4 {
-						return 1.5;
+						return 1.4;
 					}
 					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 3 {
-						return 1.25;
+						return 1.2;
 					}
 					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 2 {
 						return 1.0;
 					}
 					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 1 {
-						return 0.75;
+						return 0.8;
 					}
 				}
 				if param_hash == hash40("special_n_stick_accel_x") {
@@ -316,19 +328,19 @@ pub unsafe fn get_param_float_replace(module_accessor: u64, param_type: u64, par
 				}
 				if param_hash == hash40("special_air_n_speed_x_max") {
 					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 5 {
-						return 1.75;
+						return 1.6;
 					}
 					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 4 {
-						return 1.5;
+						return 1.4;
 					}
 					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 3 {
-						return 1.25;
+						return 1.2;
 					}
 					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 2 {
 						return 1.0;
 					}
 					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 1 {
-						return 0.75;
+						return 0.8;
 					}
 				}
 				if param_hash == hash40("special_air_n_stick_accel_x") {

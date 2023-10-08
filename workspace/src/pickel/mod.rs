@@ -1638,7 +1638,7 @@ unsafe fn steve_upb_fly(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pickel", scripts = ["game_appealsl", "appealsr"], category = ACMD_GAME, low_priority )]
+#[acmd_script( agent = "pickel", scripts = ["game_appealsl", "game_appealsr"], category = ACMD_GAME, low_priority )]
 unsafe fn steve_sidetaunt(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 93.0);
     if macros::is_excute(fighter) {

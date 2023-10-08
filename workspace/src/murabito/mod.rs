@@ -788,6 +788,42 @@ unsafe fn watercan_flowing(fighter: &mut L2CAgentBase) {
     }
 }
 
+#[acmd_script( agent = "murabito", script = "game_speciallw1", category = ACMD_GAME, low_priority )]
+unsafe fn murabito_downb_1_smash_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    macros::FT_MOTION_RATE(fighter, 0.661);
+    if macros::is_excute(fighter) {
+        macros::SET_SPEED_EX(fighter, 0.0, 0.0, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_MURABITO_STATUS_SPECIAL_LW_PLANT_FLAG_CHECK_PLANT);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 2.0);
+    if macros::is_excute(fighter) {
+        ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_MURABITO_GENERATE_ARTICLE_SEED, false, -1);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 18.0);
+    if macros::is_excute(fighter) {
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_MURABITO_STATUS_SPECIAL_LW_PLANT_FLAG_PLANT);
+    }
+}
+
+#[acmd_script( agent = "murabito", script = "game_specialairlw1failure", category = ACMD_GAME, low_priority )]
+unsafe fn murabito_downb_1_air_failure_smash_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    macros::FT_MOTION_RATE(fighter, 0.75);
+    sv_animcmd::frame(fighter.lua_state_agent, 2.0);
+    if macros::is_excute(fighter) {
+        ArticleModule::generate_article_enable(fighter.module_accessor, *FIGHTER_MURABITO_GENERATE_ARTICLE_SEED, false, -1);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 12.0);
+    if macros::is_excute(fighter) {
+        CancelModule::enable_cancel(fighter.module_accessor);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 55.0);
+    if macros::is_excute(fighter) {
+        ArticleModule::remove_exist(fighter.module_accessor, *FIGHTER_MURABITO_GENERATE_ARTICLE_SEED, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
+    }
+}
+
 #[acmd_script( agent = "murabito", script = "game_speciallw3", category = ACMD_GAME )]
 unsafe fn murabito_downb_3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
@@ -934,6 +970,8 @@ pub fn install() {
         murabito_upb_flap1_smash_script,
         murabito_upb_flap2_smash_script,
         watercan_flowing,
+        murabito_downb_1_smash_script,
+        murabito_downb_1_air_failure_smash_script,
         murabito_downb_3_smash_script,
         murabito_downb_3_air_smash_script,
         murabito_downb_3_hit_smash_script,

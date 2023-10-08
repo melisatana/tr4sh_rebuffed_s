@@ -8,6 +8,7 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 
+static mut SNAKE_FSMASH_CHARGE: [bool; 8] = [false; 8];
 static mut SNAKE_FSMASH_FULLCHARGE: [bool; 8] = [false; 8];
 
 
@@ -203,9 +204,15 @@ unsafe fn snake_dtilt_smash_script(fighter: &mut L2CAgentBase) {
 unsafe fn snake_fsmash_charge_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
+    sv_animcmd::frame(fighter.lua_state_agent, 25.0);
+    if macros::is_excute(fighter) {
+        SNAKE_FSMASH_CHARGE[entry_id] = true ;
+        macros::PLAY_SE(fighter, Hash40::new("se_common_spirits_critical_m_tail"));
+    }
     sv_animcmd::frame(fighter.lua_state_agent, 48.0);
     if macros::is_excute(fighter) {
         SNAKE_FSMASH_FULLCHARGE[entry_id] = true ;
+        SNAKE_FSMASH_CHARGE[entry_id] = false;
         macros::PLAY_SE(fighter, Hash40::new("se_common_spirits_critical_l_tail"));
     }
 }
@@ -216,7 +223,8 @@ unsafe fn snake_fsmash_smash_script(fighter: &mut L2CAgentBase) {
 
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
-        SNAKE_FSMASH_FULLCHARGE[entry_id] = false ;
+        SNAKE_FSMASH_FULLCHARGE[entry_id] = false;
+        SNAKE_FSMASH_CHARGE[entry_id] = false;
     }
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
@@ -238,8 +246,6 @@ unsafe fn snake_fsmash_smash_script(fighter: &mut L2CAgentBase) {
             MotionModule::set_rate(fighter.module_accessor, 0.5);
             macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 21.1, 361, 75, 0, 66, 12.0, 0.0, 3.0, 16.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, true, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_BOMB, *ATTACK_REGION_BOMB);
             AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
-            //methodlib::L2CValue::as_hash()const(FIGHTER_SNAKE_GENERATE_ARTICLE_RPG7, Hash40::new("main"), Hash40::new("shoot"));
-            //methodlib::L2CValue::as_hash()const();
             ArticleModule::set_visibility(fighter.module_accessor, *FIGHTER_SNAKE_GENERATE_ARTICLE_RPG7, Hash40::new("main"), Hash40::new("shoot"), smash::app::ArticleOperationTarget(0));
         }
         sv_animcmd::wait(fighter.lua_state_agent, 2.0);
@@ -271,6 +277,33 @@ unsafe fn snake_fsmash_smash_script(fighter: &mut L2CAgentBase) {
         sv_animcmd::wait(fighter.lua_state_agent, 2.0);
         if macros::is_excute(fighter) {
             AttackModule::clear(fighter.module_accessor, 2, false);
+            MotionModule::set_rate(fighter.module_accessor, 1.15);
+        }
+    }
+    else if SNAKE_FSMASH_CHARGE[entry_id] {
+        sv_animcmd::frame(fighter.lua_state_agent, 41.0);
+        if macros::is_excute(fighter) {
+            MotionModule::set_rate(fighter.module_accessor, 0.5);
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 21.1, 361, 75, 0, 66, 12.0, 0.0, 3.0, 16.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, true, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_BOMB, *ATTACK_REGION_BOMB);
+            AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
+            ArticleModule::set_visibility(fighter.module_accessor, *FIGHTER_SNAKE_GENERATE_ARTICLE_RPG7, Hash40::new("main"), Hash40::new("shoot"), smash::app::ArticleOperationTarget(0));
+        }
+        sv_animcmd::wait(fighter.lua_state_agent, 2.0);
+        if macros::is_excute(fighter) {
+            AttackModule::clear(fighter.module_accessor, 0, false);
+        }
+        sv_animcmd::wait(fighter.lua_state_agent, 3.0);
+        if macros::is_excute(fighter) {
+            macros::PLAY_SE(fighter, Hash40::new("se_snake_smash_s02"));
+            macros::EFFECT(fighter, Hash40::new("snake_atk_s4s"), Hash40::new("top"), 0, 0, 40, 0, -90, 0, 1.1, 0, 0, 0, 0, 0, 0, true);
+            macros::EFFECT(fighter, Hash40::new("snake_atk_s4s_bomb1"), Hash40::new("top"), 0, -2, 40, 0, 180, 0, 1.6, 0, 0, 0, 0, 0, 0, true);
+            macros::EFFECT(fighter, Hash40::new("snake_atk_s4s_bomb_smoke"), Hash40::new("top"), 0, -2, 40, 0, 180, 0, 1.6, 0, 0, 0, 0, 0, 0, true);
+            macros::EFFECT(fighter, Hash40::new("snake_atk_s4s_bomb2"), Hash40::new("top"), 0, -2, 40, 0, 90, 0, 1.3, 0, 0, 0, 0, 0, 0, true);
+            macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 21.1, 361, 75, 0, 66, 12.0, 0.0, 3.0, 40.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, true, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_BOMB, *ATTACK_REGION_BOMB);
+        }
+        sv_animcmd::wait(fighter.lua_state_agent, 2.0);
+        if macros::is_excute(fighter) {
+            AttackModule::clear(fighter.module_accessor, 1, false);
             MotionModule::set_rate(fighter.module_accessor, 1.15);
         }
     }

@@ -372,10 +372,10 @@ unsafe fn ken_ftilt_close_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
-        WorkModule::off_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 30.0);
     if macros::is_excute(fighter) {
+        WorkModule::off_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_ATTACK_FLAG_HIT_CANCEL);
     }
 }
@@ -982,7 +982,7 @@ unsafe fn ken_uthrow_smash_script(fighter: &mut L2CAgentBase) {
 #[acmd_script( agent = "ken", script = "game_throwlw", category = ACMD_GAME )]
 unsafe fn ken_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 4.5, 60, 113, 0, 50, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 4.5, 60, 107, 0, 58, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 18.0);
@@ -1744,6 +1744,83 @@ unsafe fn ken_downb_turn_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
+#[acmd_script( agent = "ken", scripts = ["game_final2", "game_finalair2"], category = ACMD_GAME, low_priority )]
+unsafe fn ken_final_shinryuken_start(fighter: &mut L2CAgentBase) {
+    if macros::is_excute(fighter) {
+        AttackModule::clear_all(fighter.module_accessor);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        macros::CHECK_VALID_FINAL_START_CAMERA(fighter, 0, 0, 20, 0, 0, 0);
+        macros::SLOW_OPPONENT(fighter, 6.0, 30.0);
+    }
+    if !WorkModule::is_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_DISABLE_FINAL_START_CAMERA) {
+        sv_animcmd::frame(fighter.lua_state_agent, 10.0);
+        if macros::is_excute(fighter) {
+            macros::FT_START_CUTIN(fighter);
+            macros::FT_SET_FINAL_FEAR_FACE(fighter, 40);
+            macros::REQ_FINAL_START_CAMERA(fighter, Hash40::new("d04final2.nuanmb"), true);
+        }
+        else {
+            if macros::is_excute(fighter) {
+                macros::CAM_ZOOM_IN_arg5(fighter, 1.8, 0.0, PostureModule::scale(fighter.module_accessor) * 3.0, 0.0, 0.0);
+                macros::FT_START_CUTIN(fighter);
+            }
+            sv_animcmd::frame(fighter.lua_state_agent, 28.0);
+            if macros::is_excute(fighter) {
+                macros::CAM_ZOOM_OUT(fighter);
+            }
+        }
+    }
+    if macros::is_excute(fighter) {
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 0.0, 366, 100, 50, 0, 75.0, 0.0, 5.0, -1.0, None, None, None, 0.0, 0.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 6, false, false, true, true, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 45.0);
+    if macros::is_excute(fighter) {
+        AttackModule::clear(fighter.module_accessor, 0, false);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 48.0);
+    if macros::is_excute(fighter) {
+        SlowModule::set_whole(fighter.module_accessor, 2, 0);
+    }
+    sv_animcmd::wait(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        SlowModule::clear_whole(fighter.module_accessor);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 52.0);
+    if macros::is_excute(fighter) {
+        macros::SA_SET(fighter, *SITUATION_KIND_AIR);
+        camera!(fighter, *MA_MSC_CMD_CAMERA_CAM_RECT, 40, -40, 20, 0);
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_WORK_ID_FINAL_FLAG_ADJUST_SHINRYUKEN_POS);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 90.0);
+}
+
+
+#[acmd_script( agent = "ken_shinryuken", script = "game_final", category = ACMD_GAME, low_priority )]
+unsafe fn shinryuken_projectile(fighter: &mut L2CAgentBase) {
+    if macros::is_excute(fighter) {
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 2.0, 110, 120, 130, 0, 11.0, 0.0, -20.0, 0.0, Some(0.0), Some(80.0), Some(0.0), 0.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, true, f32::NAN, 0.0, 2, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_NONE);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.0, 367, 100, 100, 0, 11.0, 0.0, 80.0, 0.0, None, None, None, 0.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, true, f32::NAN, 0.0, 2, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_NONE);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 52.0);
+    if macros::is_excute(fighter) {
+        WorkModule::on_flag(fighter.module_accessor, *WEAPON_KEN_SHINRYUKEN_INSTANCE_WORK_ID_FLAG_ADD_ATTACK);
+        macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 2.0, 110, 85, 70, 0, 11.0, 0.0, -20.0, 0.0, Some(0.0), Some(80.0), Some(0.0), 0.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, true, f32::NAN, 0.0, 3, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_NONE);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 2.0, 367, 100, 100, 0, 11.0, 0.0, 80.0, 0.0, None, None, None, 0.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, true, f32::NAN, 0.0, 3, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_NONE);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 90.0);
+    if macros::is_excute(fighter) {
+        WorkModule::off_flag(fighter.module_accessor, *WEAPON_KEN_SHINRYUKEN_INSTANCE_WORK_ID_FLAG_ADD_ATTACK);
+        macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 14.0, 70, 63, 0, 105, 11.0, 0.0, -20.0, 0.0, Some(0.0), Some(80.0), Some(0.0), 0.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, true, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_NONE);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 14.0, 70, 63, 0, 105, 11.0, 0.0, 80.0, 0.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, true, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_NONE);
+    }
+    sv_animcmd::wait(fighter.lua_state_agent, 3.0);
+    if macros::is_excute(fighter) {
+        AttackModule::clear_all(fighter.module_accessor);
+    }
+}
+
 pub fn install() {
     smashline::install_agent_frames!(
         ken_frame
@@ -1799,7 +1876,9 @@ pub fn install() {
         ken_downb_smash_script,
         ken_downb_air_smash_script,
         ken_downb_turn_smash_script,
-        ken_downb_turn_air_smash_script
+        ken_downb_turn_air_smash_script,
+        ken_final_shinryuken_start,
+        shinryuken_projectile
         
         
     );

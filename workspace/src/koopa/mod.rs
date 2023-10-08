@@ -13,6 +13,8 @@ static KOOPA_SIDEB_COOLDOWN : i32 = 240;
 
 static mut KOOPA_UPB_GROUNDTOAIR : [bool; 8] = [false; 8];
 
+static mut KOOPA_SIDEB_ITEMGRAB : [bool; 8] = [false; 8];
+
 // A Once-Per-Fighter-Frame that only applies to Bowser
 #[fighter_frame( agent = FIGHTER_KIND_KOOPA )]
 fn koopa_frame(fighter: &mut L2CFighterCommon) {
@@ -48,6 +50,17 @@ fn koopa_frame(fighter: &mut L2CFighterCommon) {
                 PostureModule::reverse_lr(fighter.module_accessor);
                 PostureModule::update_rot_y_lr(fighter.module_accessor);
             }
+        }
+
+        if status == *FIGHTER_STATUS_KIND_SPECIAL_S {
+            if KOOPA_SIDEB_ITEMGRAB[entry_id] {
+                ItemModule::pickup_item(fighter.module_accessor, ItemSize{ _address: *ITEM_SIZE_LIGHT as u8 }, *FIGHTER_HAVE_ITEM_WORK_TEMPORARY, *ITEM_TRAIT_FLAG_QUICK, QuickItemTreatType{ _address: 0 }, ItemPickupSearchMode{ _address: 0 });
+                ItemModule::use_item(fighter.module_accessor, *FIGHTER_HAVE_ITEM_WORK_TEMPORARY, false);
+                ItemModule::pickup_item(fighter.module_accessor, ItemSize{ _address: *ITEM_SIZE_LIGHT as u8 }, 0, -1, QuickItemTreatType{ _address: 0 }, ItemPickupSearchMode{ _address: 0 });
+            }
+        }
+        if status != *FIGHTER_STATUS_KIND_SPECIAL_S {
+            KOOPA_SIDEB_ITEMGRAB[entry_id] = false;
         }
 
     
@@ -121,12 +134,12 @@ unsafe fn koopa_dashattack_smash_script(fighter: &mut L2CAgentBase) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 14.2, 42, 90, 0, 50, 7.8, 0.0, 9.0, 13.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KAMEHIT, *ATTACK_REGION_KICK);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 14.2, 42, 90, 0, 50, 5.0, 0.0, 9.0, 4.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KAMEHIT, *ATTACK_REGION_KICK);
     }
-    sv_animcmd::wait(fighter.lua_state_agent, 4.0);
+    sv_animcmd::wait(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.8, 42, 90, 0, 50, 7.0, 0.0, 9.0, 13.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KAMEHIT, *ATTACK_REGION_KICK);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 11.8, 42, 90, 0, 50, 4.8, 0.0, 9.0, 4.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KAMEHIT, *ATTACK_REGION_KICK);
     }
-    sv_animcmd::wait(fighter.lua_state_agent, 6.0);
+    sv_animcmd::wait(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
     }
@@ -345,33 +358,66 @@ unsafe fn koopa_dsmash_smash_script(fighter: &mut L2CAgentBase) {
 
 #[acmd_script( agent = "koopa", script = "game_attackairn", category = ACMD_GAME )]
 unsafe fn koopa_nair_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 8.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("arml"), 7.8, 78, 50, 0, 20, 6.0, 1.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 2.0, false);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 14.5, 78, 60, 0, 45, 11.0, 0.0, 6.6, 0.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_BODY);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 3.0, false);
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 14.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 11.0);
     if macros::is_excute(fighter) {
-        MotionModule::set_rate(fighter.module_accessor, 1.15);
-        macros::ATTACK(fighter, 1, 1, Hash40::new("armr"), 7.8, 78, 80, 0, 20, 6.0, 1.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 2.0, false);
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 10.2, 81, 60, 0, 45, 10.7, 0.0, 6.6, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_BODY);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 3.0, false);
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 18.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 29.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 2, 2, Hash40::new("kneer"), 7.8, 78, 80, 0, 40, 6.0, 1.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 3, 3, Hash40::new("kneel"), 7.8, 78, 80, 0, 40, 6.0, 1.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_KICK);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 2, 2.0, false);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 3, 2.0, false);
+        AttackModule::clear_all(fighter.module_accessor);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 32.0);
     if macros::is_excute(fighter) {
-        AttackModule::clear_all(fighter.module_accessor);
-        MotionModule::set_rate(fighter.module_accessor, 1.23);
+        MotionModule::set_rate(fighter.module_accessor, 1.25);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 38.0);
     if macros::is_excute(fighter) {
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
+    }
+}
+
+#[acmd_script( agent = "koopa", script = "effect_attackairn", category = ACMD_EFFECT )]
+unsafe fn koopa_nair_effect_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 8.0);
+    for _ in 0..4 {
+        if macros::is_excute(fighter) {
+            macros::EFFECT_FOLLOW_FLIP(fighter, Hash40::new("koopa_shell_a"), Hash40::new("koopa_shell_b"), Hash40::new("rot"), 0, -3, 0, 0, 0, 0, 1.45, true, *EF_FLIP_NONE);
+        }
+        sv_animcmd::wait(fighter.lua_state_agent, 5.0);
+        if macros::is_excute(fighter) {
+            macros::EFFECT_FOLLOW_FLIP(fighter, Hash40::new("koopa_shell_a"), Hash40::new("koopa_shell_b"), Hash40::new("rot"), 0, 0, 0, 0, 0, 0, 1.45, true, *EF_FLIP_NONE);
+        }
+    }
+}
+
+#[acmd_script( agent = "koopa", script = "expression_attackairn", category = ACMD_EXPRESSION )]
+unsafe fn koopa_nair_expression_script(fighter: &mut L2CAgentBase) {
+    if macros::is_excute(fighter) {
+        AttackModule::set_attack_reference_joint_id(fighter.module_accessor, Hash40::new("top"), AttackDirectionAxis(*ATTACK_DIRECTION_Y), AttackDirectionAxis(*ATTACK_DIRECTION_Z), AttackDirectionAxis(*ATTACK_DIRECTION_X));
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        //smash::app::sv_animcmd::FT_DISABLE_CURRY_FACE(fighter, true);
+        slope!(fighter, *MA_MSC_CMD_SLOPE_SLOPE_INTP, *SLOPE_STATUS_TOP, 6, true);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 6.0);
+    if macros::is_excute(fighter) {
+        ItemModule::set_have_item_visibility(fighter.module_accessor, false, 0);
+        ItemModule::set_attach_item_visibility(fighter.module_accessor, false, *ATTACH_ITEM_GROUP_ALL as u8);
+        macros::RUMBLE_HIT(fighter, Hash40::new("rbkind_attacks"), 7);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 32.0);
+    if macros::is_excute(fighter) {
+        ItemModule::set_have_item_visibility(fighter.module_accessor, true, 0);
+        ItemModule::set_attach_item_visibility(fighter.module_accessor, true, *ATTACH_ITEM_GROUP_ALL as u8);
     }
 }
 
@@ -456,7 +502,7 @@ unsafe fn koopa_uair_smash_script(fighter: &mut L2CAgentBase) {
 unsafe fn koopa_dair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_NO_SPEED_OPERATION_CHK);
-        macros::SET_SPEED_EX(fighter, 0.0, 3.0, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
+        macros::SET_SPEED_EX(fighter, 0.0, 2.5, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_NO_SPEED_OPERATION_CHK);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 14.0);
@@ -480,17 +526,15 @@ unsafe fn koopa_dair_smash_script(fighter: &mut L2CAgentBase) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_NO_SPEED_OPERATION_CHK);
         macros::SET_SPEED_EX(fighter, 0.0, -4.0, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_NO_SPEED_OPERATION_CHK);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 20.3, 275, 100, 0, 30, 7.0, 0.0, -3.0, -1.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 6, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_BODY);
-    }
-    sv_animcmd::wait(fighter.lua_state_agent, 8.0);
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 20.3, 48, 100, 0, 30, 7.0, 0.0, -3.0, -1.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 6, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_BODY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.9, 260, 100, 45, 30, 7.4, 0.0, -3.0, -1.0, None, None, None, 0.7, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0.5, 0.0, 3, false, false, false, false, true, *COLLISION_SITUATION_MASK_A, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_BODY);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 1.9, 260, 100, 15, 20, 7.4, 0.0, -3.0, -1.0, None, None, None, 0.7, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, true, 0.5, 0.0, 3, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_BODY);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 4.0, false);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 40.0);
     if macros::is_excute(fighter) {
         CancelModule::enable_cancel(fighter.module_accessor);
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 50.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 42.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
     }
@@ -507,8 +551,8 @@ unsafe fn koopa_dair_smash_script(fighter: &mut L2CAgentBase) {
 #[acmd_script( agent = "koopa", script = "game_landingairlw", category = ACMD_GAME )]
 unsafe fn koopa_dair_landing_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.8, 20, 50, 0, 50, 9.6, 0.0, 4.0, -8.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_BODY);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 5.8, 20, 50, 0, 50, 9.6, 0.0, 4.0, 8.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_BODY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.8, 30, 138, 0, 50, 9.6, 0.0, 4.0, -8.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_BODY);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 7.8, 30, 138, 0, 50, 9.6, 0.0, 4.0, 8.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_BODY);
     }
     if macros::is_excute(fighter) {
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("head"), HitStatus(*HIT_STATUS_XLU), 0);
@@ -758,8 +802,15 @@ unsafe fn koopa_flamebreath(fighter: &mut L2CAgentBase) {
 unsafe fn koopa_sideb_grab_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
+    if StatusModule::prev_situation_kind(fighter.module_accessor) == SITUATION_KIND_AIR {
+        StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_LANDING, true);
+    }
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 5.0, 70, 30, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_BODY);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        KOOPA_SIDEB_ITEMGRAB[entry_id] = false;
     }
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
@@ -775,34 +826,29 @@ unsafe fn koopa_sideb_grab_smash_script(fighter: &mut L2CAgentBase) {
         }   
         else {
             GrabModule::clear_all(fighter.module_accessor);
-            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 9.6, 361, 100, 0, 65, 4.6, 0.0, 8.5, 19.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PUNCH);
-            macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 9.6, 361, 100, 0, 65, 5.8, 0.0, 8.0, 11.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PUNCH);
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 10.0, 361, 100, 0, 65, 4.6, 0.0, 8.5, 19.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PUNCH);
+            macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 10.0, 361, 100, 0, 65, 5.8, 0.0, 8.0, 11.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PUNCH);
         }
     }
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
-    for _ in 0..6 {
-        if macros::is_excute(fighter) {
-            ItemModule::pickup_item(fighter.module_accessor, ItemSize{ _address: *ITEM_SIZE_LIGHT as u8 }, *FIGHTER_HAVE_ITEM_WORK_TEMPORARY, *ITEM_TRAIT_FLAG_QUICK, QuickItemTreatType{ _address: 0 }, ItemPickupSearchMode{ _address: 0 });
-            ItemModule::use_item(fighter.module_accessor, *FIGHTER_HAVE_ITEM_WORK_TEMPORARY, false);
-            ItemModule::pickup_item(fighter.module_accessor, ItemSize{ _address: *ITEM_SIZE_LIGHT as u8 }, 0, -1, QuickItemTreatType{ _address: 0 }, ItemPickupSearchMode{ _address: 0 });
-        }
-        sv_animcmd::wait(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        KOOPA_SIDEB_ITEMGRAB[entry_id] = true;
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 9.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
         GrabModule::clear_all(fighter.module_accessor);
         GrabModule::set_rebound(fighter.module_accessor, false);
-        macros::FT_MOTION_RATE(fighter, 0.8547008);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 10.0);
-    if macros::is_excute(fighter) {
         if KOOPA_SIDEB_RECHARGE_TIMER[entry_id] < 1 {
             macros::FT_MOTION_RATE(fighter, 0.8547008);
         }
         else {
             macros::FT_MOTION_RATE(fighter, 0.625);
         }
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 12.0);
+    if macros::is_excute(fighter) {
+        KOOPA_SIDEB_ITEMGRAB[entry_id] = false;
     }
 }
 
@@ -812,6 +858,10 @@ unsafe fn koopa_sideb_grab_air_smash_script(fighter: &mut L2CAgentBase) {
 
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 5.0, 70, 30, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_BODY);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        KOOPA_SIDEB_ITEMGRAB[entry_id] = false;
     }
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
@@ -824,35 +874,30 @@ unsafe fn koopa_sideb_grab_air_smash_script(fighter: &mut L2CAgentBase) {
             macros::CATCH(fighter, 1, Hash40::new("top"), 6.5, 0.0, 7.0, 14.0, None, None, None, *FIGHTER_STATUS_KIND_KOOPA_DIVED, *COLLISION_SITUATION_MASK_GA);
         }
         else {
-            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 9.6, 361, 100, 0, 65, 5.5, 0.0, 6.0, 21.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PUNCH);
-            macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 9.6, 361, 100, 0, 65, 6.5, 0.0, 7.0, 14.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PUNCH);
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 10.0, 361, 100, 0, 65, 5.5, 0.0, 6.0, 21.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PUNCH);
+            macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 10.0, 361, 100, 0, 65, 6.5, 0.0, 7.0, 14.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PUNCH);
             GrabModule::clear_all(fighter.module_accessor);
         }
     }
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
-    for _ in 0..6 {
-        if macros::is_excute(fighter) {
-            ItemModule::pickup_item(fighter.module_accessor, ItemSize{ _address: *ITEM_SIZE_LIGHT as u8 }, *FIGHTER_HAVE_ITEM_WORK_TEMPORARY, *ITEM_TRAIT_FLAG_QUICK, QuickItemTreatType{ _address: 0 }, ItemPickupSearchMode{ _address: 0 });
-            ItemModule::use_item(fighter.module_accessor, *FIGHTER_HAVE_ITEM_WORK_TEMPORARY, false);
-            ItemModule::pickup_item(fighter.module_accessor, ItemSize{ _address: *ITEM_SIZE_LIGHT as u8 }, 0, -1, QuickItemTreatType{ _address: 0 }, ItemPickupSearchMode{ _address: 0 });
-        }
-        sv_animcmd::wait(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        KOOPA_SIDEB_ITEMGRAB[entry_id] = true;
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 9.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
         GrabModule::clear_all(fighter.module_accessor);
         GrabModule::set_rebound(fighter.module_accessor, false);
-        macros::FT_MOTION_RATE(fighter, 0.8547008);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 10.0);
-    if macros::is_excute(fighter) {
         if KOOPA_SIDEB_RECHARGE_TIMER[entry_id] < 1 {
             macros::FT_MOTION_RATE(fighter, 0.8547008);
         }
         else {
             macros::FT_MOTION_RATE(fighter, 0.625);
         }
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 12.0);
+    if macros::is_excute(fighter) {
+        KOOPA_SIDEB_ITEMGRAB[entry_id] = false;
     }
 }
 
@@ -920,6 +965,7 @@ unsafe fn koopa_upb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
         KineticModule::set_consider_ground_friction(fighter.module_accessor, false, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
+        notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS_BOTH_SIDES);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 39.0);
     if macros::is_excute(fighter) {
@@ -1016,6 +1062,10 @@ unsafe fn koopa_downb_smash_script(fighter: &mut L2CAgentBase) {
 
 #[acmd_script( agent = "koopa", script = "game_specialairlw", category = ACMD_GAME )]
 unsafe fn koopa_downb_air_smash_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        AttackModule::clear_all(fighter.module_accessor);
+    }
     sv_animcmd::frame(fighter.lua_state_agent, 12.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.909090909);
@@ -1084,6 +1134,8 @@ pub fn install() {
         koopa_usmash_smash_script,
         koopa_dsmash_smash_script,
         koopa_nair_smash_script,
+        koopa_nair_effect_script,
+        koopa_nair_expression_script,
         koopa_fair_smash_script,
         koopa_bair_smash_script,
         koopa_uair_smash_script,
