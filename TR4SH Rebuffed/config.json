@@ -1,5 +1,37 @@
 {
 	"new-dir-files": {
+		"fighter/zelda/c00": [
+			"fighter/zelda/motion/body/c00/c03attacks4hi.nuanmb",
+			"fighter/zelda/motion/body/c00/c03attacks4lw.nuanmb"
+		],
+		"fighter/zelda/c01": [
+			"fighter/zelda/motion/body/c01/c03attacks4hi.nuanmb",
+			"fighter/zelda/motion/body/c01/c03attacks4lw.nuanmb"
+		],
+		"fighter/zelda/c02": [
+			"fighter/zelda/motion/body/c02/c03attacks4hi.nuanmb",
+			"fighter/zelda/motion/body/c02/c03attacks4lw.nuanmb"
+		],
+		"fighter/zelda/c03": [
+			"fighter/zelda/motion/body/c03/c03attacks4hi.nuanmb",
+			"fighter/zelda/motion/body/c03/c03attacks4lw.nuanmb"
+		],
+		"fighter/zelda/c04": [
+			"fighter/zelda/motion/body/c04/c03attacks4hi.nuanmb",
+			"fighter/zelda/motion/body/c04/c03attacks4lw.nuanmb"
+		],
+		"fighter/zelda/c05": [
+			"fighter/zelda/motion/body/c05/c03attacks4hi.nuanmb",
+			"fighter/zelda/motion/body/c05/c03attacks4lw.nuanmb"
+		],
+		"fighter/zelda/c06": [
+			"fighter/zelda/motion/body/c06/c03attacks4hi.nuanmb",
+			"fighter/zelda/motion/body/c06/c03attacks4lw.nuanmb"
+		],
+		"fighter/zelda/c07": [
+			"fighter/zelda/motion/body/c07/c03attacks4hi.nuanmb",
+			"fighter/zelda/motion/body/c07/c03attacks4lw.nuanmb"
+		],
 		"fighter/roy/c00": [
 			"fighter/roy/motion/body/c00/c01attacks3hi.nuanmb",
 			"fighter/roy/motion/body/c00/c01attacks3lw.nuanmb"
