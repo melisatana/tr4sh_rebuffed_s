@@ -32,7 +32,8 @@ fn shulk_frame(fighter: &mut L2CFighterCommon) {
             }
         }
 
-        if [*FIGHTER_STATUS_KIND_ATTACK,
+        if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_SHULK_INSTANCE_WORK_ID_FLAG_SPECIAL_N_ACTIVE) 
+        && [*FIGHTER_STATUS_KIND_ATTACK,
             *FIGHTER_STATUS_KIND_ATTACK_DASH,
             *FIGHTER_STATUS_KIND_ATTACK_S3,
             *FIGHTER_STATUS_KIND_ATTACK_HI3,
@@ -43,7 +44,7 @@ fn shulk_frame(fighter: &mut L2CFighterCommon) {
             *FIGHTER_STATUS_KIND_ATTACK_AIR,
             *FIGHTER_SHULK_STATUS_KIND_SPECIAL_LW_ATTACK
         ].contains(&status) {
-            if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) /*&& AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false*/ {
+            if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) {
                 if ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_SPECIAL) && (sticky == 0.0 && stickx == 0.0) {
                     StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_SPECIAL_N, false);
                     WorkModule::on_flag(fighter.module_accessor, *FIGHTER_SHULK_INSTANCE_WORK_ID_FLAG_SPECIAL_N_SELECT);

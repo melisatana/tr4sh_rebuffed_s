@@ -595,6 +595,15 @@ unsafe fn mariod_specialn_smash_script(fighter: &mut L2CAgentBase) {
     }
 }    
 
+#[acmd_script( agent = "mariod", scripts = ["sound_specialn", "sound_specialairn"], category = ACMD_SOUND, low_priority )]
+unsafe fn mariod_specialn_sound_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 13.0);
+    if macros::is_excute(fighter) {
+        macros::PLAY_SE(fighter, Hash40::new("se_mariod_special_n01"));
+        SoundModule::set_se_pitch_ratio(fighter.module_accessor, Hash40::new("se_mariod_special_n01"), 1.08);
+    }
+}
+
 #[acmd_script( agent = "mariod_drcapsule", script = "game_regular", category = ACMD_GAME )]
 unsafe fn mariod_capsule(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
@@ -618,7 +627,7 @@ unsafe fn mariod_capsule_sound(fighter: &mut L2CAgentBase) {
         //macros::SET_TAKEOUT_SE(fighter, Hash40::new("se_mariod_special_n01"));
         macros::PLAY_SE(fighter, Hash40::new("se_mariod_special_n02"));
         macros::PLAY_SE(fighter, Hash40::new("se_mariod_special_n01"));
-        SoundModule::set_se_pitch_ratio(fighter.module_accessor, Hash40::new("se_mariod_special_n01"), 1.2);
+        SoundModule::set_se_pitch_ratio(fighter.module_accessor, Hash40::new("se_mariod_special_n01"), 1.08);
     }
 }
 
@@ -839,6 +848,7 @@ pub fn install() {
         mariod_throwlw_smash_script,
         mariod_throwb_smash_script,
         mariod_specialn_smash_script,
+        mariod_specialn_sound_script,
         mariod_capsule,
         mariod_capsule_sound,
         mariod_specials_smash_script,

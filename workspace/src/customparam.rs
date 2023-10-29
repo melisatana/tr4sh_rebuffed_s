@@ -445,6 +445,15 @@ pub unsafe fn get_param_float_replace(module_accessor: u64, param_type: u64, par
 				}
 			}
 		}
+		if fighter_kind == *WEAPON_KIND_PIKACHU_DENGEKIDAMA {
+			if param_type == hash40("param_dengekidama") {
+				if param_hash == hash40("angle_") {
+					if crate::pikachu::PIKACHU_NEUTRALB_CHANGE_ANGLE[entry_id] {
+						return -0.5;
+					}
+				}
+			}
+		}
 		
 
 		

@@ -202,6 +202,7 @@ pub unsafe fn status_landing_main_sub(fighter: &mut L2CFighterCommon) -> L2CValu
     original!()(fighter)
 }
 
+
 //determines who cannot cancel jab1 into ftilt
 unsafe fn can_jab1_cancel_to_ftilt(fighter: &mut L2CFighterCommon) -> bool {
     let fighter_kind = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_KIND);
@@ -600,7 +601,7 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
 
 //=================================================================
 //== KineticModule::change_kinetic
-//== Note: Double jump cancels for Ness, Lucas, Sora and Mewtwo
+//== Note: Double jump cancels for Ness, Sora and Mewtwo
 //== Note: This changes the kinetic energy, not the animation
 //=================================================================
 #[skyline::hook(replace=KineticModule::change_kinetic)]
@@ -612,7 +613,7 @@ unsafe fn change_kinetic_hook(boma: &mut BattleObjectModuleAccessor, kinetic_typ
     let status = StatusModule::status_kind(boma);
 
     if fighter_category == *BATTLE_OBJECT_CATEGORY_FIGHTER
-        && ( ( [*FIGHTER_KIND_NESS, *FIGHTER_KIND_LUCAS, *FIGHTER_KIND_MEWTWO, *FIGHTER_KIND_TRAIL].contains(&fighter_kind)
+        && ( ( [*FIGHTER_KIND_NESS, *FIGHTER_KIND_MEWTWO, *FIGHTER_KIND_TRAIL].contains(&fighter_kind)
         && (status == *FIGHTER_STATUS_KIND_ATTACK_AIR || ([*FIGHTER_KIND_TRAIL].contains(&fighter_kind) && [*FIGHTER_TRAIL_STATUS_KIND_ATTACK_AIR_F, *FIGHTER_TRAIL_STATUS_KIND_ATTACK_AIR_N].contains(&status)))
         && kinetic_type == FIGHTER_KINETIC_TYPE_JUMP_AERIAL_MOTION_2ND
         && !ControlModule::check_button_on(boma, *CONTROL_PAD_BUTTON_JUMP) )
@@ -624,7 +625,7 @@ unsafe fn change_kinetic_hook(boma: &mut BattleObjectModuleAccessor, kinetic_typ
 
 //=================================================================
 //== MotionModule::add_motion_2nd
-//== Note: Double jump cancels for Ness, Lucas, Sora and Mewtwo
+//== Note: Double jump cancels for Ness, Sora and Mewtwo
 //== Note: This changes the animation, not the kinetic energy
 //=================================================================
 #[skyline::hook(replace=MotionModule::add_motion_2nd)]
@@ -632,7 +633,7 @@ unsafe fn add_motion_2nd_hook(boma: &mut BattleObjectModuleAccessor, motion_kind
     let fighter_category = utility::get_category(boma);
     let fighter_kind = utility::get_kind(boma);
     let status = StatusModule::status_kind(boma);
-    if fighter_category == *BATTLE_OBJECT_CATEGORY_FIGHTER && [*FIGHTER_KIND_NESS, *FIGHTER_KIND_LUCAS, *FIGHTER_KIND_MEWTWO, *FIGHTER_KIND_TRAIL].contains(&fighter_kind) {
+    if fighter_category == *BATTLE_OBJECT_CATEGORY_FIGHTER && [*FIGHTER_KIND_NESS, *FIGHTER_KIND_MEWTWO, *FIGHTER_KIND_TRAIL].contains(&fighter_kind) {
         if [hash40("jump_aerial_f"), hash40("jump_aerial_b")].contains(&motion_kind.hash) {
             if !ControlModule::check_button_on(boma, *CONTROL_PAD_BUTTON_JUMP) {
                 return 0;
@@ -686,8 +687,8 @@ pub fn install() {
         change_kinetic_hook,
         add_motion_2nd_hook
     );
-    /*skyline::install_status_scripts!(
-        guard_status
+    /*smashline::install_status_scripts!(
+        status_pre_escape_air
     );*/
     skyline::nro::add_hook(nro_hook);
     
