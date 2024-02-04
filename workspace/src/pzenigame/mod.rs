@@ -7,6 +7,7 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
+use crate::custom::global_fighter_frame;
 
 pub static mut SQUIRTLE_TORRENT : [bool; 8] = [false; 8];
 pub static mut SQUIRTLE_TORRENT_FRAME : [i32; 8] = [0; 8];
@@ -14,21 +15,28 @@ static mut SQUIRTLE_TORRENT_STATUS_CURRENT : [i32; 8] = [0; 8];
 static mut TRT_DAMAGE : [f32; 8] = [0.0; 8];
 static mut TRT_KNOCKBACK : [f32; 8] = [0.0; 8];
 
+static mut SQUIRTLE_TORRENT_GRAPHIC : [bool; 8] = [false; 8];
+
 // A Once-Per-Fighter-Frame that only applies to Squirtle
-#[fighter_frame( agent = FIGHTER_KIND_PZENIGAME )]
-fn pzenigame_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn pzenigame_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         let status = StatusModule::status_kind(fighter.module_accessor);
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
-        println!("Squirtle Squirt ( ͡° ͜ʖ ͡°)");
+        //println!("Squirtle Squirt ( ͡° ͜ʖ ͡°)");
 
         if DamageModule::damage(fighter.module_accessor, 0) >= 75.0 {
+            if SQUIRTLE_TORRENT_GRAPHIC[entry_id] {
+                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_status_down"), Hash40::new("top"), 0, 3, 0, 0, 0, 0, 0.8, true);
+                SQUIRTLE_TORRENT_FRAME[entry_id] = 0 ;
+                SQUIRTLE_TORRENT_GRAPHIC[entry_id] = false;
+            
+            }
             SQUIRTLE_TORRENT[entry_id] = true;
             SQUIRTLE_TORRENT_FRAME[entry_id] += 1 ;
             if SQUIRTLE_TORRENT_FRAME[entry_id] == 9000 || SQUIRTLE_TORRENT_STATUS_CURRENT[entry_id] != status {
-                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_status_down"), Hash40::new("top"), 0, 3, 0, 0, 0, 0, 0.8, true);
-                SQUIRTLE_TORRENT_FRAME[entry_id] = 0 ;
+                SQUIRTLE_TORRENT_GRAPHIC[entry_id] = true;
             }
             SQUIRTLE_TORRENT_STATUS_CURRENT[entry_id] = status ;
         }
@@ -59,8 +67,7 @@ fn pzenigame_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn pzenigame_jab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.6, 361, 20, 17, 25, 2.5, 0.0, 5.0, 5.0, None, None, None, 1.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
@@ -79,8 +86,7 @@ unsafe fn pzenigame_jab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_attack12", category = ACMD_GAME )]
-unsafe fn pzenigame_jab2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_jab2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("kneer"), 2.1, 361, 25, 20, 25, 2.7, -1.5, -0.5, 0.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
@@ -97,8 +103,7 @@ unsafe fn pzenigame_jab2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_attack13", category = ACMD_GAME )]
-unsafe fn pzenigame_jab3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_jab3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("tail2"), 4.2, 104, 90, 0, 40, 3.3, -1.5, 2.0, 0.0, None, None, None, 1.7, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_TAIL);
@@ -112,8 +117,7 @@ unsafe fn pzenigame_jab3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn pzenigame_dashattack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
@@ -131,8 +135,7 @@ unsafe fn pzenigame_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_attacks3", category = ACMD_GAME )]
-unsafe fn pzenigame_ftilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("tail2"), HitStatus(*HIT_STATUS_XLU), 0);
     }
@@ -156,8 +159,7 @@ unsafe fn pzenigame_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_attacks3hi", category = ACMD_GAME )]
-unsafe fn pzenigame_ftilt2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_ftilt2_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("tail2"), HitStatus(*HIT_STATUS_XLU), 0);
     }
@@ -181,8 +183,7 @@ unsafe fn pzenigame_ftilt2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_attacks3lw", category = ACMD_GAME )]
-unsafe fn pzenigame_ftilt3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_ftilt3_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("tail2"), HitStatus(*HIT_STATUS_XLU), 0);
     }
@@ -206,8 +207,7 @@ unsafe fn pzenigame_ftilt3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn pzenigame_utilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_utilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         JostleModule::set_status(fighter.module_accessor, false);
@@ -226,8 +226,7 @@ unsafe fn pzenigame_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn pzenigame_dtilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
@@ -253,8 +252,7 @@ unsafe fn pzenigame_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn pzenigame_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     let fullmouth_damage;
@@ -290,8 +288,7 @@ unsafe fn pzenigame_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_attacks4hi", category = ACMD_GAME )]
-unsafe fn pzenigame_fsmash2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_fsmash2_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     let fullmouth_damage;
@@ -328,8 +325,7 @@ unsafe fn pzenigame_fsmash2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_attacks4lw", category = ACMD_GAME )]
-unsafe fn pzenigame_fsmash3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_fsmash3_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     let fullmouth_damage;
@@ -365,8 +361,7 @@ unsafe fn pzenigame_fsmash3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn pzenigame_usmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_usmash_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
@@ -430,8 +425,7 @@ unsafe fn pzenigame_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn pzenigame_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -493,8 +487,7 @@ unsafe fn pzenigame_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "effect_attacklw4", category = ACMD_EFFECT, low_priority )]
-unsafe fn pzenigame_dsmash_effect_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_dsmash_effect_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::EFFECT(fighter, Hash40::new("sys_smash_flash"), Hash40::new("top"), 0, 2, 8, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
     }
@@ -550,8 +543,7 @@ unsafe fn pzenigame_dsmash_effect_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn pzenigame_nair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_nair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -573,8 +565,7 @@ unsafe fn pzenigame_nair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn pzenigame_fair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_fair_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
@@ -603,8 +594,7 @@ unsafe fn pzenigame_fair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn pzenigame_bair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_bair_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
@@ -637,13 +627,11 @@ unsafe fn pzenigame_bair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_landingairb", category = ACMD_GAME )]
-unsafe fn pzenigame_bair_landing_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_bair_landing_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn pzenigame_uair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_uair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -667,8 +655,7 @@ unsafe fn pzenigame_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn pzenigame_dair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_dair_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
@@ -709,8 +696,7 @@ unsafe fn pzenigame_dair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_catch", category = ACMD_GAME )]
-unsafe fn pzenigame_grab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_grab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         GrabModule::set_rebound(fighter.module_accessor, true);
@@ -729,8 +715,7 @@ unsafe fn pzenigame_grab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn pzenigame_grabd_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_grabd_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -752,8 +737,7 @@ unsafe fn pzenigame_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn pzenigame_grabp_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_grabp_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -775,8 +759,7 @@ unsafe fn pzenigame_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn pzenigame_fthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.5, 66, 70, 0, 50, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -799,8 +782,7 @@ unsafe fn pzenigame_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn pzenigame_bthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -820,8 +802,7 @@ unsafe fn pzenigame_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn pzenigame_uthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.4, 90, 125, 0, 70, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -840,8 +821,7 @@ unsafe fn pzenigame_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn pzenigame_dthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_LEAVE_NEAR_OTTOTTO(fighter, -3.2, 3.2);
@@ -866,14 +846,12 @@ unsafe fn pzenigame_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", scripts = ["game_specialnstart", "game_specialairnstart"], category = ACMD_GAME, low_priority )]
-unsafe fn pzenigame_neutralb_start_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_neutralb_start_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     macros::FT_MOTION_RATE(fighter, 0.8);
 }
 
-#[acmd_script( agent = "pzenigame_water", script = "game_regular", category = ACMD_GAME )]
-unsafe fn water_projectile(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn water_projectile(fighter: &mut L2CAgentBase) {
     let owner_module_accessor = &mut *sv_battle_object::module_accessor((WorkModule::get_int(fighter.module_accessor, *WEAPON_INSTANCE_WORK_ID_INT_LINK_OWNER)) as u32);
     let entry_id = WorkModule::get_int(owner_module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
@@ -883,8 +861,7 @@ unsafe fn water_projectile(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", scripts = ["game_specialsstart", "game_specialairsstart"], category = ACMD_GAME, low_priority )]
-unsafe fn pzenigame_sideb_start_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_sideb_start_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         if WorkModule::get_int(fighter.module_accessor, *FIGHTER_PZENIGAME_INSTANCE_WORK_ID_INT_SPECIAL_N_CHARGE) == 75 {
@@ -896,9 +873,7 @@ unsafe fn pzenigame_sideb_start_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-
-#[acmd_script( agent = "pzenigame", scripts = ["game_specials", "game_specialairs"], category = ACMD_GAME, low_priority )]
-unsafe fn pzenigame_sideb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_sideb_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -907,8 +882,7 @@ unsafe fn pzenigame_sideb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pzenigame", scripts = ["game_specialhi", "game_specialairhi"], category = ACMD_GAME, low_priority )]
-unsafe fn pzenigame_upb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pzenigame_upb_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
@@ -948,43 +922,48 @@ unsafe fn pzenigame_upb_smash_script(fighter: &mut L2CAgentBase) {
 
 
 pub fn install() {
-    smashline::install_agent_frames!(
-        pzenigame_frame
-    );
-    smashline::install_acmd_scripts!(
-        pzenigame_jab_smash_script,
-        pzenigame_jab2_smash_script,
-        pzenigame_jab3_smash_script,
-        pzenigame_dashattack_smash_script,
-        pzenigame_ftilt_smash_script,
-        pzenigame_ftilt2_smash_script,
-        pzenigame_ftilt3_smash_script,
-        pzenigame_utilt_smash_script,
-        pzenigame_dtilt_smash_script,
-        pzenigame_fsmash_smash_script,
-        pzenigame_fsmash2_smash_script,
-        pzenigame_fsmash3_smash_script,
-        pzenigame_usmash_smash_script,
-        pzenigame_dsmash_smash_script,
-        pzenigame_dsmash_effect_script,
-        pzenigame_nair_smash_script,
-        pzenigame_fair_smash_script,
-        pzenigame_bair_smash_script,
-        pzenigame_bair_landing_smash_script,
-        pzenigame_uair_smash_script,
-        pzenigame_dair_smash_script,
-        pzenigame_grab_smash_script,
-        pzenigame_grabd_smash_script,
-        pzenigame_grabp_smash_script,
-        pzenigame_fthrow_smash_script,
-        pzenigame_bthrow_smash_script,
-        pzenigame_uthrow_smash_script,
-        pzenigame_dthrow_smash_script,
-        pzenigame_neutralb_start_smash_script,
-        water_projectile,
-        pzenigame_sideb_start_smash_script,
-        pzenigame_sideb_smash_script,
-        pzenigame_upb_smash_script
-        
-    );
+    Agent::new("pzenigame")
+    .on_line(Main, pzenigame_frame) //opff
+    .game_acmd("game_attack11", pzenigame_jab_smash_script)
+    .game_acmd("game_attack12", pzenigame_jab2_smash_script)
+    .game_acmd("game_attack13", pzenigame_jab3_smash_script)
+    .game_acmd("game_attackdash", pzenigame_dashattack_smash_script)
+    .game_acmd("game_attacks3", pzenigame_ftilt_smash_script)
+    .game_acmd("game_attacks3hi", pzenigame_ftilt2_smash_script)
+    .game_acmd("game_attacks3lw", pzenigame_ftilt3_smash_script)
+    .game_acmd("game_attackhi3", pzenigame_utilt_smash_script)
+    .game_acmd("game_attacklw3", pzenigame_dtilt_smash_script)
+    .game_acmd("game_attacks4", pzenigame_fsmash_smash_script)
+    .game_acmd("game_attacks4hi", pzenigame_fsmash2_smash_script)
+    .game_acmd("game_attacks4lw", pzenigame_fsmash3_smash_script)
+    .game_acmd("game_attackhi4", pzenigame_usmash_smash_script)
+    .game_acmd("game_attacklw4", pzenigame_dsmash_smash_script)
+    .effect_acmd("effect_attacklw4", pzenigame_dsmash_effect_script)
+    .game_acmd("game_attackairn", pzenigame_nair_smash_script)
+    .game_acmd("game_attackairf", pzenigame_fair_smash_script)
+    .game_acmd("game_attackairb", pzenigame_bair_smash_script)
+    .game_acmd("game_landingairb", pzenigame_bair_landing_smash_script)
+    .game_acmd("game_attackairhi", pzenigame_uair_smash_script)
+    .game_acmd("game_attackairlw", pzenigame_dair_smash_script)
+    .game_acmd("game_catch", pzenigame_grab_smash_script)
+    .game_acmd("game_catchdash", pzenigame_grabd_smash_script)
+    .game_acmd("game_catchturn", pzenigame_grabp_smash_script)
+    .game_acmd("game_throwf", pzenigame_fthrow_smash_script)
+    .game_acmd("game_throwb", pzenigame_bthrow_smash_script)
+    .game_acmd("game_throwhi", pzenigame_uthrow_smash_script)
+    .game_acmd("game_throwlw", pzenigame_dthrow_smash_script)
+    .game_acmd("game_specialnstart", pzenigame_neutralb_start_smash_script)
+    .game_acmd("game_specialairnstart", pzenigame_neutralb_start_smash_script)
+    .game_acmd("game_specialsstart", pzenigame_sideb_start_smash_script)
+    .game_acmd("game_specialairsstart", pzenigame_sideb_start_smash_script)
+    .game_acmd("game_specials", pzenigame_sideb_smash_script)
+    .game_acmd("game_specialairs", pzenigame_sideb_smash_script)
+    .game_acmd("game_specialhi", pzenigame_upb_smash_script)
+    .game_acmd("game_specialairhi", pzenigame_upb_smash_script)
+    .install();
+
+    Agent::new("pzenigame_water")
+    .game_acmd("game_regular", water_projectile)
+    .install();
+
 }

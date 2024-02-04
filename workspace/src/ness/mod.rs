@@ -5,20 +5,21 @@ use smash::lib::lua_const::*;
 use smash::app::*;
 use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase, L2CFighterBase};
-use smashline::*;
 use smash_script::*;
+use smashline::*;
+use crate::custom::global_fighter_frame;
 
 static mut NESS_DASHATTACK_HOLD : [bool; 8] = [false; 8];
 static mut NESS_DASHATTACK_HOLD_PARTICLE_FRAME : [i32; 8] = [0; 8];
 
 // A Once-Per-Fighter-Frame that only applies to ness. Neat!
-#[fighter_frame( agent = FIGHTER_KIND_NESS )]
-fn ness_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn ness_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
 
-        println!("It'sa me, Ness, OK");
+        //println!("It'sa me, Ness, OK");
 
         if NESS_DASHATTACK_HOLD[entry_id] {
             if [*FIGHTER_STATUS_KIND_ATTACK_DASH].contains(&status) {
@@ -56,8 +57,8 @@ fn ness_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-#[weapon_frame( agent = WEAPON_KIND_NESS_PK_THUNDER )]
-pub fn ness_pkthunder_weapon_frame(weapon : &mut L2CFighterBase) {
+//#[weapon_frame( agent = WEAPON_KIND_NESS_PK_THUNDER )]
+unsafe extern "C" fn ness_pkthunder_weapon_frame(weapon : &mut L2CFighterBase) {
     unsafe {
         let status = StatusModule::status_kind(weapon.module_accessor);
         let owner_module_accessor = &mut *sv_battle_object::module_accessor((WorkModule::get_int(weapon.module_accessor, *WEAPON_INSTANCE_WORK_ID_INT_LINK_OWNER)) as u32);
@@ -71,8 +72,7 @@ pub fn ness_pkthunder_weapon_frame(weapon : &mut L2CFighterBase) {
     }
 }
 
-#[acmd_script( agent = "ness", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn ness_jab_1(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_jab_1(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.4, 361, 25, 20, 25, 2.8, 0.0, 5.0, 4.0, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
@@ -95,8 +95,7 @@ unsafe fn ness_jab_1(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ness", script = "game_attack12", category = ACMD_GAME )]
-unsafe fn ness_jab_2(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_jab_2(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.1, 361, 25, 20, 25, 2.6, 0.0, 5.5, 5.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
@@ -113,8 +112,7 @@ unsafe fn ness_jab_2(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ness", script = "game_attack13", category = ACMD_GAME )]
-unsafe fn ness_jab_3(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_jab_3(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.6, 31, 100, 0, 50, 3.5, 0.0, 6.0, 5.0, None, None, None, 1.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
@@ -126,8 +124,7 @@ unsafe fn ness_jab_3(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ness", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn ness_dashattack(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_dashattack(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
@@ -167,8 +164,7 @@ unsafe fn ness_dashattack(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ness", scripts = ["game_attacks3", "game_attacks3hi", "game_attacks3lw"], category = ACMD_GAME, low_priority )]
-unsafe fn ness_ftilt(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_ftilt(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("legl"), 8.4, 361, 95, 0, 25, 3.7, 0.6, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
@@ -185,8 +181,7 @@ unsafe fn ness_ftilt(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ness", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn ness_utilt(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_utilt(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.81);
     }
@@ -207,8 +202,7 @@ unsafe fn ness_utilt(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ness", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn ness_dtilt(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_dtilt(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("kneel"), 4.6, 361, 3, 0, 16, 2.5, 1.8, 0.0, 0.0, Some(-3.0), Some(0.0), Some(0.0), 0.5, 0.7, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 4, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
@@ -228,8 +222,7 @@ unsafe fn ness_dtilt(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ness", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn ness_fsmash(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_fsmash(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         VisibilityModule::set_int64(fighter.module_accessor, Hash40::new("bat").hash as i64, Hash40::new("bat_visible").hash as i64);
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -272,8 +265,7 @@ unsafe fn ness_fsmash(fighter: &mut L2CAgentBase) {
         
 }
 
-#[acmd_script( agent = "ness", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn ness_nair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_nair(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -298,8 +290,7 @@ unsafe fn ness_nair(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ness", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn ness_fair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_fair(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -333,8 +324,7 @@ unsafe fn ness_fair(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ness", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn ness_bair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_bair(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -364,8 +354,7 @@ unsafe fn ness_bair(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ness", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn ness_uair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_uair(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -388,8 +377,7 @@ unsafe fn ness_uair(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ness", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn ness_dair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_dair(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.4);
@@ -415,8 +403,7 @@ unsafe fn ness_dair(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ness", script = "game_catch", category = ACMD_GAME )]
-unsafe fn ness_grab(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_grab(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         GrabModule::set_rebound(fighter.module_accessor, true);
@@ -435,8 +422,7 @@ unsafe fn ness_grab(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ness", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn ness_dashgrab(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_dashgrab(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -458,8 +444,7 @@ unsafe fn ness_dashgrab(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ness", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn ness_pivotgrab(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_pivotgrab(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -481,8 +466,7 @@ unsafe fn ness_pivotgrab(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ness", script = "game_catchattack", category = ACMD_GAME )]
-unsafe fn ness_pummel(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_pummel(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.3, 361, 100, 30, 0, 5.0, 0.0, 9.0, 9.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_PSI);
@@ -495,8 +479,7 @@ unsafe fn ness_pummel(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ness", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn ness_fthrow(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_fthrow(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 11.7, 20, 30, 0, 100, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -512,8 +495,7 @@ unsafe fn ness_fthrow(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "ness", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn ness_bthrow(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_bthrow(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 10.2, 135, 170, 0, 0, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -530,8 +512,7 @@ unsafe fn ness_bthrow(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "ness", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn ness_uthrow(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_uthrow(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 7.3, 90, 60, 0, 45, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -552,8 +533,7 @@ unsafe fn ness_uthrow(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ness", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn ness_dthrow(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_dthrow(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::FT_LEAVE_NEAR_OTTOTTO(fighter, -2.5, 2.5);
         macros::FT_LEAVE_NEAR_OTTOTTO(fighter, 1.5, 1.5);
@@ -590,8 +570,7 @@ unsafe fn ness_dthrow(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ness", script = "game_cliffattack", category = ACMD_GAME )]
-unsafe fn ness_ledge_attack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_ledge_attack_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 22.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.0);
@@ -603,8 +582,7 @@ unsafe fn ness_ledge_attack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ness", script = "game_specialairhi", category = ACMD_GAME )]
-unsafe fn ness_upspecial_hit(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_upspecial_hit(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         GroundModule::select_cliff_hangdata(fighter.module_accessor, *FIGHTER_NESS_CLIFF_HANG_DATA_SPECIAL_HI as u32);
     }
@@ -633,8 +611,7 @@ unsafe fn ness_upspecial_hit(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ness", script = "game_speciallwhold", category = ACMD_GAME )]
-unsafe fn ness_downspecial_hold(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_downspecial_hold(fighter: &mut L2CAgentBase) {
     for _ in 0..99999 {
         if macros::is_excute(fighter) {
             macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.0, 80, 100, 40, 0, 8.5, 0.0, 6.5, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 10, false, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_PSI);
@@ -647,17 +624,17 @@ unsafe fn ness_downspecial_hold(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ness", script = "game_speciallwend", category = ACMD_GAME )]
-unsafe fn ness_downspecial_end(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_downspecial_end(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 0.0, 362, 100, 80, 0, 18.0, 0.0, 6.5, 0.0, None, None, None, 0.0, 0.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 6, false, false, true, true, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 10.0);
-    AttackModule::clear_all(fighter.module_accessor);
+    if macros::is_excute(fighter) {
+        AttackModule::clear_all(fighter.module_accessor);
+    }
 }
 
-#[acmd_script( agent = "ness", script = "game_specialairlwhold", category = ACMD_GAME )]
-unsafe fn ness_downspecial_air_hold(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_downspecial_air_hold(fighter: &mut L2CAgentBase) {
     for _ in 0..99999 {
         if macros::is_excute(fighter) {
             macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.0, 80, 100, 40, 0, 8.5, 0.0, 6.5, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 10, false, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_PSI);
@@ -670,24 +647,23 @@ unsafe fn ness_downspecial_air_hold(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ness", script = "game_specialairlwend", category = ACMD_GAME )]
-unsafe fn ness_downspecial_air_end(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_downspecial_air_end(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 0.0, 362, 100, 80, 0, 18.0, 0.0, 6.5, 0.0, None, None, None, 0.0, 0.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 6, false, false, true, true, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 10.0);
-    AttackModule::clear_all(fighter.module_accessor);
+    if macros::is_excute(fighter) {
+        AttackModule::clear_all(fighter.module_accessor);
+    }
 }
 
-#[acmd_script( agent = "ness_yoyohead", script = "game_attackhi4charge", category = ACMD_GAME )]
-unsafe fn ness_yoyo_usmash_charge(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_yoyo_usmash_charge(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("attach"), 1.0, 90, 100, 50, 0, 4.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 4, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
     }
 }
 
-#[acmd_script( agent = "ness_yoyohead", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn ness_yoyo_usmash(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_yoyo_usmash(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.351352);
@@ -704,15 +680,13 @@ unsafe fn ness_yoyo_usmash(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 37.0);
 }
 
-#[acmd_script( agent = "ness_yoyohead", script = "game_attacklw4charge", category = ACMD_GAME )]
-unsafe fn ness_yoyo_dsmash_charge(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_yoyo_dsmash_charge(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("attach"), 1.0, 90, 100, 50, 0, 4.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 4, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
     }
 }
 
-#[acmd_script( agent = "ness_yoyohead", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn ness_yoyo_dsmash(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_yoyo_dsmash(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 11.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("attach"), 1.0, 367, 100, 12, 0, 4.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 4, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
@@ -754,8 +728,7 @@ unsafe fn ness_yoyo_dsmash(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 40.0);
 }
 
-#[acmd_script( agent = "ness_pkfire", script = "game_shoot", category = ACMD_GAME )]
-unsafe fn ness_pkfire_shoot(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_pkfire_shoot(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.0, 80, 80, 0, 30, 3.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_PSI);
         AttackModule::enable_safe_pos(fighter.module_accessor);
@@ -763,8 +736,7 @@ unsafe fn ness_pkfire_shoot(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ness_pkfire", script = "game_pillar", category = ACMD_GAME )]
-unsafe fn ness_pkfire_pillar(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_pkfire_pillar(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.0, 68, 30, 0, 10, 6.5, 0.0, 3.1, 2.0, None, None, None, 0.0, 1.7, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 4, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PSI);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 1.0, 68, 30, 0, 10, 4.5, 0.0, 9.6, 2.0, None, None, None, 0.0, 1.7, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 4, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PSI);
@@ -772,8 +744,7 @@ unsafe fn ness_pkfire_pillar(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ness_pkfire", script = "game_shootair", category = ACMD_GAME )]
-unsafe fn ness_pkfire_shoot_air(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_pkfire_shoot_air(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.0, 80, 80, 0, 30, 3.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_PSI);
         AttackModule::enable_safe_pos(fighter.module_accessor);
@@ -781,8 +752,7 @@ unsafe fn ness_pkfire_shoot_air(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ness_pkfire", script = "game_pillarair", category = ACMD_GAME )]
-unsafe fn ness_pkfire_pillar_air(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_pkfire_pillar_air(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.0, 68, 30, 0, 10, 6.5, 0.0, 3.1, 2.0, None, None, None, 0.0, 1.7, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 4, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PSI);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 1.0, 68, 30, 0, 10, 4.5, 0.0, 9.6, 2.0, None, None, None, 0.0, 1.7, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 4, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PSI);
@@ -790,62 +760,74 @@ unsafe fn ness_pkfire_pillar_air(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ness_pkthunder", script = "game_move", category = ACMD_GAME )]
-unsafe fn ness_pkthunder(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_pkthunder_head(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.0, 110, 55, 0, 70, 4.4, 0.0, 0.0, 0.0, None, None, None, 0.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 48, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_PSI);
     }
 }
 
-#[acmd_script( agent = "ness_pkthunder", script = "game_movechild", category = ACMD_GAME )]
-unsafe fn ness_pkthunder_trail(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ness_pkthunder_tail(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 1, 1, Hash40::new("top"), 2.0, 361, 60, 0, 20, 2.3, 0.0, 0.0, 0.0, None, None, None, 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 48, false, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_PSI);
     }
 }
 
+
+//#[skyline::main(name = "tr4sh_rebuffed")]
 pub fn install() {
-    smashline::install_agent_frames!(
-        ness_frame,
-        ness_pkthunder_weapon_frame
-    );
-    smashline::install_acmd_scripts!(
-        ness_jab_1,
-        ness_jab_2,
-        ness_jab_3,
-        ness_dashattack,
-        ness_ftilt,
-        ness_utilt,
-        ness_dtilt,
-        ness_fsmash,
-        ness_nair,
-        ness_fair,
-        ness_bair,
-        ness_uair,
-        ness_dair,
-        ness_grab,
-        ness_dashgrab,
-        ness_pivotgrab,
-        ness_pummel,
-        ness_fthrow,
-        ness_bthrow,
-        ness_uthrow,
-        ness_dthrow,
-        ness_ledge_attack_smash_script,
-        ness_upspecial_hit,
-        ness_downspecial_hold,
-        ness_downspecial_end,
-        ness_downspecial_air_hold,
-        ness_downspecial_air_end,
-        ness_yoyo_usmash_charge,
-        ness_yoyo_usmash,
-        ness_yoyo_dsmash_charge,
-        ness_yoyo_dsmash,
-        ness_pkfire_shoot,
-        ness_pkfire_pillar,
-        ness_pkfire_shoot_air,
-        ness_pkfire_pillar_air,
-        ness_pkthunder,
-        ness_pkthunder_trail
-    );
+    Agent::new("ness")
+      .on_line(Main, ness_frame) //opff
+      .game_acmd("game_attack11", ness_jab_1)
+      .game_acmd("game_attack12", ness_jab_2)
+      .game_acmd("game_attack13", ness_jab_3)
+      .game_acmd("game_attackdash", ness_dashattack)
+      .game_acmd("game_attacks3", ness_ftilt)
+      .game_acmd("game_attacks3hi", ness_ftilt)
+      .game_acmd("game_attacks3lw", ness_ftilt)
+      .game_acmd("game_attackhi3", ness_utilt)
+      .game_acmd("game_attacklw3", ness_dtilt)
+      .game_acmd("game_attacks4", ness_fsmash)
+      .game_acmd("game_attackairn", ness_nair)
+      .game_acmd("game_attackairf", ness_fair)
+      .game_acmd("game_attackairb", ness_bair)
+      .game_acmd("game_attackairhi", ness_uair)
+      .game_acmd("game_attackairlw", ness_dair)
+      .game_acmd("game_catch", ness_grab)
+      .game_acmd("game_catchdash", ness_dashgrab)
+      .game_acmd("game_catchturn", ness_pivotgrab)
+      .game_acmd("game_catchattack", ness_pummel)
+      .game_acmd("game_throwf", ness_fthrow)
+      .game_acmd("game_throwb", ness_bthrow)
+      .game_acmd("game_throwhi", ness_uthrow)
+      .game_acmd("game_throwlw", ness_dthrow)
+      .game_acmd("game_cliffattack", ness_ledge_attack_smash_script)
+      .game_acmd("game_specialairhi", ness_upspecial_hit)
+      .game_acmd("game_speciallwhold", ness_downspecial_hold)
+      .game_acmd("game_specialairlwhold", ness_downspecial_air_hold)
+      .game_acmd("game_speciallwend", ness_downspecial_end)
+      .game_acmd("game_specialairlwend", ness_downspecial_air_end)
+      .install();
+
+      Agent::new("ness_yoyohead")
+      .game_acmd("game_attackhi4charge", ness_yoyo_usmash_charge)
+      .game_acmd("game_attackhi4", ness_yoyo_usmash)
+      .game_acmd("game_attacklw4charge", ness_yoyo_dsmash_charge)
+      .game_acmd("game_attacklw4", ness_yoyo_dsmash)
+      .install();
+
+
+      Agent::new("ness_pkfire")
+      .game_acmd("game_shoot", ness_pkfire_shoot)
+      .game_acmd("game_shootair", ness_pkfire_shoot_air)
+      .game_acmd("game_pillar", ness_pkfire_pillar)
+      .game_acmd("game_pillarair", ness_pkfire_pillar_air)
+      .install();
+  
+      Agent::new("ness_pkthunder")
+      .on_line(Main, ness_pkthunder_weapon_frame)
+      .game_acmd("game_move", ness_pkthunder_head)
+      //.game_acmd("game_movechild", ness_pkthunder_tail)
+      .install();
+
+      
 }

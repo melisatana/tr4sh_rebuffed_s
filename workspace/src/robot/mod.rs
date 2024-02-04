@@ -7,6 +7,7 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
+use crate::custom::global_fighter_frame;
 
 static mut ROBOT_SLOW_BACK_AIR : [bool; 8] = [false; 8];
 static mut ROBOT_SLOW_BACK_AIR_IN_SLOW : [bool; 8] = [false; 8];
@@ -16,14 +17,14 @@ static mut ROBOT_DTHROW_BURY_RECHARGE_TIMER : [i32; 8] = [0; 8];
 static ROBOT_DTHROW_BURY_COOLDOWN : i32 = 480; 
 
 // A Once-Per-Fighter-Frame that only applies to R.O.B. wow
-#[fighter_frame( agent = FIGHTER_KIND_ROBOT )]
-fn robot_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn robot_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
         
 
-        println!("01001001 00100000 01100001 01101101 00100000 01110011 01100101 01100011 01110010 01100101 01110100 01101100 01111001 00100000 01100001 01101110 00100000 01100101 01110110 01101001 01101100 00100000 01110010 01101111 01100010 01101111 01110100");
+        //println!("01001001 00100000 01100001 01101101 00100000 01110011 01100101 01100011 01110010 01100101 01110100 01101100 01111001 00100000 01100001 01101110 00100000 01100101 01110110 01101001 01101100 00100000 01110010 01101111 01100010 01101111 01110100");
     
         if ROBOT_DTHROW_BURY_RECHARGE_TIMER[entry_id] > 0 {
             ROBOT_DTHROW_BURY_RECHARGE_TIMER[entry_id] -= 1;
@@ -63,8 +64,8 @@ fn robot_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-#[acmd_script( agent = "robot", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn robot_jab_smash_script(fighter: &mut L2CAgentBase) {
+
+unsafe extern "C" fn robot_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.2, 361, 15, 10, 18, 3.5, 0.0, 10.0, 6.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_PUNCH);
@@ -88,8 +89,7 @@ unsafe fn robot_jab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "robot", script = "game_attack12", category = ACMD_GAME )]
-unsafe fn robot_jab2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_jab2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.6, 361, 129, 0, 40, 4.0, 0.0, 9.5, 6.5, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_PUNCH);
@@ -102,8 +102,7 @@ unsafe fn robot_jab2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "robot", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn robot_dashattack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 9.4, 280, 85, 0, 20, 5.7, 0.0, 6.0, 17.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_PUNCH);
@@ -117,8 +116,7 @@ unsafe fn robot_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "robot", script = "game_attacks3", category = ACMD_GAME )]
-unsafe fn robot_ftilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 9.0, 361, 92, 0, 56, 3.1, 0.0, 9.0, 0.9, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 2, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_PUNCH);
@@ -136,8 +134,7 @@ unsafe fn robot_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "robot", script = "game_attacks3hi", category = ACMD_GAME )]
-unsafe fn robot_ftilt2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_ftilt2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 9.0, 361, 92, 0, 56, 3.1, 0.0, 9.0, 0.9, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 2, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_PUNCH);
@@ -155,8 +152,7 @@ unsafe fn robot_ftilt2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "robot", script = "game_attacks3lw", category = ACMD_GAME )]
-unsafe fn robot_ftilt3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_ftilt3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 9.0, 361, 92, 0, 56, 3.1, 0.0, 9.0, 0.9, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 2, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_PUNCH);
@@ -174,8 +170,7 @@ unsafe fn robot_ftilt3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "robot", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn robot_utilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_utilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.0, 106, 100, 70, 70, 3.6, 0.0, 13.0, 10.0, Some(0.0), Some(13.0), Some(-10.0), 0.7, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_PUNCH);
@@ -202,8 +197,7 @@ unsafe fn robot_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "robot", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn robot_dtilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 6.3, 361, 91, 0, 4, 4.9, 0.0, 1.7, 21.0, Some(0.0), Some(7.0), Some(9.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.25, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_PUNCH);
@@ -215,8 +209,7 @@ unsafe fn robot_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "robot", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn robot_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -242,8 +235,7 @@ unsafe fn robot_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "robot", script = "game_attacks4hi", category = ACMD_GAME )]
-unsafe fn robot_fsmash2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_fsmash2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -269,8 +261,7 @@ unsafe fn robot_fsmash2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "robot", script = "game_attacks4lw", category = ACMD_GAME )]
-unsafe fn robot_fsmash3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_fsmash3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -296,8 +287,7 @@ unsafe fn robot_fsmash3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "robot", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn robot_usmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -323,8 +313,7 @@ unsafe fn robot_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "robot", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn robot_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -356,8 +345,7 @@ unsafe fn robot_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "robot", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn robot_nair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_nair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -382,8 +370,7 @@ unsafe fn robot_nair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "robot", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn robot_fair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_fair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -412,8 +399,7 @@ unsafe fn robot_fair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "robot", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn robot_bair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_bair_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -483,8 +469,7 @@ unsafe fn robot_bair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "robot", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn robot_uair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_uair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -546,8 +531,7 @@ unsafe fn robot_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "robot", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn robot_dair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_dair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
     }
@@ -589,15 +573,14 @@ unsafe fn robot_dair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "robot", script = "game_catch", category = ACMD_GAME )]
-unsafe fn robot_grab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_grab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         GrabModule::set_rebound(fighter.module_accessor, true);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
-        macros::CATCH(fighter, 0, Hash40::new("top"), 4.4, 0.0, 8.0, 4.0, Some(0.0), Some(8.0), Some(14.0), *FIGHTER_STATUS_KIND_CAPTURE_PULLED, *COLLISION_SITUATION_MASK_GA);
+        macros::CATCH(fighter, 0, Hash40::new("top"), 4.8, 0.0, 8.0, 4.0, Some(0.0), Some(8.0), Some(14.2), *FIGHTER_STATUS_KIND_CAPTURE_PULLED, *COLLISION_SITUATION_MASK_GA);
     }
     macros::game_CaptureCutCommon(fighter);
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
@@ -609,8 +592,7 @@ unsafe fn robot_grab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }   
 
-#[acmd_script( agent = "robot", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn robot_grabd_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_grabd_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -621,7 +603,7 @@ unsafe fn robot_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 9.0);
     if macros::is_excute(fighter) {
-        macros::CATCH(fighter, 0, Hash40::new("top"), 4.0, 0.0, 8.0, 4.0, Some(0.0), Some(8.0), Some(15.0), *FIGHTER_STATUS_KIND_CAPTURE_PULLED, *COLLISION_SITUATION_MASK_GA);
+        macros::CATCH(fighter, 0, Hash40::new("top"), 4.5, 0.0, 8.0, 4.0, Some(0.0), Some(8.0), Some(15.2), *FIGHTER_STATUS_KIND_CAPTURE_PULLED, *COLLISION_SITUATION_MASK_GA);
     }
     macros::game_CaptureCutCommon(fighter);
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
@@ -632,8 +614,7 @@ unsafe fn robot_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
 }   
 
-#[acmd_script( agent = "robot", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn robot_grabp_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_grabp_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -644,7 +625,7 @@ unsafe fn robot_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
-        macros::CATCH(fighter, 0, Hash40::new("top"), 4.4, 0.0, 8.0, -2.0, Some(0.0), Some(8.0), Some(-21.8), *FIGHTER_STATUS_KIND_CAPTURE_PULLED, *COLLISION_SITUATION_MASK_GA);
+        macros::CATCH(fighter, 0, Hash40::new("top"), 4.8, 0.0, 8.0, -2.0, Some(0.0), Some(8.0), Some(-22.3), *FIGHTER_STATUS_KIND_CAPTURE_PULLED, *COLLISION_SITUATION_MASK_GA);
     }
     macros::game_CaptureCutCommon(fighter);
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
@@ -655,8 +636,7 @@ unsafe fn robot_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }   
 
-#[acmd_script( agent = "robot", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn robot_fthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 11.3, 39, 37, 0, 80, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -673,8 +653,7 @@ unsafe fn robot_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "robot", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn robot_bthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 9.2, 45, 120, 0, 50, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -693,8 +672,7 @@ unsafe fn robot_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "robot", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn robot_uthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::FT_LEAVE_NEAR_OTTOTTO(fighter, -2, 3);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 9.3, 80, 115, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -716,8 +694,7 @@ unsafe fn robot_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "robot", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn robot_dthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -741,8 +718,7 @@ unsafe fn robot_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "robot", scripts = ["game_specialn", "game_specialairn"], category = ACMD_GAME, low_priority )]
-unsafe fn robot_neutralb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_neutralb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.5);
@@ -776,15 +752,13 @@ unsafe fn robot_neutralb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "robot_beam", script = "game_fly", category = ACMD_GAME )]
-unsafe fn robo_beam_projectile(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robo_beam_projectile(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 10.0, 60, 40, 0, 70, 2.2, 0.0, 0.0, 3.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_SPEED, false, -0.5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_ENERGY);
     }
 }
 
-#[acmd_script( agent = "robot_beam", script = "game_flymax", category = ACMD_GAME )]
-unsafe fn robo_beam_max_projectile(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robo_beam_max_projectile(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 20.0, 45, 60, 0, 50, 3.9, 0.0, 0.0, 2.0, None, None, None, 1.3, 0.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_SPEED, false, 2, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_ENERGY);
     }
@@ -794,8 +768,7 @@ unsafe fn robo_beam_max_projectile(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "robot", scripts = ["game_specials", "game_specialairs"], category = ACMD_GAME, low_priority )]
-unsafe fn robot_sideb_speen_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_sideb_speen_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.7, 367, 65, 40, 0, 4.5, 0.0, 15.0, 10.0, Some(0.0), Some(5.0), Some(10.0), 0.2, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 0, 0.0, 5, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_rush"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
         shield!(fighter, *MA_MSC_CMD_SHIELD_ON, *COLLISION_KIND_REFLECTOR, *FIGHTER_ROBOT_REFLECTOR_KIND_ARMSPIN, *FIGHTER_REFLECTOR_GROUP_EXTEND);
@@ -815,9 +788,7 @@ unsafe fn robot_sideb_speen_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-
-#[acmd_script( agent = "robot", scripts = ["game_specialsend", "game_specialairsend"], category = ACMD_GAME, low_priority )]
-unsafe fn robot_sideb_end_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn robot_sideb_end_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.5, 40, 169, 0, 40, 6.0, 0.0, 9.0, -4.5, Some(0.0), Some(10.0), Some(14.0), 1.7, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_PUNCH);
@@ -829,41 +800,44 @@ unsafe fn robot_sideb_end_smash_script(fighter: &mut L2CAgentBase) {
 }
 
 pub fn install() {
-    smashline::install_agent_frames!(
-        robot_frame
-    );
-    smashline::install_acmd_scripts!(
-        robot_jab_smash_script,
-        robot_jab2_smash_script,
-        robot_dashattack_smash_script,
-        robot_ftilt_smash_script,
-        robot_ftilt2_smash_script,
-        robot_ftilt3_smash_script,
-        robot_utilt_smash_script,
-        robot_dtilt_smash_script,
-        robot_fsmash_smash_script,
-        robot_fsmash2_smash_script,
-        robot_fsmash3_smash_script,
-        robot_usmash_smash_script,
-        robot_dsmash_smash_script,
-        robot_nair_smash_script,
-        robot_fair_smash_script,
-        robot_bair_smash_script,
-        robot_uair_smash_script,
-        robot_dair_smash_script,
-        robot_grab_smash_script,
-        robot_grabd_smash_script,
-        robot_grabp_smash_script,
-        robot_fthrow_smash_script,
-        robot_bthrow_smash_script,
-        robot_uthrow_smash_script,
-        robot_dthrow_smash_script,
-        robot_neutralb_smash_script,
-        robo_beam_projectile,
-        robo_beam_max_projectile,
-        robot_sideb_speen_smash_script,
-        robot_sideb_end_smash_script
+    Agent::new("robot")
+    .on_line(Main, robot_frame) //opff
+    .game_acmd("game_attack11", robot_jab_smash_script)
+    .game_acmd("game_attack12", robot_jab2_smash_script)
+    .game_acmd("game_attackdash", robot_dashattack_smash_script)
+    .game_acmd("game_attacks3", robot_ftilt_smash_script)
+    .game_acmd("game_attacks3hi", robot_ftilt2_smash_script)
+    .game_acmd("game_attacks3lw", robot_ftilt3_smash_script)
+    .game_acmd("game_attackhi3", robot_utilt_smash_script)
+    .game_acmd("game_attacklw3", robot_dtilt_smash_script)
+    .game_acmd("game_attacks4", robot_fsmash_smash_script)
+    .game_acmd("game_attacks4hi", robot_fsmash2_smash_script)
+    .game_acmd("game_attacks4lw", robot_fsmash3_smash_script)
+    .game_acmd("game_attackhi4", robot_usmash_smash_script)
+    .game_acmd("game_attacklw4", robot_dsmash_smash_script)
+    .game_acmd("game_attackairn", robot_nair_smash_script)
+    .game_acmd("game_attackairf", robot_fair_smash_script)
+    .game_acmd("game_attackairb", robot_bair_smash_script)
+    .game_acmd("game_attackairhi", robot_uair_smash_script)
+    .game_acmd("game_attackairlw", robot_dair_smash_script)
+    .game_acmd("game_catch", robot_grab_smash_script)
+    .game_acmd("game_catchdash", robot_grabd_smash_script)
+    .game_acmd("game_catchturn", robot_grabp_smash_script)
+    .game_acmd("game_throwf", robot_fthrow_smash_script)
+    .game_acmd("game_throwb", robot_bthrow_smash_script)
+    .game_acmd("game_throwhi", robot_uthrow_smash_script)
+    .game_acmd("game_throwlw", robot_dthrow_smash_script)
+    .game_acmd("game_specialn", robot_neutralb_smash_script)
+    .game_acmd("game_specialairn", robot_neutralb_smash_script)
+    .game_acmd("game_specials", robot_sideb_speen_smash_script)
+    .game_acmd("game_specialairs", robot_sideb_speen_smash_script)
+    .game_acmd("game_specialsend", robot_sideb_end_smash_script)
+    .game_acmd("game_specialairsend", robot_sideb_end_smash_script)    
+    .install();
 
-        
-    );
+    Agent::new("robot_beam")
+    .game_acmd("game_fly", robo_beam_projectile)
+    .game_acmd("game_flymax", robo_beam_max_projectile)
+    .install();
+
 }

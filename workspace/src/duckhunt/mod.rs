@@ -7,15 +7,16 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
+use crate::custom::global_fighter_frame;
 
 // A Once-Per-Fighter-Frame that only applies to that bitch
-#[fighter_frame( agent = FIGHTER_KIND_DUCKHUNT )]
-fn duckhunt_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn duckhunt_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         let status = StatusModule::status_kind(fighter.module_accessor);
 
 
-        println!("woof, or something");
+        //println!("woof, or something");
 
 
         if status == *FIGHTER_STATUS_KIND_SPECIAL_S {
@@ -26,7 +27,7 @@ fn duckhunt_frame(fighter: &mut L2CFighterCommon) {
 }
 
 /*#[weapon_frame( agent = WEAPON_KIND_DUCKHUNT_CAN )]
-pub fn duckhunt_can_weapon_frame(fighter : &mut L2CFighterBase) {
+unsafe extern "C" fn duckhunt_can_weapon_frame(fighter : &mut L2CFighterBase) {
     unsafe {
         let status = StatusModule::status_kind(fighter.module_accessor);
         let owner_module_accessor = &mut *sv_battle_object::module_accessor((WorkModule::get_int(fighter.module_accessor, *WEAPON_INSTANCE_WORK_ID_INT_LINK_OWNER)) as u32);
@@ -39,8 +40,7 @@ pub fn duckhunt_can_weapon_frame(fighter : &mut L2CFighterBase) {
     }
 }*/
 
-#[acmd_script( agent = "duckhunt", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn duckhunt_jab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.5, 361, 30, 14, 20, 3.8, 0.0, 4.0, 6.0, None, None, None, 1.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
@@ -58,8 +58,7 @@ unsafe fn duckhunt_jab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_attack12", category = ACMD_GAME )]
-unsafe fn duckhunt_jab2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_jab2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.7, 361, 30, 20, 30, 3.5, 0.0, 3.5, 2.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_HEAD);
@@ -80,8 +79,7 @@ unsafe fn duckhunt_jab2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_attack13", category = ACMD_GAME )]
-unsafe fn duckhunt_jab3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_jab3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.0, 30, 130, 0, 60, 5.0, 0.0, 4.5, 1.5, Some(0.0), Some(5.5), Some(8.5), 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
@@ -92,8 +90,7 @@ unsafe fn duckhunt_jab3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_attack100", category = ACMD_GAME )]
-unsafe fn duckhunt_jab100_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_jab100_smash_script(fighter: &mut L2CAgentBase) {
     for _ in 0..i32::MAX {
         if macros::is_excute(fighter) {
             FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 4.5, 0.5);
@@ -214,8 +211,7 @@ unsafe fn duckhunt_jab100_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_attack100end", category = ACMD_GAME )]
-unsafe fn duckhunt_jab100end_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_jab100end_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 4.5, 5.0);
@@ -237,8 +233,7 @@ unsafe fn duckhunt_jab100end_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn duckhunt_dashattack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -263,8 +258,7 @@ unsafe fn duckhunt_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", scripts = ["game_attacks3", "game_attacks3hi", "game_attacks3lw"], category = ACMD_GAME, low_priority )]
-unsafe fn duckhunt_ftilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -284,8 +278,7 @@ unsafe fn duckhunt_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn duckhunt_utilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_utilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -311,8 +304,7 @@ unsafe fn duckhunt_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn duckhunt_dtilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.0, 74, 60, 0, 50, 3.75, 0.0, 2.0, 13.5, Some(0.0), Some(2.0), Some(6.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 1, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_HEAD);
@@ -326,8 +318,7 @@ unsafe fn duckhunt_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn duckhunt_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -357,8 +348,7 @@ unsafe fn duckhunt_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn duckhunt_usmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::SET_SPEED_EX(fighter, 0.0, 0.0, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
@@ -392,8 +382,7 @@ unsafe fn duckhunt_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn duckhunt_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::SET_SPEED_EX(fighter, 0.0, 0.0, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
@@ -427,8 +416,7 @@ unsafe fn duckhunt_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn duckhunt_nair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_nair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -454,8 +442,7 @@ unsafe fn duckhunt_nair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn duckhunt_fair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_fair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -486,8 +473,7 @@ unsafe fn duckhunt_fair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn duckhunt_bair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_bair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -505,8 +491,7 @@ unsafe fn duckhunt_bair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn duckhunt_uair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_uair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -539,8 +524,7 @@ unsafe fn duckhunt_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn duckhunt_dair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_dair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -573,8 +557,7 @@ unsafe fn duckhunt_dair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_catch", category = ACMD_GAME )]
-unsafe fn duckhunt_grab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_grab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         GrabModule::set_rebound(fighter.module_accessor, true);
@@ -593,8 +576,7 @@ unsafe fn duckhunt_grab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn duckhunt_grabd_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_grabd_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -616,8 +598,7 @@ unsafe fn duckhunt_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn duckhunt_grabp_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_grabp_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -639,8 +620,7 @@ unsafe fn duckhunt_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn duckhunt_fthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 11.5, 45, 40, 0, 80, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -657,8 +637,7 @@ unsafe fn duckhunt_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn duckhunt_bthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 9.1, 45, 120, 0, 55, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -677,8 +656,7 @@ unsafe fn duckhunt_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn duckhunt_uthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 7.1, 88, 60, 0, 70, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -703,8 +681,7 @@ unsafe fn duckhunt_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn duckhunt_dthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.0, 56, 80, 0, 50, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -732,16 +709,14 @@ unsafe fn duckhunt_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_specialn", category = ACMD_GAME )]
-unsafe fn duckhunt_neutralb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_neutralb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor,  *FIGHTER_DUCKHUNT_INSTANCE_WORK_ID_FLAG_RELEASE_CAN);
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_specialairn", category = ACMD_GAME )]
-unsafe fn duckhunt_neutralb_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_neutralb_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_DUCKHUNT_INSTANCE_WORK_ID_FLAG_RELEASE_CAN);
@@ -752,8 +727,7 @@ unsafe fn duckhunt_neutralb_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt_can", script = "game_explode", category = ACMD_GAME )]
-unsafe fn can_explode(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn can_explode(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 14.0, 60, 107, 0, 40, 13.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 0.5, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, -5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, true, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_BOMB);
         macros::AREA_WIND_2ND_RAD_arg9(fighter, 0, 2, 0.05, 300, 1, 0, 0, 26, 60);
@@ -764,8 +738,7 @@ unsafe fn can_explode(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_specials", category = ACMD_GAME, low_priority )]
-unsafe fn duckhunt_sideb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_sideb_smash_script(fighter: &mut L2CAgentBase) {
     if StatusModule::prev_situation_kind(fighter.module_accessor) == SITUATION_KIND_AIR {
         StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_LANDING, true);
     }
@@ -779,8 +752,7 @@ unsafe fn duckhunt_sideb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_specialairs", category = ACMD_GAME, low_priority )]
-unsafe fn duckhunt_sideb_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_sideb_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 14.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_DUCKHUNT_INSTANCE_WORK_ID_FLAG_RELEASE_CLAY);
@@ -791,8 +763,7 @@ unsafe fn duckhunt_sideb_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt_clay", script = "game_fly", category = ACMD_GAME )]
-unsafe fn claypigeon_fly(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn claypigeon_fly(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.2, 75, 40, 0, 20, 1.9, 0.0, 0.0, 0.0, None, None, None, 2.0, 0.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 4, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
         AttackModule::enable_safe_pos(fighter.module_accessor);
@@ -803,8 +774,7 @@ unsafe fn claypigeon_fly(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt_clay", script = "game_hit", category = ACMD_GAME )]
-unsafe fn claypigeon_hit(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn claypigeon_hit(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 0.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.5, 60, 100, 20, 0, 6.0, 0.0, 0.0, 0.0, None, None, None, 0.5, 0.5, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, -1.3, 0.0, 7, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
@@ -821,8 +791,7 @@ unsafe fn claypigeon_hit(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt_clay", script = "game_reflecthit", category = ACMD_GAME )]
-unsafe fn claypigeon_reflect_hit(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn claypigeon_reflect_hit(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 0.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.5, 60, 100, 20, 0, 6.0, 0.0, 0.0, 0.0, None, None, None, 0.5, 0.5, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, -1.3, 0.0, 7, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
@@ -839,8 +808,7 @@ unsafe fn claypigeon_reflect_hit(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt_clay", script = "game_wallhit", category = ACMD_GAME )]
-unsafe fn claypigeon_wall_hit(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn claypigeon_wall_hit(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 0.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.5, 60, 100, 20, 0, 6.0, 0.0, 0.0, 0.0, None, None, None, 0.5, 0.5, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, -1.3, 0.0, 7, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
@@ -857,16 +825,14 @@ unsafe fn claypigeon_wall_hit(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_specialhi", category = ACMD_GAME )]
-unsafe fn duckhunt_upb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_upb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 15.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_DUCKHUNT_INSTANCE_WORK_ID_FLAG_REQUEST_SPECIAL_HI_CANCEL);
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_speciallw", category = ACMD_GAME )]
-unsafe fn duckhunt_downb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_downb_smash_script(fighter: &mut L2CAgentBase) {
     /*sv_animcmd::frame(fighter.lua_state_agent, 2.0);
     if ArticleModule::is_exist(fighter.module_accessor, *FIGHTER_DUCKHUNT_GENERATE_ARTICLE_GUNMAN) {
         let gunman = ArticleModule::get_article(fighter.module_accessor, *FIGHTER_DUCKHUNT_GENERATE_ARTICLE_GUNMAN);
@@ -880,23 +846,7 @@ unsafe fn duckhunt_downb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_specialairlw", category = ACMD_GAME )]
-unsafe fn duckhunt_downb_air_smash_script(fighter: &mut L2CAgentBase) {
-    /*sv_animcmd::frame(fighter.lua_state_agent, 2.0);
-    if ArticleModule::is_exist(fighter.module_accessor, *FIGHTER_DUCKHUNT_GENERATE_ARTICLE_GUNMAN) {
-        let gunman = ArticleModule::get_article(fighter.module_accessor, *FIGHTER_DUCKHUNT_GENERATE_ARTICLE_GUNMAN);
-        let object_id = smash::app::lua_bind::Article::get_battle_object_id(gunman) as u32;
-        let article_boma = sv_battle_object::module_accessor(object_id);
-        StatusModule::change_status_request_from_script(article_boma, *WEAPON_DUCKHUNT_GUNMAN_STATUS_KIND_SHOOT, false);
-    }*/
-    sv_animcmd::frame(fighter.lua_state_agent, 4.0);
-    if macros::is_excute(fighter) {
-        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_DUCKHUNT_STATUS_SPECIAL_LW_FLAG_CALL_TRIGGER);
-    }
-}
-
-#[acmd_script( agent = "duckhunt_gunmanbullet", script = "game_move", category = ACMD_GAME )]
-unsafe fn gunmen_shoot(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gunmen_shoot(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 17.0, 65, 25, 0, 30, 1.2, 0.0, 0.0, 0.0, Some(1.0), Some(1.0), Some(1.0), 1.5, 0.5, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_saving"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_NONE);
         AttackModule::set_attack_level(fighter.module_accessor, 0, *FIGHTER_RYU_SAVING_LV_3 as u8);
@@ -913,19 +863,7 @@ unsafe fn gunmen_shoot(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "duckhunt", script = "game_appealsl", category = ACMD_GAME )]
-unsafe fn duckhunt_sidetaunt_left_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 4.0);
-    for _ in 0..40 {
-        if macros::is_excute(fighter) {
-            macros::SET_SPEED_EX(fighter, 1.4, 0.0, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
-        }
-        sv_animcmd::wait(fighter.lua_state_agent, 1.0);
-    }
-}
-    
-#[acmd_script( agent = "duckhunt", script = "game_appealsr", category = ACMD_GAME )]
-unsafe fn duckhunt_sidetaunt_right_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn duckhunt_sidetaunt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     for _ in 0..40 {
         if macros::is_excute(fighter) {
@@ -937,50 +875,58 @@ unsafe fn duckhunt_sidetaunt_right_smash_script(fighter: &mut L2CAgentBase) {
 
 
 pub fn install() {
-    smashline::install_agent_frames!(
-        duckhunt_frame
-        //duckhunt_can_weapon_frame
-    );
-    smashline::install_acmd_scripts!(
-        duckhunt_jab_smash_script,
-        duckhunt_jab2_smash_script,
-        duckhunt_jab3_smash_script,
-        duckhunt_jab100_smash_script,
-        duckhunt_jab100end_smash_script,
-        duckhunt_dashattack_smash_script,
-        duckhunt_ftilt_smash_script,
-        duckhunt_utilt_smash_script,
-        duckhunt_dtilt_smash_script,
-        duckhunt_fsmash_smash_script,
-        duckhunt_usmash_smash_script,
-        duckhunt_dsmash_smash_script,
-        duckhunt_nair_smash_script,
-        duckhunt_fair_smash_script,
-        duckhunt_bair_smash_script,
-        duckhunt_uair_smash_script,
-        duckhunt_dair_smash_script,
-        duckhunt_grab_smash_script,
-        duckhunt_grabd_smash_script,
-        duckhunt_grabp_smash_script,
-        duckhunt_fthrow_smash_script,
-        duckhunt_bthrow_smash_script,
-        duckhunt_uthrow_smash_script,
-        duckhunt_dthrow_smash_script,
-        duckhunt_neutralb_smash_script,
-        duckhunt_neutralb_air_smash_script,
-        can_explode,
-        duckhunt_sideb_smash_script,
-        duckhunt_sideb_air_smash_script,
-        claypigeon_fly,
-        claypigeon_hit,
-        claypigeon_reflect_hit,
-        claypigeon_wall_hit,
-        duckhunt_upb_smash_script,
-        duckhunt_downb_smash_script,
-        duckhunt_downb_air_smash_script,
-        gunmen_shoot,
-        duckhunt_sidetaunt_left_smash_script,
-        duckhunt_sidetaunt_right_smash_script
-        
-    );
+    Agent::new("duckhunt")
+    .on_line(Main, duckhunt_frame) //opff
+    .game_acmd("game_attack11", duckhunt_jab_smash_script)
+    .game_acmd("game_attack12", duckhunt_jab2_smash_script)
+    .game_acmd("game_attack13", duckhunt_jab3_smash_script)
+    .game_acmd("game_attack100", duckhunt_jab100_smash_script)
+    .game_acmd("game_attack100end", duckhunt_jab100end_smash_script)
+    .game_acmd("game_attackdash", duckhunt_dashattack_smash_script)
+    .game_acmd("game_attacks3", duckhunt_ftilt_smash_script)
+    .game_acmd("game_attacks3hi", duckhunt_ftilt_smash_script)
+    .game_acmd("game_attacks3lw", duckhunt_ftilt_smash_script)
+    .game_acmd("game_attackhi3", duckhunt_utilt_smash_script)
+    .game_acmd("game_attacklw3", duckhunt_dtilt_smash_script)
+    .game_acmd("game_attacks4", duckhunt_fsmash_smash_script)
+    .game_acmd("game_attackhi4", duckhunt_usmash_smash_script)
+    .game_acmd("game_attacklw4", duckhunt_dsmash_smash_script)
+    .game_acmd("game_attackairn", duckhunt_nair_smash_script)
+    .game_acmd("game_attackairf", duckhunt_fair_smash_script)
+    .game_acmd("game_attackairb", duckhunt_bair_smash_script)
+    .game_acmd("game_attackairhi", duckhunt_uair_smash_script)
+    .game_acmd("game_attackairlw", duckhunt_dair_smash_script)
+    .game_acmd("game_catch", duckhunt_grab_smash_script)
+    .game_acmd("game_catchdash", duckhunt_grabd_smash_script)
+    .game_acmd("game_catchturn", duckhunt_grabp_smash_script)
+    .game_acmd("game_throwf", duckhunt_fthrow_smash_script)
+    .game_acmd("game_throwb", duckhunt_bthrow_smash_script)
+    .game_acmd("game_throwhi", duckhunt_uthrow_smash_script)
+    .game_acmd("game_throwlw", duckhunt_dthrow_smash_script)
+    .game_acmd("game_specialn", duckhunt_neutralb_smash_script)
+    .game_acmd("game_specialairn", duckhunt_neutralb_air_smash_script)
+    .game_acmd("game_specials", duckhunt_sideb_smash_script)
+    .game_acmd("game_specialairs", duckhunt_sideb_air_smash_script)
+    .game_acmd("game_specialhi", duckhunt_upb_smash_script)
+    .game_acmd("game_speciallw", duckhunt_downb_smash_script)
+    .game_acmd("game_specialairlw", duckhunt_downb_smash_script)
+    .game_acmd("game_appealsl", duckhunt_sidetaunt_smash_script)
+    .game_acmd("game_appealsr", duckhunt_sidetaunt_smash_script)
+    .install();
+
+    Agent::new("duckhunt_can")
+    .game_acmd("game_explode", can_explode)
+    .install();
+
+    Agent::new("duckhunt_clay")
+    .game_acmd("game_fly", claypigeon_fly)
+    .game_acmd("game_hit", claypigeon_hit)
+    .game_acmd("game_reflecthit", claypigeon_reflect_hit)
+    .game_acmd("game_wallhit", claypigeon_wall_hit)
+    .install();
+
+    Agent::new("duckhunt_gunmanbullet")
+    .game_acmd("game_move", gunmen_shoot)
+    .install();
+
 }

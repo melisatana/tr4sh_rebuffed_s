@@ -5,8 +5,9 @@ use smash::lib::lua_const::*;
 use smash::app::*;
 use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
-use smashline::*;
 use smash_script::*;
+use smashline::*;
+use crate::custom::global_fighter_frame;
 
 static mut DARKSAMUS_ELECPOINTS_ACTIVE : [[bool; 5]; 8] = [[false; 5]; 8]; //whether the point exists
 static mut DARKSAMUS_ELECPOINTS_X : [[f32; 5]; 8] = [[0.0; 5]; 8]; //the x co-ordinate of the point
@@ -324,14 +325,14 @@ unsafe fn add_new_elecpoint(fighter: &mut L2CAgentBase) {
 }
 
 // A Once-Per-Fighter-Frame that only applies to Samus
-#[fighter_frame( agent = FIGHTER_KIND_SAMUSD )]
-fn dark_samus_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn dark_samus_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
         
 
-        println!("It'sa me, dark samus, brrrrrrrrrro!");
+        //println!("It'sa me, dark samus, brrrrrrrrrro!");
 
         if sv_information::is_ready_go() == false || [*FIGHTER_STATUS_KIND_WIN, *FIGHTER_STATUS_KIND_LOSE, *FIGHTER_STATUS_KIND_DEAD].contains(&status) {
 			clear_all_points(fighter);
@@ -389,8 +390,7 @@ fn dark_samus_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn dark_samus_jab(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_jab(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.6, 361, 10, 25, 25, 3.5, 0.0, 10.0, 4.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
@@ -414,8 +414,7 @@ unsafe fn dark_samus_jab(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_attack12", category = ACMD_GAME )]
-unsafe fn dark_samus_jab2(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_jab2(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("armr"), HitStatus(*HIT_STATUS_INVINCIBLE), 0);
@@ -434,8 +433,7 @@ unsafe fn dark_samus_jab2(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn dark_samus_dashattack(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_dashattack(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.6);
@@ -456,8 +454,7 @@ unsafe fn dark_samus_dashattack(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", scripts = ["game_attacks3", "game_attacks3hi", "game_attacks3lw"], category = ACMD_GAME, low_priority )]
-unsafe fn dark_samus_ftilt(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_ftilt(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("hip"), 8.7, 120, 60, 0, 64, 3.7, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
@@ -474,8 +471,7 @@ unsafe fn dark_samus_ftilt(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn dark_samus_utilt(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_utilt(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.3);
@@ -499,8 +495,7 @@ unsafe fn dark_samus_utilt(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn dark_samus_dtilt(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_dtilt(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("armr"), 9.8, 79, 60, 0, 60, 3.8, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 4, 0.4, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_BOMB);
@@ -519,8 +514,7 @@ unsafe fn dark_samus_dtilt(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_attacks4charge", category = ACMD_GAME )]
-unsafe fn dark_samus_fsmash_charge(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_fsmash_charge(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 40.0);
@@ -531,8 +525,7 @@ unsafe fn dark_samus_fsmash_charge(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", scripts = ["game_attacks4", "game_attacks4hi", "game_attacks4lw"], category = ACMD_GAME, low_priority )]
-unsafe fn dark_samus_fsmash(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_fsmash(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -566,8 +559,7 @@ unsafe fn dark_samus_fsmash(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn dark_samus_usmash(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_usmash(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -587,8 +579,7 @@ unsafe fn dark_samus_usmash(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn dark_samus_dsmash(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_dsmash(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -614,8 +605,7 @@ unsafe fn dark_samus_dsmash(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn dark_samus_nair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_nair(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -650,8 +640,7 @@ unsafe fn dark_samus_nair(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn dark_samus_fair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_fair(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -670,8 +659,7 @@ unsafe fn dark_samus_fair(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn dark_samus_bair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_bair(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.6);
@@ -701,8 +689,7 @@ unsafe fn dark_samus_bair(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn dark_samus_uair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_uair(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -728,8 +715,7 @@ unsafe fn dark_samus_uair(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn dark_samus_dair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_dair(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -757,16 +743,14 @@ unsafe fn dark_samus_dair(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "sound_attackairlw", category = ACMD_SOUND, low_priority )]
-unsafe fn dark_samus_dair_sound(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_dair_sound(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 11.0);
     if macros::is_excute(fighter) {
         macros::PLAY_SE(fighter, Hash40::new("se_samusd_swing_l"));
     }
 }
 
-#[acmd_script( agent = "samusd", script = "effect_attackairlw", category = ACMD_EFFECT, low_priority )]
-unsafe fn dark_samus_dair_effect(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_dair_effect(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         macros::EFFECT(fighter, Hash40::new("sys_smash_flash"), Hash40::new("legr"), 4.289, -0.272, -0.135, 0, 0, 0, 0.8, 0, 0, 0, 0, 0, 360, true);
@@ -804,8 +788,7 @@ unsafe fn dark_samus_dair_effect(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_catch", category = ACMD_GAME )]
-unsafe fn dark_samus_grab(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_grab(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 11.0);
     if macros::is_excute(fighter) {
         GrabModule::set_rebound(fighter.module_accessor, true);
@@ -831,8 +814,7 @@ unsafe fn dark_samus_grab(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn dark_samus_grabd(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_grabd(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         GrabModule::set_rebound(fighter.module_accessor, true);
@@ -858,8 +840,7 @@ unsafe fn dark_samus_grabd(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn dark_samus_grabp(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_grabp(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 17.0);
     if macros::is_excute(fighter) {
         GrabModule::set_rebound(fighter.module_accessor, true);
@@ -885,8 +866,7 @@ unsafe fn dark_samus_grabp(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_aircatch", category = ACMD_GAME )]
-unsafe fn dark_samus_zair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_zair(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_AIR_LASSO_FLAG_CHECK);
     }
@@ -913,8 +893,7 @@ unsafe fn dark_samus_zair(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn dark_samus_fthrow(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_fthrow(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 13.5, 42, 30, 0, 90, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_elec_whip"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -931,8 +910,7 @@ unsafe fn dark_samus_fthrow(fighter: &mut L2CAgentBase) {
     }
 }
         
-#[acmd_script( agent = "samusd", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn dark_samus_bthrow(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_bthrow(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 10.0, 40, 119, 0, 30, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_elec_whip"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -951,8 +929,7 @@ unsafe fn dark_samus_bthrow(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn dark_samus_uthrow(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_uthrow(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 4.7, 90, 85, 0, 50, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -973,8 +950,7 @@ unsafe fn dark_samus_uthrow(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn dark_samus_dthrow(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_dthrow(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 7.1, 285, 77, 0, 40, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_elec_whip"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -998,8 +974,7 @@ unsafe fn dark_samus_dthrow(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_special", category = ACMD_GAME )]
-unsafe fn dark_samus_sidespecial(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_sidespecial(fighter: &mut L2CAgentBase) {
     //let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 18.0);
@@ -1022,8 +997,7 @@ unsafe fn dark_samus_sidespecial(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_specialair", category = ACMD_GAME )]
-unsafe fn dark_samus_sidespecial_air(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_sidespecial_air(fighter: &mut L2CAgentBase) {
     //let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 18.0);
@@ -1050,8 +1024,7 @@ unsafe fn dark_samus_sidespecial_air(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_specials", category = ACMD_GAME )]
-unsafe fn dark_samus_sidespecial_super(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_sidespecial_super(fighter: &mut L2CAgentBase) {
     //let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 21.0);
@@ -1106,8 +1079,7 @@ unsafe fn dark_samus_sidespecial_super(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_specialairs", category = ACMD_GAME )]
-unsafe fn dark_samus_sidespecial_air_super(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_sidespecial_air_super(fighter: &mut L2CAgentBase) {
     //let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 21.0);
@@ -1166,8 +1138,7 @@ unsafe fn dark_samus_sidespecial_air_super(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_specialhi", category = ACMD_GAME )]
-unsafe fn dark_samus_upspecial(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_upspecial(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -1222,8 +1193,7 @@ unsafe fn dark_samus_upspecial(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_specialairhi", category = ACMD_GAME )]
-unsafe fn dark_samus_upspecial_air(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_upspecial_air(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -1291,8 +1261,7 @@ unsafe fn dark_samus_upspecial_air(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_speciallw", category = ACMD_GAME )]
-unsafe fn dark_samus_downspecial(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_downspecial(fighter: &mut L2CAgentBase) {
     //let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
@@ -1342,8 +1311,7 @@ unsafe fn dark_samus_downspecial(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_specialairlw", category = ACMD_GAME )]
-unsafe fn dark_samus_downspecial_air(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_downspecial_air(fighter: &mut L2CAgentBase) {
     //let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
@@ -1383,8 +1351,7 @@ unsafe fn dark_samus_downspecial_air(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_appeallwl", category = ACMD_GAME )]
-unsafe fn dark_samus_downtaunt_left(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_downtaunt(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 28.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 0.5);
@@ -1414,39 +1381,7 @@ unsafe fn dark_samus_downtaunt_left(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "samusd", script = "game_appeallwr", category = ACMD_GAME )]
-unsafe fn dark_samus_downtaunt_right(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 28.0);
-    if macros::is_excute(fighter) {
-        MotionModule::set_rate(fighter.module_accessor, 0.5);
-        if is_any_elecpoint_active(fighter) {
-            macros::PLAY_SE(fighter, Hash40::new("se_common_bomb_l"));
-        }
-        draw_downtaunt_explosions(fighter);
-        set_downtaunt_hitboxes(fighter);
-    }
-    sv_animcmd::wait(fighter.lua_state_agent, 0.499999);
-    if macros::is_excute(fighter) {
-        set_downtaunt_hitboxes(fighter);
-    }
-    sv_animcmd::wait(fighter.lua_state_agent, 0.499999);
-    if macros::is_excute(fighter) {
-        set_downtaunt_hitboxes(fighter);
-    }
-    sv_animcmd::wait(fighter.lua_state_agent, 0.499999);
-    if macros::is_excute(fighter) {
-        set_downtaunt_hitboxes(fighter);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 30.0);
-    if macros::is_excute(fighter) {
-        AttackModule::clear_all(fighter.module_accessor);
-        clear_all_points(fighter);
-        MotionModule::set_rate(fighter.module_accessor, 0.75);
-    }
-}
-
-#[acmd_script( agent = "samusd_cshot", script = "game_shoot", category = ACMD_GAME )]
-unsafe fn dark_samus_chargeshot(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dark_samus_chargeshot(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.5, 361, 42, 0, 14, 1.9, 0.0, 0.0, 0.0, None, None, None, 1.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 21.5, 40, 64, 0, 46, 8.0, 0.0, 0.0, 0.0, None, None, None, 1.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);
@@ -1455,48 +1390,54 @@ unsafe fn dark_samus_chargeshot(fighter: &mut L2CAgentBase) {
     }
 }
 
+//#[skyline::main(name = "tr4sh_rebuffed")]
 pub fn install() {
-    smashline::install_agent_frames!(
-        dark_samus_frame
-    );
-    smashline::install_acmd_scripts!(
-        dark_samus_jab,
-        dark_samus_jab2,
-        dark_samus_dashattack,
-        dark_samus_ftilt,
-        dark_samus_utilt,
-        dark_samus_dtilt,
-        dark_samus_fsmash_charge,
-        dark_samus_fsmash,
-        dark_samus_usmash,
-        dark_samus_dsmash,
-        dark_samus_nair,
-        dark_samus_fair,
-        dark_samus_bair,
-        dark_samus_uair,
-        dark_samus_dair,
-        dark_samus_dair_sound,
-        dark_samus_dair_effect,
-        dark_samus_grab,
-        dark_samus_grabd,
-        dark_samus_grabp,
-        dark_samus_zair,
-        dark_samus_fthrow,
-        dark_samus_bthrow,
-        dark_samus_uthrow,
-        dark_samus_dthrow,
-        dark_samus_sidespecial,
-        dark_samus_sidespecial_air,
-        dark_samus_sidespecial_super,
-        dark_samus_sidespecial_air_super,
-        dark_samus_upspecial,
-        dark_samus_upspecial_air,
-        dark_samus_downspecial,
-        dark_samus_downspecial_air,
-        dark_samus_downtaunt_left,
-        dark_samus_downtaunt_right,
-        dark_samus_chargeshot
-       
-        
-    );
+    Agent::new("samusd")
+      .on_line(Main, dark_samus_frame) //opff
+      .game_acmd("game_attack11", dark_samus_jab)
+      .game_acmd("game_attack12", dark_samus_jab2)
+      .game_acmd("game_attackdash", dark_samus_dashattack)
+      .game_acmd("game_attacks3", dark_samus_ftilt)
+      .game_acmd("game_attacks3hi", dark_samus_ftilt)
+      .game_acmd("game_attacks3lw", dark_samus_ftilt)
+      .game_acmd("game_attackhi3", dark_samus_utilt)
+      .game_acmd("game_attacklw3", dark_samus_dtilt)
+      .game_acmd("game_attacks4charge", dark_samus_fsmash_charge)
+      .game_acmd("game_attacks4", dark_samus_fsmash)
+      .game_acmd("game_attacks4hi", dark_samus_fsmash)
+      .game_acmd("game_attacks4lw", dark_samus_fsmash)
+      .game_acmd("game_attackhi4", dark_samus_usmash)
+      .game_acmd("game_attacklw4", dark_samus_dsmash)
+      .game_acmd("game_attackairn", dark_samus_nair)
+      .game_acmd("game_attackairf", dark_samus_fair)
+      .game_acmd("game_attackairb", dark_samus_bair)
+      .game_acmd("game_attackairhi", dark_samus_uair)
+      .game_acmd("game_attackairlw", dark_samus_dair)
+      .effect_acmd("effect_attackairlw", dark_samus_dair_effect)
+      .sound_acmd("sound_attackairlw", dark_samus_dair_sound)
+      .game_acmd("game_catch", dark_samus_grab)
+      .game_acmd("game_catchdash", dark_samus_grabd)
+      .game_acmd("game_catchturn", dark_samus_grabp)
+      .game_acmd("game_aircatch", dark_samus_zair)
+      .game_acmd("game_throwf", dark_samus_fthrow)
+      .game_acmd("game_throwb", dark_samus_bthrow)
+      .game_acmd("game_throwhi", dark_samus_uthrow)
+      .game_acmd("game_throwlw", dark_samus_dthrow)
+      .game_acmd("game_special", dark_samus_sidespecial)
+      .game_acmd("game_specialair", dark_samus_sidespecial_air)
+      .game_acmd("game_specials", dark_samus_sidespecial_super)
+      .game_acmd("game_specialairs", dark_samus_sidespecial_air_super)
+      .game_acmd("game_specialhi", dark_samus_upspecial)
+      .game_acmd("game_specialairhi", dark_samus_upspecial_air)
+      .game_acmd("game_speciallw", dark_samus_downspecial)
+      .game_acmd("game_specialairlw", dark_samus_downspecial_air)
+      .game_acmd("game_appeallwl", dark_samus_downtaunt)
+      .game_acmd("game_appeallwr", dark_samus_downtaunt)
+      .install();
+  
+      Agent::new("samusd_cshot")
+      .game_acmd("game_shoot", dark_samus_chargeshot)
+      .install();
+      
+      
 }

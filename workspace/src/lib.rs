@@ -8,20 +8,21 @@ pub mod custom;
 pub mod customparam;
 pub mod consts;
 mod mario;
-mod mariod;
 mod donkey;
 mod link;
 mod samus;
+mod samusd;
 mod kirby;
+mod sonic;
 mod fox;
-mod pichu;
 mod pikachu;
 mod luigi;
 mod ness;
+mod yoshi;
 mod captain;
 mod purin;
-mod yoshi;
-mod samusd;
+mod mariod;
+mod pichu;
 mod wario;
 mod ike;
 mod pit;
@@ -33,17 +34,19 @@ mod koopa;
 mod rosetta;
 mod wiifit;
 mod marth;
+mod lucina;
 mod roy;
+mod chrom;
 mod buddy;
 mod mewtwo;
 mod falco;
+mod inkling;
 mod miifighter;
-mod miiswordsman;
 mod miigunner;
+mod miiswordsman;
 mod gaogaen;
 mod dedede;
 mod ganon;
-mod inkling;
 mod brave;
 mod lucario;
 mod shulk;
@@ -55,24 +58,22 @@ mod toonlink;
 mod wolf;
 mod zelda;
 mod sheik;
-mod lucina;
+mod lucas;
 mod littlemac;
 mod trail;
 mod cloud;
 mod edge;
-mod lucas;
 mod snake;
 mod dolly;
 mod ryu;
 mod ken;
 mod krool;
+
 mod gekkouga;
 mod metaknight;
 mod rockman;
 mod kamui;
 mod pikmin;
-mod chrom;
-mod sonic;
 mod pacman;
 mod packun;
 mod szerosuit;
@@ -89,17 +90,19 @@ mod robot;
 mod jack;
 mod demon;
 mod murabito;
-mod plizardon;
-mod pfushigisou;
 mod pzenigame;
+mod pfushigisou;
+mod plizardon;
 mod gamewatch;
 mod pickel;
 mod popo;
 mod ridley;
-mod miienemyf;
-mod miienemys;
-mod miienemyg;
-//mod koopag;
+
+/*
+//mod miienemyf;
+//mod miienemys;
+//mod miienemyg;
+//mod koopag;*/
 
 std::arch::global_asm!(
     r#"
@@ -138,21 +141,23 @@ std::arch::global_asm!(
 pub extern "C" fn main() {
     
     custom::install();
+    customparam::install();
     mario::install();
-    mariod::install();
     donkey::install();
     link::install();
     samus::install();
     samusd::install();
     kirby::install();
+    sonic::install();
     fox::install();
-    pichu::install();
     pikachu::install();
     luigi::install();
     ness::install();
+    yoshi::install();
     captain::install();
     purin::install();
-    yoshi::install();
+    mariod::install();
+    pichu::install();
     wario::install();
     ike::install();
     pit::install();
@@ -164,17 +169,19 @@ pub extern "C" fn main() {
     rosetta::install();
     wiifit::install();
     marth::install();
+    lucina::install();
     roy::install();
+    chrom::install();
     buddy::install();
     mewtwo::install();
     falco::install();
+    inkling::install();
     miifighter::install();
-    miiswordsman::install();
     miigunner::install();
+    miiswordsman::install();
     gaogaen::install();
     dedede::install();
     ganon::install();
-    inkling::install();
     brave::install();
     lucario::install();
     shulk::install();
@@ -186,12 +193,11 @@ pub extern "C" fn main() {
     wolf::install();
     zelda::install();
     sheik::install();
-    lucina::install();
+    lucas::install();
     littlemac::install();
     trail::install();
     cloud::install();
     edge::install();
-    lucas::install();
     snake::install();
     dolly::install();
     ryu::install();
@@ -202,8 +208,6 @@ pub extern "C" fn main() {
     rockman::install();
     kamui::install();
     pikmin::install();
-    chrom::install();
-    sonic::install();
     pacman::install();
     packun::install();
     szerosuit::install();
@@ -220,18 +224,19 @@ pub extern "C" fn main() {
     jack::install();
     demon::install();
     murabito::install();
-    plizardon::install();
-    pfushigisou::install();
     pzenigame::install();
+    pfushigisou::install();
+    plizardon::install();
     gamewatch::install();
     pickel::install();
     popo::install();
     ridley::install();
+    
+    /*
     miienemyf::install();
     miienemys::install();
     miienemyg::install();
-    customparam::install();
-    //koopag::install();
+    koopag::install();*/
 
 
 }

@@ -7,6 +7,7 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
+use crate::custom::global_fighter_frame;
 
 static mut PFUSHIGISOU_SLOW_DOWN_AIR : [bool; 8] = [false; 8];
 static mut PFUSHIGISOU_SLOW_DOWN_AIR_IN_SLOW : [bool; 8] = [false; 8];
@@ -17,16 +18,16 @@ static mut PFUSHIGISOU_NEUTRALB_IN_USE : [bool; 8] = [false; 8];
 static mut PFUSHIGISOU_NEUTRALB_HAS_USED : [bool; 8] = [false; 8];
 
 // A Once-Per-Fighter-Frame that only applies to Ivysaur
-#[fighter_frame( agent = FIGHTER_KIND_PFUSHIGISOU )]
-fn pfushigisou_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn pfushigisou_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
         let stickx = ControlModule::get_stick_x(fighter.module_accessor);
         let lr = PostureModule::lr(fighter.module_accessor);
         //let stickx_directional = stickx * lr;
 
-        println!("Ivy Ivysaur???");
+        //println!("Ivy Ivysaur???");
 
         if PFUSHIGISOU_SLOW_DOWN_AIR[entry_id] && status == *FIGHTER_STATUS_KIND_ATTACK_AIR && PFUSHIGISOU_SLOW_DOWN_AIR_CAN_CANCEL[entry_id] && ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_ATTACK) == false {
             PFUSHIGISOU_SLOW_DOWN_AIR[entry_id] = false;
@@ -77,8 +78,7 @@ fn pfushigisou_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-#[fighter_frame( agent = FIGHTER_KIND_KIRBY )]
-fn kirby_ivyhat_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn kirby_ivyhat_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
@@ -117,16 +117,14 @@ fn kirby_ivyhat_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn pfushigisou_jab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_ATTACK_100, false);
     }
 }
 
-#[acmd_script( agent = "pfushigisou", script = "game_attack100", category = ACMD_GAME )]
-unsafe fn pfushigisou_jab100_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_jab100_smash_script(fighter: &mut L2CAgentBase) {
     for _ in 0..i32::MAX {
         if macros::is_excute(fighter) {
             macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 0.9, 361, 20, 0, 7, 6.0, 0.0, 6.5, 17.5, Some(0.0), Some(6.5), Some(8.0), 0.4, 0.4, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_rush"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
@@ -204,9 +202,7 @@ unsafe fn pfushigisou_jab100_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-
-#[acmd_script( agent = "pfushigisou", script = "game_attack100end", category = ACMD_GAME )]
-unsafe fn pfushigisou_jab100end_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_jab100end_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
@@ -223,8 +219,7 @@ unsafe fn pfushigisou_jab100end_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn pfushigisou_dashattack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.4);
@@ -241,8 +236,7 @@ unsafe fn pfushigisou_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou", script = "game_attacks3", category = ACMD_GAME )]
-unsafe fn pfushigisou_ftilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     for _ in 0..6 {
         if macros::is_excute(fighter) {
@@ -268,8 +262,7 @@ unsafe fn pfushigisou_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn pfushigisou_utilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_utilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -286,9 +279,9 @@ unsafe fn pfushigisou_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 9.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("hip"), 7.4, 88, 61, 0, 55, 6.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("kneel"), 7.4, 88, 61, 0, 55, 6.0, 1.4, -1.5, -0.1, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("kneer"), 7.4, 88, 61, 0, 55, 6.0, 1.4, -1.5, 0.1, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("hip"), 7.9, 88, 71, 0, 55, 6.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("kneel"), 7.9, 88, 71, 0, 55, 6.0, 1.4, -1.5, -0.1, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("kneer"), 7.9, 88, 71, 0, 55, 6.0, 1.4, -1.5, 0.1, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
@@ -297,14 +290,18 @@ unsafe fn pfushigisou_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn pfushigisou_dtilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("vinel2"), 7.4, 0, 50, 0, 17, 4.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 1.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("vinel3"), 7.4, 0, 50, 0, 17, 4.5, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 1.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 7.4, 0, 50, 0, 17, 4.5, 0.0, 3.5, 15.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 1.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
-        macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 7.4, 0, 50, 0, 17, 4.0, 0.0, 3.2, 20.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 1.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("vinel2"), 7.4, 0, 50, 0, 17, 4.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 1.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("vinel3"), 7.4, 0, 50, 0, 17, 4.5, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 1.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 7.4, 0, 50, 0, 17, 4.5, 0.0, 3.5, 15.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 1.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 7.4, 0, 50, 0, 17, 4.0, 0.0, 3.2, 20.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 1.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 4, 0, Hash40::new("vinel2"), 7.4, 20, 88, 0, 27, 4.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_A, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 5, 0, Hash40::new("vinel3"), 7.4, 20, 88, 0, 27, 4.5, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_A, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 6, 0, Hash40::new("top"), 7.4, 20, 88, 0, 27, 4.5, 0.0, 3.5, 15.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_A, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 7, 0, Hash40::new("top"), 7.4, 20, 88, 0, 27, 4.0, 0.0, 3.2, 20.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_A, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
+        
         AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
@@ -318,8 +315,7 @@ unsafe fn pfushigisou_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou", scripts = ["game_attacks4", "game_attacks4hi", "game_attacks4lw"], category = ACMD_GAME, low_priority )]
-unsafe fn pfushigisou_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -343,9 +339,7 @@ unsafe fn pfushigisou_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-
-#[acmd_script( agent = "pfushigisou", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn pfushigisou_usmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -371,26 +365,38 @@ unsafe fn pfushigisou_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn pfushigisou_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
-        MotionModule::set_rate(fighter.module_accessor, 2.0);
+        MotionModule::set_rate(fighter.module_accessor, 4.0);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
-        MotionModule::set_rate(fighter.module_accessor, 1.33333333);
+        MotionModule::set_rate(fighter.module_accessor, 1.0);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 9.0);
+    if macros::is_excute(fighter) {
+        MotionModule::set_rate(fighter.module_accessor, 1.5);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 14.0);
+    if macros::is_excute(fighter) {
+        MotionModule::set_rate(fighter.module_accessor, 1.0);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.0);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.0, 90, 70, 0, 40, 5.0, 0.0, 3.5, 3.8, Some(0.0), Some(3.5), Some(-5.2), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.4, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("vinel3"), 11.0, 100, 70, 0, 45, 5.2, 2.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.4, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("viner3"), 11.0, 100, 70, 0, 45, 5.2, 2.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.4, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
-        macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 11.0, 112, 70, 0, 50, 5.0, 0.0, 2.3, 21.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.4, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
-        macros::ATTACK(fighter, 4, 0, Hash40::new("top"), 11.0, 112, 70, 0, 50, 5.0, 0.0, 3.0, -22.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.4, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 10.2, 90, 70, 0, 40, 5.0, 0.0, 3.5, 3.8, Some(0.0), Some(3.5), Some(-5.2), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.4, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("vinel3"), 10.2, 100, 70, 0, 45, 5.2, 2.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.4, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("viner3"), 10.2, 100, 70, 0, 45, 5.2, 2.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.4, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 10.2, 112, 70, 0, 50, 5.0, 0.0, 2.3, 21.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.4, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 4, 0, Hash40::new("top"), 10.2, 112, 70, 0, 50, 5.0, 0.0, 3.0, -22.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.4, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
         AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 1.0, false);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 1.0, false);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 2, 1.0, false);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 3, 1.0, false);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 4, 1.0, false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
@@ -398,7 +404,7 @@ unsafe fn pfushigisou_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 26.0);
     if macros::is_excute(fighter) {
-        MotionModule::set_rate(fighter.module_accessor, 2.0);
+        MotionModule::set_rate(fighter.module_accessor, 1.25);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 40.0);
     if macros::is_excute(fighter) {
@@ -407,8 +413,7 @@ unsafe fn pfushigisou_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn pfushigisou_nair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_nair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -436,8 +441,7 @@ unsafe fn pfushigisou_nair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn pfushigisou_fair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_fair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -465,8 +469,7 @@ unsafe fn pfushigisou_fair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn pfushigisou_bair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_bair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -505,8 +508,7 @@ unsafe fn pfushigisou_bair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn pfushigisou_uair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_uair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -545,8 +547,7 @@ unsafe fn pfushigisou_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn pfushigisou_dair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_dair_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
@@ -592,8 +593,7 @@ unsafe fn pfushigisou_dair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou", script = "game_catch", category = ACMD_GAME )]
-unsafe fn pfushigisou_grab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_grab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -615,8 +615,7 @@ unsafe fn pfushigisou_grab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn pfushigisou_grabd_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_grabd_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -638,8 +637,7 @@ unsafe fn pfushigisou_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn pfushigisou_grabp_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_grabp_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -661,8 +659,7 @@ unsafe fn pfushigisou_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou", script = "game_catchattack", category = ACMD_GAME )]
-unsafe fn pfushigisou_pummel_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_pummel_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.3, 361, 100, 30, 0, 5.0, 0.0, 8.0, 13.0, None, None, None, 2.1, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_HEAD);
@@ -677,8 +674,7 @@ unsafe fn pfushigisou_pummel_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn pfushigisou_fthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 6.0, 29, 48, 0, 70, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -698,8 +694,7 @@ unsafe fn pfushigisou_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn pfushigisou_bthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 9.1, 45, 110, 0, 55, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -717,8 +712,7 @@ unsafe fn pfushigisou_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn pfushigisou_uthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.0, 90, 35, 0, 85, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_flower"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -737,8 +731,7 @@ unsafe fn pfushigisou_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn pfushigisou_dthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 6.3, 70, 100, 0, 44, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -763,8 +756,7 @@ unsafe fn pfushigisou_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou", scripts = ["game_specialnstart", "game_specialairnstart"], category = ACMD_GAME, low_priority )]
-unsafe fn pfushigisou_neutralb_start_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_neutralb_start_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -792,8 +784,7 @@ unsafe fn pfushigisou_neutralb_start_smash_script(fighter: &mut L2CAgentBase) {
     
 }
 
-#[acmd_script( agent = "pfushigisou", scripts = ["game_specialnend", "game_specialairnend"], category = ACMD_GAME, low_priority )]
-unsafe fn pfushigisou_neutralb_end_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_neutralb_end_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -807,8 +798,7 @@ unsafe fn pfushigisou_neutralb_end_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou", scripts = ["game_specialn", "game_specialairn"], category = ACMD_GAME, low_priority )]
-unsafe fn pfushigisou_neutralb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_neutralb_smash_script(fighter: &mut L2CAgentBase) {
     for _ in 0..i32::MAX {
         sv_animcmd::frame(fighter.lua_state_agent, 1.0);
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_PFUSHIGISOU_GENERATE_ARTICLE_SEED, false, 0);
@@ -820,8 +810,7 @@ unsafe fn pfushigisou_neutralb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou_seed", script = "game_move", category = ACMD_GAME )]
-unsafe fn bullet_seed_loop(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bullet_seed_loop(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.2, 90, 25, 0, 15, 4.5, 0.0, 0.0, 0.0, None, None, None, 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
     }
@@ -831,15 +820,13 @@ unsafe fn bullet_seed_loop(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou_seed", script = "game_movehard", category = ACMD_GAME )]
-unsafe fn bullet_seed_end(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bullet_seed_end(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.5, 70, 46, 0, 60, 4.0, 0.0, 0.0, 0.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
     }
 }
 
-#[acmd_script( agent = "pfushigisou", scripts = ["game_specials", "game_specialairs"], category = ACMD_GAME, low_priority )]
-unsafe fn pfushigisou_sideb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_sideb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.66666667);
@@ -858,8 +845,7 @@ unsafe fn pfushigisou_sideb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou_leafcutter", script = "game_move", category = ACMD_GAME )]
-unsafe fn razorleaf_projectile(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn razorleaf_projectile(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 6.8, 70, 30, 0, 20, 3.6, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, -1, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_OBJECT);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 2.0, false);
@@ -867,8 +853,7 @@ unsafe fn razorleaf_projectile(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou", script = "game_specialhi", category = ACMD_GAME )]
-unsafe fn pfushigisou_upb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_upb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.5);
@@ -900,8 +885,7 @@ unsafe fn pfushigisou_upb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pfushigisou", script = "game_specialairhi", category = ACMD_GAME )]
-unsafe fn pfushigisou_upb_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pfushigisou_upb_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_PFUSHIGISOU_GENERATE_ARTICLE_VINE, false, 0);
         ArticleModule::set_visibility_whole(fighter.module_accessor, *FIGHTER_PFUSHIGISOU_GENERATE_ARTICLE_VINE, false, smash::app::ArticleOperationTarget(0));
@@ -947,43 +931,57 @@ unsafe fn pfushigisou_upb_air_smash_script(fighter: &mut L2CAgentBase) {
 
 
 pub fn install() {
-    smashline::install_agent_frames!(
-        pfushigisou_frame,
-        kirby_ivyhat_frame
-    );
-    smashline::install_acmd_scripts!(
-        pfushigisou_jab_smash_script,
-        pfushigisou_jab100_smash_script,
-        pfushigisou_jab100end_smash_script,
-        pfushigisou_dashattack_smash_script,
-        pfushigisou_ftilt_smash_script,
-        pfushigisou_utilt_smash_script,
-        pfushigisou_dtilt_smash_script,
-        pfushigisou_fsmash_smash_script,
-        pfushigisou_usmash_smash_script,
-        pfushigisou_dsmash_smash_script,
-        pfushigisou_nair_smash_script,
-        pfushigisou_fair_smash_script,
-        pfushigisou_bair_smash_script,
-        pfushigisou_uair_smash_script,
-        pfushigisou_dair_smash_script,
-        pfushigisou_grab_smash_script,
-        pfushigisou_grabd_smash_script,
-        pfushigisou_grabp_smash_script,
-        pfushigisou_pummel_smash_script,
-        pfushigisou_fthrow_smash_script,
-        pfushigisou_bthrow_smash_script,
-        pfushigisou_uthrow_smash_script,
-        pfushigisou_dthrow_smash_script,
-        pfushigisou_neutralb_start_smash_script,
-        pfushigisou_neutralb_end_smash_script,
-        pfushigisou_neutralb_smash_script,
-        bullet_seed_loop,
-        bullet_seed_end,
-        pfushigisou_sideb_smash_script,
-        razorleaf_projectile,
-        pfushigisou_upb_smash_script,
-        pfushigisou_upb_air_smash_script
-        
-    );
+    Agent::new("pfushigisou")
+    .on_line(Main, pfushigisou_frame) //opff
+    .game_acmd("game_attack11", pfushigisou_jab_smash_script)
+    .game_acmd("game_attack100", pfushigisou_jab100_smash_script)
+    .game_acmd("game_attack100end", pfushigisou_jab100end_smash_script)
+    .game_acmd("game_attackdash", pfushigisou_dashattack_smash_script)
+    .game_acmd("game_attacks3", pfushigisou_ftilt_smash_script)
+    .game_acmd("game_attackhi3", pfushigisou_utilt_smash_script)
+    .game_acmd("game_attacklw3", pfushigisou_dtilt_smash_script)
+    .game_acmd("game_attacks4", pfushigisou_fsmash_smash_script)
+    .game_acmd("game_attacks4hi", pfushigisou_fsmash_smash_script)
+    .game_acmd("game_attacks4lw", pfushigisou_fsmash_smash_script)
+    .game_acmd("game_attackhi4", pfushigisou_usmash_smash_script)
+    .game_acmd("game_attacklw4", pfushigisou_dsmash_smash_script)
+    .game_acmd("game_attackairn", pfushigisou_nair_smash_script)
+    .game_acmd("game_attackairf", pfushigisou_fair_smash_script)
+    .game_acmd("game_attackairb", pfushigisou_bair_smash_script)
+    .game_acmd("game_attackairhi", pfushigisou_uair_smash_script)
+    .game_acmd("game_attackairlw", pfushigisou_dair_smash_script)
+    .game_acmd("game_catch", pfushigisou_grab_smash_script)
+    .game_acmd("game_catchdash", pfushigisou_grabd_smash_script)
+    .game_acmd("game_catchturn", pfushigisou_grabp_smash_script)
+    .game_acmd("game_catchattack", pfushigisou_pummel_smash_script)
+    .game_acmd("game_throwf", pfushigisou_fthrow_smash_script)
+    .game_acmd("game_throwb", pfushigisou_bthrow_smash_script)
+    .game_acmd("game_throwhi", pfushigisou_uthrow_smash_script)
+    .game_acmd("game_throwlw", pfushigisou_dthrow_smash_script)
+    .game_acmd("game_specialnstart", pfushigisou_neutralb_start_smash_script)
+    .game_acmd("game_specialairnstart", pfushigisou_neutralb_start_smash_script)
+    .game_acmd("game_specialnend", pfushigisou_neutralb_end_smash_script)
+    .game_acmd("game_specialairnend", pfushigisou_neutralb_end_smash_script)
+    .game_acmd("game_specialn", pfushigisou_neutralb_smash_script)
+    .game_acmd("game_specialairn", pfushigisou_neutralb_smash_script)
+    .game_acmd("game_specials", pfushigisou_sideb_smash_script)
+    .game_acmd("game_specialairs", pfushigisou_sideb_smash_script)
+    .game_acmd("game_specialhi", pfushigisou_upb_smash_script)
+    .game_acmd("game_specialairhi", pfushigisou_upb_air_smash_script)
+    .install();
+
+    Agent::new("kirby")
+    .on_line(Main, kirby_ivyhat_frame)
+    .install();
+
+    Agent::new("pfushigisou_seed")
+    .game_acmd("game_move", bullet_seed_loop)
+    .game_acmd("game_hard", bullet_seed_end)
+    .install();
+
+
+    Agent::new("pfushigisou_leafcutter")
+    .game_acmd("game_move", razorleaf_projectile)
+    .install();
+
 }

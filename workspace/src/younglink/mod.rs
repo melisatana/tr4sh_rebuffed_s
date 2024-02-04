@@ -8,22 +8,23 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 use smash::hash40;
+use crate::custom::global_fighter_frame;
 
 static mut YOUNGLINK_SPEEN : [bool; 8] = [false; 8];
 
 static mut YOUNGLINK_UPB_GROUNDTOAIR : [bool; 8] = [false; 8];
 
 // A Once-Per-Fighter-Frame that only applies to Young Link
-#[fighter_frame( agent = FIGHTER_KIND_YOUNGLINK )]
-fn younglink_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn younglink_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
         let stickx = ControlModule::get_stick_x(fighter.module_accessor);
         let lr = PostureModule::lr(fighter.module_accessor);
         let stickx_directional = stickx * lr;
 
-        println!("It'sa me, Link, hyaaaa!");
+        //println!("It'sa me, Link, hyaaaa!");
 
 
 
@@ -65,8 +66,7 @@ fn younglink_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn younglink_jab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -93,8 +93,7 @@ unsafe fn younglink_jab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_attack12", category = ACMD_GAME )]
-unsafe fn younglink_jab2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_jab2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.1, 361, 25, 10, 20, 3.2, 0.0, 7.0, 8.0, Some(0.0), Some(7.0), Some(7.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
@@ -119,8 +118,7 @@ unsafe fn younglink_jab2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_attack13", category = ACMD_GAME )]
-unsafe fn younglink_jab3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_jab3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.7, 34, 150, 0, 55, 3.5, 0.0, 7.0, 8.0, Some(0.0), Some(7.0), Some(8.0), 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
@@ -132,8 +130,7 @@ unsafe fn younglink_jab3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_attack100", category = ACMD_GAME )]
-unsafe fn younglink_jab100_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_jab100_smash_script(fighter: &mut L2CAgentBase) {
     for _ in 0..i32::MAX {
         if macros::is_excute(fighter) {
             macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 0.3, 361, 15, 0, 8, 4.8, 0.0, 7.0, 14.5, Some(0.0), Some(7.0), Some(8.0), 0.5, 0.4, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
@@ -229,8 +226,7 @@ unsafe fn younglink_jab100_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_attack100end", category = ACMD_GAME )]
-unsafe fn younglink_jab100end_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_jab100end_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
@@ -247,8 +243,7 @@ unsafe fn younglink_jab100end_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn younglink_dashattack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("sword"), 9.9, 68, 60, 0, 60, 4.2, 1.7, 0.0, 1.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
@@ -268,8 +263,7 @@ unsafe fn younglink_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_attacks3", category = ACMD_GAME )]
-unsafe fn younglink_ftilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -295,8 +289,7 @@ unsafe fn younglink_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn younglink_utilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_utilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -318,8 +311,7 @@ unsafe fn younglink_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn younglink_dtilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 3.0);
@@ -345,8 +337,15 @@ unsafe fn younglink_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn younglink_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        MotionModule::set_rate(fighter.module_accessor, 2.0);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 6.0);
+    if macros::is_excute(fighter) {
+        MotionModule::set_rate(fighter.module_accessor, 1.0);
+    }
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -377,23 +376,21 @@ unsafe fn younglink_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_attacks4s2", category = ACMD_GAME )]
-unsafe fn younglink_fsmash2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_fsmash2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 11.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("sword"), 12.1, 48, 119, 0, 50, 3.8, 0.5, 1.0, 1.7, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("sword"), 12.1, 48, 119, 0, 50, 3.5, 5.4, 1.0, 1.7, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("shoulderl"), 12.1, 48, 119, 0, 50, 2.8, 0.0, 0.0, 0.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("sword"), 12.1, 47, 119, 0, 50, 3.8, 0.5, 1.0, 1.7, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("sword"), 12.1, 47, 119, 0, 50, 3.5, 5.4, 1.0, 1.7, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("shoulderl"), 12.1, 47, 119, 0, 50, 2.8, 0.0, 0.0, 0.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
     }
-    sv_animcmd::wait(fighter.lua_state_agent, 2.0);
+    sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
-        MotionModule::set_rate(fighter.module_accessor, 1.15);
+        MotionModule::set_rate(fighter.module_accessor, 1.25);
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn younglink_usmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -445,8 +442,7 @@ unsafe fn younglink_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn younglink_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -484,8 +480,7 @@ unsafe fn younglink_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn younglink_nair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_nair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -505,8 +500,7 @@ unsafe fn younglink_nair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn younglink_fair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_fair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -518,9 +512,9 @@ unsafe fn younglink_fair_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 14.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.4, 367, 50, 40, 33, 5.1, 0.0, 8.0, 2.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 4.4, 367, 50, 40, 33, 5.8, 0.0, 8.0, 8.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 4.4, 367, 50, 40, 33, 4.8, 0.0, 8.0, 13.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 4.4, 367, 50, 40, 33, 5.1, 0.0, 8.0, 2.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.4, 367, 50, 40, 33, 5.8, 0.0, 8.0, 8.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 4.4, 367, 50, 40, 33, 4.8, 0.0, 8.0, 13.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 2.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 2.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 2, 2.0, false);
@@ -550,8 +544,7 @@ unsafe fn younglink_fair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn younglink_bair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_bair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -584,8 +577,7 @@ unsafe fn younglink_bair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn younglink_uair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_uair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         JostleModule::set_status(fighter.module_accessor, false);
@@ -593,7 +585,7 @@ unsafe fn younglink_uair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("sword"), 12.1, 78, 109, 0, 25, 4.2, 5.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("sword"), 12.1, 78, 109, 0, 25, 4.2, 5.8, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
         macros::ATTACK(fighter, 1, 0, Hash40::new("sword"), 12.1, 78, 109, 0, 25, 4.2, 0.5, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
         macros::ATTACK(fighter, 2, 0, Hash40::new("arml"), 12.1, 78, 109, 0, 25, 3.7, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 2.0, false);
@@ -619,8 +611,7 @@ unsafe fn younglink_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn younglink_dair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_dair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -651,8 +642,7 @@ unsafe fn younglink_dair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_catch", category = ACMD_GAME )]
-unsafe fn younglink_grab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_grab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_YOUNGLINK_GENERATE_ARTICLE_HOOKSHOT, false, -1);
@@ -696,8 +686,7 @@ unsafe fn younglink_grab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn younglink_grabd_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_grabd_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_YOUNGLINK_GENERATE_ARTICLE_HOOKSHOT, false, -1);
@@ -737,8 +726,7 @@ unsafe fn younglink_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn younglink_grabp_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_grabp_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_YOUNGLINK_GENERATE_ARTICLE_HOOKSHOT, false, -1);
@@ -778,8 +766,7 @@ unsafe fn younglink_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_aircatch", category = ACMD_GAME )]
-unsafe fn younglink_zair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_zair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     MotionModule::set_rate(fighter.module_accessor, 2.0);
     if macros::is_excute(fighter) {
@@ -835,8 +822,7 @@ unsafe fn younglink_zair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn younglink_fthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.1, 47, 169, 0, 66, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -857,8 +843,7 @@ unsafe fn younglink_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn younglink_bthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 3.5, 116, 100, 0, 45, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -881,8 +866,7 @@ unsafe fn younglink_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn younglink_uthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.7, 90, 40, 0, 86, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -907,8 +891,7 @@ unsafe fn younglink_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn younglink_dthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::FT_LEAVE_NEAR_OTTOTTO(fighter, -2, 2);
         macros::FT_LEAVE_NEAR_OTTOTTO(fighter, 2.5, 2.5);
@@ -940,8 +923,12 @@ unsafe fn younglink_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink_bowarrow", script = "game_fly", category = ACMD_GAME )]
-unsafe fn fire_arrow(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_neutralb_end_smash_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    macros::FT_MOTION_RATE(fighter, 1.1111111);
+}
+
+unsafe extern "C" fn fire_arrow(fighter: &mut L2CAgentBase) {
     MotionModule::set_rate(fighter.module_accessor, 0.8);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.0, 81, 70, 0, 45, 1.8, 0.0, 0.0, 0.0, None, None, None, 0.7, 1.1, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_OBJECT);
@@ -950,8 +937,7 @@ unsafe fn fire_arrow(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_specials1", category = ACMD_GAME )]
-unsafe fn younglink_sideb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_sideb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.740740740);
@@ -967,24 +953,7 @@ unsafe fn younglink_sideb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_specialairs1", category = ACMD_GAME )]
-unsafe fn younglink_sideb_air_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.740740740);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 5.0);
-    if macros::is_excute(fighter) {
-        ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_YOUNGLINK_GENERATE_ARTICLE_BOOMERANG, false, -1);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 27.0);
-    if macros::is_excute(fighter) {
-        ArticleModule::shoot(fighter.module_accessor, *FIGHTER_YOUNGLINK_GENERATE_ARTICLE_BOOMERANG, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL), false);
-    }
-}
-
-#[acmd_script( agent = "younglink", script = "game_specials2", category = ACMD_GAME )]
-unsafe fn younglink_sideb_catch_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_sideb_catch_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         CancelModule::enable_cancel(fighter.module_accessor);
@@ -995,35 +964,20 @@ unsafe fn younglink_sideb_catch_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_specialairs2", category = ACMD_GAME )]
-unsafe fn younglink_sideb_catch_air_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 5.0);
-    if macros::is_excute(fighter) {
-        CancelModule::enable_cancel(fighter.module_accessor);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 22.0);
-    if macros::is_excute(fighter) {
-        ArticleModule::remove_exist(fighter.module_accessor, *FIGHTER_YOUNGLINK_GENERATE_ARTICLE_BOOMERANG, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
-    }
-}
-
-#[acmd_script( agent = "younglink_boomerang", script = "game_fly", category = ACMD_GAME )]
-unsafe fn boomerang_thrown(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn boomerang_thrown(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 10.2, 110, 42, 0, 55, 4.3, 0.0, 0.0, 0.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, -4, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
         AttackModule::enable_safe_pos(fighter.module_accessor);
     }
 }
 
-#[acmd_script( agent = "younglink_boomerang", script = "game_turn", category = ACMD_GAME )]
-unsafe fn boomerang_returning(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn boomerang_returning(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.7, 60, 30, 0, 40, 4.0, 0.0, 0.0, 0.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, -1, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_specialhistart", category = ACMD_GAME )]
-unsafe fn younglink_upb_start_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_upb_start_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -1032,16 +986,13 @@ unsafe fn younglink_upb_start_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_specialhihold", category = ACMD_GAME )]
-unsafe fn younglink_upb_hold_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_upb_hold_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_DAMAGE_POWER, 8.5);
     }
 }
 
-
-#[acmd_script( agent = "younglink", script = "effect_specialhihold", category = ACMD_EFFECT, low_priority )]
-unsafe fn younglink_upb_hold_effect_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_upb_hold_effect_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         macros::EFFECT_FOLLOW(fighter, Hash40::new("younglink_kaiten_hold"), Hash40::new("sword"), 0, 0, 0, 0, 0, 0, 1, true);
@@ -1057,8 +1008,7 @@ unsafe fn younglink_upb_hold_effect_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 4.0);
 }
 
-#[acmd_script( agent = "younglink", script = "game_specialhi", category = ACMD_GAME )]
-unsafe fn younglink_upb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_upb_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -1096,8 +1046,7 @@ unsafe fn younglink_upb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_specialairhi", category = ACMD_GAME )]
-unsafe fn younglink_upb_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_upb_air_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -1206,8 +1155,7 @@ unsafe fn younglink_upb_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "younglink", script = "game_speciallw", category = ACMD_GAME )]
-unsafe fn younglink_downb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_downb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     macros::FT_MOTION_RATE(fighter, 0.66666667);
     sv_animcmd::frame(fighter.lua_state_agent, 17.0);
@@ -1227,28 +1175,7 @@ unsafe fn younglink_downb_smash_script(fighter: &mut L2CAgentBase) {
     
 }
 
-#[acmd_script( agent = "younglink", script = "game_specialairlw", category = ACMD_GAME )]
-unsafe fn younglink_downb_air_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-    macros::FT_MOTION_RATE(fighter, 0.66666667);
-    sv_animcmd::frame(fighter.lua_state_agent, 17.0);
-    if macros::is_excute(fighter) {
-        let rand_num = smash::app::sv_math::rand(hash40("fighter"), 19);
-        match rand_num {
-            0 => {
-                ItemModule::have_item(fighter.module_accessor, ItemKind(*ITEM_KIND_DEKU), 0, 0, false, false);
-            },
-            1 => {
-                ItemModule::have_item(fighter.module_accessor, ItemKind(*ITEM_KIND_BOMBCHU), 0, 0, false, false);
-            },
-            _ => WorkModule::on_flag(fighter.module_accessor, *FIGHTER_LINK_STATUS_WORK_ID_FLAG_BOMB_GENERATE_LINKBOMB),
-        }
-        
-    }
-}
-
-#[acmd_script( agent = "younglink", script = "game_appeallwl", category = ACMD_GAME )]
-unsafe fn younglink_downtaunt_left_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn younglink_downtaunt_smash_script(fighter: &mut L2CAgentBase) {
     let rand_num = smash::app::sv_math::rand(hash40("fighter"), 5);
 
     if rand_num == 0 {
@@ -1261,32 +1188,6 @@ unsafe fn younglink_downtaunt_left_smash_script(fighter: &mut L2CAgentBase) {
         if macros::is_excute(fighter) {
             macros::PLAY_SE(fighter, Hash40::new("se_item_homerunbat_l"));
             StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_DOWN, false);
-        }
-    }
-    else {
-        sv_animcmd::frame(fighter.lua_state_agent, 58.0);
-        if macros::is_excute(fighter) {
-            DamageModule::heal(fighter.module_accessor, -1.4, 0);
-            macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_recovery"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
-            macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
-        }
-    }
-}
-
-#[acmd_script( agent = "younglink", script = "game_appeallwr", category = ACMD_GAME )]
-unsafe fn younglink_downtaunt_right_smash_script(fighter: &mut L2CAgentBase) {
-    let rand_num = smash::app::sv_math::rand(hash40("fighter"), 5);
-
-    if rand_num == 0 {
-        sv_animcmd::frame(fighter.lua_state_agent, 58.0);
-        if macros::is_excute(fighter) {
-            DamageModule::add_damage(fighter.module_accessor, 7.0, 0);
-            
-        }
-        sv_animcmd::wait(fighter.lua_state_agent, 1.0);
-        if macros::is_excute(fighter) {
-            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_DOWN, false);
-            macros::PLAY_SE(fighter, Hash40::new("se_item_homerunbat_l"));
         }
     }
     else {
@@ -1300,54 +1201,58 @@ unsafe fn younglink_downtaunt_right_smash_script(fighter: &mut L2CAgentBase) {
 }
 
 pub fn install() {
-    smashline::install_agent_frames!(
-        younglink_frame
-    );
-    smashline::install_acmd_scripts!(
-        younglink_jab_smash_script,
-        younglink_jab2_smash_script,
-        younglink_jab3_smash_script,
-        younglink_jab100_smash_script,
-        younglink_jab100end_smash_script,
-        younglink_dashattack_smash_script,
-        younglink_ftilt_smash_script,
-        younglink_utilt_smash_script,
-        younglink_dtilt_smash_script,
-        younglink_fsmash_smash_script,
-        younglink_fsmash2_smash_script,
-        younglink_usmash_smash_script,
-        younglink_dsmash_smash_script,
-        younglink_nair_smash_script,
-        younglink_fair_smash_script,
-        younglink_bair_smash_script,
-        younglink_uair_smash_script,
-        younglink_dair_smash_script,
-        younglink_grab_smash_script,
-        younglink_grabd_smash_script,
-        younglink_grabp_smash_script,
-        younglink_zair_smash_script,
-        younglink_fthrow_smash_script,
-        younglink_bthrow_smash_script,
-        younglink_uthrow_smash_script,
-        younglink_dthrow_smash_script,
-        fire_arrow,
-        younglink_sideb_smash_script,
-        younglink_sideb_air_smash_script,
-        younglink_sideb_catch_smash_script,
-        younglink_sideb_catch_air_smash_script,
-        boomerang_thrown,
-        boomerang_returning,
-        younglink_upb_start_smash_script,
-        younglink_upb_hold_smash_script,
-        younglink_upb_hold_effect_script,
-        younglink_upb_smash_script,
-        younglink_upb_air_smash_script,
-        younglink_downb_smash_script,
-        younglink_downb_air_smash_script,
-        younglink_downtaunt_left_smash_script,
-        younglink_downtaunt_right_smash_script
-        
+    Agent::new("younglink")
+    .on_line(Main, younglink_frame) //opff
+    .game_acmd("game_attack11", younglink_jab_smash_script)
+    .game_acmd("game_attack12", younglink_jab2_smash_script)
+    .game_acmd("game_attack13", younglink_jab3_smash_script)
+    .game_acmd("game_attack100", younglink_jab100_smash_script)
+    .game_acmd("game_attack100end", younglink_jab100end_smash_script)
+    .game_acmd("game_attackdash", younglink_dashattack_smash_script)
+    .game_acmd("game_attacks3", younglink_ftilt_smash_script)
+    .game_acmd("game_attackhi3", younglink_utilt_smash_script)
+    .game_acmd("game_attacklw3", younglink_dtilt_smash_script)
+    .game_acmd("game_attacks4", younglink_fsmash_smash_script)
+    .game_acmd("game_attacks4s2", younglink_fsmash2_smash_script)
+    .game_acmd("game_attackhi4", younglink_usmash_smash_script)
+    .game_acmd("game_attacklw4", younglink_dsmash_smash_script)
+    .game_acmd("game_attackairn", younglink_nair_smash_script)
+    .game_acmd("game_attackairf", younglink_fair_smash_script)
+    .game_acmd("game_attackairb", younglink_bair_smash_script)
+    .game_acmd("game_attackairhi", younglink_uair_smash_script)
+    .game_acmd("game_attackairlw", younglink_dair_smash_script)
+    .game_acmd("game_catch", younglink_grab_smash_script)
+    .game_acmd("game_catchdash", younglink_grabd_smash_script)
+    .game_acmd("game_catchturn", younglink_grabp_smash_script)
+    .game_acmd("game_aircatch", younglink_zair_smash_script)
+    .game_acmd("game_throwf", younglink_fthrow_smash_script)
+    .game_acmd("game_throwb", younglink_bthrow_smash_script)
+    .game_acmd("game_throwhi", younglink_uthrow_smash_script)
+    .game_acmd("game_throwlw", younglink_dthrow_smash_script)
+    .game_acmd("game_specialnend", younglink_neutralb_end_smash_script)
+    .game_acmd("game_specialairnend", younglink_neutralb_end_smash_script)
+    .game_acmd("game_specials1", younglink_sideb_smash_script)
+    .game_acmd("game_specialairs1", younglink_sideb_smash_script)
+    .game_acmd("game_specials2", younglink_sideb_catch_smash_script)
+    .game_acmd("game_specialairs2", younglink_sideb_catch_smash_script)
+    .game_acmd("game_specialhistart", younglink_upb_start_smash_script)
+    .game_acmd("game_specialhihold", younglink_upb_hold_smash_script)
+    .effect_acmd("effect_specialhihold", younglink_upb_hold_effect_script)
+    .game_acmd("game_specialhi", younglink_upb_smash_script)
+    .game_acmd("game_specialairhi", younglink_upb_air_smash_script)
+    .game_acmd("game_speciallw", younglink_downb_smash_script)
+    .game_acmd("game_specialairlw", younglink_downb_smash_script)
+    .game_acmd("game_appeallwl", younglink_downtaunt_smash_script)
+    .game_acmd("game_appeallwr", younglink_downtaunt_smash_script)
+    .install();
 
-        
-    );
+    Agent::new("younglink_bowarrow")
+    .game_acmd("game_fly", fire_arrow)
+    .install();
+
+    Agent::new("younglink_boomerang")
+    .game_acmd("game_fly", boomerang_thrown)
+    .game_acmd("game_turn", boomerang_returning)
+    .install();
+
 }

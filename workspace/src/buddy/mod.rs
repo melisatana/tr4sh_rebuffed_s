@@ -8,6 +8,7 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 use smash::hash40;
+use crate::custom::global_fighter_frame;
 
 static mut BANJO_SLOW_FORWARD_AIR : [bool; 8] = [false; 8];
 static mut BANJO_SLOW_FORWARD_AIR_IN_SLOW : [bool; 8] = [false; 8];
@@ -16,13 +17,12 @@ static mut BANJO_DTHROW_BURY_RECHARGE_TIMER : [i32; 8] = [0; 8];
 static BANJO_DTHROW_BURY_COOLDOWN : i32 = 300; 
 
 // A Once-Per-Fighter-Frame that only applies to Banjo. Neat!
-#[fighter_frame( agent = FIGHTER_KIND_BUDDY )]
-fn banjo_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn banjo_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
 
-        println!("It's a me, buddy, guh-huh!");
 
         if BANJO_SLOW_FORWARD_AIR[entry_id] && status == *FIGHTER_STATUS_KIND_ATTACK_AIR && BANJO_SLOW_FORWARD_AIR_CAN_CANCEL[entry_id] && ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_ATTACK) == false {
             BANJO_SLOW_FORWARD_AIR[entry_id] = false;
@@ -48,15 +48,14 @@ fn banjo_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn banjo_jab_1(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_jab_1(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.2, 361, 26, 15, 20, 3.4, 0.0, 6.0, 4.8, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 2.2, 361, 26, 10, 18, 3.6, 0.0, 6.0, 8.4, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
         macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 2.2, 180, 24, 20, 30, 3.8, 0.0, 6.0, 13.2, Some(0.0), Some(6.0), Some(15.0), 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor,  0, 5.0, false);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor,  1, 5.0, false);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 5.0, false);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 5.0, false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
@@ -65,8 +64,7 @@ unsafe fn banjo_jab_1(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_attack12", category = ACMD_GAME )]
-unsafe fn banjo_jab_2(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_jab_2(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.4, 361, 26, 15, 22, 3.6, 0.0, 6.0, 4.8, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
@@ -90,8 +88,7 @@ unsafe fn banjo_jab_2(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_attack13", category = ACMD_GAME )]
-unsafe fn banjo_jab_3(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_jab_3(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.1, 79, 113, 0, 72, 2.6, 0.0, 6.0, 4.8, None, None, None, 1.7, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
@@ -106,8 +103,7 @@ unsafe fn banjo_jab_3(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_attack100", category = ACMD_GAME )]
-unsafe fn banjo_jab_100(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_jab_100(fighter: &mut L2CAgentBase) {
     for _ in 0..i32::MAX {
         if macros::is_excute(fighter) {
             macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 0.4, 361, 10, 0, 16, 3.8, 0.0, 6.8, 4.0, None, None, None, 0.6, 0.6, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, true, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_HEAD);
@@ -251,8 +247,7 @@ unsafe fn banjo_jab_100(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_attack100end", category = ACMD_GAME )]
-unsafe fn banjo_rapidjab_finisher(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_rapidjab_finisher(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
@@ -270,8 +265,7 @@ unsafe fn banjo_rapidjab_finisher(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn banjo_dashattack(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_dashattack(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 9.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.5, 62, 72, 0, 74, 6.2, 0.0, 6.8, 3.6, None, None, None, 1.25, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_BODY);
@@ -287,8 +281,7 @@ unsafe fn banjo_dashattack(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_attacks3hi", category = ACMD_GAME )]
-unsafe fn banjo_ftilt_up(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_ftilt_up(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_BUDDY_GENERATE_ARTICLE_PARTNER, false, -1);
         ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_BUDDY_GENERATE_ARTICLE_PARTNER, Hash40::new("attack_s3_hi"), false, -1.0);
@@ -320,8 +313,7 @@ unsafe fn banjo_ftilt_up(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_attacks3", category = ACMD_GAME )]
-unsafe fn banjo_ftilt(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_ftilt(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_BUDDY_GENERATE_ARTICLE_PARTNER, false, -1);
         ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_BUDDY_GENERATE_ARTICLE_PARTNER, Hash40::new("attack_s3_s"), false, -1.0);
@@ -353,8 +345,7 @@ unsafe fn banjo_ftilt(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_attacks3lw", category = ACMD_GAME )]
-unsafe fn banjo_ftilt_down(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_ftilt_down(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_BUDDY_GENERATE_ARTICLE_PARTNER, false, -1);
         ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_BUDDY_GENERATE_ARTICLE_PARTNER, Hash40::new("attack_s3_hi"), false, -1.0);
@@ -386,8 +377,7 @@ unsafe fn banjo_ftilt_down(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn banjo_utilt(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_utilt(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::HIT_NO(fighter, 12, *HIT_STATUS_NORMAL);
         macros::HIT_NO(fighter, 13, *HIT_STATUS_NORMAL);
@@ -434,8 +424,7 @@ unsafe fn banjo_utilt(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn banjo_dtilt(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_dtilt(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
     }
@@ -453,8 +442,7 @@ unsafe fn banjo_dtilt(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn banjo_fsmash(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_fsmash(fighter: &mut L2CAgentBase) {
     let rand_num = smash::app::sv_math::rand(hash40("fighter"), 5);
 
     if rand_num == 0 {
@@ -513,8 +501,7 @@ unsafe fn banjo_fsmash(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn banjo_usmash(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_usmash(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor,  *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -546,8 +533,7 @@ unsafe fn banjo_usmash(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn banjo_dsmash(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_dsmash(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor,  *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -571,8 +557,7 @@ unsafe fn banjo_dsmash(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn banjo_nair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_nair(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor,  *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -600,8 +585,7 @@ unsafe fn banjo_nair(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn banjo_fair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_fair(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
@@ -651,8 +635,7 @@ unsafe fn banjo_fair(fighter: &mut L2CAgentBase) {
     }
 }        
 
-#[acmd_script( agent = "buddy", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn banjo_bair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_bair(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor,  *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -693,8 +676,7 @@ unsafe fn banjo_bair(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn banjo_uair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_uair(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor,  *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -715,8 +697,8 @@ unsafe fn banjo_uair(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 9.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
-        macros::ATTACK(fighter, 0, 1, Hash40::new("top"), 7.0, 80, 90, 0, 50, 5.8, 0.0, 13.8, 0.0, None, None, None, 1.0, 1.3, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_BUDDY_WING, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 1, Hash40::new("top"), 7.0, 80, 90, 0, 50, 6.4, 0.0, 20.0, 0.0, None, None, None, 1.0, 1.3, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_BUDDY_WING, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 1, Hash40::new("top"), 7.0, 82, 90, 0, 50, 5.8, 0.0, 13.8, 0.0, None, None, None, 1.0, 1.3, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_BUDDY_WING, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 1, Hash40::new("top"), 7.0, 82, 90, 0, 50, 6.4, 0.0, 20.0, 0.0, None, None, None, 1.0, 1.3, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_BUDDY_WING, *ATTACK_REGION_PUNCH);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
@@ -736,15 +718,14 @@ unsafe fn banjo_uair(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn banjo_dair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_dair(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        WorkModule::on_flag(fighter.module_accessor,  *FIGHTER_STATUS_ATTACK_AIR_FLAG_LANDING_CLEAR_SPEED);
-        WorkModule::on_flag(fighter.module_accessor,  *FIGHTER_INSTANCE_WORK_ID_FLAG_NO_SPEED_OPERATION_CHK);
+        //WorkModule::on_flag(fighter.module_accessor,  *FIGHTER_STATUS_ATTACK_AIR_FLAG_LANDING_CLEAR_SPEED);
+        //WorkModule::on_flag(fighter.module_accessor,  *FIGHTER_INSTANCE_WORK_ID_FLAG_NO_SPEED_OPERATION_CHK);
         macros::SET_SPEED_EX(fighter, 0, 0.8, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
-        WorkModule::off_flag(fighter.module_accessor,  *FIGHTER_INSTANCE_WORK_ID_FLAG_NO_SPEED_OPERATION_CHK);
+        //WorkModule::off_flag(fighter.module_accessor,  *FIGHTER_INSTANCE_WORK_ID_FLAG_NO_SPEED_OPERATION_CHK);
         JostleModule::set_status(fighter.module_accessor, false);
-        KineticModule::suspend_energy(fighter.module_accessor, *FIGHTER_KINETIC_ENERGY_ID_CONTROL);
+        //KineticModule::suspend_energy(fighter.module_accessor, *FIGHTER_KINETIC_ENERGY_ID_CONTROL);
         WorkModule::on_flag(fighter.module_accessor,  *FIGHTER_STATUS_WORK_ID_FLAG_RESERVE_GRAVITY_STABLE_UNABLE);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
@@ -753,9 +734,9 @@ unsafe fn banjo_dair(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 14.0);
     if macros::is_excute(fighter) {
-        WorkModule::on_flag(fighter.module_accessor,  *FIGHTER_INSTANCE_WORK_ID_FLAG_NO_SPEED_OPERATION_CHK);
+        //WorkModule::on_flag(fighter.module_accessor,  *FIGHTER_INSTANCE_WORK_ID_FLAG_NO_SPEED_OPERATION_CHK);
         macros::SET_SPEED_EX(fighter, 0, -3.8, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
-        WorkModule::off_flag(fighter.module_accessor,  *FIGHTER_INSTANCE_WORK_ID_FLAG_NO_SPEED_OPERATION_CHK);
+        //WorkModule::off_flag(fighter.module_accessor,  *FIGHTER_INSTANCE_WORK_ID_FLAG_NO_SPEED_OPERATION_CHK);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 15.0);
     if macros::is_excute(fighter) {
@@ -764,7 +745,7 @@ unsafe fn banjo_dair(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 18.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.8, 270, 50, 0, 30, 6.0, 0.0, -0.8, 0.0, Some(0.0), Some(1.8), Some(0.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_HEAD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.8, 270, 78, 0, 30, 6.0, 0.0, -0.8, 0.0, Some(0.0), Some(1.8), Some(0.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_HEAD);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 46.0);
     if macros::is_excute(fighter) {
@@ -774,17 +755,16 @@ unsafe fn banjo_dair(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 55.0);
     if macros::is_excute(fighter) {
-        KineticModule::resume_energy(fighter.module_accessor, *FIGHTER_KINETIC_ENERGY_ID_CONTROL);
+       // KineticModule::resume_energy(fighter.module_accessor, *FIGHTER_KINETIC_ENERGY_ID_CONTROL);
         WorkModule::off_flag(fighter.module_accessor,  *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 69.0);
     if macros::is_excute(fighter) {
-        WorkModule::off_flag(fighter.module_accessor,  *FIGHTER_STATUS_WORK_ID_FLAG_RESERVE_GRAVITY_STABLE_UNABLE);
+        //WorkModule::off_flag(fighter.module_accessor,  *FIGHTER_STATUS_WORK_ID_FLAG_RESERVE_GRAVITY_STABLE_UNABLE);
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_catch", category = ACMD_GAME )]
-unsafe fn banjo_grab(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_grab(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         GrabModule::set_rebound(fighter.module_accessor, true);
@@ -803,8 +783,7 @@ unsafe fn banjo_grab(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn banjo_grabd(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_grabd(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -826,8 +805,7 @@ unsafe fn banjo_grabd(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn banjo_grabp(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_grabp(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -849,11 +827,10 @@ unsafe fn banjo_grabp(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_catchattack", category = ACMD_GAME )]
-unsafe fn banjo_pummel(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_pummel(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.4, 361, 100, 30, 0, 5.8, 0.0, 8.2, 9.6, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_HEAD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.1, 361, 100, 30, 0, 5.8, 0.0, 8.2, 9.6, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_HEAD);
         AttackModule::set_catch_only_all(fighter.module_accessor, true, false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 1.0);
@@ -863,8 +840,7 @@ unsafe fn banjo_pummel(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn banjo_fthrow(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_fthrow(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 3.0, 52, 60, 0, 68, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -891,10 +867,9 @@ unsafe fn banjo_fthrow(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn banjo_bthrow(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_bthrow(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 9.9, 45, 101, 0, 64, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 8.8, 45, 116, 0, 64, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 13.0);
@@ -918,8 +893,7 @@ unsafe fn banjo_bthrow(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn banjo_uthrow(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_uthrow(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 3.0, 80, 64, 0, 72, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -950,8 +924,7 @@ unsafe fn banjo_uthrow(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn banjo_dthrow(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_dthrow(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -976,8 +949,7 @@ unsafe fn banjo_dthrow(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_specialsdash", category = ACMD_GAME )]
-unsafe fn banjo_sidespecial_dash(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_sidespecial_dash(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor,  *FIGHTER_BUDDY_STATUS_SPECIAL_S_FLAG_SUPER_ARMOR);
         JostleModule::set_status(fighter.module_accessor, false);
@@ -1013,45 +985,7 @@ unsafe fn banjo_sidespecial_dash(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy", script = "game_specialairsdash", category = ACMD_GAME )]
-unsafe fn banjo_sidespecial_air_dash(fighter: &mut L2CAgentBase) {
-    if macros::is_excute(fighter) {
-        WorkModule::on_flag(fighter.module_accessor,  *FIGHTER_BUDDY_STATUS_SPECIAL_S_FLAG_SUPER_ARMOR);
-        JostleModule::set_status(fighter.module_accessor, false);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 22.0, 43, 64, 0, 66, 3.8, 0.0, 4.2, 1.8, Some(0.0), Some(4.2), Some(3.2), 1.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 50, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_BODY);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 22.0, 43, 64, 0, 66, 4.2, 0.0, 9.2, 3.8, Some(0.0), Some(9.2), Some(5.4), 1.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 50, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_BODY);
-        AttackModule::set_captured_same_time_attack(fighter.module_accessor, 0, true);
-        AttackModule::set_captured_same_time_attack(fighter.module_accessor, 1, true);
-        AttackModule::set_captured_same_time_attack_damage_mul(fighter.module_accessor, 0, 0.25);
-        AttackModule::set_captured_same_time_attack_damage_mul(fighter.module_accessor, 1, 0.25);
-        macros::QUAKE(fighter, *CAMERA_QUAKE_KIND_S);
-        macros::HIT_NO(fighter, 0, *HIT_STATUS_INVINCIBLE);
-        macros::HIT_NO(fighter, 1, *HIT_STATUS_INVINCIBLE);
-        macros::HIT_NO(fighter, 2, *HIT_STATUS_INVINCIBLE);
-        macros::HIT_NO(fighter, 3, *HIT_STATUS_INVINCIBLE);
-        macros::HIT_NO(fighter, 4, *HIT_STATUS_INVINCIBLE);
-        macros::HIT_NO(fighter, 5, *HIT_STATUS_INVINCIBLE);
-        macros::HIT_NO(fighter, 6, *HIT_STATUS_INVINCIBLE);
-        macros::HIT_NO(fighter, 7, *HIT_STATUS_INVINCIBLE);
-        macros::HIT_NO(fighter, 8, *HIT_STATUS_INVINCIBLE);
-        macros::HIT_NO(fighter, 9, *HIT_STATUS_INVINCIBLE);
-        macros::HIT_NO(fighter, 10, *HIT_STATUS_INVINCIBLE);
-        macros::HIT_NO(fighter, 11, *HIT_STATUS_NORMAL);
-        WorkModule::on_flag(fighter.module_accessor,  *FIGHTER_BUDDY_STATUS_SPECIAL_S_FLAG_CLIFF_CHECK);
-    }
-    sv_animcmd::wait(fighter.lua_state_agent, 18.0);
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 16.0, 43, 57, 0, 66, 3.8, 0.0, 4.2, 1.8, Some(0.0), Some(4.2), Some(3.2), 1.15, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 50, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_BODY);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 16.0, 43, 57, 0, 66, 4.2, 0.0, 9.2, 3.8, Some(0.0), Some(9.2), Some(5.4), 1.15, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 50, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_BODY);
-        AttackModule::set_captured_same_time_attack(fighter.module_accessor, 0, true);
-        AttackModule::set_captured_same_time_attack(fighter.module_accessor, 1, true);
-        AttackModule::set_captured_same_time_attack_damage_mul(fighter.module_accessor, 0, 0.25);
-        AttackModule::set_captured_same_time_attack_damage_mul(fighter.module_accessor, 1, 0.25);
-    }
-}
-
-#[acmd_script( agent = "buddy", script = "game_specialhi", category = ACMD_GAME )]
-unsafe fn banjo_upspecial_launch(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_upspecial_launch(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ArticleModule::shoot_exist(fighter.module_accessor, *FIGHTER_BUDDY_GENERATE_ARTICLE_PAD, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL), false);
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 6.9, 67, 96, 0, 69, 10.0, 0.0, 12.0, 0.0, None, None, None, 1.0, 1.2, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_BODY);
@@ -1072,8 +1006,7 @@ unsafe fn banjo_upspecial_launch(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy_bullet", script = "game_missile", category = ACMD_GAME )]
-unsafe fn banjo_egg(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_egg(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.7, 78, 30, 0, 72, 4.6, 0.0, 0.0, 0.0, None, None, None, 1.45, 0.8, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, -1.5, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
         AttackModule::enable_safe_pos(fighter.module_accessor);
@@ -1088,8 +1021,7 @@ unsafe fn banjo_egg(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy_bullet", script = "game_bakyun", category = ACMD_GAME )]
-unsafe fn banjo_rapidegg(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_rapidegg(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.2, 86, 32, 0, 72, 3.6, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, -0.7, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
         AttackModule::enable_safe_pos(fighter.module_accessor);
@@ -1111,8 +1043,7 @@ unsafe fn banjo_rapidegg(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy_bullet", script = "game_bakyunw1", category = ACMD_GAME )]
-unsafe fn banjo_rapidegg_w1(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_rapidegg_w1(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.0, 86, 32, 0, 72, 3.6, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, -0.7, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
         AttackModule::enable_safe_pos(fighter.module_accessor);
@@ -1134,8 +1065,7 @@ unsafe fn banjo_rapidegg_w1(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "buddy_bullet", script = "game_bakyunw2", category = ACMD_GAME )]
-unsafe fn banjo_rapidegg_w2(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn banjo_rapidegg_w2(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.8, 86, 32, 0, 72, 3.6, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, -0.7, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
         AttackModule::enable_safe_pos(fighter.module_accessor);
@@ -1158,43 +1088,46 @@ unsafe fn banjo_rapidegg_w2(fighter: &mut L2CAgentBase) {
 }
 
 pub fn install() {
-    smashline::install_agent_frames!(
-        banjo_frame
-    );
-    smashline::install_acmd_scripts!(
-        banjo_jab_1,
-        banjo_jab_2,
-        banjo_jab_3,
-        banjo_jab_100,
-        banjo_rapidjab_finisher,
-        banjo_dashattack,
-        banjo_ftilt_up,
-        banjo_ftilt,
-        banjo_ftilt_down,
-        banjo_utilt,
-        banjo_dtilt,
-        banjo_fsmash,
-        banjo_usmash,
-        banjo_dsmash,
-        banjo_nair,
-        banjo_fair,
-        banjo_bair,
-        banjo_uair,
-        banjo_dair,
-        banjo_grab,
-        banjo_grabd,
-        banjo_grabp,
-        banjo_pummel,
-        banjo_fthrow,
-        banjo_bthrow,
-        banjo_uthrow,
-        banjo_dthrow,
-        banjo_sidespecial_dash,
-        banjo_sidespecial_air_dash,
-        banjo_upspecial_launch,
-        banjo_egg,
-        banjo_rapidegg,
-        banjo_rapidegg_w1,
-        banjo_rapidegg_w2
-    );
+    Agent::new("buddy")
+    .on_line(Main, banjo_frame) //opff
+    .game_acmd("game_attack11", banjo_jab_1)
+    .game_acmd("game_attack12", banjo_jab_2)
+    .game_acmd("game_attack13", banjo_jab_3)
+    .game_acmd("game_attack100", banjo_jab_100)
+    .game_acmd("game_attack100end", banjo_rapidjab_finisher)
+    .game_acmd("game_attackdash", banjo_dashattack)
+    .game_acmd("game_attacks3", banjo_ftilt)
+    .game_acmd("game_attacks3hi", banjo_ftilt_up)
+    .game_acmd("game_attacks3lw", banjo_ftilt_down)
+    .game_acmd("game_attackhi3", banjo_utilt)
+    .game_acmd("game_attacklw3", banjo_dtilt)
+    .game_acmd("game_attacks4", banjo_fsmash)
+    .game_acmd("game_attackhi4", banjo_usmash)
+    .game_acmd("game_attacklw4", banjo_dsmash)
+    .game_acmd("game_attackairn", banjo_nair)
+    .game_acmd("game_attackairf", banjo_fair)
+    .game_acmd("game_attackairb", banjo_bair)
+    .game_acmd("game_attackairhi", banjo_uair)
+    .game_acmd("game_attackairlw", banjo_dair)
+    .game_acmd("game_catch", banjo_grab)
+    .game_acmd("game_catchdash", banjo_grabd)
+    .game_acmd("game_catchturn", banjo_grabp)
+    .game_acmd("game_catchattack", banjo_pummel)
+    .game_acmd("game_throwf", banjo_fthrow)
+    .game_acmd("game_throwb", banjo_bthrow)
+    .game_acmd("game_throwhi", banjo_uthrow)
+    .game_acmd("game_throwlw", banjo_dthrow)
+    .game_acmd("game_specialsdash", banjo_sidespecial_dash)
+    .game_acmd("game_specialairsdash", banjo_sidespecial_dash)
+    .game_acmd("game_specialhi", banjo_upspecial_launch)
+    .install();
+
+    Agent::new("buddy_bullet")
+    .game_acmd("game_missile", banjo_egg)
+    .game_acmd("game_bakyun", banjo_rapidegg)
+    .game_acmd("game_bakyunw1", banjo_rapidegg_w1)
+    .game_acmd("game_bakyunw2", banjo_rapidegg_w2)
+    .install();
+
+
 }

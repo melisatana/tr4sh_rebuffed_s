@@ -7,20 +7,22 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
+use crate::custom::global_fighter_frame;
 
 static mut DEMON_UPB_HAS_CANCELLED : [bool; 8] = [false; 8];
 
 static mut DEMON_UPTAUNT_IS_TAUNTING : [bool; 8] = [false; 8];
 
+static mut DEMON_SPINNINGDEMON_COUNT : [i32; 8] = [0; 8];
 
 // A Once-Per-Fighter-Frame that only applies to Kazuya
-#[fighter_frame( agent = FIGHTER_KIND_DEMON )]
-fn demon_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn demon_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
 
-        println!("Kazuya Mishima");
+        //println!("Kazuya Mishima");
 
 
         if DEMON_UPB_HAS_CANCELLED[entry_id] {
@@ -43,12 +45,15 @@ fn demon_frame(fighter: &mut L2CFighterCommon) {
                 }
             }
         }
+
+        if sv_information::is_ready_go() == false || status != *FIGHTER_DEMON_STATUS_KIND_ATTACK_STEP_2S {
+            DEMON_SPINNINGDEMON_COUNT[entry_id] = 0 ;
+        }
         
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn demon_jab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.5, 361, 10, 15, 30, 2.0, 0.0, 14.5, 9.0, None, None, None, 0.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new_raw(0x193bdcb0cc), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_DEMON_PUNCH01, *ATTACK_REGION_PUNCH);
@@ -74,8 +79,7 @@ unsafe fn demon_jab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }   
 
-#[acmd_script( agent = "demon", script = "game_attack12", category = ACMD_GAME )]
-unsafe fn demon_jab2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_jab2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         JostleModule::set_push_speed_x_overlap_rate(fighter.module_accessor, 20.0);
@@ -109,8 +113,7 @@ unsafe fn demon_jab2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_flashpunch", category = ACMD_GAME )]
-unsafe fn demon_jab3_flashpunch_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_jab3_flashpunch_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 1, Hash40::new("top"), 0.0, 361, 100, 35, 0, 4.0, 0.0, 5.0, 4.0, Some(0.0), Some(5.0), Some(5.0), 0.0, 0.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, f32::NAN, 0.0, 0, false, false, true, true, false, *COLLISION_SITUATION_MASK_GA_d, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
@@ -127,8 +130,7 @@ unsafe fn demon_jab3_flashpunch_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_attack13", category = ACMD_GAME )]
-unsafe fn demon_jab3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_jab3_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_ENABLE_COMBO);
     }
@@ -151,8 +153,7 @@ unsafe fn demon_jab3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_attack14", category = ACMD_GAME )]
-unsafe fn demon_jab4_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_jab4_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_ENABLE_COMBO);
     }
@@ -173,8 +174,7 @@ unsafe fn demon_jab4_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_attack15", category = ACMD_GAME )]
-unsafe fn demon_jab5_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_jab5_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_ENABLE_COMBO);
     }
@@ -197,8 +197,7 @@ unsafe fn demon_jab5_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_attack16", category = ACMD_GAME )]
-unsafe fn demon_jab6_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_jab6_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_ENABLE_COMBO);
     }
@@ -232,8 +231,7 @@ unsafe fn demon_jab6_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_attack17", category = ACMD_GAME )]
-unsafe fn demon_jab7_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_jab7_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_ENABLE_COMBO);
     }
@@ -254,8 +252,7 @@ unsafe fn demon_jab7_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_attack18", category = ACMD_GAME )]
-unsafe fn demon_jab8_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_jab8_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_ENABLE_COMBO);
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0);
@@ -280,8 +277,7 @@ unsafe fn demon_jab8_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_attack19", category = ACMD_GAME )]
-unsafe fn demon_jab9_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_jab9_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_ENABLE_COMBO);
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0);
@@ -303,8 +299,7 @@ unsafe fn demon_jab9_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_attack110", category = ACMD_GAME )]
-unsafe fn demon_jab10_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_jab10_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -327,8 +322,7 @@ unsafe fn demon_jab10_smash_script(fighter: &mut L2CAgentBase) {
 }
 
 //normal dash attack
-#[acmd_script( agent = "demon", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn demon_dashattack_1_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_dashattack_1_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("kneel"), HitStatus(*HIT_STATUS_XLU), 0);
@@ -371,9 +365,8 @@ unsafe fn demon_dashattack_1_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-//double forward input dash attack (Left Splits Kick) []
-#[acmd_script( agent = "demon", script = "game_attackstand1", category = ACMD_GAME )]
-unsafe fn demon_dashattack_2_smash_script(fighter: &mut L2CAgentBase) {
+//double forward input dash attack (Left Splits Kick)
+unsafe extern "C" fn demon_dashattack_2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         shield!(fighter, *MA_MSC_CMD_SHIELD_ON, *COLLISION_KIND_REFLECTOR, FIGHTER_DEMON_REFLECTOR_KIND_ATTACK_STAND1, FIGHTER_DEMON_REFLECTOR_GROUP_ATTACK_STAND1);
@@ -382,24 +375,24 @@ unsafe fn demon_dashattack_2_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 12.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 15.5, 84, 40, 0, 58, 3.8, 0.0, 10.5, 10.5, None, None, None, 0.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 15.5, 84, 40, 0, 58, 3.8, 0.0, 11.5, 5.0, None, None, None, 0.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 15.5, 84, 40, 0, 58, 4.2, 0.0, 10.5, 2.5, None, None, None, 0.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 12.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 12.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 12.0, false);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 14.5, 84, 40, 0, 58, 3.8, 0.0, 10.5, 10.5, None, None, None, 0.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 14.5, 84, 40, 0, 58, 3.8, 0.0, 11.5, 5.0, None, None, None, 0.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 14.5, 84, 40, 0, 58, 4.2, 0.0, 10.5, 2.5, None, None, None, 0.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 8.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 8.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 8.0, false);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 1.1);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 1, 1.1);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 2, 1.1);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 13.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 15.5, 84, 40, 0, 58, 3.8, 0.0, 7.25, 7.5, None, None, None, 0.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 15.5, 84, 40, 0, 58, 3.8, 0.0, 11.5, 5.0, None, None, None, 0.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 15.5, 84, 40, 0, 58, 4.2, 0.0, 10.5, 2.5, None, None, None, 0.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 12.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 12.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 12.0, false);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 14.5, 84, 40, 0, 58, 3.8, 0.0, 7.25, 7.5, None, None, None, 0.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 14.5, 84, 40, 0, 58, 3.8, 0.0, 11.5, 5.0, None, None, None, 0.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 14.5, 84, 40, 0, 58, 4.2, 0.0, 10.5, 2.5, None, None, None, 0.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 8.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 8.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 8.0, false);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 1.1);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 1, 1.1);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 2, 1.1);
@@ -417,8 +410,7 @@ unsafe fn demon_dashattack_2_smash_script(fighter: &mut L2CAgentBase) {
 }
 
 //normal ftilt
-#[acmd_script( agent = "demon", script = "game_attacks3", category = ACMD_GAME )]
-unsafe fn demon_ftilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -443,8 +435,7 @@ unsafe fn demon_ftilt_smash_script(fighter: &mut L2CAgentBase) {
 }
 
 //start of Roundhouse to Triple Spin Kicks (↗A x4)
-#[acmd_script( agent = "demon", script = "game_attackstand21", category = ACMD_GAME )]
-unsafe fn demon_ftilt_forward_up_1_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_ftilt_forward_up_1_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_ENABLE_COMBO);
@@ -486,8 +477,7 @@ unsafe fn demon_ftilt_forward_up_1_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_attackstand22", category = ACMD_GAME )]
-unsafe fn demon_ftilt_forward_up_2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_ftilt_forward_up_2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_ENABLE_COMBO);
@@ -527,8 +517,7 @@ unsafe fn demon_ftilt_forward_up_2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_attackstand23", category = ACMD_GAME )]
-unsafe fn demon_ftilt_forward_up_3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_ftilt_forward_up_3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_ENABLE_COMBO);
@@ -553,8 +542,7 @@ unsafe fn demon_ftilt_forward_up_3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_attackstand24", category = ACMD_GAME )]
-unsafe fn demon_ftilt_forward_up_4_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_ftilt_forward_up_4_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -576,8 +564,7 @@ unsafe fn demon_ftilt_forward_up_4_smash_script(fighter: &mut L2CAgentBase) {
 }
 
 //Start of Tsunami Kick (↘A)
-#[acmd_script( agent = "demon", script = "game_attackstand31", category = ACMD_GAME )]
-unsafe fn demon_ftilt_forward_down_1_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_ftilt_forward_down_1_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         JostleModule::set_push_speed_x_overlap_rate(fighter.module_accessor, 0.1);
@@ -622,8 +609,7 @@ unsafe fn demon_ftilt_forward_down_1_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_attackstand32", category = ACMD_GAME )]
-unsafe fn demon_ftilt_forward_down_2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_ftilt_forward_down_2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 13.0);
     if macros::is_excute(fighter) {
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("kneer"), HitStatus(*HIT_STATUS_XLU), 0);
@@ -666,8 +652,7 @@ unsafe fn demon_ftilt_forward_down_2_smash_script(fighter: &mut L2CAgentBase) {
 
 
 //Stature Smash (↙A)
-#[acmd_script( agent = "demon", script = "game_attackstand4", category = ACMD_GAME )]
-unsafe fn demon_back_down_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_back_down_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -705,8 +690,7 @@ unsafe fn demon_back_down_smash_script(fighter: &mut L2CAgentBase) {
 }
 
 //Flash Tornado (←A)
-#[acmd_script( agent = "demon", script = "game_attackstand5", category = ACMD_GAME )]
-unsafe fn demon_btilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_btilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -740,8 +724,7 @@ unsafe fn demon_btilt_smash_script(fighter: &mut L2CAgentBase) {
 }
 
 //Jump Side Kick (↖A)
-#[acmd_script( agent = "demon", script = "game_attackstand6", category = ACMD_GAME )]
-unsafe fn demon_back_upward_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_back_upward_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0);
@@ -774,8 +757,7 @@ unsafe fn demon_back_upward_smash_script(fighter: &mut L2CAgentBase) {
 }
 
 //Twin Pistons (Utilt)
-#[acmd_script( agent = "demon", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn demon_utilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_utilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_ENABLE_COMBO);
@@ -836,8 +818,7 @@ unsafe fn demon_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_attackhi32", category = ACMD_GAME )]
-unsafe fn demon_utilt2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_utilt2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("head"), HitStatus(*HIT_STATUS_XLU), 0);
@@ -883,8 +864,7 @@ unsafe fn demon_utilt2_smash_script(fighter: &mut L2CAgentBase) {
 }
 
 //Neijiri Uraken
-#[acmd_script( agent = "demon", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn demon_dtilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_ENABLE_COMBO);
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -907,7 +887,7 @@ unsafe fn demon_dtilt_smash_script(fighter: &mut L2CAgentBase) {
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 13.3, 85, 15, 0, 85, 4.0, 0.0, 5.0, 11.0, None, None, None, 0.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 4, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_DEMON_ATTACKLW3, *ATTACK_REGION_PUNCH);
         macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 13.3, 85, 15, 0, 85, 3.0, 0.0, 7.0, 8.0, None, None, None, 0.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 4, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_DEMON_ATTACKLW3, *ATTACK_REGION_PUNCH);
         macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 13.3, 85, 15, 0, 85, 2.8, 0.0, 9.0, 5.0, None, None, None, 0.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 4, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_DEMON_ATTACKLW3, *ATTACK_REGION_PUNCH);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 10.0, false);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 8.0, false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
@@ -917,8 +897,7 @@ unsafe fn demon_dtilt_smash_script(fighter: &mut L2CAgentBase) {
 }
 
 //Tombstone Crusher (↓↘A)
-#[acmd_script( agent = "demon", script = "game_attacksquat1", category = ACMD_GAME )]
-unsafe fn demon_crouch_forward_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_crouch_forward_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 13.0);
     if macros::is_excute(fighter) {
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("shoulderr"), HitStatus(*HIT_STATUS_XLU), 0);
@@ -955,8 +934,7 @@ unsafe fn demon_crouch_forward_smash_script(fighter: &mut L2CAgentBase) {
 }
 
 // Crouch Jab (↓A)
-#[acmd_script( agent = "demon", script = "game_attacksquat2", category = ACMD_GAME )]
-unsafe fn demon_crouch_attack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_crouch_attack_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("arml"), HitStatus(*HIT_STATUS_XLU), 0);
@@ -985,8 +963,7 @@ unsafe fn demon_crouch_attack_smash_script(fighter: &mut L2CAgentBase) {
 }
 
 //Crouch Spin Kick (↓↙A)
-#[acmd_script( agent = "demon", script = "game_attacksquat3", category = ACMD_GAME )]
-unsafe fn demon_crouch_backward_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_crouch_backward_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -1015,8 +992,7 @@ unsafe fn demon_crouch_backward_smash_script(fighter: &mut L2CAgentBase) {
 }
 
 //Demon God Fist
-#[acmd_script( agent = "demon", script = "game_attacksquat4", category = ACMD_GAME )]
-unsafe fn demon_crouch_rising_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_crouch_rising_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -1053,8 +1029,7 @@ unsafe fn demon_crouch_rising_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", scripts = ["game_attacks4transform", "game_attacks4"], category = ACMD_GAME, low_priority )]
-unsafe fn demon_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 10.0);
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
@@ -1082,8 +1057,8 @@ unsafe fn demon_fsmash_smash_script(fighter: &mut L2CAgentBase) {
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_NORMAL, 0);
         WorkModule::set_int(fighter.module_accessor, 0, *FIGHTER_DEMON_STATUS_ATTACK_S4_WORK_INT_CRITICAL_HIT_NO);
         WorkModule::set_int(fighter.module_accessor, 1, *FIGHTER_DEMON_STATUS_ATTACK_S4_WORK_INT_CRITICAL_HIT_NO);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 25.4, 361, 82, 0, 50, 3.0, 0.0, 8.5, 4.0, Some(0.0), Some(13.5), Some(4.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_PUNCH02, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("handl"), 25.4, 361, 82, 0, 50, 4.5, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_PUNCH02, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 23.2, 361, 82, 0, 50, 3.0, 0.0, 8.5, 4.0, Some(0.0), Some(13.5), Some(4.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_PUNCH02, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("handl"), 23.2, 361, 82, 0, 50, 4.5, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_PUNCH02, *ATTACK_REGION_PUNCH);
         AttackModule::set_attack_camera_quake_forced(fighter.module_accessor, 0, *CAMERA_QUAKE_KIND_L, false);
         AttackModule::set_attack_camera_quake_forced(fighter.module_accessor, 1, *CAMERA_QUAKE_KIND_L, false);
     }
@@ -1111,8 +1086,7 @@ unsafe fn demon_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     FighterSpecializer_Demon::set_devil(fighter.module_accessor, false, 0.0);
 }
 
-#[acmd_script( agent = "demon", scripts = ["game_attackhi4transform", "game_attackhi4"], category = ACMD_GAME, low_priority )]
-unsafe fn demon_usmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_usmash_smash_script(fighter: &mut L2CAgentBase) {
     FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 10.0);
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     macros::FT_MOTION_RATE(fighter, 0.5);
@@ -1166,10 +1140,7 @@ unsafe fn demon_usmash_smash_script(fighter: &mut L2CAgentBase) {
     FighterSpecializer_Demon::set_devil(fighter.module_accessor, false, 0.0);
 }
 
-
-
-#[acmd_script( agent = "demon", scripts = ["game_attacklw4", "game_attacklw4transform"], category = ACMD_GAME, low_priority )]
-unsafe fn demon_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 10.0);
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     macros::FT_MOTION_RATE(fighter, 0.5);
@@ -1261,30 +1232,46 @@ unsafe fn demon_dsmash_smash_script(fighter: &mut L2CAgentBase) {
 }
 
 //Spinning Demon to Left Hook (→ ↓ ↘ B)
-#[acmd_script( agent = "demon", script = "game_attackstep2s", category = ACMD_GAME )]
-unsafe fn demon_spinning_demon_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_spinning_demon_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+        
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 9.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.0, 65, 100, 55, 0, 1.5, 0.0, 8.25, 0.5, Some(0.0), Some(2.25), Some(0.5), 0.4, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 8, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G_d, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 3.0, 76, 100, 45, 0, 4.0, 0.0, 5.25, 3.0, Some(0.0), Some(5.25), Some(8.25), 0.4, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 8, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 3.0, 63, 100, 46, 0, 4.0, 0.0, 7.5, 3.0, Some(0.0), Some(7.5), Some(7.25), 0.4, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 8, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_A, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 7.0, false);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 1.0, false);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 2, 1.0, false);
+        if DEMON_SPINNINGDEMON_COUNT[entry_id] >= 5 {
+            macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 3.0, 65, 60, 0, 55, 1.5, 0.0, 8.25, 0.5, Some(0.0), Some(2.25), Some(0.5), 0.4, 6.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 8, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G_d, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
+            macros::ATTACK(fighter, 4, 0, Hash40::new("top"), 3.0, 76, 60, 0, 45, 4.0, 0.0, 5.25, 3.0, Some(0.0), Some(5.25), Some(8.25), 0.4, 6.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 8, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
+            macros::ATTACK(fighter, 5, 0, Hash40::new("top"), 3.0, 63, 60, 0, 46, 4.0, 0.0, 7.5, 3.0, Some(0.0), Some(7.5), Some(7.25), 0.4, 6.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 8, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_A, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
+        }
+        else {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.0, 65, 100, 55, 0, 1.5, 0.0, 8.25, 0.5, Some(0.0), Some(2.25), Some(0.5), 0.4, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 8, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G_d, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
+            macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 3.0, 76, 100, 45, 0, 4.0, 0.0, 5.25, 3.0, Some(0.0), Some(5.25), Some(8.25), 0.4, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 8, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
+            macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 3.0, 63, 100, 46, 0, 4.0, 0.0, 7.5, 3.0, Some(0.0), Some(7.5), Some(7.25), 0.4, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 8, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_A, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);    
+            AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 7.0, false);
+            AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 1.0, false);
+            AttackModule::set_add_reaction_frame(fighter.module_accessor, 2, 1.0, false);
+        }
     }
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 3.0, 80, 100, 55, 0, 4.0, 0.0, 5.25, 3.0, Some(0.0), Some(5.25), Some(12.0), 0.4, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 8, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 2.0, false);
+        if DEMON_SPINNINGDEMON_COUNT[entry_id] >= 5 {
+            macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 3.0, 80, 60, 0, 55, 4.0, 0.0, 5.25, 3.0, Some(0.0), Some(5.25), Some(12.0), 0.4, 6.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 8, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK); 
+        }
+        else {
+            macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 3.0, 80, 100, 55, 0, 4.0, 0.0, 5.25, 3.0, Some(0.0), Some(5.25), Some(12.0), 0.4, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 8, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
+            AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 2.0, false);    
+        }
     }
     sv_animcmd::frame(fighter.lua_state_agent, 12.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
         MotionModule::set_rate(fighter.module_accessor, 1.25);
+        if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) {
+            DEMON_SPINNINGDEMON_COUNT[entry_id] += 1;
+        }
     }
     sv_animcmd::frame(fighter.lua_state_agent, 23.0);
     if ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_SPECIAL) {
@@ -1296,6 +1283,7 @@ unsafe fn demon_spinning_demon_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
         MotionModule::set_rate(fighter.module_accessor, 1.0);
+        DEMON_SPINNINGDEMON_COUNT[entry_id] = 0;
     }
     sv_animcmd::frame(fighter.lua_state_agent, 33.0);
     if macros::is_excute(fighter) {
@@ -1313,8 +1301,7 @@ unsafe fn demon_spinning_demon_script(fighter: &mut L2CAgentBase) {
 }
 
 //Wind God Fist (→ ↓ ↘ A tapped) 
-#[acmd_script( agent = "demon", script = "game_attackstep2", category = ACMD_GAME )]
-unsafe fn demon_wind_god_fist_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_wind_god_fist_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("head"), HitStatus(*HIT_STATUS_XLU), 0);
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("bust"), HitStatus(*HIT_STATUS_XLU), 0);
@@ -1352,12 +1339,12 @@ unsafe fn demon_wind_god_fist_script(fighter: &mut L2CAgentBase) {
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 1.2);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 1, 1.2);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 2, 1.2);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 14.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 12.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 12.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 3, 12.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 4, 12.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 5, 12.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 5.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 5.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 5.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 3, 5.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 4, 5.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 5, 5.0, false);
         AttackModule::set_attack_camera_quake_forced(fighter.module_accessor, 0, *CAMERA_QUAKE_KIND_M, false);
         AttackModule::set_attack_camera_quake_forced(fighter.module_accessor, 1, *CAMERA_QUAKE_KIND_M, false);
         AttackModule::set_attack_camera_quake_forced(fighter.module_accessor, 2, *CAMERA_QUAKE_KIND_M, false);
@@ -1376,12 +1363,12 @@ unsafe fn demon_wind_god_fist_script(fighter: &mut L2CAgentBase) {
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 1.2);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 1, 1.2);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 2, 1.2);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 14.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 14.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 14.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 3, 12.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 4, 12.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 5, 12.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 5.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 5.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 5.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 3, 5.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 4, 5.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 5, 5.0, false);
         AttackModule::set_attack_camera_quake_forced(fighter.module_accessor, 0, *CAMERA_QUAKE_KIND_M, false);
         AttackModule::set_attack_camera_quake_forced(fighter.module_accessor, 1, *CAMERA_QUAKE_KIND_M, false);
         AttackModule::set_attack_camera_quake_forced(fighter.module_accessor, 2, *CAMERA_QUAKE_KIND_M, false);
@@ -1400,12 +1387,12 @@ unsafe fn demon_wind_god_fist_script(fighter: &mut L2CAgentBase) {
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 1.2);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 1, 1.2);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 2, 1.2);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 16.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 16.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 16.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 3, 12.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 4, 12.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 5, 12.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 5.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 5.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 5.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 3, 5.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 4, 5.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 5, 5.0, false);
         AttackModule::set_attack_camera_quake_forced(fighter.module_accessor, 0, *CAMERA_QUAKE_KIND_M, false);
         AttackModule::set_attack_camera_quake_forced(fighter.module_accessor, 1, *CAMERA_QUAKE_KIND_M, false);
         AttackModule::set_attack_camera_quake_forced(fighter.module_accessor, 2, *CAMERA_QUAKE_KIND_M, false);
@@ -1422,8 +1409,7 @@ unsafe fn demon_wind_god_fist_script(fighter: &mut L2CAgentBase) {
 }
 
 //Electric Wind God Fist (→ ↓ ↘ A tapped, must be a faster input than normal) 
-#[acmd_script( agent = "demon", script = "game_attackstep2f", category = ACMD_GAME )]
-unsafe fn demon_electric_wind_god_fist_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_electric_wind_god_fist_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -1464,12 +1450,12 @@ unsafe fn demon_electric_wind_god_fist_script(fighter: &mut L2CAgentBase) {
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 1.2);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 1, 1.2);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 2, 1.2);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 17.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 17.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 17.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 3, 13.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 4, 13.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 5, 13.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 9.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 9.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 9.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 3, 7.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 4, 7.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 5, 7.0, false);
         AttackModule::set_attack_camera_quake_forced(fighter.module_accessor, 0, *CAMERA_QUAKE_KIND_L, false);
         AttackModule::set_attack_camera_quake_forced(fighter.module_accessor, 1, *CAMERA_QUAKE_KIND_L, false);
         AttackModule::set_attack_camera_quake_forced(fighter.module_accessor, 2, *CAMERA_QUAKE_KIND_L, false);
@@ -1488,12 +1474,12 @@ unsafe fn demon_electric_wind_god_fist_script(fighter: &mut L2CAgentBase) {
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 1.2);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 1, 1.2);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 2, 1.2);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 17.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 17.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 17.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 3, 13.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 4, 13.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 5, 13.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 9.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 9.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 9.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 3, 7.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 4, 7.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 5, 7.0, false);
         AttackModule::set_attack_camera_quake_forced(fighter.module_accessor, 0, *CAMERA_QUAKE_KIND_L, false);
         AttackModule::set_attack_camera_quake_forced(fighter.module_accessor, 1, *CAMERA_QUAKE_KIND_L, false);
         AttackModule::set_attack_camera_quake_forced(fighter.module_accessor, 2, *CAMERA_QUAKE_KIND_L, false);
@@ -1512,12 +1498,12 @@ unsafe fn demon_electric_wind_god_fist_script(fighter: &mut L2CAgentBase) {
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 1.2);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 1, 1.2);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 2, 1.2);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 17.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 17.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 17.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 3, 13.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 4, 13.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 5, 13.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 9.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 9.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 9.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 3, 7.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 4, 7.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 5, 7.0, false);
         AttackModule::set_attack_camera_quake_forced(fighter.module_accessor, 0, *CAMERA_QUAKE_KIND_L, false);
         AttackModule::set_attack_camera_quake_forced(fighter.module_accessor, 1, *CAMERA_QUAKE_KIND_L, false);
         AttackModule::set_attack_camera_quake_forced(fighter.module_accessor, 2, *CAMERA_QUAKE_KIND_L, false);
@@ -1544,8 +1530,7 @@ unsafe fn demon_electric_wind_god_fist_script(fighter: &mut L2CAgentBase) {
 
 
 //Dragon Uppercut (→ ↓ ↘ A, held)
-#[acmd_script( agent = "demon", script = "game_attackstep2l", category = ACMD_GAME )]
-unsafe fn demon_dragon_uppercut_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_dragon_uppercut_script(fighter: &mut L2CAgentBase) {
     MotionModule::set_rate(fighter.module_accessor, 1.5);
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
@@ -1565,9 +1550,9 @@ unsafe fn demon_dragon_uppercut_script(fighter: &mut L2CAgentBase) {
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("shoulderl"), HitStatus(*HIT_STATUS_XLU), 0);
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("arml"), HitStatus(*HIT_STATUS_XLU), 0);
         AttackModule::set_damage_shake_scale(fighter.module_accessor, 1.5);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("handl"), 22.0, 60, 70, 0, 85, 3.0, 0.0, 0.0, 0.0, None, None, None, 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_PUNCH02, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 22.0, 60, 70, 0, 85, 5.25, 0.0, 10.5, 4.75, Some(0.0), Some(16.0), Some(7.0), 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_PUNCH02, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 22.0, 60, 70, 0, 85, 5.25, 0.0, 5.0, 2.5, Some(0.0), Some(10.5), Some(4.75), 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_PUNCH02, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("handl"), 22.0, 60, 77, 0, 85, 3.0, 0.0, 0.0, 0.0, None, None, None, 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_PUNCH02, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 22.0, 60, 77, 0, 85, 5.25, 0.0, 10.5, 4.75, Some(0.0), Some(16.0), Some(7.0), 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_PUNCH02, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 22.0, 60, 77, 0, 85, 5.25, 0.0, 5.0, 2.5, Some(0.0), Some(10.5), Some(4.75), 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_PUNCH02, *ATTACK_REGION_PUNCH);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 0.5);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 1, 0.5);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 2, 0.5);
@@ -1579,8 +1564,8 @@ unsafe fn demon_dragon_uppercut_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         AttackModule::clear(fighter.module_accessor, 2, false);
         AttackModule::set_damage_shake_scale(fighter.module_accessor, 1.0);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("handl"), 22.0, 60, 70, 0, 85, 3.0, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(0.1), 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_PUNCH02, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 22.0, 60, 70, 0, 85, 5.0, 0.0, 13.0, 3.0, Some(0.0), Some(23.0), Some(3.0), 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_PUNCH02, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("handl"), 22.0, 60, 77, 0, 85, 3.0, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(0.1), 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_PUNCH02, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 22.0, 60, 77, 0, 85, 5.0, 0.0, 13.0, 3.0, Some(0.0), Some(23.0), Some(3.0), 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_PUNCH02, *ATTACK_REGION_PUNCH);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 0.5);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 1, 0.5);
         AttackModule::set_attack_camera_quake_forced(fighter.module_accessor, 0, *CAMERA_QUAKE_KIND_L, false);
@@ -1588,8 +1573,8 @@ unsafe fn demon_dragon_uppercut_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 24.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("handl"), 22.0, 60, 70, 0, 85, 3.0, 0.0, 0.0, 0.0, None, None, None, 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_PUNCH02, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 22.0, 60, 70, 0, 85, 5.0, 0.0, 14.0, 3.0, Some(0.0), Some(24.0), Some(3.0), 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_PUNCH02, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("handl"), 22.0, 60, 77, 0, 85, 3.0, 0.0, 0.0, 0.0, None, None, None, 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_PUNCH02, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 22.0, 60, 77, 0, 85, 5.0, 0.0, 14.0, 3.0, Some(0.0), Some(24.0), Some(3.0), 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_PUNCH02, *ATTACK_REGION_PUNCH);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 0.5);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 1, 0.5);
         AttackModule::set_attack_camera_quake_forced(fighter.module_accessor, 0, *CAMERA_QUAKE_KIND_L, false);
@@ -1598,8 +1583,8 @@ unsafe fn demon_dragon_uppercut_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 25.0);
     if macros::is_excute(fighter) {
         HitModule::set_status_all(fighter.module_accessor, HitStatus(*HIT_STATUS_NORMAL), 0);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("handl"), 22.0, 60, 70, 0, 85, 3.0, 0.0, 0.0, 0.0, None, None, None, 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_PUNCH02, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 22.0, 60, 70, 0, 85, 5.0, 0.0, 21.0, 3.0, Some(0.0), Some(24.0), Some(3.0), 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_PUNCH02, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("handl"), 22.0, 60, 77, 0, 85, 3.0, 0.0, 0.0, 0.0, None, None, None, 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_PUNCH02, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 22.0, 60, 77, 0, 85, 5.0, 0.0, 21.0, 3.0, Some(0.0), Some(24.0), Some(3.0), 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_PUNCH02, *ATTACK_REGION_PUNCH);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 0.5);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 1, 0.5);
         AttackModule::set_attack_camera_quake_forced(fighter.module_accessor, 0, *CAMERA_QUAKE_KIND_M, false);
@@ -1607,7 +1592,7 @@ unsafe fn demon_dragon_uppercut_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 26.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 22.0, 60, 70, 0, 85, 5.0, 0.0, 21.5, 3.0, Some(0.0), Some(24.5), Some(3.0), 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_PUNCH02, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 22.0, 60, 77, 0, 85, 5.0, 0.0, 21.5, 3.0, Some(0.0), Some(24.5), Some(3.0), 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_PUNCH02, *ATTACK_REGION_PUNCH);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 0.5);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 1, 0.5);
         AttackModule::set_attack_camera_quake_forced(fighter.module_accessor, 0, *CAMERA_QUAKE_KIND_M, false);
@@ -1628,8 +1613,7 @@ unsafe fn demon_dragon_uppercut_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn demon_nair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_nair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -1669,17 +1653,16 @@ unsafe fn demon_nair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn demon_fair_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 5.0);
+unsafe extern "C" fn demon_fair_smash_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 9.7, 48, 80, 0, 35, 4.5, 0.0, 6.5, 11.5, None, None, None, 0.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 9.7, 48, 80, 0, 35, 3.5, 0.0, 8.0, 0.5, None, None, None, 0.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 9.7, 48, 80, 0, 35, 3.0, 0.0, 7.5, 6.0, None, None, None, 0.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 9.7, 48, 80, 0, 35, 3.5, 0.0, 8.0, 0.5, None, None, None, 0.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 10.5, 48, 100, 0, 35, 4.5, 0.0, 6.5, 11.5, None, None, None, 0.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 2.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 2.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 2, 2.0, false);
@@ -1695,8 +1678,7 @@ unsafe fn demon_fair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn demon_bair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_bair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -1727,8 +1709,7 @@ unsafe fn demon_bair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn demon_uair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_uair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -1753,8 +1734,7 @@ unsafe fn demon_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn demon_dair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_dair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_KEEP_AIR);
     }
@@ -1844,8 +1824,7 @@ unsafe fn demon_dair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_catch", category = ACMD_GAME )]
-unsafe fn demon_grab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_grab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         GrabModule::set_rebound(fighter.module_accessor, true);
@@ -1864,8 +1843,7 @@ unsafe fn demon_grab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn demon_grabd_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_grabd_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -1887,8 +1865,7 @@ unsafe fn demon_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn demon_grabp_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_grabp_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -1910,8 +1887,7 @@ unsafe fn demon_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_catchcommand", category = ACMD_GAME )]
-unsafe fn demon_grab_command_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_grab_command_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 0.75);
@@ -1939,8 +1915,7 @@ unsafe fn demon_grab_command_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_catchattack", category = ACMD_GAME )]
-unsafe fn demon_pummel_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_pummel_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.4, 361, 100, 30, 0, 5.0, 0.0, 10.0, 10.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_DEMON_CATCHATTACK, *ATTACK_REGION_PUNCH);
@@ -1952,8 +1927,7 @@ unsafe fn demon_pummel_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn demon_fthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 3.5, 30, 130, 0, 70, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -1988,8 +1962,7 @@ unsafe fn demon_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn demon_bthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         PostureModule::reverse_lr(fighter.module_accessor);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 6.0, 280, 120, 0, 25, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -2009,8 +1982,7 @@ unsafe fn demon_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn demon_uthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 10.0);
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 2.0, 76, 45, 10, 65, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -2050,8 +2022,7 @@ unsafe fn demon_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     FighterSpecializer_Demon::set_devil(fighter.module_accessor, false, 0.0);
 }
 
-#[acmd_script( agent = "demon", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn demon_dthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 2.0, 72, 120, 0, 53, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -2073,8 +2044,7 @@ unsafe fn demon_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_throwcommand", category = ACMD_GAME )]
-unsafe fn demon_commandthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_commandthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         PostureModule::reverse_lr(fighter.module_accessor);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 4.9, 170, 140, 0, 75, 0.0, 1.0, *ATTACK_LR_CHECK_B, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -2117,8 +2087,7 @@ unsafe fn demon_commandthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_specialnstart", category = ACMD_GAME )]
-unsafe fn demon_neutralb_start_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_neutralb_start_smash_script(fighter: &mut L2CAgentBase) {
     FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 10.0);
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
@@ -2134,8 +2103,7 @@ unsafe fn demon_neutralb_start_smash_script(fighter: &mut L2CAgentBase) {
     FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 3.0);
 }
 
-#[acmd_script( agent = "demon", script = "game_specialairnstart", category = ACMD_GAME )]
-unsafe fn demon_neutralb_start_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_neutralb_start_air_smash_script(fighter: &mut L2CAgentBase) {
     FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 10.0);
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
@@ -2151,12 +2119,11 @@ unsafe fn demon_neutralb_start_air_smash_script(fighter: &mut L2CAgentBase) {
     FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 3.0);
 }
 
-#[acmd_script( agent = "demon", script = "game_specialn", category = ACMD_GAME )]
-unsafe fn demon_neutralb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_neutralb_smash_script(fighter: &mut L2CAgentBase) {
     FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 2.0);
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.6666666667);
+        macros::FT_MOTION_RATE(fighter, 0.5);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 11.0);
     if macros::is_excute(fighter) {
@@ -2183,75 +2150,10 @@ unsafe fn demon_neutralb_smash_script(fighter: &mut L2CAgentBase) {
     FighterSpecializer_Demon::set_devil(fighter.module_accessor, false, 0.0);
 }
 
-#[acmd_script( agent = "demon", script = "game_specialnhi", category = ACMD_GAME )]
-unsafe fn demon_neutralb_hi_smash_script(fighter: &mut L2CAgentBase) {
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 2.0);
-    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+unsafe extern "C" fn laser_ground_neutral(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.6666666667);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 11.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.869565217);
-        ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_DEMON_GENERATE_ARTICLE_BLASTER, false, -1);
-        ArticleModule::shoot_exist(fighter.module_accessor, *FIGHTER_DEMON_GENERATE_ARTICLE_BLASTER, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL), false);
-        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_DEMON_STATUS_SPECIAL_N_FLAG_FOLLOW_SCALING);
-        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_DEMON_STATUS_SPECIAL_N_FLAG_FOLLOW_NODE);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 30.0);
-    if macros::is_excute(fighter) {
-        WorkModule::off_flag(fighter.module_accessor, *FIGHTER_DEMON_STATUS_SPECIAL_N_FLAG_FOLLOW_SCALING);
-        WorkModule::off_flag(fighter.module_accessor, *FIGHTER_DEMON_STATUS_SPECIAL_N_FLAG_FOLLOW_NODE);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 60.0);
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 3.0);
-    sv_animcmd::frame(fighter.lua_state_agent, 64.0);
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 5.0);
-    sv_animcmd::frame(fighter.lua_state_agent, 65.0);
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 7.0);
-    sv_animcmd::frame(fighter.lua_state_agent, 66.0);
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 8.0);
-    sv_animcmd::frame(fighter.lua_state_agent, 67.0);
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, false, 0.0);
-}
-
-#[acmd_script( agent = "demon", script = "game_specialnlw", category = ACMD_GAME )]
-unsafe fn demon_neutralb_lw_smash_script(fighter: &mut L2CAgentBase) {
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 2.0);
-    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.6666666667);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 11.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.869565217);
-        ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_DEMON_GENERATE_ARTICLE_BLASTER, false, -1);
-        ArticleModule::shoot_exist(fighter.module_accessor, *FIGHTER_DEMON_GENERATE_ARTICLE_BLASTER, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL), false);
-        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_DEMON_STATUS_SPECIAL_N_FLAG_FOLLOW_SCALING);
-        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_DEMON_STATUS_SPECIAL_N_FLAG_FOLLOW_NODE);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 30.0);
-    if macros::is_excute(fighter) {
-        WorkModule::off_flag(fighter.module_accessor, *FIGHTER_DEMON_STATUS_SPECIAL_N_FLAG_FOLLOW_SCALING);
-        WorkModule::off_flag(fighter.module_accessor, *FIGHTER_DEMON_STATUS_SPECIAL_N_FLAG_FOLLOW_NODE);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 60.0);
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 3.0);
-    sv_animcmd::frame(fighter.lua_state_agent, 64.0);
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 5.0);
-    sv_animcmd::frame(fighter.lua_state_agent, 65.0);
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 7.0);
-    sv_animcmd::frame(fighter.lua_state_agent, 66.0);
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 8.0);
-    sv_animcmd::frame(fighter.lua_state_agent, 67.0);
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, false, 0.0);
-}
-
-#[acmd_script( agent = "demon_blaster", script = "game_flyn", category = ACMD_GAME )]
-unsafe fn laser_ground_neutral(fighter: &mut L2CAgentBase) {
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.4, 50, 85, 0, 30, 1.0, 0.0, -1.5, 0.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 11.4, 50, 85, 0, 30, 7.0, 0.0, -3.0, 6.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.4, 50, 85, 0, 30, 1.0, 0.0, -1.5, 0.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 12.4, 50, 85, 0, 30, 7.0, 0.0, -3.0, 6.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 1.1);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 1, 1.1);
         AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 0.1, false);
@@ -2259,16 +2161,15 @@ unsafe fn laser_ground_neutral(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         AttackModule::clear(fighter.module_accessor, 1, false);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.0, 50, 85, 0, 30, 3.0, 0.0, -1.5, -1.0, Some(0.0), Some(-1.5), Some(-11.0), 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.4, 50, 85, 0, 30, 3.0, 0.0, -1.5, -1.0, Some(0.0), Some(-1.5), Some(-11.0), 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
         AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 10.0, false);
     }
 }
 
-#[acmd_script( agent = "demon_blaster", script = "game_flyhi", category = ACMD_GAME )]
-unsafe fn laser_ground_hi(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn laser_ground_hi(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.4, 50, 85, 0, 30, 1.0, 0.0, 0.0, 0.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 11.4, 50, 85, 0, 30, 7.0, 0.0, -3.0, 6.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.4, 50, 85, 0, 30, 1.0, 0.0, 0.0, 0.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 12.4, 50, 85, 0, 30, 7.0, 0.0, -3.0, 6.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 1.1);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 1, 1.1);
         AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 0.1, false);
@@ -2276,16 +2177,15 @@ unsafe fn laser_ground_hi(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         AttackModule::clear(fighter.module_accessor, 1, false);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.4, 50, 85, 0, 30, 2.5, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(-10.0), 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.4, 50, 85, 0, 30, 2.5, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(-10.0), 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
         AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 10.0, false);
     }
 }
 
-#[acmd_script( agent = "demon_blaster", script = "game_flylw", category = ACMD_GAME )]
-unsafe fn laser_ground_lw(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn laser_ground_lw(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.4, 50, 85, 0, 30, 1.0, 0.0, 0.0, 0.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 11.4, 50, 85, 0, 30, 7.0, 0.0, -3.0, 6.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.4, 50, 85, 0, 30, 1.0, 0.0, 0.0, 0.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 12.4, 50, 85, 0, 30, 7.0, 0.0, -3.0, 6.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 1.1);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 1, 1.1);
         AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 0.1, false);
@@ -2293,15 +2193,18 @@ unsafe fn laser_ground_lw(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         AttackModule::clear(fighter.module_accessor, 1, false);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.4, 50, 85, 0, 30, 2.5, 0.0, 0.0, -1.0, Some(0.0), Some(0.0), Some(-11.0), 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.4, 50, 85, 0, 30, 2.5, 0.0, 0.0, -1.0, Some(0.0), Some(0.0), Some(-11.0), 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
         AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 10.0, false);
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_specialairn", category = ACMD_GAME )]
-unsafe fn demon_neutralb_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_neutralb_air_smash_script(fighter: &mut L2CAgentBase) {
     FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 2.0);
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
+    if macros::is_excute(fighter) {
+        macros::FT_MOTION_RATE(fighter, 0.5);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 11.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.6666666667);
     }
@@ -2335,85 +2238,11 @@ unsafe fn demon_neutralb_air_smash_script(fighter: &mut L2CAgentBase) {
     FighterSpecializer_Demon::set_devil(fighter.module_accessor, false, 0.0);
 }
 
-#[acmd_script( agent = "demon", script = "game_specialairnhi", category = ACMD_GAME )]
-unsafe fn demon_neutralb_air_hi_smash_script(fighter: &mut L2CAgentBase) {
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 2.0);
-    sv_animcmd::frame(fighter.lua_state_agent, 2.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.6666666667);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 14.0);
-    if macros::is_excute(fighter) {
-        ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_DEMON_GENERATE_ARTICLE_BLASTER, false, -1);
-        ArticleModule::shoot_exist(fighter.module_accessor, *FIGHTER_DEMON_GENERATE_ARTICLE_BLASTER, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL), false);
-        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_DEMON_STATUS_SPECIAL_N_FLAG_FOLLOW_NODE);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 28.0);
-    if macros::is_excute(fighter) {
-        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_DEMON_STATUS_SPECIAL_N_FLAG_ENABLE_CONTROL_ENERGY);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 30.0);
-    if macros::is_excute(fighter) {
-        WorkModule::off_flag(fighter.module_accessor, *FIGHTER_DEMON_STATUS_SPECIAL_N_FLAG_FOLLOW_NODE);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 43.0);
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 3.0);
-    sv_animcmd::frame(fighter.lua_state_agent, 46.0);
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 4.0);
-    sv_animcmd::frame(fighter.lua_state_agent, 50.0);
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 5.0);
-    sv_animcmd::frame(fighter.lua_state_agent, 54.0);
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 6.0);
-    sv_animcmd::frame(fighter.lua_state_agent, 56.0);
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 7.0);
-    sv_animcmd::frame(fighter.lua_state_agent, 58.0);
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 8.0);
-    sv_animcmd::frame(fighter.lua_state_agent, 60.0);
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, false, 0.0);
-}
 
-#[acmd_script( agent = "demon", script = "game_specialairnlw", category = ACMD_GAME )]
-unsafe fn demon_neutralb_air_lw_smash_script(fighter: &mut L2CAgentBase) {
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 2.0);
-    sv_animcmd::frame(fighter.lua_state_agent, 2.0);
+unsafe extern "C" fn laser_air_neutral(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.6666666667);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 14.0);
-    if macros::is_excute(fighter) {
-        ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_DEMON_GENERATE_ARTICLE_BLASTER, false, -1);
-        ArticleModule::shoot_exist(fighter.module_accessor, *FIGHTER_DEMON_GENERATE_ARTICLE_BLASTER, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL), false);
-        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_DEMON_STATUS_SPECIAL_N_FLAG_FOLLOW_NODE);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 28.0);
-    if macros::is_excute(fighter) {
-        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_DEMON_STATUS_SPECIAL_N_FLAG_ENABLE_CONTROL_ENERGY);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 30.0);
-    if macros::is_excute(fighter) {
-        WorkModule::off_flag(fighter.module_accessor, *FIGHTER_DEMON_STATUS_SPECIAL_N_FLAG_FOLLOW_NODE);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 43.0);
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 3.0);
-    sv_animcmd::frame(fighter.lua_state_agent, 46.0);
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 4.0);
-    sv_animcmd::frame(fighter.lua_state_agent, 50.0);
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 5.0);
-    sv_animcmd::frame(fighter.lua_state_agent, 54.0);
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 6.0);
-    sv_animcmd::frame(fighter.lua_state_agent, 56.0);
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 7.0);
-    sv_animcmd::frame(fighter.lua_state_agent, 58.0);
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 8.0);
-    sv_animcmd::frame(fighter.lua_state_agent, 60.0);
-    FighterSpecializer_Demon::set_devil(fighter.module_accessor, false, 0.0);
-}
-
-#[acmd_script( agent = "demon_blaster", script = "game_flyairn", category = ACMD_GAME )]
-unsafe fn laser_air_neutral(fighter: &mut L2CAgentBase) {
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.4, 50, 85, 0, 30, 1.0, 0.0, 0.0, 0.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 11.4, 50, 85, 0, 30, 7.0, 0.0, -3.0, 6.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.4, 50, 85, 0, 30, 1.0, 0.0, 0.0, 0.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 12.4, 50, 85, 0, 30, 7.0, 0.0, -3.0, 6.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 1.1);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 1, 1.1);
         AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 0.1, false);
@@ -2421,16 +2250,15 @@ unsafe fn laser_air_neutral(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         AttackModule::clear(fighter.module_accessor, 1, false);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.4, 50, 85, 0, 30, 2.5, 0.0, 0.0, 0.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.4, 50, 85, 0, 30, 2.5, 0.0, 0.0, 0.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
         AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 10.0, false);
     }
 }
 
-#[acmd_script( agent = "demon_blaster", script = "game_flyairhi", category = ACMD_GAME )]
-unsafe fn laser_air_hi(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn laser_air_hi(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.4, 50, 85, 0, 30, 1.0, 0.0, -1.0, 0.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 11.4, 50, 85, 0, 30, 7.0, 0.0, -3.0, 6.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.4, 50, 85, 0, 30, 1.0, 0.0, -1.0, 0.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 12.4, 50, 85, 0, 30, 7.0, 0.0, -3.0, 6.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 1.1);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 1, 1.1);
         AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 0.1, false);
@@ -2438,16 +2266,15 @@ unsafe fn laser_air_hi(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         AttackModule::clear(fighter.module_accessor, 1, false);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.4, 50, 85, 0, 30, 2.5, 0.0, -1.0, 0.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.4, 50, 85, 0, 30, 2.5, 0.0, -1.0, 0.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
         AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 10.0, false);
     }
 }
 
-#[acmd_script( agent = "demon_blaster", script = "game_flyairlw", category = ACMD_GAME )]
-unsafe fn laser_air_lw(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn laser_air_lw(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.4, 50, 85, 0, 30, 1.0, 0.0, 0.0, 0.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 11.4, 50, 85, 0, 30, 7.0, 0.0, -3.0, 6.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.4, 50, 85, 0, 30, 1.0, 0.0, 0.0, 0.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 12.4, 50, 85, 0, 30, 7.0, 0.0, -3.0, 6.0, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 1.1);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 1, 1.1);
         AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 0.1, false);
@@ -2455,13 +2282,12 @@ unsafe fn laser_air_lw(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         AttackModule::clear(fighter.module_accessor, 1, false);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.4, 50, 85, 0, 30, 2.5, 0.0, -1.0, 0.8, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.4, 50, 85, 0, 30, 2.5, 0.0, -1.0, 0.8, None, None, None, 0.25, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
         AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 10.0, false);
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_specials", category = ACMD_GAME )]
-unsafe fn demon_sideb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_sideb_smash_script(fighter: &mut L2CAgentBase) {
     FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 10.0);
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 5.0);
@@ -2504,8 +2330,7 @@ unsafe fn demon_sideb_smash_script(fighter: &mut L2CAgentBase) {
     FighterSpecializer_Demon::set_devil(fighter.module_accessor, false, 0.0);
 }
 
-#[acmd_script( agent = "demon", script = "game_specialshit", category = ACMD_GAME )]
-unsafe fn demon_sideb_hit_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_sideb_hit_smash_script(fighter: &mut L2CAgentBase) {
     FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 1.0);
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
@@ -2518,8 +2343,7 @@ unsafe fn demon_sideb_hit_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_specialairs", category = ACMD_GAME )]
-unsafe fn demon_sideb_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_sideb_air_smash_script(fighter: &mut L2CAgentBase) {
     FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 10.0);
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 5.0);
@@ -2562,8 +2386,7 @@ unsafe fn demon_sideb_air_smash_script(fighter: &mut L2CAgentBase) {
     FighterSpecializer_Demon::set_devil(fighter.module_accessor, false, 0.0);
 }
 
-#[acmd_script( agent = "demon", script = "game_specialairshit", category = ACMD_GAME )]
-unsafe fn demon_sideb_air_hit_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_sideb_air_hit_smash_script(fighter: &mut L2CAgentBase) {
     FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 1.0);
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_NONE);
@@ -2580,17 +2403,16 @@ unsafe fn demon_sideb_air_hit_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_specialhi", category = ACMD_GAME )]
-unsafe fn demon_upb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_upb_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_DEMON_STATUS_SPECIAL_HI_FLAG_AIR) {
         FighterSpecializer_Demon::set_devil(fighter.module_accessor, true, 2.0);
         sv_animcmd::frame(fighter.lua_state_agent, 1.0);
         if macros::is_excute(fighter) {
-            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 18.0, 76, 53, 0, 80, 6.0, 0.0, 6.0, 6.0, Some(0.0), Some(11.25), Some(6.0), 0.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_DEMON_PUNCH01, *ATTACK_REGION_BODY);
-            macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 16.0, 76, 53, 0, 80, 6.0, 0.0, 18.0, 0.0, None, None, None, 0.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_DEMON_PUNCH01, *ATTACK_REGION_BODY);
-            macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 18.0, 76, 53, 0, 80, 6.0, 0.0, 6.0, -2.5, Some(0.0), Some(10.25), Some(-2.5), 0.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_DEMON_PUNCH01, *ATTACK_REGION_BODY);
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 18.0, 76, 63, 0, 80, 6.0, 0.0, 6.0, 6.0, Some(0.0), Some(11.25), Some(6.0), 0.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_DEMON_PUNCH01, *ATTACK_REGION_BODY);
+            macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 16.0, 76, 63, 0, 80, 6.4, 0.0, 18.0, 0.0, None, None, None, 0.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_DEMON_PUNCH01, *ATTACK_REGION_BODY);
+            macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 18.0, 76, 63, 0, 80, 6.0, 0.0, 6.0, -2.5, Some(0.0), Some(10.25), Some(-2.5), 0.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_DEMON_PUNCH01, *ATTACK_REGION_BODY);
         }
         sv_animcmd::frame(fighter.lua_state_agent, 2.0);
         if macros::is_excute(fighter) {
@@ -2599,7 +2421,7 @@ unsafe fn demon_upb_smash_script(fighter: &mut L2CAgentBase) {
         }
         sv_animcmd::frame(fighter.lua_state_agent, 4.0);
         if macros::is_excute(fighter) {
-            macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 13.0, 76, 75, 0, 75, 5.7, 0.0, 18.0, 0.0, None, None, None, 0.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_DEMON_PUNCH01, *ATTACK_REGION_BODY);
+            macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 13.0, 76, 82, 0, 75, 6.3, 0.0, 18.0, 0.0, None, None, None, 0.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_DEMON_PUNCH01, *ATTACK_REGION_BODY);
         }
         sv_animcmd::frame(fighter.lua_state_agent, 7.0);
         if macros::is_excute(fighter) {
@@ -2674,8 +2496,7 @@ unsafe fn demon_upb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_appealhil", category = ACMD_GAME )]
-unsafe fn demon_uptaunt_left_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_uptaunt_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -2697,31 +2518,7 @@ unsafe fn demon_uptaunt_left_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_appealhir", category = ACMD_GAME )]
-unsafe fn demon_uptaunt_right_smash_script(fighter: &mut L2CAgentBase) {
-    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
-
-    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-    if macros::is_excute(fighter) {
-        DEMON_UPTAUNT_IS_TAUNTING[entry_id] = false;
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 9.0);
-    if macros::is_excute(fighter) {
-        damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_DAMAGE_POWER, 8.0);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 10.0);
-    if macros::is_excute(fighter) {
-        DEMON_UPTAUNT_IS_TAUNTING[entry_id] = true;
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 45.0);
-    if macros::is_excute(fighter) {
-        damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_NORMAL, 0.0);
-        DEMON_UPTAUNT_IS_TAUNTING[entry_id] = false;
-    }
-}
-
-#[acmd_script( agent = "demon", script = "game_appealsl", category = ACMD_GAME )]
-unsafe fn demon_sidetaunt_left_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn demon_sidetaunt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 18.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 6.0, 180, 5, 0, 20, 4.0, 0.0, 16.5, 10.0, None, None, None, 0.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
@@ -2772,139 +2569,92 @@ unsafe fn demon_sidetaunt_left_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "demon", script = "game_appealsr", category = ACMD_GAME )]
-unsafe fn demon_sidetaunt_right_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 18.0);
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 6.0, 180, 5, 0, 20, 4.0, 0.0, 16.5, 10.0, None, None, None, 0.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 6.0, 180, 5, 0, 20, 3.5, 0.0, 13.0, 6.5, None, None, None, 0.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 6.0, 180, 5, 0, 20, 3.5, 0.0, 10.0, 3.5, None, None, None, 0.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 8.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 8.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 8.0, false);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 20.0);
-    if macros::is_excute(fighter) {
-        AttackModule::clear_all(fighter.module_accessor);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 31.0);
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 1, Hash40::new("top"), 3.0, 180, 5, 0, 20, 3.5, 0.0, 11.0, 8.5, None, None, None, 0.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_DEMON_PUNCH01, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 1, Hash40::new("top"), 3.0, 180, 5, 0, 20, 3.0, 0.0, 12.5, 5.0, None, None, None, 0.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_DEMON_PUNCH01, *ATTACK_REGION_PUNCH);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 10.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 10.0, false);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 33.0);
-    if macros::is_excute(fighter) {
-        AttackModule::clear_all(fighter.module_accessor);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 47.0);
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 2, Hash40::new("top"), 3.0, 180, 5, 0, 20, 3.5, 0.0, 6.5, 10.5, None, None, None, 0.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 1, 2, Hash40::new("top"), 3.0, 180, 5, 0, 20, 3.0, 0.0, 9.0, 5.0, None, None, None, 0.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_DEMON_KICK, *ATTACK_REGION_KICK);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 9.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 9.0, false);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 49.0);
-    if macros::is_excute(fighter) {
-        AttackModule::clear_all(fighter.module_accessor);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 62.0);
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 3, Hash40::new("top"), 7.0, 40, 110, 0, 80, 3.5, 0.0, 10.5, 8.0, None, None, None, 0.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_DEMON_APPEAL, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 3, Hash40::new("top"), 7.0, 40, 110, 0, 80, 3.0, 0.0, 13.0, 4.0, None, None, None, 0.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_DEMON_APPEAL, *ATTACK_REGION_PUNCH);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 10.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 10.0, false);
-        AttackModule::set_attack_camera_quake_forced(fighter.module_accessor, 0, *CAMERA_QUAKE_KIND_M, false);
-        AttackModule::set_attack_camera_quake_forced(fighter.module_accessor, 1, *CAMERA_QUAKE_KIND_M, false);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 64.0);
-    if macros::is_excute(fighter) {
-        AttackModule::clear_all(fighter.module_accessor);
-    }
-}
 
 
 pub fn install() {
-    smashline::install_agent_frames!(
-        demon_frame
-    );
-    smashline::install_acmd_scripts!(
-        demon_jab_smash_script,
-        demon_jab2_smash_script,
-        demon_jab3_flashpunch_smash_script,
-        demon_jab3_smash_script,
-        demon_jab4_smash_script,
-        demon_jab5_smash_script,
-        demon_jab6_smash_script,
-        demon_jab7_smash_script,
-        demon_jab8_smash_script,
-        demon_jab9_smash_script,
-        demon_jab10_smash_script,
-        demon_dashattack_1_smash_script,
-        demon_dashattack_2_smash_script,
-        demon_ftilt_smash_script,
-        demon_ftilt_forward_up_1_smash_script,
-        demon_ftilt_forward_up_2_smash_script,
-        demon_ftilt_forward_up_3_smash_script,
-        demon_ftilt_forward_up_4_smash_script,
-        demon_ftilt_forward_down_1_smash_script,
-        demon_ftilt_forward_down_2_smash_script,
-        demon_back_down_smash_script,
-        demon_btilt_smash_script,
-        demon_back_upward_smash_script,
-        demon_utilt_smash_script,
-        demon_utilt2_smash_script,
-        demon_dtilt_smash_script,
-        demon_crouch_forward_smash_script,
-        demon_crouch_attack_smash_script,
-        demon_crouch_backward_smash_script,
-        demon_crouch_rising_smash_script,
-        demon_fsmash_smash_script,
-        demon_usmash_smash_script,
-        demon_dsmash_smash_script,
-        demon_spinning_demon_script,
-        demon_wind_god_fist_script,
-        demon_electric_wind_god_fist_script,
-        demon_dragon_uppercut_script,
-        demon_nair_smash_script,
-        demon_fair_smash_script,
-        demon_bair_smash_script,
-        demon_uair_smash_script,
-        demon_dair_smash_script,
-        demon_grab_smash_script,
-        demon_grabd_smash_script,
-        demon_grabp_smash_script,
-        demon_grab_command_smash_script,
-        demon_pummel_smash_script,
-        demon_fthrow_smash_script,
-        demon_bthrow_smash_script,
-        demon_uthrow_smash_script,
-        demon_dthrow_smash_script,
-        demon_commandthrow_smash_script,
-        demon_neutralb_start_smash_script,
-        demon_neutralb_start_air_smash_script,
-        demon_neutralb_smash_script,
-        demon_neutralb_hi_smash_script,
-        demon_neutralb_lw_smash_script,
-        laser_ground_neutral,
-        laser_ground_hi,
-        laser_ground_lw,
-        demon_neutralb_air_smash_script,
-        demon_neutralb_air_hi_smash_script,
-        demon_neutralb_air_lw_smash_script,
-        laser_air_neutral,
-        laser_air_hi,
-        laser_air_lw,
-        demon_sideb_smash_script,
-        demon_sideb_hit_smash_script,
-        demon_sideb_air_smash_script,
-        demon_sideb_air_hit_smash_script,
-        demon_upb_smash_script,
-        demon_uptaunt_left_smash_script,
-        demon_uptaunt_right_smash_script,
-        demon_sidetaunt_left_smash_script,
-        demon_sidetaunt_right_smash_script
-        
-    );
+    Agent::new("demon")
+    .on_line(Main, demon_frame) //opff
+    .game_acmd("game_attack11", demon_jab_smash_script)
+    .game_acmd("game_attack12", demon_jab2_smash_script)
+    .game_acmd("game_flashpunch", demon_jab3_flashpunch_smash_script)
+    .game_acmd("game_attack13", demon_jab3_smash_script)
+    .game_acmd("game_attack14", demon_jab4_smash_script)
+    .game_acmd("game_attack15", demon_jab5_smash_script)
+    .game_acmd("game_attack16", demon_jab6_smash_script)
+    .game_acmd("game_attack17", demon_jab7_smash_script)
+    .game_acmd("game_attack18", demon_jab8_smash_script)
+    .game_acmd("game_attack19", demon_jab9_smash_script)
+    .game_acmd("game_attack110", demon_jab10_smash_script)
+    .game_acmd("game_attackdash", demon_dashattack_1_smash_script)
+    .game_acmd("game_attackstand1", demon_dashattack_2_smash_script) // Double forward input dash attack (Left Splits Kick)
+    .game_acmd("game_attacks3", demon_ftilt_smash_script)
+    .game_acmd("game_attackstand21", demon_ftilt_forward_up_1_smash_script) //start of Roundhouse to Triple Spin Kicks (↗A x4)
+    .game_acmd("game_attackstand22", demon_ftilt_forward_up_2_smash_script)
+    .game_acmd("game_attackstand23", demon_ftilt_forward_up_3_smash_script)
+    .game_acmd("game_attackstand24", demon_ftilt_forward_up_4_smash_script)
+    .game_acmd("game_attackstand31", demon_ftilt_forward_down_1_smash_script) //Start of Tsunami Kick (↘A)
+    .game_acmd("game_attackstand32", demon_ftilt_forward_down_2_smash_script) 
+    .game_acmd("game_attackstand4", demon_back_down_smash_script) //Stature Smash (↙A)
+    .game_acmd("game_attackstand5", demon_btilt_smash_script) //Flash Tornado (←A)
+    .game_acmd("game_attackstand6", demon_back_upward_smash_script) //Jump Side Kick (↖A)
+    .game_acmd("game_attackhi3", demon_utilt_smash_script) //Twin Pistons (Utilt)
+    .game_acmd("game_attackhi32", demon_utilt2_smash_script)
+    .game_acmd("game_attacklw3", demon_dtilt_smash_script) //Neijiri Uraken
+    .game_acmd("game_attacksquat1", demon_crouch_forward_smash_script) //Tombstone Crusher (↓↘A)
+    .game_acmd("game_attacksquat2", demon_crouch_attack_smash_script) //Crouch Jab (↓A)
+    .game_acmd("game_attacksquat3", demon_crouch_backward_smash_script) //Crouch Spin Kick (↓↙A)
+    .game_acmd("game_attacksquat4", demon_crouch_rising_smash_script) //Demon God Fist (uncrouch + A)
+    .game_acmd("game_attacks4", demon_fsmash_smash_script)
+    .game_acmd("game_attacks4transform", demon_fsmash_smash_script)
+    .game_acmd("game_attackhi4", demon_usmash_smash_script)
+    .game_acmd("game_attackhi4transform", demon_usmash_smash_script)
+    .game_acmd("game_attacklw4", demon_dsmash_smash_script)
+    .game_acmd("game_attacklw4transform", demon_dsmash_smash_script)
+    .game_acmd("game_attackstep2s", demon_spinning_demon_script) //Spinning Demon to Left Hook (→ ↓ ↘ B)
+    .game_acmd("game_attackstep2", demon_wind_god_fist_script) //Wind God Fist (→ ↓ ↘ A tapped) 
+    .game_acmd("game_attackstep2f", demon_electric_wind_god_fist_script) //Electric Wind God Fist (→ ↓ ↘ A tapped, must be a faster input than normal) 
+    .game_acmd("game_attackstep2l", demon_dragon_uppercut_script) //Dragon Uppercut (→ ↓ ↘ A, held)
+    .game_acmd("game_attackairn", demon_nair_smash_script)
+    .game_acmd("game_attackairf", demon_fair_smash_script)
+    .game_acmd("game_attackairb", demon_bair_smash_script)
+    .game_acmd("game_attackairhi", demon_uair_smash_script)
+    .game_acmd("game_attackairlw", demon_dair_smash_script)
+    .game_acmd("game_catch", demon_grab_smash_script)
+    .game_acmd("game_catchdash", demon_grabd_smash_script)
+    .game_acmd("game_catchturn", demon_grabp_smash_script)
+    .game_acmd("game_catchcommand", demon_grab_command_smash_script)
+    .game_acmd("game_catchattack", demon_pummel_smash_script)
+    .game_acmd("game_throwf", demon_fthrow_smash_script)
+    .game_acmd("game_throwb", demon_bthrow_smash_script)
+    .game_acmd("game_throwhi", demon_uthrow_smash_script)
+    .game_acmd("game_throwlw", demon_dthrow_smash_script)
+    .game_acmd("game_throwcommand", demon_commandthrow_smash_script)
+    .game_acmd("game_specialnstart", demon_neutralb_start_smash_script)
+    .game_acmd("game_specialairnstart", demon_neutralb_start_air_smash_script)
+    .game_acmd("game_specialn", demon_neutralb_smash_script)
+    .game_acmd("game_specialnhi", demon_neutralb_smash_script)
+    .game_acmd("game_specialnlw", demon_neutralb_smash_script)
+    .game_acmd("game_specialairn", demon_neutralb_air_smash_script)
+    .game_acmd("game_specialairnhi", demon_neutralb_air_smash_script)
+    .game_acmd("game_specialairnlw", demon_neutralb_air_smash_script)
+    .game_acmd("game_specials", demon_sideb_smash_script)
+    .game_acmd("game_specialshit", demon_sideb_hit_smash_script)
+    .game_acmd("game_specialairs", demon_sideb_air_smash_script)
+    .game_acmd("game_specialairshit", demon_sideb_air_hit_smash_script)
+    .game_acmd("game_specialhi", demon_upb_smash_script)
+    .game_acmd("game_appealhil", demon_uptaunt_script) 
+    .game_acmd("game_appealhir", demon_uptaunt_script) 
+    .game_acmd("game_appealsl", demon_sidetaunt_smash_script) 
+    .game_acmd("game_appealsr", demon_sidetaunt_smash_script) 
+    .install();
+
+    Agent::new("demon_blaster")
+    .game_acmd("game_flyn", laser_ground_neutral)
+    .game_acmd("game_flyhi", laser_ground_hi)
+    .game_acmd("game_flylw", laser_ground_lw)
+    .game_acmd("game_flyairn", laser_air_neutral)
+    .game_acmd("game_flyairhi", laser_air_hi)
+    .game_acmd("game_flyairlw", laser_air_lw)
+    .install();
+
 }

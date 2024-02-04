@@ -7,17 +7,17 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
+use crate::custom::global_fighter_frame;
 
 
 // A Once-Per-Fighter-Frame that only applies to King Dedede
-#[fighter_frame( agent = FIGHTER_KIND_DEDEDE )]
-fn dedede_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn dedede_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
-
+        global_fighter_frame(fighter);
         let status = StatusModule::status_kind(fighter.module_accessor);
         let sticky = ControlModule::get_stick_y(fighter.module_accessor);
         
-        println!("It'sa me, King Dedede, Gotta clobba that there Kirby!!");
+        //println!("It'sa me, King Dedede, Gotta clobba that there Kirby!!");
 
         if [*FIGHTER_DEDEDE_STATUS_KIND_SPECIAL_HI_JUMP].contains(&status) {
             if sticky <= -0.5 {
@@ -36,8 +36,7 @@ fn dedede_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-#[acmd_script( agent = "dedede", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn dedede_jab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -73,8 +72,7 @@ unsafe fn dedede_jab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", script = "game_attack12", category = ACMD_GAME )]
-unsafe fn dedede_jab2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_jab2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -110,8 +108,7 @@ unsafe fn dedede_jab2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", script = "game_attack100", category = ACMD_GAME )]
-unsafe fn dedede_jab100_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_jab100_smash_script(fighter: &mut L2CAgentBase) {
     for _ in 0..i32::MAX {
         if macros::is_excute(fighter) {
             macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 0.5, 361, 12, 0, 10, 3.5, 0.0, 7.5, 10.0, Some(0.0), Some(7.5), Some(15.0), 0.5, 0.6, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_rush"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_DEDEDE, *ATTACK_REGION_HAMMER);
@@ -217,8 +214,7 @@ unsafe fn dedede_jab100_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", script = "game_attack100end", category = ACMD_GAME )]
-unsafe fn dedede_jab100end_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_jab100end_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
@@ -235,12 +231,11 @@ unsafe fn dedede_jab100end_smash_script(fighter: &mut L2CAgentBase) {
 }
 
 //the fabled Super Dedede Attack
-#[acmd_script( agent = "dedede", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn dedede_dashattack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
-        damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_DAMAGE_POWER, 12.5);
+        damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_DAMAGE_POWER, 11.5);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 20.0);
     if macros::is_excute(fighter) {
@@ -262,8 +257,7 @@ unsafe fn dedede_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", script = "game_attacks3", category = ACMD_GAME )]
-unsafe fn dedede_ftilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -296,8 +290,7 @@ unsafe fn dedede_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn dedede_utilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_utilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 7.0, 6.0);
@@ -322,8 +315,7 @@ unsafe fn dedede_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn dedede_dtilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.1, 49, 78, 0, 40, 12.0, 0.0, 6.5, 0.0, None, None, None, 0.7, 1.2, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.4, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_BODY);
@@ -331,7 +323,6 @@ unsafe fn dedede_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
-        
     }
     sv_animcmd::frame(fighter.lua_state_agent, 18.0);
     if macros::is_excute(fighter) {
@@ -345,8 +336,7 @@ unsafe fn dedede_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn dedede_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.6);
@@ -368,7 +358,7 @@ unsafe fn dedede_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 44.0);
     if macros::is_excute(fighter) {
         AttackModule::clear(fighter.module_accessor, 1, false);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 16.3, 115, 30, 0, 60, 15.0, 0.0, 5.0, 10.0, Some(0.0), Some(5.0), Some(51.0), 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, -6, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_bury"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEDEDE, *ATTACK_REGION_HAMMER);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 13.3, 115, 30, 0, 60, 15.0, 0.0, 5.0, 10.0, Some(0.0), Some(5.0), Some(51.0), 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, -6, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_bury"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEDEDE, *ATTACK_REGION_HAMMER);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
@@ -376,8 +366,7 @@ unsafe fn dedede_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn dedede_usmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -404,8 +393,7 @@ unsafe fn dedede_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn dedede_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -414,8 +402,7 @@ unsafe fn dedede_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("hammer2"), 16.4, 30, 92, 0, 44, 7.0, 2.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_dedede_hammer"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_DEDEDE, *ATTACK_REGION_HAMMER);
         macros::ATTACK(fighter, 1, 0, Hash40::new("hammer2"), 16.4, 30, 92, 0, 44, 5.0, -8.0, -3.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_dedede_hammer"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_DEDEDE, *ATTACK_REGION_HAMMER);
-        macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 1.3);
-        macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 1, 1.3);
+        macros::ATK_SET_SHIELD_SETOFF_MUL_arg3(fighter, 0, 1, 1.2);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 23.0);
     if macros::is_excute(fighter) {
@@ -424,8 +411,7 @@ unsafe fn dedede_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn dedede_nair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_nair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -451,8 +437,7 @@ unsafe fn dedede_nair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn dedede_fair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_fair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -478,8 +463,7 @@ unsafe fn dedede_fair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn dedede_bair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_bair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.3);
@@ -506,8 +490,7 @@ unsafe fn dedede_bair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn dedede_uair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_uair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -532,10 +515,10 @@ unsafe fn dedede_uair_smash_script(fighter: &mut L2CAgentBase) {
         sv_animcmd::wait(fighter.lua_state_agent, 1.0);
     }
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("hammer1"), 7.1, 70, 150, 0, 52, 6.5, 17.0, 0.0, -3.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_dedede_hammer"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEDEDE, *ATTACK_REGION_HAMMER);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("hammer1"), 7.1, 70, 150, 0, 52, 6.5, 17.0, 0.0, 6.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_dedede_hammer"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEDEDE, *ATTACK_REGION_HAMMER);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("hammer1"), 7.1, 70, 150, 0, 52, 5.0, 9.0, 0.0, 0.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_dedede_hammer"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEDEDE, *ATTACK_REGION_HAMMER);
-        macros::ATTACK(fighter, 3, 0, Hash40::new("hammer1"), 7.1, 70, 150, 0, 52, 5.0, 3.0, 0.0, 0.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_dedede_hammer"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEDEDE, *ATTACK_REGION_HAMMER);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("hammer1"), 7.1, 72, 144, 0, 52, 6.5, 17.0, 0.0, -3.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_dedede_hammer"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEDEDE, *ATTACK_REGION_HAMMER);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("hammer1"), 7.1, 72, 144, 0, 52, 6.5, 17.0, 0.0, 6.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_dedede_hammer"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEDEDE, *ATTACK_REGION_HAMMER);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("hammer1"), 7.1, 72, 144, 0, 52, 5.0, 9.0, 0.0, 0.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_dedede_hammer"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEDEDE, *ATTACK_REGION_HAMMER);
+        macros::ATTACK(fighter, 3, 0, Hash40::new("hammer1"), 7.1, 72, 144, 0, 52, 5.0, 3.0, 0.0, 0.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_dedede_hammer"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_DEDEDE, *ATTACK_REGION_HAMMER);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
@@ -547,8 +530,7 @@ unsafe fn dedede_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn dedede_dair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_dair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -573,8 +555,7 @@ unsafe fn dedede_dair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", script = "game_catch", category = ACMD_GAME )]
-unsafe fn dedede_grab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_grab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -596,8 +577,7 @@ unsafe fn dedede_grab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn dedede_grabd_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_grabd_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -608,7 +588,7 @@ unsafe fn dedede_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 11.0);
     if macros::is_excute(fighter) {
-        macros::CATCH(fighter, 0, Hash40::new("top"), 4.3, 0.0, 7.0, 4.0, Some(0.0), Some(7.0), Some(16.6), *FIGHTER_STATUS_KIND_CAPTURE_PULLED, *COLLISION_SITUATION_MASK_GA);
+        macros::CATCH(fighter, 0, Hash40::new("top"), 4.5, 0.0, 7.0, 4.0, Some(0.0), Some(7.0), Some(16.6), *FIGHTER_STATUS_KIND_CAPTURE_PULLED, *COLLISION_SITUATION_MASK_GA);
     }
     macros::game_CaptureCutCommon(fighter);
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
@@ -619,8 +599,7 @@ unsafe fn dedede_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn dedede_grabp_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_grabp_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -642,8 +621,7 @@ unsafe fn dedede_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn dedede_fthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 6.0, 32, 70, 0, 80, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -669,8 +647,7 @@ unsafe fn dedede_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn dedede_bthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.4, 50, 119, 0, 65, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -700,8 +677,7 @@ unsafe fn dedede_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn dedede_uthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.0, 80, 72, 0, 70, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -728,8 +704,7 @@ unsafe fn dedede_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn dedede_dthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 6.5, 70, 72, 0, 66, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -758,8 +733,7 @@ unsafe fn dedede_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", scripts = ["game_specialnstart", "game_specialairnstart"], category = ACMD_GAME, low_priority )]
-unsafe fn dedede_neutralb_start_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_neutralb_start_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.6666666667);
@@ -782,9 +756,7 @@ unsafe fn dedede_neutralb_start_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-
-#[acmd_script( agent = "dedede", scripts = ["game_specialnshotobjectswallow", "game_specialairnshotobjectswallow"], category = ACMD_GAME, low_priority )]
-unsafe fn dedede_neutralb_object_swallow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_neutralb_object_swallow_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.599999999);
@@ -801,9 +773,7 @@ unsafe fn dedede_neutralb_object_swallow_smash_script(fighter: &mut L2CAgentBase
     }
 }
 
-
-#[acmd_script( agent = "dedede", scripts = ["game_specialnshotobjectspit", "game_specialairnshotobjectspit"], category = ACMD_GAME, low_priority )]
-unsafe fn dedede_neutralb_object_spit_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_neutralb_object_spit_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 14.7, 4.0);
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0.0);
@@ -825,9 +795,7 @@ unsafe fn dedede_neutralb_object_spit_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-
-#[acmd_script( agent = "dedede", scripts = ["game_specialsstart", "game_specialairsstart"], category = ACMD_GAME, low_priority )]
-unsafe fn dedede_sideb_start_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_sideb_start_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_DEDEDE_STATUS_GORDO_THROW_FLAG_GENERATE);
     }
@@ -850,9 +818,7 @@ unsafe fn dedede_sideb_start_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-
-#[acmd_script( agent = "dedede", scripts = ["game_specialsmiss", "game_specialairsmiss"], category = ACMD_GAME, low_priority )]
-unsafe fn dedede_sideb_miss_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_sideb_miss_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_DEDEDE_STATUS_GORDO_THROW_FLAG_MISS_SEARCH);
     }
@@ -874,9 +840,7 @@ unsafe fn dedede_sideb_miss_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-
-#[acmd_script( agent = "dedede", scripts = ["game_specialsget", "game_specialairsget"], category = ACMD_GAME, low_priority )]
-unsafe fn dedede_sideb_get_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_sideb_get_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     macros::FT_MOTION_RATE(fighter, 0.5);
     sv_animcmd::frame(fighter.lua_state_agent, 20.0);
@@ -887,8 +851,7 @@ unsafe fn dedede_sideb_get_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede_gordo", script = "game_specialsattack", category = ACMD_GAME )]
-unsafe fn gordo_reflected_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gordo_reflected_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("hip"), 12.5, 270, 66, 0, 20, 0.9, 3.8, 3.8, 0.0, Some(-3.8), Some(-3.8), Some(0.0), 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, -2, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_NONE);
         macros::ATTACK(fighter, 1, 0, Hash40::new("hip"), 12.5, 270, 66, 0, 20, 0.9, 3.8, -3.8, 0.0, Some(-3.8), Some(3.8), Some(0.0), 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, -2, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_NONE);
@@ -899,8 +862,7 @@ unsafe fn gordo_reflected_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede_gordo", script = "game_specialsthrow", category = ACMD_GAME )]
-unsafe fn gordo_thrown_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gordo_thrown_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("hip"), 12.5, 270, 66, 0, 20, 0.9, 3.8, 3.8, 0.0, Some(-3.8), Some(-3.8), Some(0.0), 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, -2, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_NONE);
         macros::ATTACK(fighter, 1, 0, Hash40::new("hip"), 12.5, 270, 66, 0, 20, 0.9, 3.8, -3.8, 0.0, Some(-3.8), Some(3.8), Some(0.0), 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, -2, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_NONE);
@@ -911,8 +873,7 @@ unsafe fn gordo_thrown_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede_gordo", script = "game_specialsshot", category = ACMD_GAME )]
-unsafe fn gordo_inhaled_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gordo_inhaled_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("hip"), 16.8, 40, 88, 0, 55, 0.9, 3.8, 3.8, 0.0, Some(-3.8), Some(-3.8), Some(0.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, -2, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_NONE);
         macros::ATTACK(fighter, 1, 0, Hash40::new("hip"), 16.8, 40, 88, 0, 55, 0.9, 3.8, -3.8, 0.0, Some(-3.8), Some(3.8), Some(0.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, -2, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_NONE);
@@ -923,8 +884,7 @@ unsafe fn gordo_inhaled_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", script = "game_specialhijump", category = ACMD_GAME )]
-unsafe fn dedede_upb_jump_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_upb_jump_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS_BOTH_SIDES);
@@ -958,8 +918,7 @@ unsafe fn dedede_upb_jump_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", script = "game_specialhilandingl", category = ACMD_GAME )]
-unsafe fn dedede_upb_landing_left_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_upb_landing_left_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_NORMAL, 0);
     }
@@ -987,8 +946,7 @@ unsafe fn dedede_upb_landing_left_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", script = "game_specialhilandingr", category = ACMD_GAME )]
-unsafe fn dedede_upb_landing_right_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_upb_landing_right_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_NORMAL, 0);
     }
@@ -1016,8 +974,7 @@ unsafe fn dedede_upb_landing_right_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", script = "game_specialhifailure", category = ACMD_GAME )]
-unsafe fn dedede_upb_fail_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_upb_fail_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.6, 270, 50, 0, 15, 400.0, 0.0, 8.0, 0.0, None, None, None, 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, f32::NAN, 1.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
@@ -1030,10 +987,9 @@ unsafe fn dedede_upb_fail_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", scripts = ["game_speciallwstart", "game_specialairlwstart"], category = ACMD_GAME, low_priority )]
-unsafe fn dedede_downb_start_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_downb_start_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_DEDEDE_GENERATE_ARTICLE_JETHAMMER, false, 0);
+        ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_DEDEDE_GENERATE_ARTICLE_JETHAMMER, false, -1);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
@@ -1041,8 +997,7 @@ unsafe fn dedede_downb_start_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", scripts = ["game_speciallw", "game_specialairlw"], category = ACMD_GAME, low_priority )]
-unsafe fn dedede_downb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_downb_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0.0);
     }
@@ -1065,8 +1020,7 @@ unsafe fn dedede_downb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "dedede", scripts = ["game_speciallwmax", "game_specialairlwmax"], category = ACMD_GAME, low_priority )]
-unsafe fn dedede_downb_max_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dedede_downb_max_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0.0);
     }
@@ -1091,49 +1045,59 @@ unsafe fn dedede_downb_max_smash_script(fighter: &mut L2CAgentBase) {
 
 
 pub fn install() {
-    smashline::install_agent_frames!(
-        dedede_frame
-    );
-    smashline::install_acmd_scripts!(
-        dedede_jab_smash_script,
-        dedede_jab2_smash_script,
-        dedede_jab100_smash_script,
-        dedede_jab100end_smash_script,
-        dedede_dashattack_smash_script,
-        dedede_ftilt_smash_script,
-        dedede_utilt_smash_script,
-        dedede_dtilt_smash_script,
-        dedede_fsmash_smash_script,
-        dedede_usmash_smash_script,
-        dedede_dsmash_smash_script,
-        dedede_nair_smash_script,
-        dedede_fair_smash_script,
-        dedede_bair_smash_script,
-        dedede_uair_smash_script,
-        dedede_dair_smash_script,
-        dedede_grab_smash_script,
-        dedede_grabd_smash_script,
-        dedede_grabp_smash_script,
-        dedede_fthrow_smash_script,
-        dedede_bthrow_smash_script,
-        dedede_uthrow_smash_script,
-        dedede_dthrow_smash_script,
-        dedede_neutralb_start_smash_script,
-        dedede_neutralb_object_swallow_smash_script,
-        dedede_neutralb_object_spit_smash_script,
-        dedede_sideb_start_smash_script,
-        dedede_sideb_miss_smash_script,
-        dedede_sideb_get_smash_script,
-        gordo_thrown_script,
-        gordo_reflected_script,
-        gordo_inhaled_script,
-        dedede_upb_jump_smash_script,
-        dedede_upb_landing_left_smash_script,
-        dedede_upb_landing_right_smash_script,
-        dedede_upb_fail_smash_script,
-        dedede_downb_start_smash_script,
-        dedede_downb_smash_script,
-        dedede_downb_max_smash_script
-        
-    );
+    Agent::new("dedede")
+    .on_line(Main, dedede_frame) //opff
+    .game_acmd("game_attack11", dedede_jab_smash_script)
+    .game_acmd("game_attack12", dedede_jab2_smash_script)
+    .game_acmd("game_attack100", dedede_jab100_smash_script)
+    .game_acmd("game_attack100end", dedede_jab100end_smash_script)
+    .game_acmd("game_attackdash", dedede_dashattack_smash_script)
+    .game_acmd("game_attacks3", dedede_ftilt_smash_script)
+    .game_acmd("game_attackhi3", dedede_utilt_smash_script)
+    .game_acmd("game_attacklw3", dedede_dtilt_smash_script)
+    .game_acmd("game_attacks4", dedede_fsmash_smash_script)
+    .game_acmd("game_attackhi4", dedede_usmash_smash_script)
+    .game_acmd("game_attacklw4", dedede_dsmash_smash_script)
+    .game_acmd("game_attackairn", dedede_nair_smash_script)
+    .game_acmd("game_attackairf", dedede_fair_smash_script)
+    .game_acmd("game_attackairb", dedede_bair_smash_script)
+    .game_acmd("game_attackairhi", dedede_uair_smash_script)
+    .game_acmd("game_attackairlw", dedede_dair_smash_script)
+    .game_acmd("game_catch", dedede_grab_smash_script)
+    .game_acmd("game_catchdash", dedede_grabd_smash_script)
+    .game_acmd("game_catchturn", dedede_grabp_smash_script)
+    .game_acmd("game_throwf", dedede_fthrow_smash_script)
+    .game_acmd("game_throwb", dedede_bthrow_smash_script)
+    .game_acmd("game_throwhi", dedede_uthrow_smash_script)
+    .game_acmd("game_throwlw", dedede_dthrow_smash_script)
+    .game_acmd("game_specialnstart", dedede_neutralb_start_smash_script)
+    .game_acmd("game_specialairnstart", dedede_neutralb_start_smash_script)
+    .game_acmd("game_specialnshotobjectswallow", dedede_neutralb_object_swallow_smash_script)
+    .game_acmd("game_specialairnshotobjectswallow", dedede_neutralb_object_swallow_smash_script)
+    .game_acmd("game_specialnshotobjectspit", dedede_neutralb_object_spit_smash_script)
+    .game_acmd("game_specialairnshotobjectspit", dedede_neutralb_object_spit_smash_script)
+    .game_acmd("game_specialsstart", dedede_sideb_start_smash_script)
+    .game_acmd("game_specialairsstart", dedede_sideb_start_smash_script)
+    .game_acmd("game_specialsget", dedede_sideb_get_smash_script)
+    .game_acmd("game_specialairsget", dedede_sideb_get_smash_script)
+    .game_acmd("game_specialsmiss", dedede_sideb_miss_smash_script)
+    .game_acmd("game_specialairsmiss", dedede_sideb_miss_smash_script)
+    .game_acmd("game_specialhijump", dedede_upb_jump_smash_script)
+    .game_acmd("game_specialhilandingl", dedede_upb_landing_left_smash_script)
+    .game_acmd("game_specialhilandingr", dedede_upb_landing_right_smash_script)
+    .game_acmd("game_specialhifailure", dedede_upb_fail_smash_script)
+    .game_acmd("game_speciallwstart", dedede_downb_start_smash_script)
+    .game_acmd("game_specialairlwstart", dedede_downb_start_smash_script)
+    .game_acmd("game_speciallw", dedede_downb_smash_script)
+    .game_acmd("game_specialairlw", dedede_downb_smash_script)
+    .game_acmd("game_speciallwmax", dedede_downb_max_smash_script)
+    .game_acmd("game_specialairlwmax", dedede_downb_max_smash_script)
+    .install();
+
+    Agent::new("dedede_gordo")
+    .game_acmd("game_specialsthrow", gordo_thrown_script)
+    .game_acmd("game_specialsattack", gordo_reflected_script)
+    .game_acmd("game_specialsshot", gordo_inhaled_script)
+    .install();
+
 }

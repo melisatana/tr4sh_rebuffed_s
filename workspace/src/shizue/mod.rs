@@ -7,19 +7,20 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase, L2CFighterBase};
 use smashline::*;
 use smash_script::*;
+use crate::custom::global_fighter_frame;
 
 
 static mut SHIZUE_CLAYROCKET_IS_HITSTUN : [bool; 8] = [false; 8];
 static mut SHIZUE_SHIELDB_SET : [bool; 8] = [false; 8];
 
 // A Once-Per-Fighter-Frame that only applies to Isabelle
-#[fighter_frame( agent = FIGHTER_KIND_SHIZUE )]
-fn shizue_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn shizue_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         let status = StatusModule::status_kind(fighter.module_accessor);
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
-        println!("It'sa me, Isabelle, *unintelligible noises*");
+        //println!("It'sa me, Isabelle, *unintelligible noises*");
 
 
         if [*FIGHTER_STATUS_KIND_SPECIAL_N, *FIGHTER_MURABITO_STATUS_KIND_SPECIAL_N_SEARCH, *FIGHTER_MURABITO_STATUS_KIND_SPECIAL_N_POCKET, *FIGHTER_MURABITO_STATUS_KIND_SPECIAL_N_TAKE_OUT].contains(&status) {
@@ -50,9 +51,21 @@ fn shizue_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
+unsafe extern "C" fn kirby_shizuehat_frame(fighter: &mut L2CFighterCommon) {
+    unsafe {
+        let status = StatusModule::status_kind(fighter.module_accessor);
 
-#[weapon_frame( agent = WEAPON_KIND_SHIZUE_CLAYROCKET )]
-pub fn shizue_rocket_weapon_frame(weapon : &mut L2CFighterBase) {
+        if [*FIGHTER_KIRBY_STATUS_KIND_MURABITO_SPECIAL_N, *FIGHTER_KIRBY_STATUS_KIND_MURABITO_SPECIAL_N_SEARCH, *FIGHTER_KIRBY_STATUS_KIND_MURABITO_SPECIAL_N_POCKET, *FIGHTER_KIRBY_STATUS_KIND_MURABITO_SPECIAL_N_TAKE_OUT].contains(&status) {
+            crate::custom::fastfall_helper(fighter);
+        }
+
+    }
+    
+}
+
+
+//#[weapon_frame( agent = WEAPON_KIND_SHIZUE_CLAYROCKET )]
+pub unsafe extern "C" fn shizue_rocket_weapon_frame(weapon : &mut L2CFighterBase) {
     unsafe {
         let status = StatusModule::status_kind(weapon.module_accessor);
         let owner_module_accessor = &mut *sv_battle_object::module_accessor((WorkModule::get_int(weapon.module_accessor, *WEAPON_INSTANCE_WORK_ID_INT_LINK_OWNER)) as u32);
@@ -71,8 +84,8 @@ pub fn shizue_rocket_weapon_frame(weapon : &mut L2CFighterBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn shizue_jab_smash_script(fighter: &mut L2CAgentBase) {
+
+unsafe extern "C" fn shizue_jab_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_SHIZUE_GENERATE_ARTICLE_PICOPICOHAMMER, false, -1);
     }
@@ -103,8 +116,7 @@ unsafe fn shizue_jab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn shizue_dashattack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.67);
@@ -121,8 +133,7 @@ unsafe fn shizue_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue_pot", script = "game_throwed", category = ACMD_GAME )]
-unsafe fn dashattack_pot(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dashattack_pot(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("have"), 10.7, 35, 100, 0, 35, 4.2, 0.0, 2.5, 0.0, None, None, None, 0.6, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
         AttackModule::enable_safe_pos(fighter.module_accessor);
@@ -133,8 +144,7 @@ unsafe fn dashattack_pot(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_attacks3", category = ACMD_GAME )]
-unsafe fn shizue_ftilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_SHIZUE_GENERATE_ARTICLE_UMBRELLA, false, -1);
     }
@@ -159,8 +169,7 @@ unsafe fn shizue_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn shizue_utilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_utilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_SHIZUE_GENERATE_ARTICLE_BROOM, false, -1);
@@ -186,8 +195,7 @@ unsafe fn shizue_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn shizue_dtilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 2.0, 4.0);
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_SHIZUE_GENERATE_ARTICLE_WEEDS, true, 0);
@@ -215,8 +223,7 @@ unsafe fn shizue_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn shizue_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_SHIZUE_GENERATE_ARTICLE_CRACKER, false, -1);
         ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_SHIZUE_GENERATE_ARTICLE_CRACKER, Hash40::new("fire"), false, -1.0);
@@ -259,8 +266,7 @@ unsafe fn shizue_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn shizue_usmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -294,8 +300,7 @@ unsafe fn shizue_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue_trafficsign", script = "game_attack", category = ACMD_GAME )]
-unsafe fn usmash_traffic_sign(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn usmash_traffic_sign(fighter: &mut L2CAgentBase) {
     MotionModule::set_rate(fighter.module_accessor, 2.1834061);
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
@@ -317,8 +322,7 @@ unsafe fn usmash_traffic_sign(fighter: &mut L2CAgentBase) {
     MotionModule::set_rate(fighter.module_accessor, 1.13);
 }
 
-#[acmd_script( agent = "shizue", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn shizue_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_SHIZUE_GENERATE_ARTICLE_BUCKET, false, -1);
         ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_SHIZUE_GENERATE_ARTICLE_BUCKET, Hash40::new("attack"), false, -1.0);
@@ -358,8 +362,7 @@ unsafe fn shizue_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue_bucket", script = "effect_attack", category = ACMD_EFFECT )]
-unsafe fn bucket_water_effect(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bucket_water_effect(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if PostureModule::lr(fighter.module_accessor) > 0.0 {
         if macros::is_excute(fighter) {
@@ -385,9 +388,7 @@ unsafe fn bucket_water_effect(fighter: &mut L2CAgentBase) {
     }
 }
 
-
-#[acmd_script( agent = "shizue", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn shizue_nair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_nair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_SHIZUE_INSTANCE_WORK_ID_FLAG_POMPON_LEFT);
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_SHIZUE_GENERATE_ARTICLE_POMPON, false, -1);
@@ -403,8 +404,8 @@ unsafe fn shizue_nair_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 23.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 1, Hash40::new("handl"), 5.8, 56, 110, 0, 42, 4.2, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 1, Hash40::new("handr"), 5.8, 56, 110, 0, 42, 4.2, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 1, Hash40::new("handl"), 5.8, 56, 110, 0, 42, 4.2, 0.0, 0.0, 0.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 1, Hash40::new("handr"), 5.8, 56, 110, 0, 42, 4.2, 0.0, 0.0, 0.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 26.0);
     if macros::is_excute(fighter) {
@@ -425,8 +426,7 @@ unsafe fn shizue_nair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn shizue_fair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_fair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_SHIZUE_GENERATE_ARTICLE_SLINGSHOT, true, 0);
     }
@@ -444,8 +444,7 @@ unsafe fn shizue_fair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue_bullet", script = "game_shootf", category = ACMD_GAME )]
-unsafe fn slingshot_fair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn slingshot_fair(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 9.1, 123, 70, 0, 50, 3.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, -1, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
         AttackModule::enable_safe_pos(fighter.module_accessor);
@@ -453,8 +452,7 @@ unsafe fn slingshot_fair(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn shizue_bair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_bair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_SHIZUE_GENERATE_ARTICLE_SLINGSHOT, true, 0);
     }
@@ -468,8 +466,7 @@ unsafe fn shizue_bair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue_bullet", script = "game_shootb", category = ACMD_GAME )]
-unsafe fn slingshot_bair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn slingshot_bair(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.1, 361, 100, 0, 55, 4.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, -4.5, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
         AttackModule::enable_safe_pos(fighter.module_accessor);
@@ -480,8 +477,7 @@ unsafe fn slingshot_bair(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn shizue_uair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_uair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -502,8 +498,7 @@ unsafe fn shizue_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn shizue_dair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_dair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -532,8 +527,7 @@ unsafe fn shizue_dair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_catch", category = ACMD_GAME )]
-unsafe fn shizue_grab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_grab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -565,8 +559,7 @@ unsafe fn shizue_grab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn shizue_grabd_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_grabd_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -594,8 +587,7 @@ unsafe fn shizue_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn shizue_grabp_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_grabp_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -623,8 +615,7 @@ unsafe fn shizue_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn shizue_fthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 9.3, 45, 110, 0, 61, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -640,8 +631,7 @@ unsafe fn shizue_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn shizue_bthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 7.1, 121, 80, 0, 30, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -665,8 +655,7 @@ unsafe fn shizue_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn shizue_uthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 12.1, 90, 20, 0, 95, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -682,8 +671,7 @@ unsafe fn shizue_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn shizue_dthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 6.0, 56, 70, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -707,8 +695,7 @@ unsafe fn shizue_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_specialairsstart", category = ACMD_GAME )]
-unsafe fn shizue_sideb_start_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_sideb_start_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     macros::FT_MOTION_RATE(fighter, 0.8);
     if macros::is_excute(fighter) {
@@ -745,8 +732,7 @@ unsafe fn shizue_sideb_start_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_specialsthrowf", category = ACMD_GAME )]
-unsafe fn shizue_sideb_fthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_sideb_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 14.0, 48, 90, 0, 55, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
@@ -761,8 +747,7 @@ unsafe fn shizue_sideb_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_specialairsthrowf", category = ACMD_GAME )]
-unsafe fn shizue_sideb_fthrow_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_sideb_fthrow_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 14.0, 48, 90, 0, 55, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
@@ -778,8 +763,7 @@ unsafe fn shizue_sideb_fthrow_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_specialsthrowb", category = ACMD_GAME )]
-unsafe fn shizue_sideb_bthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_sideb_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 9.0, 60, 40, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_B, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
@@ -802,8 +786,7 @@ unsafe fn shizue_sideb_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_specialairsthrowb", category = ACMD_GAME )]
-unsafe fn shizue_sideb_bthrow_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_sideb_bthrow_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 9.0, 60, 40, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_B, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
@@ -827,8 +810,7 @@ unsafe fn shizue_sideb_bthrow_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_specialsthrowhi", category = ACMD_GAME )]
-unsafe fn shizue_sideb_uthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_sideb_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 12.0, 90, 100, 0, 50, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
@@ -843,8 +825,7 @@ unsafe fn shizue_sideb_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_specialairsthrowhi", category = ACMD_GAME )]
-unsafe fn shizue_sideb_uthrow_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_sideb_uthrow_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 12.0, 90, 100, 0, 50, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
@@ -860,8 +841,7 @@ unsafe fn shizue_sideb_uthrow_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_specialsthrowlw", category = ACMD_GAME )]
-unsafe fn shizue_sideb_dthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_sideb_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 8.5, 80, 80, 0, 22, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
@@ -885,8 +865,7 @@ unsafe fn shizue_sideb_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
  
-#[acmd_script( agent = "shizue", script = "game_specialairsthrowlw", category = ACMD_GAME )]
-unsafe fn shizue_sideb_dthrow_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_sideb_dthrow_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 8.5, 270, 90, 0, 22, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
@@ -911,8 +890,7 @@ unsafe fn shizue_sideb_dthrow_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue", script = "game_speciallwset", category = ACMD_GAME )]
-unsafe fn shizue_downb_set_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shizue_downb_set_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         JostleModule::set_status(fighter.module_accessor, false);
@@ -923,16 +901,14 @@ unsafe fn shizue_downb_set_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue_clayrocket", script = "game_ready", category = ACMD_GAME )]
-unsafe fn lloid_trap_ready(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lloid_trap_ready(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
-        println!("You just got heckin' BEANED!!!!");
+        //println!("You just got heckin' BEANED!!!!");
     }
 }
 
-#[acmd_script( agent = "shizue_clayrocket", script = "game_fly", category = ACMD_GAME )]
-unsafe fn lloid_trap_travel(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lloid_trap_travel(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ModelModule::set_scale(fighter.module_accessor, 1.5);
     }
@@ -946,8 +922,7 @@ unsafe fn lloid_trap_travel(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "shizue_clayrocket", script = "game_burst", category = ACMD_GAME )]
-unsafe fn lloid_trap_burst(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lloid_trap_burst(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ModelModule::set_scale(fighter.module_accessor, 1.0);
     }
@@ -962,49 +937,67 @@ unsafe fn lloid_trap_burst(fighter: &mut L2CAgentBase) {
 
 
 pub fn install() {
-    smashline::install_agent_frames!(
-        shizue_frame,
-        shizue_rocket_weapon_frame
-    );
-    smashline::install_acmd_scripts!(
-        shizue_jab_smash_script,
-        shizue_dashattack_smash_script,
-        dashattack_pot,
-        shizue_ftilt_smash_script,
-        shizue_utilt_smash_script,
-        shizue_dtilt_smash_script,
-        shizue_fsmash_smash_script,
-        shizue_usmash_smash_script,
-        usmash_traffic_sign,
-        shizue_dsmash_smash_script,
-        bucket_water_effect,
-        shizue_nair_smash_script,
-        shizue_fair_smash_script,
-        slingshot_fair,
-        shizue_bair_smash_script,
-        slingshot_bair,
-        shizue_uair_smash_script,
-        shizue_dair_smash_script,
-        shizue_grab_smash_script,
-        shizue_grabd_smash_script,
-        shizue_grabp_smash_script,
-        shizue_fthrow_smash_script,
-        shizue_bthrow_smash_script,
-        shizue_uthrow_smash_script,
-        shizue_dthrow_smash_script,
-        shizue_sideb_start_air_smash_script,
-        shizue_sideb_fthrow_smash_script,
-        shizue_sideb_fthrow_air_smash_script,
-        shizue_sideb_bthrow_smash_script,
-        shizue_sideb_bthrow_air_smash_script,
-        shizue_sideb_uthrow_smash_script,
-        shizue_sideb_uthrow_air_smash_script,
-        shizue_sideb_dthrow_smash_script,
-        shizue_sideb_dthrow_air_smash_script,
-        shizue_downb_set_smash_script,
-        lloid_trap_ready,
-        lloid_trap_travel,
-        lloid_trap_burst
-        
-    );
+    Agent::new("shizue")
+    .on_line(Main, shizue_frame) //opff
+    .game_acmd("game_attack11", shizue_jab_smash_script)
+    .game_acmd("game_attackdash", shizue_dashattack_smash_script)
+    .game_acmd("game_attacks3", shizue_ftilt_smash_script)
+    .game_acmd("game_attackhi3", shizue_utilt_smash_script)
+    .game_acmd("game_attacklw3", shizue_dtilt_smash_script)
+    .game_acmd("game_attacks4", shizue_fsmash_smash_script)
+    .game_acmd("game_attackhi4", shizue_usmash_smash_script)
+    .game_acmd("game_attacklw4", shizue_dsmash_smash_script)
+    .game_acmd("game_attackairn", shizue_nair_smash_script)
+    .game_acmd("game_attackairf", shizue_fair_smash_script)
+    .game_acmd("game_attackairb", shizue_bair_smash_script)
+    .game_acmd("game_attackairhi", shizue_uair_smash_script)
+    .game_acmd("game_attackairlw", shizue_dair_smash_script)
+    .game_acmd("game_catch", shizue_grab_smash_script)
+    .game_acmd("game_catchdash", shizue_grabd_smash_script)
+    .game_acmd("game_catchturn", shizue_grabp_smash_script)
+    .game_acmd("game_throwf", shizue_fthrow_smash_script)
+    .game_acmd("game_throwb", shizue_bthrow_smash_script)
+    .game_acmd("game_throwhi", shizue_uthrow_smash_script)
+    .game_acmd("game_throwlw", shizue_dthrow_smash_script)
+    .game_acmd("game_specialairsstart", shizue_sideb_start_air_smash_script)
+    .game_acmd("game_specialsthrowf", shizue_sideb_fthrow_smash_script)
+    .game_acmd("game_specialairsthrowf", shizue_sideb_fthrow_air_smash_script)
+    .game_acmd("game_specialsthrowb", shizue_sideb_bthrow_smash_script)
+    .game_acmd("game_specialairsthrowb", shizue_sideb_bthrow_air_smash_script)
+    .game_acmd("game_specialsthrowhi", shizue_sideb_uthrow_smash_script)
+    .game_acmd("game_specialairsthrowhi", shizue_sideb_uthrow_air_smash_script)
+    .game_acmd("game_specialsthrowlw", shizue_sideb_dthrow_smash_script)
+    .game_acmd("game_specialairsthrowlw", shizue_sideb_dthrow_air_smash_script)
+    .game_acmd("game_speciallwset", shizue_downb_set_smash_script)
+    .install();
+
+    Agent::new("kirby")
+    .on_line(Main, kirby_shizuehat_frame)
+    .install();
+
+    Agent::new("shizue_pot")
+    .game_acmd("game_throwed", dashattack_pot)
+    .install();
+
+    Agent::new("shizue_trafficsign")
+    .game_acmd("game_attack", usmash_traffic_sign)
+    .install();
+
+    Agent::new("shizue_bucket")
+    .effect_acmd("effect_attack", bucket_water_effect)
+    .install();
+
+    Agent::new("shizue_bullet")
+    .game_acmd("game_shootf", slingshot_fair)
+    .game_acmd("game_shootb", slingshot_bair)
+    .install();
+
+    Agent::new("shizue_clayrocket")
+    .on_line(Main, shizue_rocket_weapon_frame)
+    .game_acmd("game_ready", lloid_trap_ready)
+    .game_acmd("game_fly", lloid_trap_travel)
+    .game_acmd("game_burst", lloid_trap_burst)
+    .install();
+
+
 }

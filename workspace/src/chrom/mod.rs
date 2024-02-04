@@ -7,6 +7,7 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
+use crate::custom::global_fighter_frame;
 
 static mut CHROM_DASHATTACK_HITBOX_ACTIVE : [bool; 8] = [false; 8];
 static mut CHROM_DASHATTACK_HITBOX_FINAL : [bool; 8] = [false; 8];
@@ -31,14 +32,14 @@ unsafe fn set_dashattack_hitbox(fighter: &mut L2CAgentBase) {
 }
 
 // A Once-Per-Fighter-Frame that only applies to Chrom
-#[fighter_frame( agent = FIGHTER_KIND_CHROM )]
-fn chrom_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn chrom_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
         let sticky = ControlModule::get_stick_y(fighter.module_accessor);
 
-        println!("It'sa me, Chrom, has anyone seen my daughter and my wife I miss them :(");
+        //println!("It'sa me, Chrom, has anyone seen my daughter and my wife I miss them :(");
 
         if CHROM_DASHATTACK_HITBOX_ACTIVE[entry_id] {
             if status == *FIGHTER_STATUS_KIND_ATTACK_DASH {
@@ -86,9 +87,7 @@ fn chrom_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-
-#[fighter_frame( agent = FIGHTER_KIND_KIRBY )]
-fn kirby_chromhat_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn kirby_chromhat_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
         let status = StatusModule::status_kind(fighter.module_accessor);
 
@@ -108,8 +107,7 @@ fn kirby_chromhat_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn chrom_jab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 5.0, 5.0);
@@ -124,8 +122,7 @@ unsafe fn chrom_jab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "effect_attack11", category = ACMD_EFFECT )]
-unsafe fn chrom_jab_effect_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_jab_effect_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         macros::EFFECT_FOLLOW(fighter, Hash40::new("chrom_sword_blue"), Hash40::new("sword1"), -0.0, 0, 0, 0, 0, 0, 1, true);
@@ -142,8 +139,7 @@ unsafe fn chrom_jab_effect_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "sound_attack11", category = ACMD_SOUND )]
-unsafe fn chrom_jab_sound_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_jab_sound_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         macros::PLAY_SE(fighter, Hash40::new("se_chrom_swing_s"));
@@ -152,8 +148,7 @@ unsafe fn chrom_jab_sound_script(fighter: &mut L2CAgentBase) {
 }
 
 
-#[acmd_script( agent = "chrom", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn chrom_dashattack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -200,8 +195,7 @@ unsafe fn chrom_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_attacks3", category = ACMD_GAME )]
-unsafe fn chrom_ftilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -228,8 +222,7 @@ unsafe fn chrom_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn chrom_utilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_utilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 9.8, 98, 83, 0, 40, 4.8, 0.0, 16.0, 0.0, Some(0.0), Some(16.0), Some(0.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CHROM_HIT, *ATTACK_REGION_SWORD);
@@ -249,8 +242,7 @@ unsafe fn chrom_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn chrom_dtilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.4, 76, 58, 0, 50, 5.8, 0.0, 5.6, 14.0, Some(0.0), Some(7.0), Some(10.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CHROM_HIT, *ATTACK_REGION_SWORD);
@@ -261,7 +253,7 @@ unsafe fn chrom_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
-        AttackModule::clear_all(fighter.module_accessor,);
+        AttackModule::clear_all(fighter.module_accessor);
         MotionModule::set_rate(fighter.module_accessor, 1.15);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 52.0);
@@ -270,8 +262,7 @@ unsafe fn chrom_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "effect_attacklw3", category = ACMD_EFFECT )]
-unsafe fn chrom_dtilt_effect_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_dtilt_effect_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         macros::EFFECT_FOLLOW(fighter, Hash40::new("chrom_sword_blue"), Hash40::new("sword1"), -0.0, 0, 0, 0, 0, 0, 1, true);
@@ -288,8 +279,7 @@ unsafe fn chrom_dtilt_effect_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn chrom_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 0.8);
@@ -336,8 +326,7 @@ unsafe fn chrom_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn chrom_usmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -393,8 +382,7 @@ unsafe fn chrom_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn chrom_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -429,8 +417,7 @@ unsafe fn chrom_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn chrom_nair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_nair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -462,8 +449,7 @@ unsafe fn chrom_nair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn chrom_fair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_fair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -498,8 +484,7 @@ unsafe fn chrom_fair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn chrom_bair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_bair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -525,8 +510,7 @@ unsafe fn chrom_bair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn chrom_uair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_uair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -546,8 +530,7 @@ unsafe fn chrom_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn chrom_dair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_dair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -585,8 +568,7 @@ unsafe fn chrom_dair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_catch", category = ACMD_GAME )]
-unsafe fn chrom_grab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_grab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         GrabModule::set_rebound(fighter.module_accessor, true);
@@ -605,8 +587,7 @@ unsafe fn chrom_grab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn chrom_grabd_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_grabd_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -628,8 +609,7 @@ unsafe fn chrom_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn chrom_grabp_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_grabp_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -651,8 +631,7 @@ unsafe fn chrom_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn chrom_fthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 9.7, 45, 120, 0, 40, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -667,8 +646,7 @@ unsafe fn chrom_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn chrom_bthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.6, 117, 45, 0, 70, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -687,8 +665,7 @@ unsafe fn chrom_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn chrom_uthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 11.9, 97, 60, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -703,8 +680,7 @@ unsafe fn chrom_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn chrom_dthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.0, 59, 60, 0, 55, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -723,8 +699,7 @@ unsafe fn chrom_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", scripts = ["game_specialnturn", "game_specialairnturn"], category = ACMD_GAME, low_priority )]
-unsafe fn chrom_neutralb_turn_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_neutralb_turn_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     macros::FT_MOTION_RATE(fighter, 0.5);
     /*if macros::is_excute(fighter) {
@@ -732,8 +707,7 @@ unsafe fn chrom_neutralb_turn_smash_script(fighter: &mut L2CAgentBase) {
     }*/
 }
 
-#[acmd_script( agent = "chrom", scripts = ["game_specialnend", "game_specialairnend"], category = ACMD_GAME, low_priority )]
-unsafe fn chrom_neutralb_1_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_neutralb_1_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         KineticModule::set_consider_ground_friction(fighter.module_accessor, false, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
     }
@@ -747,8 +721,7 @@ unsafe fn chrom_neutralb_1_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", scripts = ["game_specialnend2", "game_specialairnend2"], category = ACMD_GAME, low_priority )]
-unsafe fn chrom_neutralb_2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_neutralb_2_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         KineticModule::set_consider_ground_friction(fighter.module_accessor, false, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
     }
@@ -762,8 +735,7 @@ unsafe fn chrom_neutralb_2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", scripts = ["game_specialnend3", "game_specialairnend3"], category = ACMD_GAME, low_priority )]
-unsafe fn chrom_neutralb_3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_neutralb_3_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         KineticModule::set_consider_ground_friction(fighter.module_accessor, false, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
     }
@@ -777,8 +749,7 @@ unsafe fn chrom_neutralb_3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", scripts = ["game_specialnendmax", "game_specialairnendmax"], category = ACMD_GAME, low_priority )]
-unsafe fn chrom_neutralb_max_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_neutralb_max_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         KineticModule::set_consider_ground_friction(fighter.module_accessor, false, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0.0);
@@ -794,8 +765,7 @@ unsafe fn chrom_neutralb_max_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_specials1", category = ACMD_GAME )]
-unsafe fn chrom_sideb_1_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_sideb_1_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_MARTH_STATUS_SPECIAL_S_FLAG_INPUT_CHECK);
@@ -817,8 +787,7 @@ unsafe fn chrom_sideb_1_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_specialairs1", category = ACMD_GAME )]
-unsafe fn chrom_sideb_1_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_sideb_1_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_MARTH_STATUS_SPECIAL_S_FLAG_INPUT_CHECK);
@@ -840,8 +809,7 @@ unsafe fn chrom_sideb_1_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_specials2lw", category = ACMD_GAME )]
-unsafe fn chrom_sideb_2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_sideb_2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_MARTH_STATUS_SPECIAL_S_FLAG_INPUT_CHECK);
@@ -863,8 +831,7 @@ unsafe fn chrom_sideb_2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_specialairs2lw", category = ACMD_GAME )]
-unsafe fn chrom_sideb_2_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_sideb_2_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_MARTH_STATUS_SPECIAL_S_FLAG_INPUT_CHECK);
@@ -886,9 +853,7 @@ unsafe fn chrom_sideb_2_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-
-#[acmd_script( agent = "chrom", script = "game_specials3s", category = ACMD_GAME )]
-unsafe fn chrom_sideb_3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_sideb_3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_MARTH_STATUS_SPECIAL_S_FLAG_INPUT_CHECK);
@@ -910,8 +875,7 @@ unsafe fn chrom_sideb_3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_specialairs3s", category = ACMD_GAME )]
-unsafe fn chrom_sideb_3_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_sideb_3_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_MARTH_STATUS_SPECIAL_S_FLAG_INPUT_CHECK);
@@ -933,9 +897,7 @@ unsafe fn chrom_sideb_3_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-
-#[acmd_script( agent = "chrom", script = "game_specials4s", category = ACMD_GAME )]
-unsafe fn chrom_sideb_4_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_sideb_4_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 9.0, 361, 110, 0, 69, 6.0, 0.0, 9.0, 10.7, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CHROM_HIT, *ATTACK_REGION_SWORD);
@@ -952,8 +914,7 @@ unsafe fn chrom_sideb_4_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_specialairs4s", category = ACMD_GAME )]
-unsafe fn chrom_sideb_4_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_sideb_4_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 9.0, 361, 110, 0, 69, 6.0, 0.0, 9.0, 10.7, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CHROM_HIT, *ATTACK_REGION_SWORD);
@@ -970,8 +931,7 @@ unsafe fn chrom_sideb_4_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_specialhi2", category = ACMD_GAME )]
-unsafe fn chrom_upb_2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_upb_2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.0, 91, 100, 155, 0, 4.8, 0.0, 5.0, 18.0, None, None, None, 1.6, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CHROM_HIT, *ATTACK_REGION_SWORD);
@@ -1014,8 +974,7 @@ unsafe fn chrom_upb_2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_specialairhi2", category = ACMD_GAME )]
-unsafe fn chrom_upb_2_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_upb_2_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.0, 91, 100, 155, 0, 4.8, 0.0, 5.0, 18.0, None, None, None, 1.6, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CHROM_HIT, *ATTACK_REGION_SWORD);
@@ -1058,8 +1017,7 @@ unsafe fn chrom_upb_2_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_specialhi4", category = ACMD_GAME )]
-unsafe fn chrom_upb_4_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_upb_4_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.7, 30, 130, 0, 50, 10.0, 0.0, 6.0, 11.8, Some(0.0), Some(11.0), Some(11.8), 1.2, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CHROM_HIT, *ATTACK_REGION_SWORD);
     }
@@ -1069,8 +1027,7 @@ unsafe fn chrom_upb_4_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_speciallw", category = ACMD_GAME )]
-unsafe fn chrom_downb_counter_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_downb_counter_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.66666666667);
@@ -1085,41 +1042,7 @@ unsafe fn chrom_downb_counter_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "chrom", script = "game_specialairlw", category = ACMD_GAME )]
-unsafe fn chrom_downb_air_counter_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.66666666667);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 8.0);
-    if macros::is_excute(fighter) {
-        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_ROY_STATUS_SPECIAL_LW_FLAG_SHIELD);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 30.0);
-    if macros::is_excute(fighter) {
-        WorkModule::off_flag(fighter.module_accessor, *FIGHTER_ROY_STATUS_SPECIAL_LW_FLAG_SHIELD);
-    }
-}
-
-#[acmd_script( agent = "chrom", script = "game_speciallwhit", category = ACMD_GAME )]
-unsafe fn chrom_downb_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 5.0);
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.0, 70, 50, 0, 35, 7.7, 0.0, 8.0, 13.0, Some(0.0), Some(8.0), Some(3.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 8.0, 70, 50, 0, 35, 7.5, 0.0, 8.0, 18.0, Some(0.0), Some(8.0), Some(2.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_SWORD);
-        AttackModule::set_force_reaction(fighter.module_accessor, 0, true, false);
-        AttackModule::set_force_reaction(fighter.module_accessor, 1, true, false);
-        AttackModule::set_is_critical_attack(fighter.module_accessor, true);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 8.0);
-    if macros::is_excute(fighter) {
-        AttackModule::clear_all(fighter.module_accessor);
-        CancelModule::enable_cancel(fighter.module_accessor);
-    }
-}
-
-#[acmd_script( agent = "chrom", script = "game_specialairlwhit", category = ACMD_GAME )]
-unsafe fn chrom_downb_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chrom_downb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.0, 70, 50, 0, 35, 7.7, 0.0, 8.0, 13.0, Some(0.0), Some(8.0), Some(3.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_SWORD);
@@ -1136,54 +1059,61 @@ unsafe fn chrom_downb_air_smash_script(fighter: &mut L2CAgentBase) {
 }
 
 pub fn install() {
-    smashline::install_agent_frames!(
-        chrom_frame,
-        kirby_chromhat_frame
-    );
-    smashline::install_acmd_scripts!(
-        chrom_jab_smash_script,
-        chrom_jab_effect_script,
-        chrom_jab_sound_script,
-        chrom_dashattack_smash_script,
-        chrom_ftilt_smash_script,
-        chrom_utilt_smash_script,
-        chrom_dtilt_smash_script,
-        chrom_dtilt_effect_script,
-        chrom_fsmash_smash_script,
-        chrom_usmash_smash_script,
-        chrom_dsmash_smash_script,
-        chrom_nair_smash_script,
-        chrom_fair_smash_script,
-        chrom_bair_smash_script,
-        chrom_uair_smash_script,
-        chrom_dair_smash_script,
-        chrom_grab_smash_script,
-        chrom_grabd_smash_script,
-        chrom_grabp_smash_script,
-        chrom_fthrow_smash_script,
-        chrom_bthrow_smash_script,
-        chrom_uthrow_smash_script,
-        chrom_dthrow_smash_script,
-        chrom_neutralb_turn_smash_script,
-        chrom_neutralb_1_smash_script,
-        chrom_neutralb_2_smash_script,
-        chrom_neutralb_3_smash_script,
-        chrom_neutralb_max_smash_script,
-        chrom_sideb_1_smash_script,
-        chrom_sideb_1_air_smash_script,
-        chrom_sideb_2_smash_script,
-        chrom_sideb_2_air_smash_script,
-        chrom_sideb_3_smash_script,
-        chrom_sideb_3_air_smash_script,
-        chrom_sideb_4_smash_script,
-        chrom_sideb_4_air_smash_script,
-        chrom_upb_2_smash_script,
-        chrom_upb_2_air_smash_script,
-        chrom_upb_4_smash_script,
-        chrom_downb_counter_smash_script,
-        chrom_downb_air_counter_smash_script,
-        chrom_downb_smash_script,
-        chrom_downb_air_smash_script
-        
-    );
+    Agent::new("chrom")
+    .on_line(Main, chrom_frame) //opff
+    .game_acmd("game_attack11", chrom_jab_smash_script)
+    .effect_acmd("effect_attack11", chrom_jab_effect_script)
+    .sound_acmd("sound_attack11", chrom_jab_sound_script)
+    .game_acmd("game_attackdash", chrom_dashattack_smash_script)
+    .game_acmd("game_attacks3", chrom_ftilt_smash_script)
+    .game_acmd("game_attackhi3", chrom_utilt_smash_script)
+    .game_acmd("game_attacklw3", chrom_dtilt_smash_script)
+    .effect_acmd("effect_attacklw3", chrom_dtilt_effect_script)
+    .game_acmd("game_attacks4", chrom_fsmash_smash_script)
+    .game_acmd("game_attackhi4", chrom_usmash_smash_script)
+    .game_acmd("game_attacklw4", chrom_dsmash_smash_script)
+    .game_acmd("game_attackairn", chrom_nair_smash_script)
+    .game_acmd("game_attackairf", chrom_fair_smash_script)
+    .game_acmd("game_attackairb", chrom_bair_smash_script)
+    .game_acmd("game_attackairhi", chrom_uair_smash_script)
+    .game_acmd("game_attackairlw", chrom_dair_smash_script)
+    .game_acmd("game_catch", chrom_grab_smash_script)
+    .game_acmd("game_catchdash", chrom_grabd_smash_script)
+    .game_acmd("game_catchturn", chrom_grabp_smash_script)
+    .game_acmd("game_throwf", chrom_fthrow_smash_script)
+    .game_acmd("game_throwb", chrom_bthrow_smash_script)
+    .game_acmd("game_throwhi", chrom_uthrow_smash_script)
+    .game_acmd("game_throwlw", chrom_dthrow_smash_script)
+    .game_acmd("game_specialnturn", chrom_neutralb_turn_smash_script)
+    .game_acmd("game_specialnairturn", chrom_neutralb_turn_smash_script)
+    .game_acmd("game_specialnend", chrom_neutralb_1_smash_script)
+    .game_acmd("game_specialairnend", chrom_neutralb_1_smash_script)
+    .game_acmd("game_specialnend2", chrom_neutralb_2_smash_script)
+    .game_acmd("game_specialairnen2", chrom_neutralb_2_smash_script)
+    .game_acmd("game_specialnend3", chrom_neutralb_3_smash_script)
+    .game_acmd("game_specialairnend3", chrom_neutralb_3_smash_script)
+    .game_acmd("game_specialnendmax", chrom_neutralb_max_smash_script)
+    .game_acmd("game_specialairnendmax", chrom_neutralb_max_smash_script)
+    .game_acmd("game_specials1", chrom_sideb_1_smash_script)
+    .game_acmd("game_specialairs1", chrom_sideb_1_air_smash_script)
+    .game_acmd("game_specials2lw", chrom_sideb_2_smash_script)
+    .game_acmd("game_specialairs2lw", chrom_sideb_2_air_smash_script)
+    .game_acmd("game_specials3s", chrom_sideb_3_smash_script)
+    .game_acmd("game_specialairs3s", chrom_sideb_3_air_smash_script)
+    .game_acmd("game_specials4s", chrom_sideb_4_smash_script)
+    .game_acmd("game_specialairs4s", chrom_sideb_4_air_smash_script)
+    .game_acmd("game_specialhi2", chrom_upb_2_smash_script)
+    .game_acmd("game_specialairhi2", chrom_upb_2_air_smash_script)
+    .game_acmd("game_specialhi4", chrom_upb_4_smash_script)
+    .game_acmd("game_speciallw", chrom_downb_counter_smash_script)
+    .game_acmd("game_specialairlw", chrom_downb_counter_smash_script)
+    .game_acmd("game_speciallwhit", chrom_downb_smash_script)
+    .game_acmd("game_specialairlwhit", chrom_downb_smash_script)
+    .install();
+
+
+    Agent::new("kirby")
+    .on_line(Main, kirby_chromhat_frame) //opff
+    .install();
+
 }

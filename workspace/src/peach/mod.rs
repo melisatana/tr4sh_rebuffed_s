@@ -7,6 +7,7 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
+use crate::custom::global_fighter_frame;
 
 
 static mut PEACH_SIDEB_POWER : [bool; 8] = [false; 8];
@@ -15,16 +16,16 @@ static mut PEACH_SIDEB_POWER_TIMER : [i32; 8] = [0; 8];
 
 
 // A Once-Per-Fighter-Frame that only applies to Peach
-#[fighter_frame( agent = FIGHTER_KIND_PEACH )]
-fn peach_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn peach_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
         let touch_right = GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_RIGHT_SIDE as u32);
         let touch_left = GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_LEFT_SIDE as u32);
         let touch_side =  GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_SIDE as u32);
 
-        println!("It'sa me, Peach, Peachy!");
+        //println!("It'sa me, Peach, Peachy!");
 
 
         if PEACH_SIDEB_POWER_TIMER[entry_id] > 0 {
@@ -55,8 +56,7 @@ fn peach_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn peach_jab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.5, 361, 25, 30, 30, 3.4, 0.0, 9.0, 5.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PEACH_BINTA, *ATTACK_REGION_PUNCH);
@@ -79,8 +79,7 @@ unsafe fn peach_jab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_attack12", category = ACMD_GAME )]
-unsafe fn peach_jab2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_jab2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("arml"), 7.5, 30, 89, 0, 53, 4.0, 2.5, 0.0, 0.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PEACH_BINTA, *ATTACK_REGION_PUNCH);
@@ -94,8 +93,7 @@ unsafe fn peach_jab2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn peach_dashattack_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_dashattack_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.6, 40, 100, 55, 0, 3.2, 0.0, 7.0, 5.5, None, None, None, 0.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_PUNCH);
@@ -125,8 +123,7 @@ unsafe fn peach_dashattack_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_attacks3", category = ACMD_GAME )]
-unsafe fn peach_ftilt_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_ftilt_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("legr"), 10.1, 100, 90, 0, 40, 5.0, 0.0, 1.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 4, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
@@ -144,8 +141,7 @@ unsafe fn peach_ftilt_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn peach_utilt_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_utilt_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 9.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.4, 94, 84, 0, 55, 8.0, 0.0, 24.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_MAGIC);
@@ -159,15 +155,14 @@ unsafe fn peach_utilt_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn peach_dtilt_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_dtilt_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         JostleModule::set_status(fighter.module_accessor, false);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.5, 270, 98, 0, 30, 4.1, 0.0, 3.2, 3.5, Some(0.0), Some(2.4), Some(11.7), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 10.5, 270, 98, 0, 30, 4.1, 0.0, 3.2, 3.5, Some(0.0), Some(2.4), Some(11.7), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_KICK);
         AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 11.0);
@@ -177,8 +172,7 @@ unsafe fn peach_dtilt_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn peach_fsmash_golf_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_fsmash_golf_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -200,8 +194,7 @@ unsafe fn peach_fsmash_golf_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_attacks4hi", category = ACMD_GAME )]
-unsafe fn peach_fsmash_pan_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_fsmash_pan_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -222,8 +215,7 @@ unsafe fn peach_fsmash_pan_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_attacks4lw", category = ACMD_GAME )]
-unsafe fn peach_fsmash_tennis_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_fsmash_tennis_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -248,8 +240,7 @@ unsafe fn peach_fsmash_tennis_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn peach_usmash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_usmash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -288,17 +279,16 @@ unsafe fn peach_usmash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn peach_dsmash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_dsmash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 14.7, 33, 108, 0, 44, 4.5, 0.0, 1.8, 8.2, Some(0.0), Some(1.8), Some(-8.2), 1.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 7, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_BODY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 14.5, 33, 105, 0, 44, 4.5, 0.0, 1.8, 8.2, Some(0.0), Some(1.8), Some(-8.2), 1.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 7, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_BODY);
         AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
-        macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 2.5);
+        macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 2.0);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 27.0);
     if macros::is_excute(fighter) {
@@ -307,8 +297,7 @@ unsafe fn peach_dsmash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn peach_nair_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_nair_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -333,8 +322,7 @@ unsafe fn peach_nair_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn peach_fair_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_fair_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.25);
@@ -360,8 +348,7 @@ unsafe fn peach_fair_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn peach_bair_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_bair_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -378,8 +365,7 @@ unsafe fn peach_bair_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn peach_uair_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_uair_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -408,14 +394,14 @@ unsafe fn peach_uair_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::wait(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.4, 70, 94, 0, 42, 5.2, 0.0, 24.0, 4.0, Some(0.0), Some(24.0), Some(-4.0), 1.2, 0.5, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_MAGIC);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 4.4, 70, 94, 0, 42, 5.2, 0.0, 24.0, -4.0, Some(0.0), Some(21.0), Some(-9.0), 1.2, 0.5, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_MAGIC);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.4, 70, 94, 0, 42, 5.2, 0.0, 24.0, 4.0, Some(0.0), Some(24.0), Some(-4.0), 1.2, 0.8, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_MAGIC);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 4.4, 70, 94, 0, 42, 5.2, 0.0, 24.0, -4.0, Some(0.0), Some(21.0), Some(-9.0), 1.2, 0.8, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_MAGIC);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 4.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 4.0, false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 4.4, 70, 89, 0, 42, 5.2, 0.0, 24.0, 4.0, Some(0.0), Some(21.0), Some(9.0), 1.2, 0.5, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_MAGIC);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 4.4, 70, 94, 0, 42, 5.2, 0.0, 24.0, 4.0, Some(0.0), Some(21.0), Some(9.0), 1.2, 0.8, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_MAGIC);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 2, 4.0, false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
@@ -429,8 +415,7 @@ unsafe fn peach_uair_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn peach_dair_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_dair_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -465,8 +450,7 @@ unsafe fn peach_dair_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_catch", category = ACMD_GAME )]
-unsafe fn peach_grab_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_grab_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         GrabModule::set_rebound(fighter.module_accessor, true);
@@ -485,8 +469,7 @@ unsafe fn peach_grab_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn peach_grabd_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_grabd_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -508,8 +491,7 @@ unsafe fn peach_grabd_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn peach_grabp_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_grabp_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -531,8 +513,7 @@ unsafe fn peach_grabp_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn peach_fthrow_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_fthrow_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 8.0, 20, 40, 0, 75, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -559,8 +540,7 @@ unsafe fn peach_fthrow_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn peach_bthrow_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_bthrow_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.4, 145, 125, 0, 55, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -591,8 +571,7 @@ unsafe fn peach_bthrow_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn peach_uthrow_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_uthrow_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 6.0, 80, 72, 0, 42, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -626,8 +605,7 @@ unsafe fn peach_uthrow_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn peach_dthrow_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_dthrow_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 7.0, 106, 50, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -661,24 +639,21 @@ unsafe fn peach_dthrow_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "peach_kinopiospore", script = "game_shot", category = ACMD_GAME )]
-unsafe fn neutralb_toad_spores(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn neutralb_toad_spores(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.1, 45, 196, 0, 40, 4.5, 0.0, 0.0, 0.0, None, None, None, 1.1, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_SPEED, false, 2, 0.0, 0, true, true, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_NONE);
         AttackModule::set_force_reaction(fighter.module_accessor, 0, true, false);
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_specialairsend", category = ACMD_GAME )]
-unsafe fn peach_sideb_air_end_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_sideb_air_end_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.75);
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_specialshitend", category = ACMD_GAME )]
-unsafe fn peach_sideb_landing_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_sideb_landing_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     PEACH_SIDEB_POWER[entry_id] = false ;
@@ -712,8 +687,7 @@ unsafe fn peach_sideb_landing_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_specialhistart", category = ACMD_GAME )]
-unsafe fn peach_upb_rise_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_upb_rise_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_PEACH_GENERATE_ARTICLE_KASSAR, false, 0);
         ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_PEACH_GENERATE_ARTICLE_KINOPIO, Hash40::new("special_hi_start"), false, 0.0);
@@ -772,8 +746,7 @@ unsafe fn peach_upb_rise_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_specialairhistart", category = ACMD_GAME )]
-unsafe fn peach_upb_rise_air_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_upb_rise_air_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_PEACH_GENERATE_ARTICLE_KASSAR, false, 0);
         ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_PEACH_GENERATE_ARTICLE_KINOPIO, Hash40::new("special_hi_start"), false, 0.0);
@@ -832,8 +805,7 @@ unsafe fn peach_upb_rise_air_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "peach", script = "game_specialhiopen", category = ACMD_GAME )]
-unsafe fn peach_upb_parasolopen_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn peach_upb_parasolopen_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_PEACH_GENERATE_ARTICLE_KASSAR, Hash40::new("special_hi_open"), false, 0.0);
     }
@@ -845,39 +817,40 @@ unsafe fn peach_upb_parasolopen_script(fighter: &mut L2CAgentBase) {
 }
 
 pub fn install() {
-    smashline::install_agent_frames!(
-        peach_frame
-    );
-    smashline::install_acmd_scripts!(
-        peach_jab_smash_script,
-        peach_jab2_smash_script,
-        peach_dashattack_script,
-        peach_ftilt_script,
-        peach_utilt_script,
-        peach_dtilt_script,
-        peach_fsmash_golf_script,
-        peach_fsmash_pan_script,
-        peach_fsmash_tennis_script,
-        peach_usmash_script,
-        peach_dsmash_script,
-        peach_nair_script, 
-        peach_fair_script,
-        peach_bair_script,
-        peach_uair_script,
-        peach_dair_script,
-        peach_grab_script,
-        peach_grabd_script,
-        peach_grabp_script,
-        peach_fthrow_script,
-        peach_bthrow_script,
-        peach_uthrow_script,
-        peach_dthrow_script,
-        neutralb_toad_spores,
-        peach_sideb_air_end_script,
-        peach_sideb_landing_script,
-        peach_upb_rise_script,
-        peach_upb_rise_air_script,
-        peach_upb_parasolopen_script
-        
-    );
+    Agent::new("peach")
+    .on_line(Main, peach_frame) //opff
+    .game_acmd("game_attack11", peach_jab_smash_script)
+    .game_acmd("game_attack12", peach_jab2_smash_script)
+	.game_acmd("game_attackdash", peach_dashattack_script)
+    .game_acmd("game_attacks3", peach_ftilt_script)
+    .game_acmd("game_attackhi3", peach_utilt_script)
+    .game_acmd("game_attacklw3", peach_dtilt_script)
+    .game_acmd("game_attacks4", peach_fsmash_golf_script)
+    .game_acmd("game_attacks4hi", peach_fsmash_pan_script)
+    .game_acmd("game_attacks4lw", peach_fsmash_tennis_script)
+    .game_acmd("game_attackhi4", peach_usmash_script)
+    .game_acmd("game_attacklw4", peach_dsmash_script)
+    .game_acmd("game_attackairn", peach_nair_script)
+    .game_acmd("game_attackairf", peach_fair_script)
+    .game_acmd("game_attackairb", peach_bair_script)
+    .game_acmd("game_attackairhi", peach_uair_script)
+    .game_acmd("game_attackairlw", peach_dair_script)
+    .game_acmd("game_catch", peach_grab_script)
+    .game_acmd("game_catchdash", peach_grabd_script)
+    .game_acmd("game_catchturn", peach_grabp_script)
+    .game_acmd("game_throwf", peach_fthrow_script)
+    .game_acmd("game_throwb", peach_bthrow_script)
+    .game_acmd("game_throwhi", peach_uthrow_script)
+    .game_acmd("game_throwlw", peach_dthrow_script)
+    .game_acmd("game_specialairsend", peach_sideb_air_end_script)
+    .game_acmd("game_specialshitend", peach_sideb_landing_script)
+    .game_acmd("game_specialhistart", peach_upb_rise_script)
+    .game_acmd("game_specialairhistart", peach_upb_rise_air_script)
+    .game_acmd("game_specialhiopen", peach_upb_parasolopen_script)
+    .install();
+
+    Agent::new("peach_kinopiospore")
+    .game_acmd("game_shot", neutralb_toad_spores)
+    .install();
+
 }

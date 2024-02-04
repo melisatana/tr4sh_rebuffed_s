@@ -7,13 +7,15 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
+use crate::custom::global_fighter_frame;
 
 static mut DARKPIT_UPAIR_COUNT : [i32; 8] = [0; 8]; //number of times up air has been used
 static DARKPIT_UPAIR_YVEL : [f32; 4] = [1.5, 1.1, 0.6, 0.3]; //heights for each up air
 
-#[fighter_frame( agent = FIGHTER_KIND_PITB )]
-fn darkpit_frame(fighter: &mut L2CFighterCommon) {
+
+unsafe extern "C" fn darkpit_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+		global_fighter_frame(fighter);
 		let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
 		let sticky = ControlModule::get_stick_y(fighter.module_accessor);
@@ -42,8 +44,7 @@ fn darkpit_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-#[acmd_script( agent = "pitb", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn darkpit_jab(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_jab(fighter: &mut L2CAgentBase) {
 	sv_animcmd::frame(fighter.lua_state_agent, 5.0);
 	if macros::is_excute(fighter) {
 		MotionModule::set_rate(fighter.module_accessor, 1.0);
@@ -67,8 +68,7 @@ unsafe fn darkpit_jab(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "game_attack12", category = ACMD_GAME )]
-unsafe fn darkpit_jab2(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_jab2(fighter: &mut L2CAgentBase) {
 	sv_animcmd::frame(fighter.lua_state_agent, 5.0);
 	if macros::is_excute(fighter) {
 		macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.6, 361, 20, 18, 24, 3.0, 0.0, 8.0, 10.5, Some(0.0), Some(8.0), Some(10.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PALUTENA);
@@ -91,8 +91,7 @@ unsafe fn darkpit_jab2(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "game_attack13", category = ACMD_GAME )]
-unsafe fn darkpit_jab3(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_jab3(fighter: &mut L2CAgentBase) {
 	if macros::is_excute(fighter) {
 		WorkModule::off_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_ENABLE_100);
 	}
@@ -110,8 +109,7 @@ unsafe fn darkpit_jab3(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "game_attack100", category = ACMD_GAME )]
-unsafe fn darkpit_jab100(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_jab100(fighter: &mut L2CAgentBase) {
 	for _ in 0..i32::MAX {
 		if macros::is_excute(fighter) {
 			macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 0.5, 361, 10, 0, 8, 4.5, 0.0, 8.0, 13.0, Some(0.0), Some(8.0), Some(19.5), 0.5, 0.4, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PALUTENA);
@@ -199,8 +197,7 @@ unsafe fn darkpit_jab100(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "game_attack100end", category = ACMD_GAME )]
-unsafe fn darkpit_jabfinisher(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_jabfinisher(fighter: &mut L2CAgentBase) {
 	sv_animcmd::frame(fighter.lua_state_agent, 4.0);
 	if macros::is_excute(fighter) {
 		macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.0, 361, 185, 0, 40, 4.0, 0.0, 8.3, 6.0, None, None, None, 2.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PALUTENA);
@@ -214,8 +211,7 @@ unsafe fn darkpit_jabfinisher(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn darkpit_dashattack(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_dashattack(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
 	if macros::is_excute(fighter) {
 		MotionModule::set_rate(fighter.module_accessor, 0.5);
@@ -246,8 +242,7 @@ unsafe fn darkpit_dashattack(fighter: &mut L2CAgentBase) {
 
 }
 
-#[acmd_script( agent = "pitb", script = "game_attacks3", category = ACMD_GAME )]
-unsafe fn darkpit_ftilt(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_ftilt(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
 	if macros::is_excute(fighter) {
 		MotionModule::set_rate(fighter.module_accessor, 0.5);
@@ -268,8 +263,7 @@ unsafe fn darkpit_ftilt(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn darkpit_utilt(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_utilt(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
 	if macros::is_excute(fighter) {
 		MotionModule::set_rate(fighter.module_accessor, 0.769);
@@ -295,8 +289,7 @@ unsafe fn darkpit_utilt(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn darkpit_dtilt(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_dtilt(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
 	if macros::is_excute(fighter) {
 		macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 9.0, 105, 46, 0, 70, 3.5, 0.0, 3.0, 16.0, Some(0.0), Some(5.0), Some(7.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.2, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PALUTENA);
@@ -310,8 +303,7 @@ unsafe fn darkpit_dtilt(fighter: &mut L2CAgentBase) {
 	
 }
 
-#[acmd_script( agent = "pitb", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn darkpit_fsmash(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_fsmash(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
 	if macros::is_excute(fighter) {
 		WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -347,8 +339,7 @@ unsafe fn darkpit_fsmash(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn darkpit_usmash(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_usmash(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
 	if macros::is_excute(fighter) {
 		WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -397,8 +388,7 @@ unsafe fn darkpit_usmash(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn darkpit_dsmash(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_dsmash(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
 	if macros::is_excute(fighter) {
 		WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -421,8 +411,7 @@ unsafe fn darkpit_dsmash(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "sound_attacklw4", category = ACMD_SOUND )]
-unsafe fn darkpit_dsmash_sound(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_dsmash_sound(fighter: &mut L2CAgentBase) {
 	sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         macros::STOP_SE(fighter, Hash40::new("se_common_smash_start"));
@@ -439,8 +428,7 @@ unsafe fn darkpit_dsmash_sound(fighter: &mut L2CAgentBase) {
 }
 
 
-#[acmd_script( agent = "pitb", script = "effect_attacklw4", category = ACMD_EFFECT )]
-unsafe fn darkpit_dsmash_effect(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_dsmash_effect(fighter: &mut L2CAgentBase) {
 	sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::EFFECT(fighter, Hash40::new("sys_smash_flash"), Hash40::new("top"), 0, 12, -3, 0, 0, 0, 0.8, 0, 0, 0, 0, 0, 0, true);
@@ -472,8 +460,7 @@ unsafe fn darkpit_dsmash_effect(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn darkpit_nair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_nair(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
 	if macros::is_excute(fighter) {
 		MotionModule::set_rate(fighter.module_accessor, 0.5);
@@ -491,6 +478,7 @@ unsafe fn darkpit_nair(fighter: &mut L2CAgentBase) {
 	sv_animcmd::frame(fighter.lua_state_agent, 22.0);
 	if macros::is_excute(fighter) {
 		AttackModule::clear_all(fighter.module_accessor);
+		MotionModule::set_rate(fighter.module_accessor, 1.35);
 	}
 	sv_animcmd::frame(fighter.lua_state_agent, 30.0);
 	if macros::is_excute(fighter) {
@@ -498,8 +486,7 @@ unsafe fn darkpit_nair(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn darkpit_fair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_fair(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
 	if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -531,8 +518,7 @@ unsafe fn darkpit_fair(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pitb", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn darkpit_bair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_bair(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
 	if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -555,9 +541,7 @@ unsafe fn darkpit_bair(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pitb", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn darkpit_uair(fighter: &mut L2CAgentBase) {
-
+unsafe extern "C" fn darkpit_uair(fighter: &mut L2CAgentBase) {
 	let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -610,8 +594,7 @@ unsafe fn darkpit_uair(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn darkpit_dair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_dair(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
 	if macros::is_excute(fighter) {
 		MotionModule::set_rate(fighter.module_accessor, 0.42);
@@ -643,8 +626,7 @@ unsafe fn darkpit_dair(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "game_catchattack", category = ACMD_GAME )]
-unsafe fn darkpit_pummel(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_pummel(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
 	if macros::is_excute(fighter) {
 		macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 6.9, 361, 100, 30, 0, 5.5, 0.0, 9.0, 11.0, None, None, None, 3.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 10, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_KNEE);
@@ -657,8 +639,7 @@ unsafe fn darkpit_pummel(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "game_catch", category = ACMD_GAME )]
-unsafe fn darkpit_grab(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_grab(fighter: &mut L2CAgentBase) {
 	sv_animcmd::frame(fighter.lua_state_agent, 5.0);
 	if macros::is_excute(fighter) {
 		GrabModule::set_rebound(fighter.module_accessor, true);
@@ -677,8 +658,7 @@ unsafe fn darkpit_grab(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn darkpit_grabd(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_grabd(fighter: &mut L2CAgentBase) {
 	sv_animcmd::frame(fighter.lua_state_agent, 1.0);
 	if macros::is_excute(fighter) {
 		MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -700,8 +680,7 @@ unsafe fn darkpit_grabd(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn darkpit_grabp(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_grabp(fighter: &mut L2CAgentBase) {
 	sv_animcmd::frame(fighter.lua_state_agent, 1.0);
 	if macros::is_excute(fighter) {
 		MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -723,8 +702,7 @@ unsafe fn darkpit_grabp(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn darkpit_fthrow(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_fthrow(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
 	if macros::is_excute(fighter) {
 		macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 4.0, 45, 150, 0, 50, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -744,8 +722,7 @@ unsafe fn darkpit_fthrow(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn darkpit_bthrow(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_bthrow(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
 	if macros::is_excute(fighter) {
 		macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 10.0, 315, 52, 0, 48, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -765,16 +742,14 @@ unsafe fn darkpit_bthrow(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "effect_throwb", category = ACMD_EFFECT )]
-unsafe fn darkpit_bthrow_effect(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_bthrow_effect(fighter: &mut L2CAgentBase) {
 	sv_animcmd::frame(fighter.lua_state_agent, 19.0);
     if macros::is_excute(fighter) {
         macros::LANDING_EFFECT(fighter, Hash40::new("sys_action_smoke_h"), Hash40::new("top"), 0, 0, 0, 0, 180, 0, 0.7, 0, 0, 0, 0, 0, 0, false);
     }
 }
 
-#[acmd_script( agent = "pitb", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn darkpit_uthrow(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_uthrow(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
 	if macros::is_excute(fighter) {
 		macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 7.0, 84, 40, 0, 55, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -798,8 +773,7 @@ unsafe fn darkpit_uthrow(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn darkpit_dthrow(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_dthrow(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
 	if macros::is_excute(fighter) {
 		macros::FT_LEAVE_NEAR_OTTOTTO(fighter, -3, 3);
@@ -824,8 +798,7 @@ unsafe fn darkpit_dthrow(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "game_specialsstart", category = ACMD_GAME )]
-unsafe fn darkpit_sidespecial_start(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_sidespecial_start(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
 	if macros::is_excute(fighter) {
 		macros::FT_MOTION_RATE(fighter, 1.66666667);
@@ -863,8 +836,7 @@ unsafe fn darkpit_sidespecial_start(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "game_specialsend", category = ACMD_GAME )]
-unsafe fn darkpit_sidespecial_end(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_sidespecial_end(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
 	if macros::is_excute(fighter) {
 		shield!(fighter, *MA_MSC_CMD_SHIELD_ON, *COLLISION_KIND_REFLECTOR, *FIGHTER_PIT_REFLECTOR_KIND_SPECIAL_S, *FIGHTER_PIT_REFLECTOR_GROUP_SPECIAL_S);
@@ -883,8 +855,7 @@ unsafe fn darkpit_sidespecial_end(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "game_specialairsstart", category = ACMD_GAME )]
-unsafe fn darkpit_sidespecial_air_start(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_sidespecial_air_start(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
 	if macros::is_excute(fighter) {
 		macros::FT_MOTION_RATE(fighter, 1.66666667);
@@ -922,8 +893,7 @@ unsafe fn darkpit_sidespecial_air_start(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "game_specialairsend", category = ACMD_GAME )]
-unsafe fn darkpit_sidespecial_air_end(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_sidespecial_air_end(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
 	if macros::is_excute(fighter) {
 		shield!(fighter, *MA_MSC_CMD_SHIELD_ON, *COLLISION_KIND_REFLECTOR, *FIGHTER_PIT_REFLECTOR_KIND_SPECIAL_S, *FIGHTER_PIT_REFLECTOR_GROUP_SPECIAL_S);
@@ -946,8 +916,7 @@ unsafe fn darkpit_sidespecial_air_end(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "game_specialhi", category = ACMD_GAME )]
-unsafe fn darkpit_upspecial(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_upspecial(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
 		macros::ATTACK(fighter, 0, 0, Hash40::new("hip"), 14.6, 270, 40, 0, 40, 10.0, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, false, 10, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
 		JostleModule::set_status(fighter.module_accessor, false);
@@ -969,8 +938,7 @@ unsafe fn darkpit_upspecial(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb_bowarrow", script = "game_fly", category = ACMD_GAME )]
-unsafe fn darkpit_arrow(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_arrow(fighter: &mut L2CAgentBase) {
     //sv_animcmd::frame(fighter.lua_state_agent, 1.0);
 	if macros::is_excute(fighter) {
 		ModelModule::set_scale(fighter.module_accessor, 3.0);
@@ -979,8 +947,7 @@ unsafe fn darkpit_arrow(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "game_appealsl", category = ACMD_GAME )]
-unsafe fn darkpit_sidetaunt_left(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_sidetaunt_left(fighter: &mut L2CAgentBase) {
 	sv_animcmd::frame(fighter.lua_state_agent, 20.0);
 	if macros::is_excute(fighter) {
 		macros::ATTACK(fighter, 0, 1, Hash40::new("top"), 14.5, 361, 70, 0, 60, 10.5, 0.0, 9.5, -1.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PALUTENA);
@@ -991,8 +958,7 @@ unsafe fn darkpit_sidetaunt_left(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pitb", script = "game_appealsr", category = ACMD_GAME )]
-unsafe fn darkpit_sidetaunt_right(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn darkpit_sidetaunt_right(fighter: &mut L2CAgentBase) {
 	sv_animcmd::frame(fighter.lua_state_agent, 20.0);
 	if macros::is_excute(fighter) {
 		macros::ATTACK(fighter, 0, 1, Hash40::new("top"), 14.5, 361, 70, 0, 60, 10.5, 0.0, 9.5, 2.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PALUTENA);
@@ -1004,46 +970,48 @@ unsafe fn darkpit_sidetaunt_right(fighter: &mut L2CAgentBase) {
 }
 
 pub fn install() {
-	smashline::install_agent_frames!(
-        darkpit_frame
-    );
-    smashline::install_acmd_scripts!(
-		darkpit_jab,
-		darkpit_jab2,
-		darkpit_jab3,
-		darkpit_jab100,
-		darkpit_jabfinisher,
-        darkpit_dashattack,
-        darkpit_ftilt,
-        darkpit_utilt,
-        darkpit_dtilt,
-		darkpit_fsmash,
-		darkpit_usmash,
-		darkpit_dsmash,
-		darkpit_dsmash_effect,
-		darkpit_dsmash_sound,
-        darkpit_nair,
-        darkpit_fair,
-        darkpit_bair,
-        darkpit_uair,
-		darkpit_dair,
-		darkpit_grab,
-		darkpit_grabd,
-		darkpit_grabp,
-		darkpit_pummel,
-		darkpit_fthrow,
-		darkpit_bthrow,
-		darkpit_bthrow_effect,
-		darkpit_uthrow,
-		darkpit_dthrow,
-		darkpit_sidespecial_start,
-		darkpit_sidespecial_end,
-		darkpit_sidespecial_air_start,
-		darkpit_sidespecial_air_end,
-		darkpit_upspecial,
-		darkpit_arrow,
-		darkpit_sidetaunt_left,
-		darkpit_sidetaunt_right
+    Agent::new("pitb")
+    .on_line(Main, darkpit_frame) //opff
+    .game_acmd("game_attack11", darkpit_jab)
+    .game_acmd("game_attack12", darkpit_jab2)
+	.game_acmd("game_attack13", darkpit_jab3)
+    .game_acmd("game_attack100", darkpit_jab100)
+	.game_acmd("game_attackend", darkpit_jabfinisher)
+    .game_acmd("game_attackdash", darkpit_dashattack)
+    .game_acmd("game_attacks3", darkpit_ftilt)
+    .game_acmd("game_attackhi3", darkpit_utilt)
+    .game_acmd("game_attacklw3", darkpit_dtilt)
+    .game_acmd("game_attacks4", darkpit_fsmash)
+    .game_acmd("game_attackhi4", darkpit_usmash)
+    .game_acmd("game_attacklw4", darkpit_dsmash)
+	.effect_acmd("effect_attacklw4", darkpit_dsmash_effect)
+	.sound_acmd("sound_attacklw4", darkpit_dsmash_sound)
+    .game_acmd("game_attackairn", darkpit_nair)
+    .game_acmd("game_attackairf", darkpit_fair)
+    .game_acmd("game_attackairb", darkpit_bair)
+    .game_acmd("game_attackairhi", darkpit_uair)
+    .game_acmd("game_attackairlw", darkpit_dair)
+    .game_acmd("game_catch", darkpit_grab)
+    .game_acmd("game_catchdash", darkpit_grabd)
+    .game_acmd("game_catchturn", darkpit_grabp)
+	.game_acmd("game_catchattack", darkpit_pummel)
+    .game_acmd("game_throwf", darkpit_fthrow)
+    .game_acmd("game_throwb", darkpit_bthrow)
+	.effect_acmd("effect_throwb", darkpit_bthrow_effect)
+    .game_acmd("game_throwhi", darkpit_uthrow)
+    .game_acmd("game_throwlw", darkpit_dthrow)
+    .game_acmd("game_specialsstart", darkpit_sidespecial_start)
+    .game_acmd("game_specialairsstart", darkpit_sidespecial_air_start)
+    .game_acmd("game_specialsend", darkpit_sidespecial_end)
+    .game_acmd("game_specialairsend", darkpit_sidespecial_air_end)
+    .game_acmd("game_specialhi", darkpit_upspecial)
+    .game_acmd("game_appealsl", darkpit_sidetaunt_left)
+	.game_acmd("game_appealsr", darkpit_sidetaunt_right)
+    .install();
 
-    );
+    Agent::new("pitb_bowarrow")
+    .game_acmd("game_fly", darkpit_arrow)
+    .install();
+
+
 }

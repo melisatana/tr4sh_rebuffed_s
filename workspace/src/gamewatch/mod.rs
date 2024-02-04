@@ -7,11 +7,12 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase, L2CFighterBase};
 use smashline::*;
 use smash_script::*;
+use crate::custom::global_fighter_frame;
 
 // A Once-Per-Fighter-Frame that only applies to Mr. Game & Watch
-#[fighter_frame( agent = FIGHTER_KIND_GAMEWATCH )]
-fn gamewatch_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn gamewatch_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         //let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
         let stickx = ControlModule::get_stick_x(fighter.module_accessor);
@@ -19,7 +20,7 @@ fn gamewatch_frame(fighter: &mut L2CFighterCommon) {
         let stickx_directional = stickx * lr;
 
         
-        println!("BEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEP BEEP BEEP BEEP BEEEEEEP BEEP");
+        //println!("BEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEP BEEP BEEP BEEP BEEEEEEP BEEP");
 
 
         if [*FIGHTER_GAMEWATCH_STATUS_KIND_SPECIAL_LW_WAIT].contains(&status) {
@@ -47,8 +48,8 @@ fn gamewatch_frame(fighter: &mut L2CFighterCommon) {
 
 
 //Weapon OPFF
-#[weapon_frame( agent = WEAPON_KIND_GAMEWATCH_BOMB )]
-pub fn gamewatch_bomb_weapon_frame(weapon : &mut L2CFighterBase) {
+//#[weapon_frame( agent = WEAPON_KIND_GAMEWATCH_BOMB )]
+pub unsafe extern "C" fn gamewatch_bomb_weapon_frame(weapon : &mut L2CFighterBase) {
     unsafe {
         let status = StatusModule::status_kind(weapon.module_accessor);
 
@@ -62,8 +63,7 @@ pub fn gamewatch_bomb_weapon_frame(weapon : &mut L2CFighterBase) {
 }
 
 
-#[acmd_script( agent = "gamewatch", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn gamewatch_jab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_jab_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::set_int(fighter.module_accessor, *WEAPON_GAMEWATCH_NORMAL_WEAPON_KIND_SPRAY, *FIGHTER_GAMEWATCH_INSTANCE_WORK_ID_INT_NORMAL_WEAPON_KIND);
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_GAMEWATCH_GENERATE_ARTICLE_NORMAL_WEAPON, false, -1);
@@ -92,8 +92,7 @@ unsafe fn gamewatch_jab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_attack100", category = ACMD_GAME )]
-unsafe fn gamewatch_jab100_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_jab100_smash_script(fighter: &mut L2CAgentBase) {
     for _ in 0..i32::MAX {
         if macros::is_excute(fighter) {
             macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 0.9, 361, 15, 0, 12, 5.5, 0.0, 5.0, 14.5, None, None, None, 0.5, 0.8, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_rush"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_OBJECT);
@@ -132,8 +131,7 @@ unsafe fn gamewatch_jab100_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_attack100end", category = ACMD_GAME )]
-unsafe fn gamewatch_jab100end_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_jab100end_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_GAMEWATCH_GENERATE_ARTICLE_NORMAL_WEAPON, Hash40::new("attack_100_end"), false, 0.0);
     }
@@ -153,8 +151,7 @@ unsafe fn gamewatch_jab100end_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn gamewatch_dashattack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 9.0, 4.0);
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("head"), HitStatus(*HIT_STATUS_XLU), 0);
@@ -175,8 +172,7 @@ unsafe fn gamewatch_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_attacks3", category = ACMD_GAME )]
-unsafe fn gamewatch_ftilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
         WorkModule::set_int(fighter.module_accessor, *WEAPON_GAMEWATCH_NORMAL_WEAPON_KIND_CHAIR, *FIGHTER_GAMEWATCH_INSTANCE_WORK_ID_INT_NORMAL_WEAPON_KIND);
@@ -201,8 +197,7 @@ unsafe fn gamewatch_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn gamewatch_utilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_utilt_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("handr"), HitStatus(*HIT_STATUS_XLU), 0);
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("handl"), HitStatus(*HIT_STATUS_XLU), 0);
@@ -247,8 +242,7 @@ unsafe fn gamewatch_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn gamewatch_dtilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::set_int(fighter.module_accessor, *WEAPON_GAMEWATCH_NORMAL_WEAPON_KIND_MANHOLE, *FIGHTER_GAMEWATCH_INSTANCE_WORK_ID_INT_NORMAL_WEAPON_KIND);
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_GAMEWATCH_GENERATE_ARTICLE_NORMAL_WEAPON, false, -1);
@@ -273,8 +267,7 @@ unsafe fn gamewatch_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn gamewatch_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -297,8 +290,7 @@ unsafe fn gamewatch_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }   
 
-#[acmd_script( agent = "gamewatch", scripts = ["game_attackhi4", "game_attackhi4r"], category = ACMD_GAME, low_priority )]
-unsafe fn gamewatch_usmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -325,8 +317,7 @@ unsafe fn gamewatch_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn gamewatch_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2738853);
@@ -351,8 +342,7 @@ unsafe fn gamewatch_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn gamewatch_nair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_nair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::set_int(fighter.module_accessor, *WEAPON_GAMEWATCH_NORMAL_WEAPON_KIND_TROPICALFISH, *FIGHTER_GAMEWATCH_INSTANCE_WORK_ID_INT_NORMAL_WEAPON_KIND);
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_GAMEWATCH_GENERATE_ARTICLE_NORMAL_WEAPON, false, -1);
@@ -432,8 +422,7 @@ unsafe fn gamewatch_nair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn gamewatch_fair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_fair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_GAMEWATCH_GENERATE_ARTICLE_BOMB, false, -1);
@@ -460,16 +449,14 @@ unsafe fn gamewatch_fair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch_bomb", script = "game_fly", category = ACMD_GAME )]
-unsafe fn bomb_travel(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bomb_travel(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 0.0, 361, 0, 0, 0, 4.0, 0.0, 0.4, 0.0, None, None, None, 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 0, true, false, false, true, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
         //AttackModule::off_target_kind(fighter.module_accessor, 0, *COLLISION_KIND_MASK_HIT);
     }
 }
 
-#[acmd_script( agent = "gamewatch_bomb", script = "game_burst", category = ACMD_GAME )]
-unsafe fn bomb_explode(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bomb_explode(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         VisibilityModule::set_whole(fighter.module_accessor, false);
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.1, 90, 81, 0, 40, 9.5, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, -6, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_BOMB, *ATTACK_REGION_OBJECT);  
@@ -488,8 +475,7 @@ unsafe fn bomb_explode(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn gamewatch_bair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_bair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::set_int(fighter.module_accessor, *WEAPON_GAMEWATCH_NORMAL_WEAPON_KIND_TURTLE, *FIGHTER_GAMEWATCH_INSTANCE_WORK_ID_INT_NORMAL_WEAPON_KIND);
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_GAMEWATCH_GENERATE_ARTICLE_NORMAL_WEAPON, false, -1);
@@ -532,8 +518,7 @@ unsafe fn gamewatch_bair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_landingairb", category = ACMD_GAME )]
-unsafe fn gamewatch_bair_landing_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_bair_landing_smash_script(fighter: &mut L2CAgentBase) {
     if ArticleModule::is_exist(fighter.module_accessor, *FIGHTER_GAMEWATCH_GENERATE_ARTICLE_NORMAL_WEAPON) {
         if macros::is_excute(fighter) {
             ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_GAMEWATCH_GENERATE_ARTICLE_NORMAL_WEAPON, Hash40::new("landing_air_b"), false, 0.0);
@@ -545,8 +530,7 @@ unsafe fn gamewatch_bair_landing_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn gamewatch_uair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_uair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
         }
@@ -590,8 +574,7 @@ unsafe fn gamewatch_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch_breath", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn uair_breath(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn uair_breath(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.4, 97, 100, 63, 0, 3.8, 0.0, 2.4, 0.3, None, None, None, 0.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 6, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_NONE);
     }
@@ -613,9 +596,7 @@ unsafe fn uair_breath(fighter: &mut L2CAgentBase) {
     }
 }
 
-
-#[acmd_script( agent = "gamewatch", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn gamewatch_dair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_dair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -646,8 +627,7 @@ unsafe fn gamewatch_dair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_landingairlw", category = ACMD_GAME )]
-unsafe fn gamewatch_dair_landing_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_dair_landing_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::SET_SPEED_EX(fighter, 0.0, 0.0, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.4, 80, 40, 0, 60, 5.5, 0.0, 2.0, 5.0, Some(0.0), Some(2.0), Some(-2.2), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
@@ -658,8 +638,7 @@ unsafe fn gamewatch_dair_landing_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_cliffattack", category = ACMD_GAME )]
-unsafe fn gamewatch_ledgeattack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_ledgeattack_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 24.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 9.0, 135, 20, 0, 90, 5.0, 0.0, 5.0, 13.0, Some(0.0), Some(5.0), Some(3.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 1, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
@@ -670,8 +649,7 @@ unsafe fn gamewatch_ledgeattack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_catch", category = ACMD_GAME )]
-unsafe fn gamewatch_grab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_grab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         GrabModule::set_rebound(fighter.module_accessor, true);
@@ -690,8 +668,7 @@ unsafe fn gamewatch_grab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn gamewatch_grabd_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_grabd_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -713,8 +690,7 @@ unsafe fn gamewatch_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn gamewatch_grabp_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_grabp_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -736,8 +712,7 @@ unsafe fn gamewatch_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn gamewatch_fthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 11.0, 30, 30, 0, 90, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -775,8 +750,7 @@ unsafe fn gamewatch_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn gamewatch_bthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 8.6, 44, 124, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -815,8 +789,7 @@ unsafe fn gamewatch_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn gamewatch_uthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 6.3, 90, 69, 0, 40, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -858,8 +831,7 @@ unsafe fn gamewatch_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn gamewatch_dthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::FT_LEAVE_NEAR_OTTOTTO(fighter, -2.5, 2.5);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.1, 60, 87, 0, 58, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -902,8 +874,7 @@ unsafe fn gamewatch_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specialn", category = ACMD_GAME )]
-unsafe fn gamewatch_neutralb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_neutralb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.5);
@@ -945,79 +916,31 @@ unsafe fn gamewatch_neutralb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specialairn", category = ACMD_GAME )]
-unsafe fn gamewatch_neutralb_air_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.5);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 8.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 1.0);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 18.0);
-    if macros::is_excute(fighter) {
-        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GAMEWATCH_STATUS_SPECIAL_N_FLAG_SHOOT);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 10.0, 15, 30, 0, 60, 4.2, 0.0, 8.5, 9.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_OBJECT);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 10.0, 15, 30, 0, 60, 3.2, 0.0, 6.5, 5.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_OBJECT);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 21.0);
-    if macros::is_excute(fighter) {
-        AttackModule::clear_all(fighter.module_accessor);
-        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GAMEWATCH_STATUS_SPECIAL_N_FLAG_RAPID_CHECK);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 24.0);
-    if macros::is_excute(fighter) {
-        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GAMEWATCH_STATUS_SPECIAL_N_FLAG_COUNT_ENABLE);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 36.0);
-    if macros::is_excute(fighter) {
-        WorkModule::off_flag(fighter.module_accessor, *FIGHTER_GAMEWATCH_STATUS_SPECIAL_N_FLAG_RAPID_CHECK);
-        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GAMEWATCH_STATUS_SPECIAL_N_FLAG_LOOP_CHECK);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 43.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 2.0);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 48.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 1.0);
-    }
-    if macros::is_excute(fighter) {
-        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GAMEWATCH_STATUS_SPECIAL_N_FLAG_COUNT_CHECK);
-    }
-}
-
-#[acmd_script( agent = "gamewatch_food", script = "game_fish", category = ACMD_GAME )]
-unsafe fn food_fish(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn food_fish(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.1, 53, 50, 0, 15, 2.4, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, 1, 0.1, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
     }
 }
 
-#[acmd_script( agent = "gamewatch_food", script = "game_friedprawns", category = ACMD_GAME )]
-unsafe fn food_prawns(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn food_prawns(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.1, 53, 50, 0, 15, 2.4, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, 1, 0.1, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
     }
 }
 
-#[acmd_script( agent = "gamewatch_food", script = "game_sausage", category = ACMD_GAME )]
-unsafe fn food_sausage(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn food_sausage(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.1, 53, 50, 0, 15, 2.4, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, 1, 0.1, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
     }
 }
 
-#[acmd_script( agent = "gamewatch_food", script = "game_steak", category = ACMD_GAME )]
-unsafe fn food_steak(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn food_steak(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.1, 53, 50, 0, 15, 2.4, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, 1, 0.1, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specials1", category = ACMD_GAME )]
-unsafe fn gamewatch_sideb_1_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_sideb_1_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GAMEWATCH_STATUS_SPECIAL_S_FLAG_FIX_PANEL);
@@ -1032,8 +955,7 @@ unsafe fn gamewatch_sideb_1_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specialairs1", category = ACMD_GAME )]
-unsafe fn gamewatch_sideb_1_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_sideb_1_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GAMEWATCH_STATUS_SPECIAL_S_FLAG_FIX_PANEL);
@@ -1048,8 +970,7 @@ unsafe fn gamewatch_sideb_1_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specials1_sub", category = ACMD_GAME )]
-unsafe fn judge_1(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn judge_1(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.5, 361, 0, 0, 0, 6.0, 0.0, 10.6, 8.9, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_turn"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KAMEHIT, *ATTACK_REGION_OBJECT);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 2.5, 361, 0, 0, 0, 3.0, 0.0, 7.0, 5.6, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_turn"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KAMEHIT, *ATTACK_REGION_OBJECT);
@@ -1057,8 +978,7 @@ unsafe fn judge_1(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specials2", category = ACMD_GAME )]
-unsafe fn gamewatch_sideb_2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_sideb_2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GAMEWATCH_STATUS_SPECIAL_S_FLAG_FIX_PANEL);
@@ -1072,8 +992,7 @@ unsafe fn gamewatch_sideb_2_smash_script(fighter: &mut L2CAgentBase) {
     }  
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specialairs2", category = ACMD_GAME )]
-unsafe fn gamewatch_sideb_2_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_sideb_2_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GAMEWATCH_STATUS_SPECIAL_S_FLAG_FIX_PANEL);
@@ -1087,16 +1006,14 @@ unsafe fn gamewatch_sideb_2_air_smash_script(fighter: &mut L2CAgentBase) {
     }   
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specials2_sub", category = ACMD_GAME )]
-unsafe fn judge_2(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn judge_2(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.0, 361, 40, 0, 10, 6.0, 0.0, 10.6, 8.9, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_bind"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 5.0, 361, 40, 0, 10, 3.0, 0.0, 7.0, 5.6, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_bind"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specials3", category = ACMD_GAME )]
-unsafe fn gamewatch_sideb_3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_sideb_3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GAMEWATCH_STATUS_SPECIAL_S_FLAG_FIX_PANEL);
@@ -1110,8 +1027,7 @@ unsafe fn gamewatch_sideb_3_smash_script(fighter: &mut L2CAgentBase) {
     }   
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specialairs3", category = ACMD_GAME )]
-unsafe fn gamewatch_sideb_3_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_sideb_3_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GAMEWATCH_STATUS_SPECIAL_S_FLAG_FIX_PANEL);
@@ -1125,16 +1041,14 @@ unsafe fn gamewatch_sideb_3_air_smash_script(fighter: &mut L2CAgentBase) {
     }   
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specials3_sub", category = ACMD_GAME )]
-unsafe fn judge_3(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn judge_3(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.5, 140, 50, 0, 45, 6.0, 0.0, 10.6, 8.9, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 300, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HARISEN, *ATTACK_REGION_OBJECT);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 7.5, 140, 50, 0, 45, 3.0, 0.0, 7.0, 5.6, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 300, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HARISEN, *ATTACK_REGION_OBJECT);
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specials4", category = ACMD_GAME )]
-unsafe fn gamewatch_sideb_4_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_sideb_4_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GAMEWATCH_STATUS_SPECIAL_S_FLAG_FIX_PANEL);
@@ -1148,8 +1062,7 @@ unsafe fn gamewatch_sideb_4_smash_script(fighter: &mut L2CAgentBase) {
     }  
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specialairs4", category = ACMD_GAME )]
-unsafe fn gamewatch_sideb_4_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_sideb_4_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GAMEWATCH_STATUS_SPECIAL_S_FLAG_FIX_PANEL);
@@ -1163,16 +1076,14 @@ unsafe fn gamewatch_sideb_4_air_smash_script(fighter: &mut L2CAgentBase) {
     }   
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specials4_sub", category = ACMD_GAME )]
-unsafe fn judge_4(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn judge_4(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 10.0, 285, 100, 0, 25, 6.0, 0.0, 10.6, 8.9, None, None, None, 1.3, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_OBJECT);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 10.0, 285, 100, 0, 25, 3.0, 0.0, 7.0, 5.6, None, None, None, 1.3, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_OBJECT);
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specials5", category = ACMD_GAME )]
-unsafe fn gamewatch_sideb_5_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_sideb_5_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GAMEWATCH_STATUS_SPECIAL_S_FLAG_FIX_PANEL);
@@ -1198,8 +1109,7 @@ unsafe fn gamewatch_sideb_5_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specialairs5", category = ACMD_GAME )]
-unsafe fn gamewatch_sideb_5_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_sideb_5_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GAMEWATCH_STATUS_SPECIAL_S_FLAG_FIX_PANEL);
@@ -1225,8 +1135,7 @@ unsafe fn gamewatch_sideb_5_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specials5_sub", category = ACMD_GAME )]
-unsafe fn judge_5(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn judge_5(fighter: &mut L2CAgentBase) {
     for _ in 0..3 {
         if macros::is_excute(fighter) {
             macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 3.0, 75, 40, 0, 15, 6.0, 0.0, 10.6, 8.9, None, None, None, 0.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_OBJECT);
@@ -1247,8 +1156,7 @@ unsafe fn judge_5(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specials6", category = ACMD_GAME )]
-unsafe fn gamewatch_sideb_6_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_sideb_6_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GAMEWATCH_STATUS_SPECIAL_S_FLAG_FIX_PANEL);
@@ -1262,8 +1170,7 @@ unsafe fn gamewatch_sideb_6_smash_script(fighter: &mut L2CAgentBase) {
     } 
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specialairs6", category = ACMD_GAME )]
-unsafe fn gamewatch_sideb_6_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_sideb_6_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GAMEWATCH_STATUS_SPECIAL_S_FLAG_FIX_PANEL);
@@ -1277,16 +1184,14 @@ unsafe fn gamewatch_sideb_6_air_smash_script(fighter: &mut L2CAgentBase) {
     }   
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specials6_sub", category = ACMD_GAME )]
-unsafe fn judge_6(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn judge_6(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 15.0, 20, 85, 0, 30, 6.0, 0.0, 10.6, 8.9, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_OBJECT);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 15.0, 20, 85, 0, 30, 3.0, 0.0, 7.0, 5.6, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_OBJECT);
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specials7", category = ACMD_GAME )]
-unsafe fn gamewatch_sideb_7_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_sideb_7_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GAMEWATCH_STATUS_SPECIAL_S_FLAG_FIX_PANEL);
@@ -1300,8 +1205,7 @@ unsafe fn gamewatch_sideb_7_smash_script(fighter: &mut L2CAgentBase) {
     }   
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specialairs7", category = ACMD_GAME )]
-unsafe fn gamewatch_sideb_7_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_sideb_7_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GAMEWATCH_STATUS_SPECIAL_S_FLAG_FIX_PANEL);
@@ -1315,8 +1219,7 @@ unsafe fn gamewatch_sideb_7_air_smash_script(fighter: &mut L2CAgentBase) {
     } 
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specials7_sub", category = ACMD_GAME )]
-unsafe fn judge_7(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn judge_7(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 17.5, 45, 20, 0, 45, 6.0, 0.0, 10.6, 8.9, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 17.5, 45, 20, 0, 45, 3.0, 0.0, 7.0, 5.6, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
@@ -1324,8 +1227,7 @@ unsafe fn judge_7(fighter: &mut L2CAgentBase) {
     
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specials8", category = ACMD_GAME )]
-unsafe fn gamewatch_sideb_8_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_sideb_8_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GAMEWATCH_STATUS_SPECIAL_S_FLAG_FIX_PANEL);
@@ -1339,8 +1241,7 @@ unsafe fn gamewatch_sideb_8_smash_script(fighter: &mut L2CAgentBase) {
     }   
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specialairs8", category = ACMD_GAME )]
-unsafe fn gamewatch_sideb_8_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_sideb_8_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GAMEWATCH_STATUS_SPECIAL_S_FLAG_FIX_PANEL);
@@ -1354,16 +1255,14 @@ unsafe fn gamewatch_sideb_8_air_smash_script(fighter: &mut L2CAgentBase) {
     }   
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specials8_sub", category = ACMD_GAME )]
-unsafe fn judge_8(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn judge_8(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 20.0, 80, 70, 30, 0, 6.0, 0.0, 10.6, 8.9, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_ice"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_BAT, *ATTACK_REGION_OBJECT);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 20.0, 80, 70, 30, 0, 3.0, 0.0, 7.0, 5.6, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_ice"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_BAT, *ATTACK_REGION_OBJECT);
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specials9", category = ACMD_GAME )]
-unsafe fn gamewatch_sideb_9_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_sideb_9_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GAMEWATCH_STATUS_SPECIAL_S_FLAG_FIX_PANEL);
@@ -1377,8 +1276,7 @@ unsafe fn gamewatch_sideb_9_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specialairs9", category = ACMD_GAME )]
-unsafe fn gamewatch_sideb_9_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_sideb_9_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GAMEWATCH_STATUS_SPECIAL_S_FLAG_FIX_PANEL);
@@ -1392,16 +1290,14 @@ unsafe fn gamewatch_sideb_9_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specials9_sub", category = ACMD_GAME )]
-unsafe fn judge_9(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn judge_9(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 69.0, 361, 40, 0, 60, 6.0, 0.0, 10.6, 8.9, None, None, None, 2.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 420, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_BAT, *ATTACK_REGION_OBJECT);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 69.0, 361, 40, 0, 60, 3.0, 0.0, 7.0, 5.6, None, None, None, 2.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 420, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_BAT, *ATTACK_REGION_OBJECT);
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specialhi", category = ACMD_GAME )]
-unsafe fn gamewatch_upb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_upb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 3.333333333);
@@ -1449,8 +1345,7 @@ unsafe fn gamewatch_upb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gamewatch", script = "game_specialairhi", category = ACMD_GAME )]
-unsafe fn gamewatch_upb_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gamewatch_upb_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 3.333333333);
@@ -1496,75 +1391,87 @@ unsafe fn gamewatch_upb_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
+
 pub fn install() {
-    smashline::install_agent_frames!(
-        gamewatch_frame,
-        gamewatch_bomb_weapon_frame
-    );
-    smashline::install_acmd_scripts!(
-        gamewatch_jab_smash_script,
-        gamewatch_jab100_smash_script,
-        gamewatch_jab100end_smash_script,
-        gamewatch_dashattack_smash_script,
-        gamewatch_ftilt_smash_script,
-        gamewatch_utilt_smash_script,
-        gamewatch_dtilt_smash_script,
-        gamewatch_fsmash_smash_script,
-        gamewatch_usmash_smash_script,
-        gamewatch_dsmash_smash_script,
-        gamewatch_nair_smash_script,
-        gamewatch_fair_smash_script,
-        bomb_travel,
-        bomb_explode,
-        gamewatch_bair_smash_script,
-        gamewatch_bair_landing_smash_script,
-        gamewatch_uair_smash_script,
-        uair_breath,
-        gamewatch_dair_smash_script,
-        gamewatch_dair_landing_smash_script,
-        gamewatch_ledgeattack_smash_script,
-        gamewatch_grab_smash_script,
-        gamewatch_grabd_smash_script,
-        gamewatch_grabp_smash_script,
-        gamewatch_fthrow_smash_script,
-        gamewatch_bthrow_smash_script,
-        gamewatch_uthrow_smash_script,
-        gamewatch_dthrow_smash_script,
-        gamewatch_neutralb_smash_script,
-        gamewatch_neutralb_air_smash_script,
-        food_fish,
-        food_prawns,
-        food_sausage,
-        food_steak,
-        gamewatch_sideb_1_smash_script,
-        gamewatch_sideb_1_air_smash_script,
-        judge_1,
-        gamewatch_sideb_2_smash_script,
-        gamewatch_sideb_2_air_smash_script,
-        judge_2,
-        gamewatch_sideb_3_smash_script,
-        gamewatch_sideb_3_air_smash_script,
-        judge_3,
-        gamewatch_sideb_4_smash_script,
-        gamewatch_sideb_4_air_smash_script,
-        judge_4,
-        gamewatch_sideb_5_smash_script,
-        gamewatch_sideb_5_air_smash_script,
-        judge_5,
-        gamewatch_sideb_6_smash_script,
-        gamewatch_sideb_6_air_smash_script,
-        judge_6,
-        gamewatch_sideb_7_smash_script,
-        gamewatch_sideb_7_air_smash_script,
-        judge_7,
-        gamewatch_sideb_8_smash_script,
-        gamewatch_sideb_8_air_smash_script,
-        judge_8,
-        gamewatch_sideb_9_smash_script,
-        gamewatch_sideb_9_air_smash_script,
-        judge_9,
-        gamewatch_upb_smash_script,
-        gamewatch_upb_air_smash_script
-        
-    );
+    Agent::new("gamewatch")
+    .on_line(Main, gamewatch_frame) //opff
+    .game_acmd("game_attack11", gamewatch_jab_smash_script)
+    .game_acmd("game_attack100", gamewatch_jab100_smash_script)
+    .game_acmd("game_attack100end", gamewatch_jab100end_smash_script)
+    .game_acmd("game_attackdash", gamewatch_dashattack_smash_script)
+    .game_acmd("game_attacks3", gamewatch_ftilt_smash_script)
+    .game_acmd("game_attackhi3", gamewatch_utilt_smash_script)
+    .game_acmd("game_attacklw3", gamewatch_dtilt_smash_script)
+    .game_acmd("game_attacks4", gamewatch_fsmash_smash_script)
+    .game_acmd("game_attackhi4", gamewatch_usmash_smash_script)
+    .game_acmd("game_attackhi4r", gamewatch_usmash_smash_script)
+    .game_acmd("game_attacklw4", gamewatch_dsmash_smash_script)
+    .game_acmd("game_attackairn", gamewatch_nair_smash_script)
+    .game_acmd("game_attackairf", gamewatch_fair_smash_script)
+    .game_acmd("game_attackairb", gamewatch_bair_smash_script)
+    .game_acmd("game_landingairb", gamewatch_bair_landing_smash_script)
+    .game_acmd("game_attackairhi", gamewatch_uair_smash_script)
+    .game_acmd("game_attackairlw", gamewatch_dair_smash_script)
+    .game_acmd("game_landingairlw", gamewatch_dair_landing_smash_script)
+    .game_acmd("game_catch", gamewatch_grab_smash_script)
+    .game_acmd("game_catchdash", gamewatch_grabd_smash_script)
+    .game_acmd("game_catchturn", gamewatch_grabp_smash_script)
+    .game_acmd("game_throwf", gamewatch_fthrow_smash_script)
+    .game_acmd("game_throwb", gamewatch_bthrow_smash_script)
+    .game_acmd("game_throwhi", gamewatch_uthrow_smash_script)
+    .game_acmd("game_throwlw", gamewatch_dthrow_smash_script)
+    .game_acmd("game_cliffattack", gamewatch_ledgeattack_smash_script)
+    .game_acmd("game_specialn", gamewatch_neutralb_smash_script)
+    .game_acmd("game_specialairn", gamewatch_neutralb_smash_script)
+    .game_acmd("game_specials1", gamewatch_sideb_1_smash_script)
+    .game_acmd("game_specialairs1", gamewatch_sideb_1_air_smash_script)
+    .game_acmd("game_specials1_sub", judge_1)
+    .game_acmd("game_specials2", gamewatch_sideb_2_smash_script)
+    .game_acmd("game_specialairs2", gamewatch_sideb_2_air_smash_script)
+    .game_acmd("game_specials2_sub", judge_2)
+    .game_acmd("game_specials3", gamewatch_sideb_3_smash_script)
+    .game_acmd("game_specialairs3", gamewatch_sideb_3_air_smash_script)
+    .game_acmd("game_specials3_sub", judge_3)
+    .game_acmd("game_specials4", gamewatch_sideb_4_smash_script)
+    .game_acmd("game_specialairs4", gamewatch_sideb_4_air_smash_script)
+    .game_acmd("game_specials4_sub", judge_4)
+    .game_acmd("game_specials5", gamewatch_sideb_5_smash_script)
+    .game_acmd("game_specialairs5", gamewatch_sideb_5_air_smash_script)
+    .game_acmd("game_specials5_sub", judge_5)
+    .game_acmd("game_specials6", gamewatch_sideb_6_smash_script)
+    .game_acmd("game_specialairs6", gamewatch_sideb_6_air_smash_script)
+    .game_acmd("game_specials6_sub", judge_6)
+    .game_acmd("game_specials7", gamewatch_sideb_7_smash_script)
+    .game_acmd("game_specialairs7", gamewatch_sideb_7_air_smash_script)
+    .game_acmd("game_specials7_sub", judge_7)
+    .game_acmd("game_specials8", gamewatch_sideb_8_smash_script)
+    .game_acmd("game_specialairs8", gamewatch_sideb_8_air_smash_script)
+    .game_acmd("game_specials8_sub", judge_8)
+    .game_acmd("game_specials1", gamewatch_sideb_1_smash_script)
+    .game_acmd("game_specialairs1", gamewatch_sideb_1_air_smash_script)
+    .game_acmd("game_specials1_sub", judge_1)
+    .game_acmd("game_specials9", gamewatch_sideb_9_smash_script)
+    .game_acmd("game_specialairs9", gamewatch_sideb_9_air_smash_script)
+    .game_acmd("game_specials9_sub", judge_9)
+    .game_acmd("game_specialhi", gamewatch_upb_smash_script)
+    .game_acmd("game_specialairhi", gamewatch_upb_air_smash_script)
+    .install();
+
+    Agent::new("gamewatch_bomb")
+    .on_line(Main, gamewatch_bomb_weapon_frame)
+    .game_acmd("game_fly", bomb_travel)
+    .game_acmd("game_burst", bomb_explode)
+    .install();
+
+    Agent::new("gamewatch_breath")
+    .game_acmd("game_attackairhi", uair_breath)
+    .install();
+
+    Agent::new("gamewatch_food")
+    .game_acmd("game_fish", food_fish)
+    .game_acmd("game_friedprawns", food_prawns)
+    .game_acmd("game_sausage", food_sausage)
+    .game_acmd("game_steak", food_steak)
+    .install();
+
 }

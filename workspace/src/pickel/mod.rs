@@ -7,15 +7,16 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
+use crate::custom::global_fighter_frame;
 
 // A Once-Per-Fighter-Frame that only applies to Steve
-#[fighter_frame( agent = FIGHTER_KIND_PICKEL )]
-fn steve_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn steve_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         //let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
 
-        println!("*vibe check*");
+        //println!("*vibe check*");
 
         if 
         [*FIGHTER_STATUS_KIND_DAMAGE, 
@@ -46,8 +47,7 @@ fn steve_frame(fighter: &mut L2CFighterCommon) {
 }
 
 
-#[acmd_script( agent = "pickel", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn steve_dashattack(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_dashattack(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_PICKEL_INSTANCE_WORK_ID_FLAG_REQUEST_REMOVE_HAVE_CRAFT_WEAPON);
     }
@@ -132,8 +132,7 @@ unsafe fn steve_dashattack(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pickel", script = "game_attacks3", category = ACMD_GAME )]
-unsafe fn steve_ftilt(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_ftilt(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_PICKEL_INSTANCE_WORK_ID_FLAG_REQUEST_REMOVE_HAVE_CRAFT_WEAPON);
     }
@@ -263,8 +262,7 @@ unsafe fn steve_ftilt(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pickel", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn steve_utilt(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_utilt(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_PICKEL_INSTANCE_WORK_ID_FLAG_REQUEST_REMOVE_HAVE_CRAFT_WEAPON);
     }
@@ -409,8 +407,7 @@ unsafe fn steve_utilt(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pickel", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn steve_dtilt(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_dtilt(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_PICKEL_INSTANCE_WORK_ID_FLAG_REQUEST_REMOVE_HAVE_CRAFT_WEAPON);
@@ -425,8 +422,7 @@ unsafe fn steve_dtilt(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pickel_fire", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn steve_dtilt_fire(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_dtilt_fire(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         AttackModule::disable_tip(fighter.module_accessor);
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.6, 114, 50, 0, 51, 3.5, 0.0, 2.8, 2.0, None, None, None, 0.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_OBJECT);
@@ -450,8 +446,7 @@ unsafe fn steve_dtilt_fire(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pickel_fire", script = "effect_attacklw3", category = ACMD_EFFECT )]
-unsafe fn steve_dtilt_fire_effect(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_dtilt_fire_effect(fighter: &mut L2CAgentBase) {
     for _ in 0..19 {
         if macros::is_excute(fighter) {
             macros::EFFECT_FOLLOW(fighter, Hash40::new("pickel_fire_soot"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, false);
@@ -468,8 +463,7 @@ unsafe fn steve_dtilt_fire_effect(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pickel", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn steve_fsmash(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_fsmash(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_PICKEL_INSTANCE_WORK_ID_FLAG_REQUEST_REMOVE_HAVE_CRAFT_WEAPON);
         WorkModule::set_int(fighter.module_accessor, *FIGHTER_PICKEL_CRAFT_WEAPON_KIND_SWORD, *FIGHTER_PICKEL_INSTANCE_WORK_ID_INT_REQUEST_HAVE_CRAFT_WEAPON_KIND);
@@ -549,8 +543,7 @@ unsafe fn steve_fsmash(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pickel", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn steve_usmash(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_usmash(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_PICKEL_INSTANCE_WORK_ID_FLAG_REQUEST_REMOVE_HAVE_CRAFT_WEAPON);
     }
@@ -624,8 +617,7 @@ unsafe fn steve_usmash(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pickel_melt", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn steve_dsmash_lava(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_dsmash_lava(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         AttackModule::enable_safe_pos(fighter.module_accessor);
         macros::ATTACK(fighter, 0, 1, Hash40::new("top"), 15.2, 27, 89, 0, 40, 4.5, 0.0, 2.5, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, true, 0, -1.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_OBJECT);
@@ -648,8 +640,7 @@ unsafe fn steve_dsmash_lava(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pickel", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn steve_nair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_nair(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_PICKEL_INSTANCE_WORK_ID_FLAG_REQUEST_REMOVE_HAVE_CRAFT_WEAPON);
     }
@@ -779,8 +770,7 @@ unsafe fn steve_nair(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pickel", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn steve_fair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_fair(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_PICKEL_INSTANCE_WORK_ID_FLAG_REQUEST_REMOVE_HAVE_CRAFT_WEAPON);
         WorkModule::set_int(fighter.module_accessor, *FIGHTER_PICKEL_CRAFT_WEAPON_KIND_PICK, *FIGHTER_PICKEL_INSTANCE_WORK_ID_INT_REQUEST_HAVE_CRAFT_WEAPON_KIND);
@@ -925,8 +915,7 @@ unsafe fn steve_fair(fighter: &mut L2CAgentBase) {
     }   
 }
 
-#[acmd_script( agent = "pickel", script = "effect_attackairf" , category = ACMD_EFFECT)]
-unsafe fn steve_fair_effect(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_fair_effect(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 0.0);
     if macros::is_excute(fighter) {
         if WorkModule::get_int(fighter.module_accessor, *FIGHTER_PICKEL_INSTANCE_WORK_ID_INT_HAVE_CRAFT_WEAPON_MATERIAL_KIND) == *FIGHTER_PICKEL_MATERIAL_KIND_DIAMOND {
@@ -979,8 +968,7 @@ unsafe fn steve_fair_effect(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pickel", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn steve_bair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_bair(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_PICKEL_INSTANCE_WORK_ID_FLAG_REQUEST_REMOVE_HAVE_CRAFT_WEAPON);
         WorkModule::set_int(fighter.module_accessor, *FIGHTER_PICKEL_CRAFT_WEAPON_KIND_PICK, *FIGHTER_PICKEL_INSTANCE_WORK_ID_INT_REQUEST_HAVE_CRAFT_WEAPON_KIND);
@@ -1096,8 +1084,7 @@ unsafe fn steve_bair(fighter: &mut L2CAgentBase) {
     
 }
 
-#[acmd_script( agent = "pickel", script = "effect_attackairb" , category = ACMD_EFFECT)]
-unsafe fn steve_bair_effect(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_bair_effect(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 0.0);
     if macros::is_excute(fighter) {
         if WorkModule::get_int(fighter.module_accessor, *FIGHTER_PICKEL_INSTANCE_WORK_ID_INT_HAVE_CRAFT_WEAPON_MATERIAL_KIND) == *FIGHTER_PICKEL_MATERIAL_KIND_DIAMOND {
@@ -1150,8 +1137,7 @@ unsafe fn steve_bair_effect(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pickel", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn steve_uair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_uair(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_PICKEL_INSTANCE_WORK_ID_FLAG_REQUEST_REMOVE_HAVE_CRAFT_WEAPON);
     }
@@ -1273,8 +1259,7 @@ unsafe fn steve_uair(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pickel_forge", script = "game_fallattack", category = ACMD_GAME, low_priority )]
-unsafe fn steve_dair_anvil(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_dair_anvil(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 10.0, 270, 78, 0, 22, 6.4, 0.0, 4.6, 0.0, Some(0.0), Some(4.8), Some(0.0), 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 2, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_A, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_OBJECT);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 10.0, 70, 78, 0, 42, 6.4, 0.0, 4.6, 0.0, Some(0.0), Some(4.8), Some(0.0), 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 2, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_bury"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_OBJECT);
@@ -1282,8 +1267,7 @@ unsafe fn steve_dair_anvil(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pickel_forge", script = "game_fallattackride", category = ACMD_GAME, low_priority )]
-unsafe fn steve_dair_anvil_ride(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_dair_anvil_ride(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 18.0, 270, 84, 0, 22, 6.4, 0.0, 4.6, 0.0, Some(0.0), Some(4.8), Some(0.0), 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 2, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_A, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_OBJECT);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 18.0, 70, 84, 0, 42, 6.4, 0.0, 4.6, 0.0, Some(0.0), Some(4.8), Some(0.0), 0.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 2, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_bury"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_OBJECT);
@@ -1291,8 +1275,7 @@ unsafe fn steve_dair_anvil_ride(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pickel_forge", script = "game_wait", category = ACMD_GAME, low_priority )]
-unsafe fn steve_dair_anvil_land(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_dair_anvil_land(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::QUAKE(fighter, *CAMERA_QUAKE_KIND_M);
         //macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.0, 70, 78, 0, 58, 6.4, 0.0, 4.6, 0.0, 0.0, 4.8, 0.0, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 2, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_OBJECT);
@@ -1312,8 +1295,7 @@ unsafe fn steve_dair_anvil_land(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pickel", script = "game_catch", category = ACMD_GAME )]
-unsafe fn steve_grab(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_grab(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, /*Flag*/ *FIGHTER_PICKEL_INSTANCE_WORK_ID_FLAG_REQUEST_REMOVE_HAVE_CRAFT_WEAPON);
@@ -1369,8 +1351,7 @@ unsafe fn steve_grab(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pickel", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn steve_dashgrab(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_dashgrab(fighter: &mut L2CAgentBase) {
     //sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, /*Flag*/ *FIGHTER_PICKEL_INSTANCE_WORK_ID_FLAG_REQUEST_REMOVE_HAVE_CRAFT_WEAPON);
@@ -1426,8 +1407,7 @@ unsafe fn steve_dashgrab(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pickel", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn steve_pivotgrab(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_pivotgrab(fighter: &mut L2CAgentBase) {
     //sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, /*Flag*/ *FIGHTER_PICKEL_INSTANCE_WORK_ID_FLAG_REQUEST_REMOVE_HAVE_CRAFT_WEAPON);
@@ -1483,8 +1463,7 @@ unsafe fn steve_pivotgrab(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pickel", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn steve_fthrow(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_fthrow(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 6.0, 25, 75, 0, 78, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -1511,8 +1490,7 @@ unsafe fn steve_fthrow(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pickel", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn steve_bthrow(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_bthrow(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_PICKEL_GENERATE_ARTICLE_FISHINGROD, false, -1);
         //methodlib::L2CValue::as_hash()const(*FIGHTER_PICKEL_GENERATE_ARTICLE_FISHINGROD, Hash40::new("throw_b"));
@@ -1536,8 +1514,7 @@ unsafe fn steve_bthrow(fighter: &mut L2CAgentBase) {
 	}
 }
 
-#[acmd_script( agent = "pickel", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn steve_uthrow(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_uthrow(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 8.0, 90, 20, 0, 70, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 40, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -1568,8 +1545,7 @@ unsafe fn steve_uthrow(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pickel", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn steve_dthrow(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_dthrow(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 8.0, 58, 50, 0, 50, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 40, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -1615,8 +1591,7 @@ unsafe fn steve_dthrow(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pickel", script = "game_specialairhi", category = ACMD_GAME )]
-unsafe fn steve_upb_fly(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_upb_fly(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS);
@@ -1638,8 +1613,7 @@ unsafe fn steve_upb_fly(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pickel", scripts = ["game_appealsl", "game_appealsr"], category = ACMD_GAME, low_priority )]
-unsafe fn steve_sidetaunt(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn steve_sidetaunt(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 93.0);
     if macros::is_excute(fighter) {
         DamageModule::heal(fighter.module_accessor, -2.5, 0);
@@ -1650,36 +1624,45 @@ unsafe fn steve_sidetaunt(fighter: &mut L2CAgentBase) {
 
 
 pub fn install() {
-    smashline::install_agent_frames!(
-        steve_frame
-    );
-    smashline::install_acmd_scripts!(
-        steve_dashattack,
-        steve_ftilt,
-        steve_utilt,
-        steve_dtilt,
-        steve_dtilt_fire,
-        steve_dtilt_fire_effect,
-        steve_fsmash,
-        steve_usmash,
-        steve_dsmash_lava,
-        steve_nair,
-        steve_fair,
-        steve_fair_effect,
-        steve_bair,
-        steve_bair_effect,
-        steve_uair,
-        steve_dair_anvil,
-        steve_dair_anvil_ride,
-        steve_dair_anvil_land,
-        steve_grab,
-        steve_dashgrab,
-        steve_pivotgrab,
-        steve_fthrow,
-        steve_bthrow,
-        steve_uthrow,
-        steve_dthrow,
-        steve_upb_fly,
-        steve_sidetaunt
-    );
+    Agent::new("pickel")
+    .on_line(Main, steve_frame) //opff
+    .game_acmd("game_attackdash", steve_dashattack)
+    .game_acmd("game_attacks3", steve_ftilt)
+    .game_acmd("game_attackhi3", steve_utilt)
+    .game_acmd("game_attacklw3", steve_dtilt)
+    .game_acmd("game_attacks4", steve_fsmash)
+    .game_acmd("game_attackhi4", steve_usmash)
+    .game_acmd("game_attackairn", steve_nair)
+    .game_acmd("game_attackairf", steve_fair)
+    .effect_acmd("effect_attackairf", steve_fair_effect)
+    .game_acmd("game_attackairb", steve_bair)
+    .effect_acmd("effect_attackairb", steve_bair_effect)
+    .game_acmd("game_attackairhi", steve_uair)
+    .game_acmd("game_catch", steve_grab)
+    .game_acmd("game_catchdash", steve_dashgrab)
+    .game_acmd("game_catchturn", steve_pivotgrab)
+    .game_acmd("game_throwf", steve_fthrow)
+    .game_acmd("game_throwb", steve_bthrow)
+    .game_acmd("game_throwhi", steve_uthrow)
+    .game_acmd("game_throwlw", steve_dthrow)
+    .game_acmd("game_specialairhi", steve_upb_fly)
+    .game_acmd("game_appealsl", steve_sidetaunt)
+    .game_acmd("game_appealsr", steve_sidetaunt)
+    .install();
+
+    Agent::new("pickel_fire")
+    .game_acmd("game_attacklw3", steve_dtilt_fire)
+    .effect_acmd("effect_attacklw3", steve_dtilt_fire_effect)
+    .install();
+
+    Agent::new("pickel_melt")
+    .game_acmd("game_attacklw4", steve_dsmash_lava)
+    .install();
+
+    Agent::new("pickel_forge")
+    .game_acmd("game_fallattack", steve_dair_anvil)
+    .game_acmd("game_fallattackride", steve_dair_anvil_ride)
+    .game_acmd("game_wait", steve_dair_anvil_land)
+    .install();
+
 }

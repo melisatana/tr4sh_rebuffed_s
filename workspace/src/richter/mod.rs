@@ -7,14 +7,15 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
+use crate::custom::global_fighter_frame;
 
 // A Once-Per-Fighter-Frame that only applies to Richter
-#[fighter_frame( agent = FIGHTER_KIND_RICHTER )]
-fn richter_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn richter_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         let status = StatusModule::status_kind(fighter.module_accessor);
         
-        println!("It'sa me, Richter, You don't belong in this world!!");
+        //println!("It'sa me, Richter, You don't belong in this world!!");
 
 
         if [*FIGHTER_STATUS_KIND_SPECIAL_N].contains(&status) {
@@ -25,8 +26,7 @@ fn richter_frame(fighter: &mut L2CFighterCommon) {
 }
 
 
-#[acmd_script( agent = "richter_whip", script = "game_attackhold", category = ACMD_GAME )]
-unsafe fn richter_whiphold_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_whiphold_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         PhysicsModule::set_2nd_status(fighter.module_accessor, *PH2NDARY_CRAW_MOVE as i32);
     }
@@ -39,8 +39,7 @@ unsafe fn richter_whiphold_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn richter_jab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.4, 361, 20, 15, 20, 3.5, 0.0, 8.5, 7.5, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_RICHTER_WHIP, *ATTACK_REGION_WHIP);
@@ -68,13 +67,12 @@ unsafe fn richter_jab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_attack12", category = ACMD_GAME )]
-unsafe fn richter_jab2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_jab2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.4, 361, 25, 20, 30, 4.0, 0.0, 9.0, 7.5, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_RICHTER_WHIP, *ATTACK_REGION_WHIP);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 2.4, 361, 25, 20, 30, 4.2, 0.0, 9.0, 10.5, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_RICHTER_WHIP, *ATTACK_REGION_WHIP);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 2.4, 361, 15, 15, 20, 4.5, 0.0, 9.0, 14.5, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_RICHTER_WHIP, *ATTACK_REGION_WHIP);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 2.4, 180, 15, 15, 20, 4.5, 0.0, 9.0, 14.5, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_RICHTER_WHIP, *ATTACK_REGION_WHIP);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 2.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 2.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 2, 2.0, false);
@@ -93,8 +91,7 @@ unsafe fn richter_jab2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_attack100", category = ACMD_GAME )]
-unsafe fn richter_jab100_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_jab100_smash_script(fighter: &mut L2CAgentBase) {
     for _ in 0..i32::MAX {
         if macros::is_excute(fighter) {
             macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 0.5, 361, 10, 0, 8, 7.3, 0.0, 7.5, 10.0, Some(0.0), Some(7.5), Some(13.0), 0.3, 0.7, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_WHIP);
@@ -171,29 +168,27 @@ unsafe fn richter_jab100_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_attack100end", category = ACMD_GAME )]
-unsafe fn richter_jab100end_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_jab100end_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.0, 80, 100, 0, 60, 7.5, 0.0, 7.5, 12.0, Some(0.0), Some(7.5), Some(14.0), 2.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_RICHTER_WHIP, *ATTACK_REGION_WHIP);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 3.0, false);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.0, 80, 100, 0, 70, 7.5, 0.0, 7.5, 12.0, Some(0.0), Some(7.5), Some(14.0), 2.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_RICHTER_WHIP, *ATTACK_REGION_WHIP);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 5.0, false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
     }
-    sv_animcmd::wait(fighter.lua_state_agent, 11.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 26.0);
     if macros::is_excute(fighter) {
         CancelModule::enable_cancel(fighter.module_accessor);
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn richter_dashattack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -226,8 +221,7 @@ unsafe fn richter_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_attacks3", category = ACMD_GAME )]
-unsafe fn richter_ftilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -262,8 +256,7 @@ unsafe fn richter_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn richter_utilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_utilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.0, 115, 100, 60, 68, 4.5, 0.0, 4.5, 8.0, None, None, None, 0.5, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
@@ -291,8 +284,7 @@ unsafe fn richter_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn richter_dtilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_SIMON_STATUS_ATTACK_FLAG_ENABLE_COMBO);
@@ -316,8 +308,7 @@ unsafe fn richter_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_attacklw32", category = ACMD_GAME )]
-unsafe fn richter_dtilt2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_dtilt2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         JostleModule::set_status(fighter.module_accessor, false);
@@ -347,9 +338,7 @@ unsafe fn richter_dtilt2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-
-#[acmd_script( agent = "richter", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn richter_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -377,8 +366,7 @@ unsafe fn richter_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_attacks4hi", category = ACMD_GAME )]
-unsafe fn richter_fsmash2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_fsmash2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -406,8 +394,7 @@ unsafe fn richter_fsmash2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_attacks4lw", category = ACMD_GAME )]
-unsafe fn richter_fsmash3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_fsmash3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -435,8 +422,7 @@ unsafe fn richter_fsmash3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn richter_usmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 5.0);
@@ -474,8 +460,7 @@ unsafe fn richter_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn richter_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -506,8 +491,7 @@ unsafe fn richter_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn richter_nair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_nair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 2.5, 4.5);
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -546,8 +530,7 @@ unsafe fn richter_nair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn richter_fair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_fair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -587,8 +570,7 @@ unsafe fn richter_fair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_attackairfhi", category = ACMD_GAME )]
-unsafe fn richter_fair2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_fair2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -627,8 +609,7 @@ unsafe fn richter_fair2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_attackairflw", category = ACMD_GAME )]
-unsafe fn richter_fair3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_fair3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -667,8 +648,7 @@ unsafe fn richter_fair3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn richter_bair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_bair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -704,8 +684,7 @@ unsafe fn richter_bair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_attackairbhi", category = ACMD_GAME )]
-unsafe fn richter_bair2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_bair2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -741,8 +720,7 @@ unsafe fn richter_bair2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_attackairblw", category = ACMD_GAME )]
-unsafe fn richter_bair3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_bair3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -778,8 +756,7 @@ unsafe fn richter_bair3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn richter_uair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_uair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -816,8 +793,7 @@ unsafe fn richter_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn richter_dair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_dair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_NO_SPEED_OPERATION_CHK);
         macros::SET_SPEED_EX(fighter, 0, 0.6, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
@@ -856,8 +832,7 @@ unsafe fn richter_dair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_attackairlw2", category = ACMD_GAME )]
-unsafe fn richter_dair2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_dair2_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
         macros::SET_SPEED_EX(fighter, 0, 2.7, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
@@ -874,14 +849,17 @@ unsafe fn richter_dair2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_catch", category = ACMD_GAME )]
-unsafe fn richter_grab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_grab_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 4.0, 6.0);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
-        MotionModule::set_rate(fighter.module_accessor, 1.3);
+        MotionModule::set_rate(fighter.module_accessor, 2.0);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 8.0);
+    if macros::is_excute(fighter) {
+        MotionModule::set_rate(fighter.module_accessor, 1.0);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 9.0);
     if macros::is_excute(fighter) {
@@ -901,14 +879,17 @@ unsafe fn richter_grab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn richter_grabd_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_grabd_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 6.0, 4.0);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
-        MotionModule::set_rate(fighter.module_accessor, 1.3);
+        MotionModule::set_rate(fighter.module_accessor, 2.0);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 10.0);
+    if macros::is_excute(fighter) {
+        MotionModule::set_rate(fighter.module_accessor, 1.0);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 12.0);
     if macros::is_excute(fighter) {
@@ -928,14 +909,17 @@ unsafe fn richter_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn richter_grabp_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_grabp_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 6.5, 6.0);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
-        MotionModule::set_rate(fighter.module_accessor, 1.3);
+        MotionModule::set_rate(fighter.module_accessor, 2.0);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 10.0);
+    if macros::is_excute(fighter) {
+        MotionModule::set_rate(fighter.module_accessor, 1.0);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 13.0);
     if macros::is_excute(fighter) {
@@ -955,8 +939,7 @@ unsafe fn richter_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn richter_fthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 8.4, 40, 110, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -971,8 +954,7 @@ unsafe fn richter_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn richter_bthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 11.8, 44, 30, 0, 70, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -990,8 +972,7 @@ unsafe fn richter_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn richter_uthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 4.0, 76, 82, 0, 70, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -1015,8 +996,7 @@ unsafe fn richter_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn richter_dthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.4, 49, 65, 0, 75, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -1039,8 +1019,7 @@ unsafe fn richter_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_specialn", category = ACMD_GAME )]
-unsafe fn richter_neutralb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_neutralb_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_SIMON_GENERATE_ARTICLE_AXE, false, -1);
     }
@@ -1055,31 +1034,13 @@ unsafe fn richter_neutralb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", script = "game_specialairn", category = ACMD_GAME )]
-unsafe fn richter_neutralb_air_smash_script(fighter: &mut L2CAgentBase) {
-    if macros::is_excute(fighter) {
-        ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_SIMON_GENERATE_ARTICLE_AXE, false, -1);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.625);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 30.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 1.111111111);
-        ArticleModule::shoot(fighter.module_accessor, *FIGHTER_SIMON_GENERATE_ARTICLE_AXE, smash::app::ArticleOperationTarget(*ARTICLE_OPE_TARGET_LAST), false);
-    }
-}
-
-#[acmd_script( agent = "richter_axe", script = "game_fly", category = ACMD_GAME )]
-unsafe fn axe_projectile(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn axe_projectile(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("axe"), 13.0, 69, 75, 0, 50, 4.5, 0.0, 0.0, 0.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, 8, 0.0, 20, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_OBJECT);
     }
 }
 
-#[acmd_script( agent = "richter", scripts = ["game_specials2", "game_specialairs2"], category = ACMD_GAME, low_priority )]
-unsafe fn richter_sideb2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_sideb2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         CancelModule::enable_cancel(fighter.module_accessor);
@@ -1090,8 +1051,7 @@ unsafe fn richter_sideb2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter_cross", script = "game_fly", category = ACMD_GAME )]
-unsafe fn cross_forward(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn cross_forward(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("rot"), 9.0, 110, 60, 0, 45, 1.2, 0.0, 3.9, 0.0, Some(0.0), Some(-3.9), Some(0.0), 0.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, 2, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_RICHTER_CROSS, *ATTACK_REGION_OBJECT);
         macros::ATTACK(fighter, 1, 0, Hash40::new("rot"), 9.0, 110, 60, 0, 45, 1.2, 0.0, 0.0, 3.9, Some(0.0), Some(0.0), Some(-3.9), 0.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, 2, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_RICHTER_CROSS, *ATTACK_REGION_OBJECT);
@@ -1100,9 +1060,7 @@ unsafe fn cross_forward(fighter: &mut L2CAgentBase) {
     }
 }
 
-
-#[acmd_script( agent = "richter_cross", script = "game_turn", category = ACMD_GAME )]
-unsafe fn cross_backward(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn cross_backward(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("rot"), 9.0, 55, 70, 0, 55, 1.2, 0.0, 3.9, 0.0, Some(0.0), Some(-3.9), Some(0.0), 0.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, 2, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_RICHTER_CROSS, *ATTACK_REGION_OBJECT);
         macros::ATTACK(fighter, 1, 0, Hash40::new("rot"), 9.0, 55, 70, 0, 55, 1.2, 0.0, 0.0, 3.9, Some(0.0), Some(0.0), Some(-3.9), 0.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, 2, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_RICHTER_CROSS, *ATTACK_REGION_OBJECT);
@@ -1111,8 +1069,7 @@ unsafe fn cross_backward(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", scripts = ["game_specialhi", "game_specialairhi"], category = ACMD_GAME, low_priority )]
-unsafe fn richter_upb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_upb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_SUPER_JUMP_PUNCH_FLAG_REVERSE_LR);
@@ -1141,8 +1098,7 @@ unsafe fn richter_upb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "richter", scripts = ["game_speciallw", "game_specialairlw"], category = ACMD_GAME, low_priority )]
-unsafe fn richter_downb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn richter_downb_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_SIMON_STATUS_SPECIAL_LW_FLAG_GENERATE_HOLYWATER);
     }
@@ -1156,51 +1112,63 @@ unsafe fn richter_downb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
+
+//#[skyline::main(name = "tr4sh_rebuffed")]
 pub fn install() {
-    smashline::install_agent_frames!(
-        richter_frame
-    );
-    smashline::install_acmd_scripts!(
-        richter_whiphold_smash_script,
-        richter_jab_smash_script,
-        richter_jab2_smash_script,
-        richter_jab100_smash_script,
-        richter_jab100end_smash_script,
-        richter_dashattack_smash_script,
-        richter_ftilt_smash_script,
-        richter_utilt_smash_script,
-        richter_dtilt_smash_script,
-        richter_dtilt2_smash_script,
-        richter_fsmash_smash_script,
-        richter_fsmash2_smash_script,
-        richter_fsmash3_smash_script,
-        richter_usmash_smash_script,
-        richter_dsmash_smash_script,
-        richter_nair_smash_script,
-        richter_fair_smash_script,
-        richter_fair2_smash_script,
-        richter_fair3_smash_script,
-        richter_bair_smash_script,
-        richter_bair2_smash_script,
-        richter_bair3_smash_script,
-        richter_uair_smash_script,
-        richter_dair_smash_script,
-        richter_dair2_smash_script,
-        richter_grab_smash_script,
-        richter_grabd_smash_script,
-        richter_grabp_smash_script,
-        richter_fthrow_smash_script,
-        richter_bthrow_smash_script,
-        richter_uthrow_smash_script,
-        richter_dthrow_smash_script,
-        richter_neutralb_smash_script,
-        richter_neutralb_air_smash_script,
-        axe_projectile,
-        richter_sideb2_smash_script,
-        cross_forward,
-        cross_backward,
-        richter_upb_smash_script,
-        richter_downb_smash_script
-        
-    );
+    Agent::new("richter")
+      .on_line(Main, richter_frame) //opff
+      .game_acmd("game_attack11", richter_jab_smash_script)
+      .game_acmd("game_attack12", richter_jab2_smash_script)
+      .game_acmd("game_attack100", richter_jab100_smash_script)
+      .game_acmd("game_attack100end", richter_jab100end_smash_script)
+      .game_acmd("game_attackdash", richter_dashattack_smash_script)
+      .game_acmd("game_attacks3", richter_ftilt_smash_script)
+      .game_acmd("game_attackhi3", richter_utilt_smash_script)
+      .game_acmd("game_attacklw3", richter_dtilt_smash_script)
+      .game_acmd("game_attacklw32", richter_dtilt2_smash_script)
+      .game_acmd("game_attacks4", richter_fsmash_smash_script)
+      .game_acmd("game_attacks4hi", richter_fsmash2_smash_script)
+      .game_acmd("game_attacks4lw", richter_fsmash3_smash_script)
+      .game_acmd("game_attackhi4", richter_usmash_smash_script)
+      .game_acmd("game_attacklw4", richter_dsmash_smash_script)
+      .game_acmd("game_attackairn", richter_nair_smash_script)
+      .game_acmd("game_attackairf", richter_fair_smash_script)
+      .game_acmd("game_attackairfhi", richter_fair2_smash_script)
+      .game_acmd("game_attackairflw", richter_fair3_smash_script)
+      .game_acmd("game_attackairb", richter_bair_smash_script)
+      .game_acmd("game_attackairbhi", richter_bair2_smash_script)
+      .game_acmd("game_attackairblw", richter_bair3_smash_script)
+      .game_acmd("game_attackairhi", richter_uair_smash_script)
+      .game_acmd("game_attackairlw", richter_dair_smash_script)
+      .game_acmd("game_attackairlw2", richter_dair2_smash_script)
+      .game_acmd("game_catch", richter_grab_smash_script)
+      .game_acmd("game_catchdash", richter_grabd_smash_script)
+      .game_acmd("game_catchturn", richter_grabp_smash_script)
+      .game_acmd("game_throwf", richter_fthrow_smash_script)
+      .game_acmd("game_throwb", richter_bthrow_smash_script)
+      .game_acmd("game_throwhi", richter_uthrow_smash_script)
+      .game_acmd("game_throwlw", richter_dthrow_smash_script)
+      .game_acmd("game_specialn", richter_neutralb_smash_script)
+      .game_acmd("game_specialairn", richter_neutralb_smash_script)
+      .game_acmd("game_specials2", richter_sideb2_smash_script)
+      .game_acmd("game_specialairs2", richter_sideb2_smash_script)
+      .game_acmd("game_specialhi", richter_upb_smash_script)
+      .game_acmd("game_specialairhi", richter_upb_smash_script)
+      .game_acmd("game_speciallw", richter_downb_smash_script)
+      .game_acmd("game_specialairlw", richter_downb_smash_script)
+      .install();
+  
+      Agent::new("richter_whip")
+      .game_acmd("game_attackhold", richter_whiphold_smash_script)
+      .install();
+  
+      Agent::new("richter_axe")
+      .game_acmd("game_fly", axe_projectile)
+      .install();
+  
+      Agent::new("richter_cross")
+      .game_acmd("game_fly", cross_forward)
+      .game_acmd("game_turn", cross_backward)
+      .install();
+  
 }

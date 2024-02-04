@@ -7,34 +7,35 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
+use crate::custom::global_fighter_frame;
 
 static mut BAYONETTA_SMASHATTACK_CAN_MOVE_LIMB : [bool; 8] = [false; 8];
 static mut BAYONETTA_SMASHATTACK_LIMB_X : [f32; 8] = [0.0; 8];
 static mut BAYONETTA_SMASHATTACK_LIMB_X_VEL : [f32; 8] = [0.0; 8];
 static mut BAYONETTA_SMASHATTACK_LIMB_EFFECT_FRAME : [i32; 8] = [0; 8];
+static mut BAYONETTA_SMASHATTACK_RESET_GRACE_FRAME : [i32; 8] = [3; 8];
 
-static mut BAYONETTA_SMASHATTACK_LIMB_X_ACCEL : f32 = 0.09;
-static mut BAYONETTA_SMASHATTACK_LIMB_X_DECCEL : f32 = 0.1;
-static mut BAYONETTA_SMASHATTACK_LIMB_X_MAX_VEL : f32 = 3.0;
-static mut BAYONETTA_FORWARDSMASH_LIMB_EFFECT_X_OFFSET : f32 = -4.0;
-static mut BAYONETTA_FORWARDSMASH_LIMB_EFFECT_Y_OFFSET : f32 = 20.0;
-static mut BAYONETTA_UPSMASH_LIMB_EFFECT_X_OFFSET : f32 = 14.0;
-static mut BAYONETTA_UPSMASH_LIMB_EFFECT_Y_OFFSET : f32 = 1.0;
-static mut BAYONETTA_DOWNSMASH_LIMB_EFFECT_X_OFFSET : f32 = 14.0;
-static mut BAYONETTA_DOWNSMASH_LIMB_EFFECT_Y_OFFSET : f32 = 40.0;
+static BAYONETTA_SMASHATTACK_LIMB_X_ACCEL : f32 = 0.09;
+static BAYONETTA_SMASHATTACK_LIMB_X_DECCEL : f32 = 0.1;
+static BAYONETTA_SMASHATTACK_LIMB_X_MAX_VEL : f32 = 3.0;
+static BAYONETTA_FORWARDSMASH_LIMB_EFFECT_X_OFFSET : f32 = -4.0;
+static BAYONETTA_FORWARDSMASH_LIMB_EFFECT_Y_OFFSET : f32 = 20.0;
+static BAYONETTA_UPSMASH_LIMB_EFFECT_X_OFFSET : f32 = 14.0;
+static BAYONETTA_UPSMASH_LIMB_EFFECT_Y_OFFSET : f32 = 1.0;
+static BAYONETTA_DOWNSMASH_LIMB_EFFECT_X_OFFSET : f32 = 14.0;
+static BAYONETTA_DOWNSMASH_LIMB_EFFECT_Y_OFFSET : f32 = 40.0;
 
 
 // A Once-Per-Fighter-Frame that only applies to Bayonetta
-#[fighter_frame( agent = FIGHTER_KIND_BAYONETTA )]
-fn bayonetta_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn bayonetta_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
         let stick_x = ControlModule::get_stick_x(fighter.module_accessor);
         let sticky = ControlModule::get_stick_y(fighter.module_accessor);
 
-        //println!("It'sa me, Bayonetta, dreenkin' a wa-o-bo-le");
-
+        
         if BAYONETTA_SMASHATTACK_CAN_MOVE_LIMB[entry_id] {
             if [*FIGHTER_STATUS_KIND_ATTACK_S4, *FIGHTER_STATUS_KIND_ATTACK_S4_HOLD, *FIGHTER_STATUS_KIND_ATTACK_HI4, *FIGHTER_STATUS_KIND_ATTACK_HI4_HOLD, *FIGHTER_STATUS_KIND_ATTACK_LW4, *FIGHTER_STATUS_KIND_ATTACK_LW4_HOLD].contains(&status) {
                 if stick_x > 0.5 {
@@ -91,7 +92,11 @@ fn bayonetta_frame(fighter: &mut L2CFighterCommon) {
                 }
             }
             else {
-                BAYONETTA_SMASHATTACK_CAN_MOVE_LIMB[entry_id] = false;
+                BAYONETTA_SMASHATTACK_RESET_GRACE_FRAME[entry_id] -= 1;
+                if BAYONETTA_SMASHATTACK_RESET_GRACE_FRAME[entry_id] <= 0 {
+                    BAYONETTA_SMASHATTACK_CAN_MOVE_LIMB[entry_id] = false;
+                    BAYONETTA_SMASHATTACK_RESET_GRACE_FRAME[entry_id] = 3;
+                }
             }
         }
 
@@ -124,8 +129,7 @@ fn bayonetta_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn bayonetta_jab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -161,8 +165,7 @@ unsafe fn bayonetta_jab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_attack12", category = ACMD_GAME )]
-unsafe fn bayonetta_jab2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_jab2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2d51fcdb09), *FIGHTER_BAYONETTA_SHOOTING_SLOT_L_ARM, true, true, false, 10, 3, 10, 5, true);
@@ -196,8 +199,7 @@ unsafe fn bayonetta_jab2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_attack13", category = ACMD_GAME )]
-unsafe fn bayonetta_jab3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_jab3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2d51fcdb09), *FIGHTER_BAYONETTA_SHOOTING_SLOT_R_ARM, true, true, false, 10, 3, 10, 5, true);
@@ -226,8 +228,7 @@ unsafe fn bayonetta_jab3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_attack100end", category = ACMD_GAME )]
-unsafe fn bayonetta_jab100end_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_jab100end_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2bfb02b69a), true);
         macros::CORRECT(fighter, *GROUND_CORRECT_KIND_GROUND_CLIFF_STOP);
@@ -265,8 +266,7 @@ unsafe fn bayonetta_jab100end_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn bayonetta_dashattack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2d51fcdb09), *FIGHTER_BAYONETTA_SHOOTING_SLOT_R_ARM, true, true, false, 10, 3, 15, 5, true);
@@ -299,8 +299,7 @@ unsafe fn bayonetta_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_attacks3", category = ACMD_GAME )]
-unsafe fn bayonetta_ftilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2d51fcdb09), *FIGHTER_BAYONETTA_SHOOTING_SLOT_R_LEG, true, false, false, 10, 3, 10, 5, true);
@@ -332,8 +331,7 @@ unsafe fn bayonetta_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_attacks32", category = ACMD_GAME )]
-unsafe fn bayonetta_ftilt2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_ftilt2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2d51fcdb09), *FIGHTER_BAYONETTA_SHOOTING_SLOT_L_LEG, true, false, false, 10, 3, 10, 5, true);
@@ -363,8 +361,7 @@ unsafe fn bayonetta_ftilt2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_attacks33", category = ACMD_GAME )]
-unsafe fn bayonetta_ftilt3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_ftilt3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2d51fcdb09), *FIGHTER_BAYONETTA_SHOOTING_SLOT_R_LEG, true, false, false, 10, 3, 10, 5, true);
@@ -391,8 +388,7 @@ unsafe fn bayonetta_ftilt3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn bayonetta_utilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_utilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2d51fcdb09), *FIGHTER_BAYONETTA_SHOOTING_SLOT_R_ARM, true, true, false, 10, 3, 10, 5, true);
@@ -437,8 +433,7 @@ unsafe fn bayonetta_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn bayonetta_dtilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2d51fcdb09), *FIGHTER_BAYONETTA_SHOOTING_SLOT_L_LEG, false, false, false, 10, 3, 15, 5, true);
@@ -466,8 +461,7 @@ unsafe fn bayonetta_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn bayonetta_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -480,6 +474,7 @@ unsafe fn bayonetta_fsmash_smash_script(fighter: &mut L2CAgentBase) {
         BAYONETTA_SMASHATTACK_LIMB_X[entry_id] = 0.0;
         BAYONETTA_SMASHATTACK_LIMB_X_VEL[entry_id] = 0.0;
         BAYONETTA_SMASHATTACK_LIMB_EFFECT_FRAME[entry_id] = 0;
+        BAYONETTA_SMASHATTACK_RESET_GRACE_FRAME[entry_id] = 3;
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
     }
     sv_animcmd::execute(fighter.lua_state_agent, 3.0);
@@ -496,6 +491,7 @@ unsafe fn bayonetta_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         BAYONETTA_SMASHATTACK_CAN_MOVE_LIMB[entry_id] = false;
+        BAYONETTA_SMASHATTACK_RESET_GRACE_FRAME[entry_id] = 3;
         if BAYONETTA_SMASHATTACK_LIMB_X[entry_id] > 0.5 || BAYONETTA_SMASHATTACK_LIMB_X[entry_id] < -0.5 {
             let limb_old_pos = ArticleModule::get_joint_pos(fighter.module_accessor, *FIGHTER_BAYONETTA_GENERATE_ARTICLE_WICKEDWEAVEARM, Hash40::new("top"), ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
             ArticleModule::set_pos(fighter.module_accessor, *FIGHTER_BAYONETTA_GENERATE_ARTICLE_WICKEDWEAVEARM, smash::phx::Vector3f{x: limb_old_pos.x + BAYONETTA_SMASHATTACK_LIMB_X[entry_id], y: limb_old_pos.y, z: limb_old_pos.z});
@@ -510,8 +506,7 @@ unsafe fn bayonetta_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_attacks4hi", category = ACMD_GAME )]
-unsafe fn bayonetta_fsmash2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_fsmash2_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -524,6 +519,7 @@ unsafe fn bayonetta_fsmash2_smash_script(fighter: &mut L2CAgentBase) {
         BAYONETTA_SMASHATTACK_LIMB_X[entry_id] = 0.0;
         BAYONETTA_SMASHATTACK_LIMB_X_VEL[entry_id] = 0.0;
         BAYONETTA_SMASHATTACK_LIMB_EFFECT_FRAME[entry_id] = 0;
+        BAYONETTA_SMASHATTACK_RESET_GRACE_FRAME[entry_id] = 3;
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
     }
     sv_animcmd::execute(fighter.lua_state_agent, 3.0);
@@ -540,6 +536,7 @@ unsafe fn bayonetta_fsmash2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         BAYONETTA_SMASHATTACK_CAN_MOVE_LIMB[entry_id] = false;
+        BAYONETTA_SMASHATTACK_RESET_GRACE_FRAME[entry_id] = 3;
         if BAYONETTA_SMASHATTACK_LIMB_X[entry_id] > 0.5 || BAYONETTA_SMASHATTACK_LIMB_X[entry_id] < -0.5 {
             let limb_old_pos = ArticleModule::get_joint_pos(fighter.module_accessor, *FIGHTER_BAYONETTA_GENERATE_ARTICLE_WICKEDWEAVEARM, Hash40::new("top"), ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
             ArticleModule::set_pos(fighter.module_accessor, *FIGHTER_BAYONETTA_GENERATE_ARTICLE_WICKEDWEAVEARM, smash::phx::Vector3f{x: limb_old_pos.x + BAYONETTA_SMASHATTACK_LIMB_X[entry_id], y: limb_old_pos.y, z: limb_old_pos.z});
@@ -554,8 +551,7 @@ unsafe fn bayonetta_fsmash2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_attacks4lw", category = ACMD_GAME )]
-unsafe fn bayonetta_fsmash3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_fsmash3_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -564,6 +560,7 @@ unsafe fn bayonetta_fsmash3_smash_script(fighter: &mut L2CAgentBase) {
         BAYONETTA_SMASHATTACK_LIMB_X[entry_id] = 0.0;
         BAYONETTA_SMASHATTACK_LIMB_X_VEL[entry_id] = 0.0;
         BAYONETTA_SMASHATTACK_LIMB_EFFECT_FRAME[entry_id] = 0;
+        BAYONETTA_SMASHATTACK_RESET_GRACE_FRAME[entry_id] = 3;
         macros::FT_MOTION_RATE(fighter, 0.75);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
@@ -584,6 +581,7 @@ unsafe fn bayonetta_fsmash3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         BAYONETTA_SMASHATTACK_CAN_MOVE_LIMB[entry_id] = false;
+        BAYONETTA_SMASHATTACK_RESET_GRACE_FRAME[entry_id] = 3;
         if BAYONETTA_SMASHATTACK_LIMB_X[entry_id] > 0.5 || BAYONETTA_SMASHATTACK_LIMB_X[entry_id] < -0.5 {
             let limb_old_pos = ArticleModule::get_joint_pos(fighter.module_accessor, *FIGHTER_BAYONETTA_GENERATE_ARTICLE_WICKEDWEAVEARM, Hash40::new("top"), ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
             ArticleModule::set_pos(fighter.module_accessor, *FIGHTER_BAYONETTA_GENERATE_ARTICLE_WICKEDWEAVEARM, smash::phx::Vector3f{x: limb_old_pos.x + BAYONETTA_SMASHATTACK_LIMB_X[entry_id], y: limb_old_pos.y, z: limb_old_pos.z});
@@ -598,8 +596,7 @@ unsafe fn bayonetta_fsmash3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta_wickedweavearm", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn weavearm_fsmash(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn weavearm_fsmash(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         VisibilityModule::set_int64(fighter.module_accessor, Hash40::new("body").hash as i64, Hash40::new("body_hide").hash as i64);
     }
@@ -628,8 +625,7 @@ unsafe fn weavearm_fsmash(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta_wickedweavearm", script = "game_attacks4hi", category = ACMD_GAME )]
-unsafe fn weavearm_fsmashhi(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn weavearm_fsmashhi(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         VisibilityModule::set_int64(fighter.module_accessor, Hash40::new("body").hash as i64, Hash40::new("body_hide").hash as i64);
     }
@@ -658,8 +654,7 @@ unsafe fn weavearm_fsmashhi(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta_wickedweavearm", script = "game_attacks4lw", category = ACMD_GAME )]
-unsafe fn weavearm_fsmashlw(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn weavearm_fsmashlw(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         VisibilityModule::set_int64(fighter.module_accessor, Hash40::new("body").hash as i64, Hash40::new("body_hide").hash as i64);
     }
@@ -688,8 +683,7 @@ unsafe fn weavearm_fsmashlw(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn bayonetta_usmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_usmash_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -698,6 +692,7 @@ unsafe fn bayonetta_usmash_smash_script(fighter: &mut L2CAgentBase) {
         BAYONETTA_SMASHATTACK_LIMB_X[entry_id] = 0.0;
         BAYONETTA_SMASHATTACK_LIMB_X_VEL[entry_id] = 0.0;
         BAYONETTA_SMASHATTACK_LIMB_EFFECT_FRAME[entry_id] = 0;
+        BAYONETTA_SMASHATTACK_RESET_GRACE_FRAME[entry_id] = 3;
     }
 
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
@@ -721,11 +716,12 @@ unsafe fn bayonetta_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         BAYONETTA_SMASHATTACK_CAN_MOVE_LIMB[entry_id] = false;
-        println!("[bayo] ey");
+        BAYONETTA_SMASHATTACK_RESET_GRACE_FRAME[entry_id] = 3;
+        //println!("[bayo] ey");
         if BAYONETTA_SMASHATTACK_LIMB_X[entry_id] > 0.5 || BAYONETTA_SMASHATTACK_LIMB_X[entry_id] < -0.5 {
-            println!("[bayo] yo");
+            //println!("[bayo] yo");
             let limb_old_pos = ArticleModule::get_joint_pos(fighter.module_accessor, *FIGHTER_BAYONETTA_GENERATE_ARTICLE_WICKEDWEAVEARM, Hash40::new("top"), ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
-            println!("[bayo] Up Smash x: {}, y: {}, z: {}", limb_old_pos.x + BAYONETTA_SMASHATTACK_LIMB_X[entry_id], limb_old_pos.y, limb_old_pos.z);
+            //println!("[bayo] Up Smash x: {}, y: {}, z: {}", limb_old_pos.x + BAYONETTA_SMASHATTACK_LIMB_X[entry_id], limb_old_pos.y, limb_old_pos.z);
             ArticleModule::set_pos(fighter.module_accessor, *FIGHTER_BAYONETTA_GENERATE_ARTICLE_WICKEDWEAVEARM, smash::phx::Vector3f{x: limb_old_pos.x + BAYONETTA_SMASHATTACK_LIMB_X[entry_id], y: limb_old_pos.y, z: limb_old_pos.z});
         }
     }
@@ -742,8 +738,7 @@ unsafe fn bayonetta_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta_wickedweavearm", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn weavearm_usmash(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn weavearm_usmash(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         VisibilityModule::set_int64(fighter.module_accessor, Hash40::new("body").hash as i64, Hash40::new("body_hide").hash as i64);
     }
@@ -775,8 +770,7 @@ unsafe fn weavearm_usmash(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn bayonetta_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -785,6 +779,7 @@ unsafe fn bayonetta_dsmash_smash_script(fighter: &mut L2CAgentBase) {
         BAYONETTA_SMASHATTACK_LIMB_X[entry_id] = 0.0;
         BAYONETTA_SMASHATTACK_LIMB_X_VEL[entry_id] = 0.0;
         BAYONETTA_SMASHATTACK_LIMB_EFFECT_FRAME[entry_id] = 0;
+        BAYONETTA_SMASHATTACK_RESET_GRACE_FRAME[entry_id] = 3;
     }
 
     sv_animcmd::frame(fighter.lua_state_agent, 9.0);
@@ -808,6 +803,7 @@ unsafe fn bayonetta_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         BAYONETTA_SMASHATTACK_CAN_MOVE_LIMB[entry_id] = false;
+        BAYONETTA_SMASHATTACK_RESET_GRACE_FRAME[entry_id] = 3;
         if BAYONETTA_SMASHATTACK_LIMB_X[entry_id] > 0.5 || BAYONETTA_SMASHATTACK_LIMB_X[entry_id] < -0.5 {
             let limb_old_pos = ArticleModule::get_joint_pos(fighter.module_accessor, *FIGHTER_BAYONETTA_GENERATE_ARTICLE_WICKEDWEAVELEG, Hash40::new("top"), ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL));
             ArticleModule::set_pos(fighter.module_accessor, *FIGHTER_BAYONETTA_GENERATE_ARTICLE_WICKEDWEAVELEG, smash::phx::Vector3f{x: limb_old_pos.x + BAYONETTA_SMASHATTACK_LIMB_X[entry_id], y: limb_old_pos.y, z: limb_old_pos.z});
@@ -839,8 +835,7 @@ unsafe fn bayonetta_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta_wickedweaveleg", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn weaveleg_dsmash(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn weaveleg_dsmash(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         VisibilityModule::set_int64(fighter.module_accessor, Hash40::new("body").hash as i64, Hash40::new("body_hide").hash as i64);
     }
@@ -876,8 +871,7 @@ unsafe fn weaveleg_dsmash(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn bayonetta_nair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_nair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2d51fcdb09), *FIGHTER_BAYONETTA_SHOOTING_SLOT_R_ARM, false, false, true, 20, 0, 15, 0, false);
@@ -921,8 +915,7 @@ unsafe fn bayonetta_nair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_attackairnhold", category = ACMD_GAME )]
-unsafe fn bayonetta_nair_hold_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_nair_hold_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("legr"), 4.8, 64, 85, 0, 60, 4.8, 3.5, 0.0, 1.7, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
         macros::ATTACK(fighter, 1, 0, Hash40::new("kneer"), 4.8, 64, 85, 0, 60, 3.3, 7.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
@@ -956,8 +949,7 @@ unsafe fn bayonetta_nair_hold_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn bayonetta_fair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_fair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -996,8 +988,7 @@ unsafe fn bayonetta_fair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_attackairf2", category = ACMD_GAME )]
-unsafe fn bayonetta_fair2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_fair2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2d51fcdb09), *FIGHTER_BAYONETTA_SHOOTING_SLOT_L_ARM, true, false, true, 10, 3, 10, 0, true);
@@ -1034,8 +1025,7 @@ unsafe fn bayonetta_fair2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_attackairf3", category = ACMD_GAME )]
-unsafe fn bayonetta_fair3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_fair3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2d51fcdb09), *FIGHTER_BAYONETTA_SHOOTING_SLOT_L_ARM, false, false, true, 10, 3, 10, 5, true);
@@ -1072,8 +1062,7 @@ unsafe fn bayonetta_fair3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn bayonetta_bair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_bair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2d51fcdb09), *FIGHTER_BAYONETTA_SHOOTING_SLOT_L_LEG, false, false, true, 10, 3, 10, 5, true);
@@ -1112,8 +1101,7 @@ unsafe fn bayonetta_bair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn bayonetta_uair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_uair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2d51fcdb09), *FIGHTER_BAYONETTA_SHOOTING_SLOT_L_ARM, false, false, true, 20, 3, 15, 0, false);
@@ -1159,8 +1147,7 @@ unsafe fn bayonetta_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_attackairhihold", category = ACMD_GAME )]
-unsafe fn bayonetta_uair_hold_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_uair_hold_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.0);
@@ -1173,8 +1160,7 @@ unsafe fn bayonetta_uair_hold_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn bayonetta_dair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_dair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -1216,8 +1202,7 @@ unsafe fn bayonetta_dair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_landingairlw", category = ACMD_GAME )]
-unsafe fn bayonetta_dair_landing_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_dair_landing_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::SET_SPEED_EX(fighter, 0, 0, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
@@ -1251,8 +1236,7 @@ unsafe fn bayonetta_dair_landing_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_cliffattack", category = ACMD_GAME )]
-unsafe fn bayonetta_ledge_attack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_ledge_attack_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 24.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 9.0, 45, 20, 0, 90, 5.0, 0.0, 5.0, 13.5, Some(0.0), Some(5.0), Some(2.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 1, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
@@ -1263,8 +1247,7 @@ unsafe fn bayonetta_ledge_attack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_catch", category = ACMD_GAME )]
-unsafe fn bayonetta_grab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_grab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         GrabModule::set_rebound(fighter.module_accessor, true);
@@ -1283,8 +1266,7 @@ unsafe fn bayonetta_grab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn bayonetta_grabd_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_grabd_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -1306,8 +1288,7 @@ unsafe fn bayonetta_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn bayonetta_grabp_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_grabp_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -1329,8 +1310,7 @@ unsafe fn bayonetta_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn bayonetta_fthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.0, 42, 160, 0, 50, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -1349,8 +1329,7 @@ unsafe fn bayonetta_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn bayonetta_bthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 6.0, 45, 50, 0, 70, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -1373,8 +1352,7 @@ unsafe fn bayonetta_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn bayonetta_uthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 4.5, 115, 70, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -1401,8 +1379,7 @@ unsafe fn bayonetta_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn bayonetta_dthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 4.0, 73, 120, 0, 36, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -1432,25 +1409,21 @@ unsafe fn bayonetta_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta_specialn_bullet", script = "game_move", category = ACMD_GAME )]
-unsafe fn bullet_climax_uncharged(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bullet_climax_uncharged(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.9, 0, 45, 0, 0, 1.0, 0.0, 0.0, 0.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, -0.3, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_BAYONETTA_HIT_01, *ATTACK_REGION_OBJECT);
         AttackModule::enable_safe_pos(fighter.module_accessor);
     }
 }
 
-#[acmd_script( agent = "bayonetta_specialn_bullet", script = "game_movechargebullet", category = ACMD_GAME )]
-unsafe fn bullet_climax_charged(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bullet_climax_charged(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.7, 45, 190, 0, 21, 2.3, 0.0, 0.0, 0.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, -0.6, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_BAYONETTA_HIT_02, *ATTACK_REGION_OBJECT);
         AttackModule::enable_safe_pos(fighter.module_accessor);
     }
 }
 
-
-#[acmd_script( agent = "bayonetta", script = "game_specials", category = ACMD_GAME )]
-unsafe fn bayonetta_sideb_heelslide_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_sideb_heelslide_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2d51fcdb09), *FIGHTER_BAYONETTA_SHOOTING_SLOT_R_LEG, false, false, true, 10, 0, 20, 0, false);
@@ -1495,8 +1468,7 @@ unsafe fn bayonetta_sideb_heelslide_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_specialsholdend", category = ACMD_GAME )]
-unsafe fn bayonetta_sideb_heelslide_hold_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_sideb_heelslide_hold_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -1530,8 +1502,7 @@ unsafe fn bayonetta_sideb_heelslide_hold_smash_script(fighter: &mut L2CAgentBase
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_specialairsd", category = ACMD_GAME )]
-unsafe fn bayonetta_sideb_afterburner_down_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_sideb_afterburner_down_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         JostleModule::set_status(fighter.module_accessor, false);
     }
@@ -1555,8 +1526,7 @@ unsafe fn bayonetta_sideb_afterburner_down_smash_script(fighter: &mut L2CAgentBa
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_specialairsu", category = ACMD_GAME )]
-unsafe fn bayonetta_sideb_afterburner_up_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_sideb_afterburner_up_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         JostleModule::set_status(fighter.module_accessor, false);
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -1615,8 +1585,7 @@ unsafe fn bayonetta_sideb_afterburner_up_smash_script(fighter: &mut L2CAgentBase
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_specialhi", category = ACMD_GAME )]
-unsafe fn bayonetta_upb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_upb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2d51fcdb09), *FIGHTER_BAYONETTA_SHOOTING_SLOT_R_ARM, false, false, true, 20, 0, 15, 0, false);
@@ -1703,8 +1672,7 @@ unsafe fn bayonetta_upb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", script = "game_specialairhi", category = ACMD_GAME )]
-unsafe fn bayonetta_upb_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_upb_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2d51fcdb09), *FIGHTER_BAYONETTA_SHOOTING_SLOT_R_ARM, false, false, true, 20, 0, 15, 0, false);
@@ -1791,8 +1759,7 @@ unsafe fn bayonetta_upb_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", scripts = ["game_speciallw", "specialairlw"], category = ACMD_GAME, low_priority )]
-unsafe fn bayonetta_downb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_downb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_BAYONETTA_STATUS_WORK_ID_SPECIAL_LW_FLAG_ENABLE_NEXT_NO_COMP);
@@ -1823,8 +1790,7 @@ unsafe fn bayonetta_downb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }   
 
-#[acmd_script( agent = "bayonetta", script = "game_finalvisualscene01", category = ACMD_GAME, low_priority )]
-unsafe fn bayonetta_final_visualscene01_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_final_visualscene01_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 40.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_BAYONETTA_STATUS_WORK_ID_FINAL_FLAG_START_CLIMAX_GAUGE);
@@ -1883,8 +1849,7 @@ unsafe fn bayonetta_final_visualscene01_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "bayonetta", scripts = ["game_finalend", "game_finalairend"], category = ACMD_GAME, low_priority )]
-unsafe fn bayonetta_final_end_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bayonetta_final_end_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_BAYONETTA_FINAL_FINISH, 0, 10.7, 361, 98, 0, 79, 0.0, 1.0, *ATTACK_LR_CHECK_POS, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_BAYONETTA_STATUS_WORK_ID_FINAL_FLAG_ABS_SET);
@@ -1914,61 +1879,71 @@ unsafe fn bayonetta_final_end_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-pub fn install() {
-    smashline::install_agent_frames!(
-        bayonetta_frame
-    );
-    smashline::install_acmd_scripts!(
-        bayonetta_jab_smash_script,
-        bayonetta_jab2_smash_script,
-        bayonetta_jab3_smash_script,
-        bayonetta_jab100end_smash_script,
-        bayonetta_dashattack_smash_script,
-        bayonetta_ftilt_smash_script,
-        bayonetta_ftilt2_smash_script,
-        bayonetta_ftilt3_smash_script,
-        bayonetta_utilt_smash_script,
-        bayonetta_dtilt_smash_script,
-        bayonetta_fsmash_smash_script,
-        bayonetta_fsmash2_smash_script,
-        bayonetta_fsmash3_smash_script,
-        weavearm_fsmash,
-        weavearm_fsmashhi,
-        weavearm_fsmashlw,
-        bayonetta_usmash_smash_script,
-        weavearm_usmash,
-        bayonetta_dsmash_smash_script,
-        weaveleg_dsmash,
-        bayonetta_nair_smash_script,
-        bayonetta_nair_hold_smash_script,
-        bayonetta_fair_smash_script,
-        bayonetta_fair2_smash_script,
-        bayonetta_fair3_smash_script,
-        bayonetta_bair_smash_script,
-        bayonetta_uair_smash_script,
-        bayonetta_uair_hold_smash_script,
-        bayonetta_dair_smash_script,
-        bayonetta_dair_landing_smash_script,
-        bayonetta_ledge_attack_smash_script,
-        bayonetta_grab_smash_script,
-        bayonetta_grabd_smash_script,
-        bayonetta_grabp_smash_script,
-        bayonetta_fthrow_smash_script,
-        bayonetta_bthrow_smash_script,
-        bayonetta_uthrow_smash_script,
-        bayonetta_dthrow_smash_script,
-        bullet_climax_uncharged,
-        bullet_climax_charged,
-        bayonetta_sideb_heelslide_smash_script,
-        bayonetta_sideb_heelslide_hold_smash_script,
-        bayonetta_sideb_afterburner_down_smash_script,
-        bayonetta_sideb_afterburner_up_smash_script,
-        bayonetta_upb_smash_script,
-        bayonetta_upb_air_smash_script,
-        bayonetta_downb_smash_script,
-        bayonetta_final_visualscene01_script,
-        bayonetta_final_end_smash_script
 
-        
-    );
+pub fn install() {
+    Agent::new("bayonetta")
+    .on_line(Main, bayonetta_frame) //opff
+    .game_acmd("game_attack11", bayonetta_jab_smash_script)
+    .game_acmd("game_attack12", bayonetta_jab2_smash_script)
+    .game_acmd("game_attack13", bayonetta_jab3_smash_script)
+    .game_acmd("game_attack100end", bayonetta_jab100end_smash_script)
+    .game_acmd("game_attackdash", bayonetta_dashattack_smash_script)
+    .game_acmd("game_attacks3", bayonetta_ftilt_smash_script)
+    .game_acmd("game_attacks32", bayonetta_ftilt2_smash_script)
+    .game_acmd("game_attacks33", bayonetta_ftilt3_smash_script)
+    .game_acmd("game_attackhi3", bayonetta_utilt_smash_script)
+    .game_acmd("game_attacklw3", bayonetta_dtilt_smash_script)
+    .game_acmd("game_attacks4", bayonetta_fsmash_smash_script)
+    .game_acmd("game_attacks4hi", bayonetta_fsmash2_smash_script)
+    .game_acmd("game_attacks4lw", bayonetta_fsmash3_smash_script)
+    .game_acmd("game_attackhi4", bayonetta_usmash_smash_script)
+    .game_acmd("game_attacklw4", bayonetta_dsmash_smash_script)
+    .game_acmd("game_attackairn", bayonetta_nair_smash_script)
+    .game_acmd("game_attackairnhold", bayonetta_nair_hold_smash_script)
+    .game_acmd("game_attackairf", bayonetta_fair_smash_script)
+    .game_acmd("game_attackairf2", bayonetta_fair2_smash_script)
+    .game_acmd("game_attackairf3", bayonetta_fair3_smash_script)
+    .game_acmd("game_attackairb", bayonetta_bair_smash_script)
+    .game_acmd("game_attackairhi", bayonetta_uair_smash_script)
+    .game_acmd("game_attackairhihold", bayonetta_uair_hold_smash_script)
+    .game_acmd("game_attackairlw", bayonetta_dair_smash_script)
+    .game_acmd("game_landingairlw", bayonetta_dair_landing_smash_script)
+    .game_acmd("game_cliffattack", bayonetta_ledge_attack_smash_script)
+    .game_acmd("game_catch", bayonetta_grab_smash_script)
+    .game_acmd("game_catchdash", bayonetta_grabd_smash_script)
+    .game_acmd("game_catchturn", bayonetta_grabp_smash_script)
+    .game_acmd("game_throwf", bayonetta_fthrow_smash_script)
+    .game_acmd("game_throwb", bayonetta_bthrow_smash_script)
+    .game_acmd("game_throwhi", bayonetta_uthrow_smash_script)
+    .game_acmd("game_throwlw", bayonetta_dthrow_smash_script)
+    .game_acmd("game_specials", bayonetta_sideb_heelslide_smash_script)
+    .game_acmd("game_specialsholdend", bayonetta_sideb_heelslide_hold_smash_script)
+    .game_acmd("game_specialairsu", bayonetta_sideb_afterburner_up_smash_script)
+    .game_acmd("game_specialairsd", bayonetta_sideb_afterburner_down_smash_script)
+    .game_acmd("game_specialhi", bayonetta_upb_smash_script)
+    .game_acmd("game_specialairhi", bayonetta_upb_air_smash_script)
+    .game_acmd("game_speciallw", bayonetta_downb_smash_script)
+    .game_acmd("game_specialairlw", bayonetta_downb_smash_script)
+    .game_acmd("game_finalvisualscene01", bayonetta_final_visualscene01_script)
+    .game_acmd("game_finalend", bayonetta_final_end_smash_script)
+    .game_acmd("game_finalairend", bayonetta_final_end_smash_script)
+    .install();
+
+    Agent::new("bayonetta_wickedweavearm")
+    .game_acmd("game_attacks4", weavearm_fsmash)
+    .game_acmd("game_attacks4hi", weavearm_fsmashhi)
+    .game_acmd("game_attacks4lw", weavearm_fsmashlw)
+    .game_acmd("game_attackhi4", weavearm_usmash)
+    .install();
+
+    Agent::new("bayonetta_wickedweaveleg")
+    .game_acmd("game_attacklw4", weaveleg_dsmash)
+    .install();
+
+    Agent::new("bayonetta_specialn_bullet")
+    .game_acmd("game_move", bullet_climax_uncharged)
+    .game_acmd("game_movechargebullet", bullet_climax_charged)
+    .install();
+
+
 }

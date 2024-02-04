@@ -7,6 +7,7 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
+use crate::custom::global_fighter_frame;
 
 static mut KOOPA_SIDEB_RECHARGE_TIMER : [i32; 8] = [0; 8];
 static KOOPA_SIDEB_COOLDOWN : i32 = 240; 
@@ -16,14 +17,14 @@ static mut KOOPA_UPB_GROUNDTOAIR : [bool; 8] = [false; 8];
 static mut KOOPA_SIDEB_ITEMGRAB : [bool; 8] = [false; 8];
 
 // A Once-Per-Fighter-Frame that only applies to Bowser
-#[fighter_frame( agent = FIGHTER_KIND_KOOPA )]
-fn koopa_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn koopa_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         let status = StatusModule::status_kind(fighter.module_accessor);
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let sticky = ControlModule::get_stick_y(fighter.module_accessor);
 
-        println!("It'sa me, Bowser, gwaaaaaaah!");
+        //println!("It'sa me, Bowser, gwaaaaaaah!");
 
         if KOOPA_SIDEB_RECHARGE_TIMER[entry_id] > 0 {
             KOOPA_SIDEB_RECHARGE_TIMER[entry_id] -= 1;
@@ -67,22 +68,19 @@ fn koopa_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_squatf", category = ACMD_GAME )]
-unsafe fn koopa_squatf_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_squatf_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_squatb", category = ACMD_GAME )]
-unsafe fn koopa_squatb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_squatb_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn koopa_jab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -107,8 +105,7 @@ unsafe fn koopa_jab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_attack12", category = ACMD_GAME )]
-unsafe fn koopa_jab2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_jab2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 9.0);
     if macros::is_excute(fighter) {
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("armr"), HitStatus(*HIT_STATUS_XLU), 0);
@@ -123,8 +120,7 @@ unsafe fn koopa_jab2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn koopa_dashattack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -145,8 +141,7 @@ unsafe fn koopa_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", scripts = ["game_attacks3", "game_attacks3hi", "game_attacks3lw"], category = ACMD_GAME, low_priority )]
-unsafe fn koopa_ftilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_DAMAGE_POWER, 8.0);
@@ -167,8 +162,7 @@ unsafe fn koopa_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn koopa_utilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_utilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.4);
@@ -190,8 +184,7 @@ unsafe fn koopa_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn koopa_dtilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
        MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -232,8 +225,7 @@ unsafe fn koopa_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn koopa_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -270,8 +262,7 @@ unsafe fn koopa_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn koopa_usmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -315,8 +306,7 @@ unsafe fn koopa_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn koopa_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -356,8 +346,7 @@ unsafe fn koopa_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn koopa_nair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_nair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -384,8 +373,7 @@ unsafe fn koopa_nair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "effect_attackairn", category = ACMD_EFFECT )]
-unsafe fn koopa_nair_effect_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_nair_effect_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     for _ in 0..4 {
         if macros::is_excute(fighter) {
@@ -398,8 +386,7 @@ unsafe fn koopa_nair_effect_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "expression_attackairn", category = ACMD_EXPRESSION )]
-unsafe fn koopa_nair_expression_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_nair_expression_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         AttackModule::set_attack_reference_joint_id(fighter.module_accessor, Hash40::new("top"), AttackDirectionAxis(*ATTACK_DIRECTION_Y), AttackDirectionAxis(*ATTACK_DIRECTION_Z), AttackDirectionAxis(*ATTACK_DIRECTION_X));
     }
@@ -421,8 +408,7 @@ unsafe fn koopa_nair_expression_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn koopa_fair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_fair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -452,8 +438,7 @@ unsafe fn koopa_fair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn koopa_bair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_bair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -474,8 +459,7 @@ unsafe fn koopa_bair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn koopa_uair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_uair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -498,8 +482,7 @@ unsafe fn koopa_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn koopa_dair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_dair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_NO_SPEED_OPERATION_CHK);
         macros::SET_SPEED_EX(fighter, 0.0, 2.5, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
@@ -548,8 +531,7 @@ unsafe fn koopa_dair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_landingairlw", category = ACMD_GAME )]
-unsafe fn koopa_dair_landing_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_dair_landing_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.8, 30, 138, 0, 50, 9.6, 0.0, 4.0, -8.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_BODY);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 7.8, 30, 138, 0, 50, 9.6, 0.0, 4.0, 8.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_BODY);
@@ -576,8 +558,7 @@ unsafe fn koopa_dair_landing_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_catch", category = ACMD_GAME )]
-unsafe fn koopa_grab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_grab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.1);
@@ -600,8 +581,7 @@ unsafe fn koopa_grab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn koopa_grabd_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_grabd_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -623,8 +603,7 @@ unsafe fn koopa_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn koopa_grabp_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_grabp_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -646,8 +625,7 @@ unsafe fn koopa_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn koopa_fthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 11.1, 39, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -662,8 +640,7 @@ unsafe fn koopa_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn koopa_bthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 13.2, 45, 30, 0, 90, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -680,8 +657,7 @@ unsafe fn koopa_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn koopa_uthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 2.0, 85, 100, 0, 35, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -738,8 +714,7 @@ unsafe fn koopa_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn koopa_dthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 4.0, 20, 40, 0, 40, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -770,24 +745,14 @@ unsafe fn koopa_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_specialnstart", category = ACMD_GAME )]
-unsafe fn koopa_neutralb_start_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_neutralb_start_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.75);
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_specialairnstart", category = ACMD_GAME )]
-unsafe fn koopa_neutralb_start_air_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.75);
-    }
-}
-
-#[acmd_script( agent = "koopa_breath", script = "game_move", category = ACMD_GAME )]
-unsafe fn koopa_flamebreath(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_flamebreath(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.1, 55, 30, 0, 20, 4.5, 0.0, 0.0, 0.0, None, None, None, 1.0, 0.8, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_SPEED, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_NONE);
         AttackModule::enable_safe_pos(fighter.module_accessor);
@@ -798,8 +763,7 @@ unsafe fn koopa_flamebreath(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_specialscatch", category = ACMD_GAME )]
-unsafe fn koopa_sideb_grab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_sideb_grab_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if StatusModule::prev_situation_kind(fighter.module_accessor) == SITUATION_KIND_AIR {
@@ -852,8 +816,7 @@ unsafe fn koopa_sideb_grab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_specialsaircatch", category = ACMD_GAME )]
-unsafe fn koopa_sideb_grab_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_sideb_grab_air_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -901,16 +864,14 @@ unsafe fn koopa_sideb_grab_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_specialsfall", category = ACMD_GAME )]
-unsafe fn koopa_sideb_fall_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_sideb_fall_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 5.0, 70, 30, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_BODY);
         macros::ATTACK_IGNORE_THROW(fighter, 0, 0, Hash40::new("top"), 23.7, 270, 80, 0, 80, 8.0, 0.0, 2.0, 6.5, Some(0.0), Some(2.0), Some(-4.5), 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 10, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_BODY);
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_specialslanding", category = ACMD_GAME )]
-unsafe fn koopa_sideb_landing_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_sideb_landing_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -934,8 +895,7 @@ unsafe fn koopa_sideb_landing_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_specialhi", category = ACMD_GAME )]
-unsafe fn koopa_upb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_upb_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -986,8 +946,7 @@ unsafe fn koopa_upb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
     
-#[acmd_script( agent = "koopa", script = "game_specialairhi", category = ACMD_GAME )]
-unsafe fn koopa_upb_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_upb_air_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -1033,8 +992,7 @@ unsafe fn koopa_upb_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_speciallw", category = ACMD_GAME )]
-unsafe fn koopa_downb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_downb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 11.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.0, 80, 100, 60, 0, 4.0, 0.0, 1.0, 17.0, Some(0.0), Some(9.0), Some(17.0), 1.0, 0.5, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_BODY);
@@ -1060,8 +1018,7 @@ unsafe fn koopa_downb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_specialairlw", category = ACMD_GAME )]
-unsafe fn koopa_downb_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_downb_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
@@ -1078,8 +1035,7 @@ unsafe fn koopa_downb_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_speciallwlanding", category = ACMD_GAME )]
-unsafe fn koopa_downb_landing_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_downb_landing_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.0, 76, 72, 0, 60, 8.0, 0.0, 1.5, -5.5, Some(0.0), Some(1.5), Some(5.5), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 10, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_BODY);
@@ -1093,8 +1049,7 @@ unsafe fn koopa_downb_landing_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_appeallwl", category = ACMD_GAME )]
-unsafe fn koopa_downtaunt_left_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn koopa_downtaunt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 20.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.0, 0, 1, 0, 1, 72.0, 0.0, 10.0, 0.0, None, None, None, 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, f32::NAN, 1.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_NONE);
@@ -1105,63 +1060,56 @@ unsafe fn koopa_downtaunt_left_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "koopa", script = "game_appeallwr", category = ACMD_GAME )]
-unsafe fn koopa_downtaunt_right_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 20.0);
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.0, 0, 1, 0, 1, 72.0, 0.0, 10.0, 0.0, None, None, None, 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, f32::NAN, 1.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_NONE);
-    }
-    sv_animcmd::wait(fighter.lua_state_agent, 2.0);
-    if macros::is_excute(fighter) {
-        AttackModule::clear_all(fighter.module_accessor);
-    }
-}
 
 pub fn install() {
-    smashline::install_agent_frames!(
-        koopa_frame
-    );
-    smashline::install_acmd_scripts!(
-        koopa_squatf_smash_script,
-        koopa_squatb_smash_script,
-        koopa_jab_smash_script,
-        koopa_jab2_smash_script,
-        koopa_dashattack_smash_script,
-        koopa_ftilt_smash_script,
-        koopa_utilt_smash_script,
-        koopa_dtilt_smash_script,
-        koopa_fsmash_smash_script,
-        koopa_usmash_smash_script,
-        koopa_dsmash_smash_script,
-        koopa_nair_smash_script,
-        koopa_nair_effect_script,
-        koopa_nair_expression_script,
-        koopa_fair_smash_script,
-        koopa_bair_smash_script,
-        koopa_uair_smash_script,
-        koopa_dair_smash_script,
-        koopa_dair_landing_smash_script,
-        koopa_grab_smash_script,
-        koopa_grabd_smash_script,
-        koopa_grabp_smash_script,
-        koopa_fthrow_smash_script,
-        koopa_bthrow_smash_script,
-        koopa_uthrow_smash_script,
-        koopa_dthrow_smash_script,
-        koopa_neutralb_start_smash_script,
-        koopa_neutralb_start_air_smash_script,
-        koopa_flamebreath,
-        koopa_sideb_grab_smash_script,
-        koopa_sideb_grab_air_smash_script,
-        koopa_sideb_fall_smash_script,
-        koopa_sideb_landing_smash_script,
-        koopa_upb_smash_script,
-        koopa_upb_air_smash_script,
-        koopa_downb_smash_script,
-        koopa_downb_air_smash_script,
-        koopa_downb_landing_smash_script,
-        koopa_downtaunt_left_smash_script,
-        koopa_downtaunt_right_smash_script
-        
-    );
+    Agent::new("koopa")
+    .on_line(Main, koopa_frame) //opff
+    .game_acmd("game_squatf", koopa_squatf_smash_script)
+    .game_acmd("game_squatf", koopa_squatb_smash_script)
+    .game_acmd("game_attack11", koopa_jab_smash_script)
+    .game_acmd("game_attack12", koopa_jab2_smash_script)
+    .game_acmd("game_attackdash", koopa_dashattack_smash_script)
+    .game_acmd("game_attacks3", koopa_ftilt_smash_script)
+    .game_acmd("game_attacks3hi", koopa_ftilt_smash_script)
+    .game_acmd("game_attacks3lw", koopa_ftilt_smash_script)
+    .game_acmd("game_attackhi3", koopa_utilt_smash_script)
+    .game_acmd("game_attacklw3", koopa_dtilt_smash_script)
+    .game_acmd("game_attacks4", koopa_fsmash_smash_script)
+    .game_acmd("game_attackhi4", koopa_usmash_smash_script)
+    .game_acmd("game_attacklw4", koopa_dsmash_smash_script)
+    .game_acmd("game_attackairn", koopa_nair_smash_script)
+    .effect_acmd("effect_attackairn", koopa_nair_effect_script)
+    .expression_acmd("expression_attackairn", koopa_nair_expression_script)
+    .game_acmd("game_attackairf", koopa_fair_smash_script)
+    .game_acmd("game_attackairb", koopa_bair_smash_script)
+    .game_acmd("game_attackairhi", koopa_uair_smash_script)
+    .game_acmd("game_attackairlw", koopa_dair_smash_script)
+    .game_acmd("game_landingairlw", koopa_dair_landing_smash_script)
+    .game_acmd("game_catch", koopa_grab_smash_script)
+    .game_acmd("game_catchdash", koopa_grabd_smash_script)
+    .game_acmd("game_catchturn", koopa_grabp_smash_script)
+    .game_acmd("game_throwf", koopa_fthrow_smash_script)
+    .game_acmd("game_throwb", koopa_bthrow_smash_script)
+    .game_acmd("game_throwhi", koopa_uthrow_smash_script)
+    .game_acmd("game_throwlw", koopa_dthrow_smash_script)
+    .game_acmd("game_specialnstart", koopa_neutralb_start_smash_script)
+    .game_acmd("game_specialairnstart", koopa_neutralb_start_smash_script)
+    .game_acmd("game_specialscatch", koopa_sideb_grab_smash_script)
+    .game_acmd("game_specialsaircatch", koopa_sideb_grab_air_smash_script)
+    .game_acmd("game_specialsfall", koopa_sideb_fall_smash_script)
+    .game_acmd("game_specialslanding", koopa_sideb_landing_smash_script)
+    .game_acmd("game_specialhi", koopa_upb_smash_script)
+    .game_acmd("game_specialairhi", koopa_upb_air_smash_script)
+    .game_acmd("game_speciallw", koopa_downb_smash_script)
+    .game_acmd("game_specialairlw", koopa_downb_air_smash_script)
+    .game_acmd("game_speciallwlanding", koopa_downb_landing_smash_script)
+    .game_acmd("game_appeallwl", koopa_downtaunt_smash_script)
+    .game_acmd("game_appeallwr", koopa_downtaunt_smash_script)
+    .install();
+
+    Agent::new("koopa_breath")
+    .game_acmd("game_move", koopa_flamebreath)
+    .install();
+
+
 }

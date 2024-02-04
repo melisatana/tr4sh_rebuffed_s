@@ -7,18 +7,18 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
+use crate::custom::global_fighter_frame;
 
 // A Once-Per-Fighter-Frame that only applies to Min Min
-#[fighter_frame( agent = FIGHTER_KIND_TANTAN )]
-fn tantan_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn tantan_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
-
-        println!("It'sa me, Min Min, 我愛拉麵");
+        global_fighter_frame(fighter);
+        //println!("It'sa me, Min Min, 我愛拉麵");
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn tantan_jab_smash_script(fighter: &mut L2CAgentBase) {
+
+unsafe extern "C" fn tantan_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 3.0, 4.5);
@@ -46,8 +46,7 @@ unsafe fn tantan_jab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_attack12", category = ACMD_GAME )]
-unsafe fn tantan_jab2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_jab2_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 3.5, 4.5);
     }
@@ -80,8 +79,7 @@ unsafe fn tantan_jab2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_attack13", category = ACMD_GAME )]
-unsafe fn tantan_jab3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_jab3_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 4.5, 4.5);
     }
@@ -99,8 +97,7 @@ unsafe fn tantan_jab3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_attack100", category = ACMD_GAME )]
-unsafe fn tantan_jab100_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_jab100_smash_script(fighter: &mut L2CAgentBase) {
     for _ in 0..i32::MAX {
         if macros::is_excute(fighter) {
             macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 0.5, 361, 16, 0, 12, 3.8, 0.0, 5.4, 7.0, Some(0.0), Some(11.6), Some(7.0), 1.0, 0.4, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_rush"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
@@ -209,8 +206,7 @@ unsafe fn tantan_jab100_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_attack100end", category = ACMD_GAME )]
-unsafe fn tantan_jab100end_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_jab100end_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
@@ -226,8 +222,7 @@ unsafe fn tantan_jab100end_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn tantan_dashattack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area_xy(fighter.module_accessor, 5.5, 6.5, 9.0, 1.5);
@@ -255,8 +250,7 @@ unsafe fn tantan_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn tantan_utilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_utilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("legl"), 3.2, 121, 80, 36, 36, 3.9, 0.0, 0.0, 0.0, None, None, None, 1.0, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
@@ -288,8 +282,7 @@ unsafe fn tantan_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn tantan_dtilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -326,8 +319,7 @@ unsafe fn tantan_dtilt_smash_script(fighter: &mut L2CAgentBase) {
 //2 = megawatt
 //3 = ram ram
 
-#[acmd_script( agent = "tantan", script = "game_attackshortstartl1", category = ACMD_GAME )]
-unsafe fn ftilt_startup_1_left(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ftilt_startup_1_left(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_TANTAN_INSTANCE_WORK_ID_FLAG_ATTACK_COMBO_ENABLE);
     }
@@ -359,8 +351,7 @@ unsafe fn ftilt_startup_1_left(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_attackshortstartlb1", category = ACMD_GAME )]
-unsafe fn ftilt_startup_1_left_back(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ftilt_startup_1_left_back(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.5);
@@ -385,8 +376,7 @@ unsafe fn ftilt_startup_1_left_back(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_attackshortstartl2", category = ACMD_GAME )]
-unsafe fn ftilt_startup_2_left(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ftilt_startup_2_left(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.5);
@@ -411,8 +401,7 @@ unsafe fn ftilt_startup_2_left(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_attackshortstartlb2", category = ACMD_GAME )]
-unsafe fn ftilt_startup_2_left_back(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ftilt_startup_2_left_back(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.5);
@@ -437,8 +426,7 @@ unsafe fn ftilt_startup_2_left_back(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_attackshortstartl3", category = ACMD_GAME )]
-unsafe fn ftilt_startup_3_left(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ftilt_startup_3_left(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.5);
@@ -463,8 +451,7 @@ unsafe fn ftilt_startup_3_left(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_attackshortstartlb3", category = ACMD_GAME )]
-unsafe fn ftilt_startup_3_left_back(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ftilt_startup_3_left_back(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.5);
@@ -489,8 +476,7 @@ unsafe fn ftilt_startup_3_left_back(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_attackshortstartr1", category = ACMD_GAME )]
-unsafe fn ftilt_startup_1_right(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ftilt_startup_1_right(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_TANTAN_INSTANCE_WORK_ID_FLAG_ATTACK_COMBO_ENABLE);
     }
@@ -523,8 +509,7 @@ unsafe fn ftilt_startup_1_right(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_attackshortstartrb1", category = ACMD_GAME )]
-unsafe fn ftilt_startup_1_right_back(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ftilt_startup_1_right_back(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.5);
@@ -549,8 +534,7 @@ unsafe fn ftilt_startup_1_right_back(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_attackshortstartr2", category = ACMD_GAME )]
-unsafe fn ftilt_startup_2_right(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ftilt_startup_2_right(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.5);
@@ -575,8 +559,7 @@ unsafe fn ftilt_startup_2_right(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_attackshortstartrb2", category = ACMD_GAME )]
-unsafe fn ftilt_startup_2_right_back(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ftilt_startup_2_right_back(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.5);
@@ -601,8 +584,7 @@ unsafe fn ftilt_startup_2_right_back(fighter: &mut L2CAgentBase) {
     }
 }   
 
-#[acmd_script( agent = "tantan", script = "game_attackshortstartr3", category = ACMD_GAME )]
-unsafe fn ftilt_startup_3_right(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ftilt_startup_3_right(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.5);
@@ -627,8 +609,7 @@ unsafe fn ftilt_startup_3_right(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_attackshortstartrb3", category = ACMD_GAME )]
-unsafe fn ftilt_startup_3_right_back(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ftilt_startup_3_right_back(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.5);
@@ -654,8 +635,7 @@ unsafe fn ftilt_startup_3_right_back(fighter: &mut L2CAgentBase) {
 }
 
 //dragon arm ftilt/hold/fair/bair
-#[acmd_script( agent = "tantan_punch1", script = "game_attackshort", category = ACMD_GAME )]
-unsafe fn dragon_arm_ftilt(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dragon_arm_ftilt(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("have"), 9.4, 361, 87, 0, 40, 3.1, 3.1, 0.5, 0.0, Some(-6.0), Some(0.5), Some(0.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, true, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_TANTAN_PUNCH01, *ATTACK_REGION_PUNCH);
         AttackModule::enable_safe_pos(fighter.module_accessor);
@@ -674,8 +654,7 @@ unsafe fn dragon_arm_ftilt(fighter: &mut L2CAgentBase) {
 }
 
 //dragon power ftilt
-#[acmd_script( agent = "tantan_punch1", script = "game_attackdragonshootshort", category = ACMD_GAME )]
-unsafe fn dragon_power_arm_ftilt(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dragon_power_arm_ftilt(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("have"), 10.1, 361, 86, 0, 50, 3.7, 5.4, 0.5, 0.3, Some(-6.0), Some(0.5), Some(0.3), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, true, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_TANTAN_PUNCH01, *ATTACK_REGION_PUNCH);
         AttackModule::enable_safe_pos(fighter.module_accessor);
@@ -694,8 +673,7 @@ unsafe fn dragon_power_arm_ftilt(fighter: &mut L2CAgentBase) {
 }
 
 //megawatt arm ftilt/hold/fair/bair
-#[acmd_script( agent = "tantan_punch2", script = "game_attackshort", category = ACMD_GAME )]
-unsafe fn megawatt_arm_ftilt(fighter: &mut L2CAgentBase) {   
+unsafe extern "C" fn megawatt_arm_ftilt(fighter: &mut L2CAgentBase) {   
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("center"), 13.3, 45, 97, 0, 50, 4.0, 0.0, 0.0, 0.0, Some(-5.0), Some(0.0), Some(0.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_TANTAN_PUNCH02, *ATTACK_REGION_PUNCH);
         AttackModule::enable_safe_pos(fighter.module_accessor);
@@ -714,8 +692,7 @@ unsafe fn megawatt_arm_ftilt(fighter: &mut L2CAgentBase) {
 }
 
 //ram ram ftilt/hold/fair/bair
-#[acmd_script( agent = "tantan_punch3", script = "game_attackshort", category = ACMD_GAME )]
-unsafe fn ramram_arm_ftilt(fighter: &mut L2CAgentBase) {  
+unsafe extern "C" fn ramram_arm_ftilt(fighter: &mut L2CAgentBase) {  
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("cakram1"), 6.5, 30, 85, 0, 25, 4.0, 0.0, 2.0, 0.0, Some(12.0), Some(0.0), Some(0.0), 0.9, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_TANTAN_PUNCH03, *ATTACK_REGION_PUNCH);
         AttackModule::enable_safe_pos(fighter.module_accessor);
@@ -736,8 +713,7 @@ unsafe fn ramram_arm_ftilt(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan_ring", script = "game_attackfly", category = ACMD_GAME )]
-unsafe fn ramram_arm_projectile(fighter: &mut L2CAgentBase) {  
+unsafe extern "C" fn ramram_arm_projectile(fighter: &mut L2CAgentBase) {  
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("cakram1"), 3.2, 135, 85, 0, 45, 4.5, 0.0, 2.0, 0.0, Some(0.0), Some(-2.0), Some(0.0), 0.7, 0.85, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_TANTAN_PUNCH03, *ATTACK_REGION_OBJECT);
@@ -767,8 +743,7 @@ unsafe fn ramram_arm_projectile(fighter: &mut L2CAgentBase) {
 }
 
 //dragon fsmash (regular)
-#[acmd_script( agent = "tantan_punch1", script = "game_attacklong", category = ACMD_GAME )]
-unsafe fn dragon_arm_fsmash(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dragon_arm_fsmash(fighter: &mut L2CAgentBase) {
     if WorkModule::is_flag(fighter.module_accessor, *WEAPON_TANTAN_PUNCH1_INSTANCE_WORK_ID_FLAG_IS_KIRBY) {
         if macros::is_excute(fighter) {
             macros::ATTACK(fighter, 0, 0, Hash40::new("have"), 15.5, 361, 87, 0, 40, 3.0, 3.1, 0.5, 0.0, None, None, None, 0.9, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, true, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_TANTAN_PUNCH01, *ATTACK_REGION_PUNCH);
@@ -806,8 +781,7 @@ unsafe fn dragon_arm_fsmash(fighter: &mut L2CAgentBase) {
 }
 
 //dragon power fsmash
-#[acmd_script( agent = "tantan_punch1", script = "game_attackdragonshootlong", category = ACMD_GAME )]
-unsafe fn dragon_power_arm_fsmash(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn dragon_power_arm_fsmash(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("have"), 17.0, 361, 87, 0, 40, 4.2, 5.4, 0.5, 0.3, Some(-7.0), Some(0.5), Some(0.3), 0.9, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 2, 0.0, 0, false, false, false, true, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_LL, *COLLISION_SOUND_ATTR_TANTAN_PUNCH01, *ATTACK_REGION_PUNCH);
         ControlModule::set_rumble(fighter.module_accessor, Hash40::new("rbkind_76_dragonarm"), 6, false, *BATTLE_OBJECT_ID_INVALID as u32);
@@ -823,8 +797,7 @@ unsafe fn dragon_power_arm_fsmash(fighter: &mut L2CAgentBase) {
 }
 
 //megawatt fsmash
-#[acmd_script( agent = "tantan_punch2", script = "game_attacklong", category = ACMD_GAME )]
-unsafe fn megawatt_arm_fsmash(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn megawatt_arm_fsmash(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("center"), 21.0, 45, 78, 0, 48, 4.1, 0.0, 0.0, 0.0, Some(-9.0), Some(0.0), Some(0.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_TANTAN_PUNCH02, *ATTACK_REGION_PUNCH);
         AttackModule::enable_safe_pos(fighter.module_accessor);
@@ -843,8 +816,7 @@ unsafe fn megawatt_arm_fsmash(fighter: &mut L2CAgentBase) {
 }
 
 //megawatt fsmash charge
-#[acmd_script( agent = "tantan_punch2", script = "game_attacklonghold", category = ACMD_GAME )]
-unsafe fn megawatt_arm_fsmash_hold(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn megawatt_arm_fsmash_hold(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("center"), 21.0, 45, 78, 0, 48, 3.0, 0.0, 0.0, 0.0, None, None, None, 0.7, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_TANTAN_PUNCH02, *ATTACK_REGION_PUNCH);
         AttackModule::set_paralyze_frame(fighter.module_accessor, 0, 50, false);
@@ -867,8 +839,7 @@ unsafe fn megawatt_arm_fsmash_hold(fighter: &mut L2CAgentBase) {
 }
 
 //ramram fsmash
-#[acmd_script( agent = "tantan_punch3", script = "game_attacklong", category = ACMD_GAME )]
-unsafe fn ramram_arm_fsmash(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ramram_arm_fsmash(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("cakram1"), 11.0, 30, 69, 0, 35, 3.7, 0.0, 2.0, 0.0, Some(12.0), Some(2.0), Some(0.0), 0.9, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_TANTAN_PUNCH03, *ATTACK_REGION_PUNCH);
         AttackModule::enable_safe_pos(fighter.module_accessor);
@@ -887,8 +858,7 @@ unsafe fn ramram_arm_fsmash(fighter: &mut L2CAgentBase) {
 }
 
 //ramram fsmash charge
-#[acmd_script( agent = "tantan_punch3", script = "game_attacklonghold", category = ACMD_GAME )]
-unsafe fn ramram_arm_fsmash_hold(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ramram_arm_fsmash_hold(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("cakram1"), 12.8, 30, 67, 0, 35, 4.0, 0.0, 2.0, 0.0, None, None, None, 0.9, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_TANTAN_PUNCH03, *ATTACK_REGION_PUNCH);
         AttackModule::enable_safe_pos(fighter.module_accessor);
@@ -917,8 +887,7 @@ unsafe fn ramram_arm_fsmash_hold(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan_ring", script = "game_attacks4fly", category = ACMD_GAME )]
-unsafe fn ramram_arm_projectile_fsmash(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ramram_arm_projectile_fsmash(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("cakram1"), 5.0, 30, 80, 0, 40, 4.6, 0.0, 2.0, 0.0, Some(0.0), Some(-2.0), Some(0.0), 0.7, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_OBJECT);
@@ -939,9 +908,7 @@ unsafe fn ramram_arm_projectile_fsmash(fighter: &mut L2CAgentBase) {
     }
 }
 
-
-#[acmd_script( agent = "tantan", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn tantan_usmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -969,8 +936,7 @@ unsafe fn tantan_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn tantan_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 4.5, 4.5);
     }
@@ -1000,8 +966,7 @@ unsafe fn tantan_dsmash_smash_script(fighter: &mut L2CAgentBase) {
 }
 
 //dragon arm nair on (A) button
-#[acmd_script( agent = "tantan", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn tantan_nair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_nair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -1041,8 +1006,7 @@ unsafe fn tantan_nair_smash_script(fighter: &mut L2CAgentBase) {
 }
 
 //nair on (B) button
-#[acmd_script( agent = "tantan", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn tantan_nair_neutralb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_nair_neutralb_smash_script(fighter: &mut L2CAgentBase) {
     if WorkModule::get_int64(fighter.module_accessor, *FIGHTER_TANTAN_INSTANCE_WORK_ID_INT_PUNCH_KIND_R) == 1 as u64 {
     //if(0x39fa00(*FIGHTER_TANTAN_INSTANCE_WORK_ID_INT_PUNCH_KIND_R, 1)){;
         sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -1122,8 +1086,7 @@ unsafe fn tantan_nair_neutralb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn tantan_uair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_uair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -1148,8 +1111,7 @@ unsafe fn tantan_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn tantan_dair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_dair_smash_script(fighter: &mut L2CAgentBase) {
     let stickx = ControlModule::get_stick_x(fighter.module_accessor);
     let lr = PostureModule::lr(fighter.module_accessor);
     let stickx_directional = stickx * lr;
@@ -1202,24 +1164,21 @@ unsafe fn tantan_dair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_landingairlw", category = ACMD_GAME )]
-unsafe fn tantan_dair_landing_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_dair_landing_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_catch", category = ACMD_GAME )]
-unsafe fn tantan_grab_start_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_grab_start_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 3.5, 3.5);
         MotionModule::set_rate(fighter.module_accessor, 1.3);
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_catchstart", category = ACMD_GAME )]
-unsafe fn tantan_grab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_grab_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 3.5, 3.5);
         GrabModule::set_rebound(fighter.module_accessor, true);
@@ -1262,16 +1221,14 @@ unsafe fn tantan_grab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn tantan_grabd_start_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_grabd_start_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 3.5, 3.5);
         MotionModule::set_rate(fighter.module_accessor, 1.3);
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_catchdashstart", category = ACMD_GAME )]
-unsafe fn tantan_grabd_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_grabd_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 3.5, 3.5);
         GrabModule::set_rebound(fighter.module_accessor, true);
@@ -1314,16 +1271,14 @@ unsafe fn tantan_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn tantan_grabp_start_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_grabp_start_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 3.5, 3.5);
         MotionModule::set_rate(fighter.module_accessor, 1.3);
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_catchturnstart", category = ACMD_GAME )]
-unsafe fn tantan_grabp_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_grabp_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 3.5, 3.5);
         GrabModule::set_rebound(fighter.module_accessor, true);
@@ -1366,8 +1321,7 @@ unsafe fn tantan_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn tantan_fthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 4.0, 30, 75, 0, 58, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -1391,8 +1345,7 @@ unsafe fn tantan_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn tantan_bthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.1, 47, 180, 0, 45, 0.0, 1.0, *ATTACK_LR_CHECK_B, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -1418,8 +1371,7 @@ unsafe fn tantan_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn tantan_uthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 8.0, 73, 68, 0, 65, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -1439,8 +1391,7 @@ unsafe fn tantan_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn tantan_dthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 4.0, 56, 60, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -1463,8 +1414,7 @@ unsafe fn tantan_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan", script = "game_specialairhistart", category = ACMD_GAME )]
-unsafe fn tantan_upb_start_air_hitbox_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_upb_start_air_hitbox_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_TANTAN_STATUS_SPECIAL_HI_FLAG_REVERSE_LR);
@@ -1491,8 +1441,7 @@ unsafe fn tantan_upb_start_air_hitbox_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan_punch1", script = "game_specialairhiattack", category = ACMD_GAME )]
-unsafe fn tantan_upb_air_hitbox_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_upb_air_hitbox_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("have"), 10.5, 45, 106, 0, 56, 4.5, 3.9, 0.0, 0.3, Some(-6.0), Some(0.0), Some(0.3), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, true, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_TANTAN_PUNCH01, *ATTACK_REGION_PUNCH);
     }
@@ -1506,8 +1455,7 @@ unsafe fn tantan_upb_air_hitbox_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "tantan_punch1", script = "game_specialairhiattackdragon", category = ACMD_GAME )]
-unsafe fn tantan_upb_air_hitbox_dragon_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tantan_upb_air_hitbox_dragon_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("have"), 13.9, 72, 94, 0, 66, 5.5, 4.8, 0.0, 0.4, Some(-6.0), Some(0.0), Some(0.4), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, true, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_TANTAN_PUNCH01, *ATTACK_REGION_PUNCH);
     }
@@ -1521,63 +1469,74 @@ unsafe fn tantan_upb_air_hitbox_dragon_script(fighter: &mut L2CAgentBase) {
     }
 }
 
+
 pub fn install() {
-    smashline::install_agent_frames!(
-        tantan_frame
-    );
-    smashline::install_acmd_scripts!(
-        tantan_jab_smash_script,
-        tantan_jab2_smash_script,
-        tantan_jab3_smash_script,
-        tantan_jab100_smash_script,
-        tantan_jab100end_smash_script,
-        tantan_dashattack_smash_script,
-        tantan_utilt_smash_script,
-        tantan_dtilt_smash_script,
-        ftilt_startup_1_left,
-        ftilt_startup_1_left_back,
-        ftilt_startup_2_left,
-        ftilt_startup_2_left_back,
-        ftilt_startup_3_left,
-        ftilt_startup_3_left_back,
-        ftilt_startup_1_right,
-        ftilt_startup_1_right_back,
-        ftilt_startup_2_right,
-        ftilt_startup_2_right_back,
-        ftilt_startup_3_right,
-        ftilt_startup_3_right_back,
-        dragon_arm_ftilt,
-        dragon_power_arm_ftilt,
-        megawatt_arm_ftilt,
-        ramram_arm_ftilt,
-        ramram_arm_projectile,
-        dragon_arm_fsmash,
-        dragon_power_arm_fsmash,
-        megawatt_arm_fsmash,
-        megawatt_arm_fsmash_hold,
-        ramram_arm_fsmash,
-        ramram_arm_fsmash_hold,
-        ramram_arm_projectile_fsmash,
-        tantan_usmash_smash_script,
-        tantan_dsmash_smash_script,
-        tantan_nair_smash_script,
-        tantan_nair_neutralb_smash_script,
-        tantan_uair_smash_script,
-        tantan_dair_smash_script,
-        tantan_dair_landing_smash_script,
-        tantan_grab_start_smash_script,
-        tantan_grab_smash_script,
-        tantan_grabd_start_smash_script,
-        tantan_grabd_smash_script,
-        tantan_grabp_start_smash_script,
-        tantan_grabp_smash_script,
-        tantan_fthrow_smash_script,
-        tantan_bthrow_smash_script,
-        tantan_uthrow_smash_script,
-        tantan_dthrow_smash_script,
-        tantan_upb_start_air_hitbox_script,
-        tantan_upb_air_hitbox_script,
-        tantan_upb_air_hitbox_dragon_script
-        
-    );
+    Agent::new("tantan")
+    .on_line(Main, tantan_frame) //opff
+    .game_acmd("game_attack11", tantan_jab_smash_script)
+    .game_acmd("game_attack12", tantan_jab2_smash_script)
+    .game_acmd("game_attack13", tantan_jab3_smash_script)
+    .game_acmd("game_attack100", tantan_jab100_smash_script)
+    .game_acmd("game_attack100end", tantan_jab100end_smash_script)
+    .game_acmd("game_attackdash", tantan_dashattack_smash_script)
+    .game_acmd("game_attackhi3", tantan_utilt_smash_script)
+    .game_acmd("game_attacklw3", tantan_dtilt_smash_script)
+    .game_acmd("game_attackshortstartl1", ftilt_startup_1_left)
+    .game_acmd("game_attackshortstartlb1", ftilt_startup_1_left_back)
+    .game_acmd("game_attackshortstartr1", ftilt_startup_1_right)
+    .game_acmd("game_attackshortstartrb1", ftilt_startup_1_right_back)
+    .game_acmd("game_attackshortstartl2", ftilt_startup_2_left)
+    .game_acmd("game_attackshortstartlb2", ftilt_startup_2_left_back)
+    .game_acmd("game_attackshortstartr2", ftilt_startup_2_right)
+    .game_acmd("game_attackshortstartrb2", ftilt_startup_2_right_back)
+    .game_acmd("game_attackshortstartl3", ftilt_startup_3_left)
+    .game_acmd("game_attackshortstartlb3", ftilt_startup_3_left_back)
+    .game_acmd("game_attackshortstartr3", ftilt_startup_3_right)
+    .game_acmd("game_attackshortstartrb3", ftilt_startup_3_right_back)
+    .game_acmd("game_attackhi4", tantan_usmash_smash_script)
+    .game_acmd("game_attacklw4", tantan_dsmash_smash_script)
+    .game_acmd("game_attackairn", tantan_nair_smash_script)
+    .game_acmd("game_attackairf", tantan_nair_neutralb_smash_script)
+    .game_acmd("game_attackairhi", tantan_uair_smash_script)
+    .game_acmd("game_attackairlw", tantan_dair_smash_script)
+    .game_acmd("game_landingairlw", tantan_dair_landing_smash_script)
+    .game_acmd("game_catch", tantan_grab_start_smash_script)
+    .game_acmd("game_catchstart", tantan_grab_smash_script)
+    .game_acmd("game_catchdash", tantan_grabd_start_smash_script)
+    .game_acmd("game_catchdashstart", tantan_grabd_smash_script)
+    .game_acmd("game_catchturn", tantan_grabp_start_smash_script)
+    .game_acmd("game_catchturnstart", tantan_grabp_smash_script)
+    .game_acmd("game_throwf", tantan_fthrow_smash_script)
+    .game_acmd("game_throwb", tantan_bthrow_smash_script)
+    .game_acmd("game_throwhi", tantan_uthrow_smash_script)
+    .game_acmd("game_throwlw", tantan_dthrow_smash_script)
+    .game_acmd("game_specialairhistart", tantan_upb_start_air_hitbox_script)
+    .install();
+
+    Agent::new("tantan_punch1")
+    .game_acmd("game_attackshort", dragon_arm_ftilt)
+    .game_acmd("game_attackdragonshootshort", dragon_power_arm_ftilt)
+    .game_acmd("game_attacklong", dragon_arm_fsmash)
+    .game_acmd("game_attackdragonshootlong", dragon_power_arm_fsmash)
+    .game_acmd("game_specialairhiattack", tantan_upb_air_hitbox_script)
+    .game_acmd("game_specialairhiattackdragon", tantan_upb_air_hitbox_dragon_script)
+    .install();
+
+    Agent::new("tantan_punch2")
+    .game_acmd("game_attackshort", megawatt_arm_ftilt)
+    .game_acmd("game_attacklong", megawatt_arm_fsmash)
+    .game_acmd("game_attacklonghold", megawatt_arm_fsmash_hold)
+    .install();
+
+    Agent::new("tantan_punch3")
+    .game_acmd("game_attackshort", ramram_arm_ftilt)
+    .game_acmd("game_attacklong", ramram_arm_fsmash)
+    .game_acmd("game_attacklonghold", ramram_arm_fsmash_hold)
+    .install();
+
+    Agent::new("tantan_ring")
+    .game_acmd("game_attackfly", ramram_arm_projectile)
+    .game_acmd("game_attacks4fly", ramram_arm_projectile_fsmash)
+    .install();
+
 }

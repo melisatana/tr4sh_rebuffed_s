@@ -7,18 +7,19 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
+use crate::custom::global_fighter_frame;
 
 static mut PLIZARDON_UTHROW_BURY_RECHARGE_TIMER : [i32; 8] = [0; 8];
 static PLIZARDON_UTHROW_BURY_COOLDOWN : i32 = 480; 
 
 // A Once-Per-Fighter-Frame that only applies to Charizard
-#[fighter_frame( agent = FIGHTER_KIND_PLIZARDON )]
-fn plizardon_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn plizardon_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         let status = StatusModule::status_kind(fighter.module_accessor);
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         
-        println!("Gwaaaaaaaaaaaar?");
+        //println!("Gwaaaaaaaaaaaar?");
 
         if PLIZARDON_UTHROW_BURY_RECHARGE_TIMER[entry_id] > 0 {
             PLIZARDON_UTHROW_BURY_RECHARGE_TIMER[entry_id] -= 1;
@@ -37,8 +38,7 @@ fn plizardon_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn plizardon_jab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.2, 361, 30, 15, 20, 3.4, 0.0, 8.0, 4.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PUNCH);
@@ -61,8 +61,7 @@ unsafe fn plizardon_jab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_attack12", category = ACMD_GAME )]
-unsafe fn plizardon_jab2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_jab2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         KineticModule::add_speed(fighter.module_accessor, &smash::phx::Vector3f{x: 0.72, y: 0.0, z: 0.0});
@@ -88,8 +87,7 @@ unsafe fn plizardon_jab2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_attack13", category = ACMD_GAME )]
-unsafe fn plizardon_jab3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_jab3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.2, 60, 130, 0, 60, 5.0, 0.0, 6.5, 6.5, Some(0.0), Some(6.5), Some(17.0), 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_BODY);
@@ -103,8 +101,7 @@ unsafe fn plizardon_jab3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn plizardon_dashattack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("trans"), 13.9, 33, 93, 0, 58, 4.8, 0.0, 7.7, 15.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 1, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
@@ -125,8 +122,7 @@ unsafe fn plizardon_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_attacks3", category = ACMD_GAME )]
-unsafe fn plizardon_ftilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -158,8 +154,7 @@ unsafe fn plizardon_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_attacks3hi", category = ACMD_GAME )]
-unsafe fn plizardon_ftilt2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_ftilt2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -191,8 +186,7 @@ unsafe fn plizardon_ftilt2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_attacks3lw", category = ACMD_GAME )]
-unsafe fn plizardon_ftilt3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_ftilt3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -224,8 +218,7 @@ unsafe fn plizardon_ftilt3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn plizardon_utilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_utilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 9.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 1, Hash40::new("top"), 9.3, 78, 75, 0, 42, 8.2, 0.0, 13.5, 2.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
@@ -240,8 +233,7 @@ unsafe fn plizardon_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn plizardon_dtilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -262,8 +254,7 @@ unsafe fn plizardon_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn plizardon_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -304,8 +295,7 @@ unsafe fn plizardon_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn plizardon_usmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -355,8 +345,7 @@ unsafe fn plizardon_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn plizardon_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -386,8 +375,7 @@ unsafe fn plizardon_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn plizardon_nair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_nair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -414,8 +402,7 @@ unsafe fn plizardon_nair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn plizardon_fair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_fair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -434,8 +421,7 @@ unsafe fn plizardon_fair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }   
 
-#[acmd_script( agent = "plizardon", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn plizardon_bair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_bair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.3);
@@ -475,8 +461,7 @@ unsafe fn plizardon_bair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn plizardon_uair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_uair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -510,8 +495,7 @@ unsafe fn plizardon_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn plizardon_dair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_dair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.4);
@@ -542,8 +526,7 @@ unsafe fn plizardon_dair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_catch", category = ACMD_GAME )]
-unsafe fn plizardon_grab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_grab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -565,8 +548,7 @@ unsafe fn plizardon_grab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn plizardon_grabd_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_grabd_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -588,8 +570,7 @@ unsafe fn plizardon_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn plizardon_grabp_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_grabp_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -611,8 +592,7 @@ unsafe fn plizardon_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn plizardon_fthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 9.5, 40, 115, 0, 55, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -628,8 +608,7 @@ unsafe fn plizardon_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn plizardon_bthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 8.8, 270, 85, 0, 25, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -648,8 +627,7 @@ unsafe fn plizardon_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn plizardon_uthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
@@ -692,8 +670,7 @@ unsafe fn plizardon_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn plizardon_dthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 1.1, 57, 110, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -722,72 +699,49 @@ unsafe fn plizardon_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_specialnstart", category = ACMD_GAME )]
-unsafe fn plizardon_neutralb_start_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_neutralb_start_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.8);
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_specialairnstart", category = ACMD_GAME )]
-unsafe fn plizardon_neutralb_start_air_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.8);
-    }
-}
-
-#[acmd_script( agent = "plizardon", script = "game_specialnend", category = ACMD_GAME )]
-unsafe fn plizardon_neutralb_end_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_neutralb_end_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.909090909);
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_specialairnend", category = ACMD_GAME )]
-unsafe fn plizardon_neutralb_end_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_neutralb_end_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.8);
     }
 }
 
-#[acmd_script( agent = "plizardon_breath", script = "game_move", category = ACMD_GAME )]
-unsafe fn flamethrower_flames(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn flamethrower_flames(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.5, 45, 44, 0, 30, 5.0, 0.0, 0.0, 0.0, None, None, None, 0.5, 0.7, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_SPEED, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_LIZARDON_FIRE, *ATTACK_REGION_NONE);
         AttackModule::enable_safe_pos(fighter.module_accessor);
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_specialsstart", category = ACMD_GAME )]
-unsafe fn plizardon_sideb_start_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_sideb_start_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.8);
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_specialairsstart", category = ACMD_GAME )]
-unsafe fn plizardon_sideb_start_air_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.8);
-    }
-}
-
-#[acmd_script( agent = "plizardon", script = "game_specials", category = ACMD_GAME )]
-unsafe fn plizardon_sideb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_sideb_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         JostleModule::set_status(fighter.module_accessor, false);
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 6.0, 366, 78, 46, 60, 10.5, 0.0, 6.5, 10.5, None, None, None, 0.1, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 4, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_BODY);
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_specialairs", category = ACMD_GAME )]
-unsafe fn plizardon_sideb_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_sideb_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_NONE);
         JostleModule::set_status(fighter.module_accessor, false);
@@ -799,32 +753,21 @@ unsafe fn plizardon_sideb_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_specialsend", category = ACMD_GAME )]
-unsafe fn plizardon_sideb_end_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_sideb_end_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.869565217);
     }
 }
 
-#[acmd_script( agent = "plizardon", script = "game_specialairsend", category = ACMD_GAME )]
-unsafe fn plizardon_sideb_end_air_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.869565217);
-    }
-}
-
-#[acmd_script( agent = "plizardon_explosion", script = "game_start", category = ACMD_GAME )]
-unsafe fn sideb_explosion(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn sideb_explosion(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 17.5, 361, 100, 0, 48, 14.0, 0.0, 0.0, 0.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_BOMB, *ATTACK_REGION_BOMB);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 17.5, 361, 100, 0, 48, 8.0, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(-10.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_BOMB, *ATTACK_REGION_BOMB);
     }
 }
 
-#[acmd_script( agent = "plizardon", scripts = ["game_specialhi", "game_specialairhi"], category = ACMD_GAME, low_priority )]
-unsafe fn plizardon_upb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn plizardon_upb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0);
@@ -861,48 +804,54 @@ unsafe fn plizardon_upb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
+
 pub fn install() {
-    smashline::install_agent_frames!(
-        plizardon_frame
-    );
-    smashline::install_acmd_scripts!(
-        plizardon_jab_smash_script,
-        plizardon_jab2_smash_script,
-        plizardon_jab3_smash_script,
-        plizardon_dashattack_smash_script,
-        plizardon_ftilt_smash_script,
-        plizardon_ftilt2_smash_script,
-        plizardon_ftilt3_smash_script,
-        plizardon_utilt_smash_script,
-        plizardon_dtilt_smash_script,
-        plizardon_fsmash_smash_script,
-        plizardon_usmash_smash_script,
-        plizardon_dsmash_smash_script,
-        plizardon_nair_smash_script,
-        plizardon_fair_smash_script,
-        plizardon_bair_smash_script,
-        plizardon_uair_smash_script,
-        plizardon_dair_smash_script,
-        plizardon_grab_smash_script,
-        plizardon_grabd_smash_script,
-        plizardon_grabp_smash_script,
-        plizardon_fthrow_smash_script,
-        plizardon_bthrow_smash_script,
-        plizardon_uthrow_smash_script,
-        plizardon_dthrow_smash_script,
-        plizardon_neutralb_start_smash_script,
-        plizardon_neutralb_start_air_smash_script,
-        plizardon_neutralb_end_smash_script,
-        plizardon_neutralb_end_air_smash_script,
-        flamethrower_flames,
-        plizardon_sideb_start_smash_script,
-        plizardon_sideb_start_air_smash_script,
-        plizardon_sideb_smash_script,
-        plizardon_sideb_air_smash_script,
-        plizardon_sideb_end_smash_script,
-        plizardon_sideb_end_air_smash_script,
-        sideb_explosion,
-        plizardon_upb_smash_script
-        
-    );
+    Agent::new("plizardon")
+    .on_line(Main, plizardon_frame) //opff
+    .game_acmd("game_attack11", plizardon_jab_smash_script)
+    .game_acmd("game_attack12", plizardon_jab2_smash_script)
+    .game_acmd("game_attack13", plizardon_jab3_smash_script)
+    .game_acmd("game_attackdash", plizardon_dashattack_smash_script)
+    .game_acmd("game_attacks3", plizardon_ftilt_smash_script)
+    .game_acmd("game_attacks3hi", plizardon_ftilt2_smash_script)
+    .game_acmd("game_attacks3lw", plizardon_ftilt3_smash_script)
+    .game_acmd("game_attackhi3", plizardon_utilt_smash_script)
+    .game_acmd("game_attacklw3", plizardon_dtilt_smash_script)
+    .game_acmd("game_attacks4", plizardon_fsmash_smash_script)
+    .game_acmd("game_attackhi4", plizardon_usmash_smash_script)
+    .game_acmd("game_attacklw4", plizardon_dsmash_smash_script)
+    .game_acmd("game_attackairn", plizardon_nair_smash_script)
+    .game_acmd("game_attackairf", plizardon_fair_smash_script)
+    .game_acmd("game_attackairb", plizardon_bair_smash_script)
+    .game_acmd("game_attackairhi", plizardon_uair_smash_script)
+    .game_acmd("game_attackairlw", plizardon_dair_smash_script)
+    .game_acmd("game_catch", plizardon_grab_smash_script)
+    .game_acmd("game_catchdash", plizardon_grabd_smash_script)
+    .game_acmd("game_catchturn", plizardon_grabp_smash_script)
+    .game_acmd("game_throwf", plizardon_fthrow_smash_script)
+    .game_acmd("game_throwb", plizardon_bthrow_smash_script)
+    .game_acmd("game_throwhi", plizardon_uthrow_smash_script)
+    .game_acmd("game_throwlw", plizardon_dthrow_smash_script)
+    .game_acmd("game_specialnstart", plizardon_neutralb_start_smash_script)
+    .game_acmd("game_specialairnstart", plizardon_neutralb_start_smash_script)
+    .game_acmd("game_specialnend", plizardon_neutralb_end_smash_script)
+    .game_acmd("game_specialairnend", plizardon_neutralb_end_air_smash_script)
+    .game_acmd("game_specialsstart", plizardon_sideb_start_smash_script)
+    .game_acmd("game_specialairsstart", plizardon_sideb_start_smash_script)
+    .game_acmd("game_specials", plizardon_sideb_smash_script)
+    .game_acmd("game_specialairs", plizardon_sideb_air_smash_script)
+    .game_acmd("game_specialsend", plizardon_sideb_end_smash_script)
+    .game_acmd("game_specialairsend", plizardon_sideb_end_smash_script)
+    .game_acmd("game_specialhi", plizardon_upb_smash_script)
+    .game_acmd("game_specialairhi", plizardon_upb_smash_script)
+    .install();
+
+    Agent::new("plizardon_breath")
+    .game_acmd("game_specialmove", flamethrower_flames)
+    .install();
+
+    Agent::new("plizardon_explosion")
+    .game_acmd("game_start", sideb_explosion)
+    .install();
+
 }

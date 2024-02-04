@@ -7,15 +7,14 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
+use crate::custom::global_fighter_frame;
 
 // A Once-Per-Fighter-Frame that only applies to Villager
-#[fighter_frame( agent = FIGHTER_KIND_MURABITO )]
-fn murabito_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn murabito_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         let status = StatusModule::status_kind(fighter.module_accessor);
         
-        println!(":)");
-
 
         if [*FIGHTER_STATUS_KIND_SPECIAL_N, *FIGHTER_MURABITO_STATUS_KIND_SPECIAL_N_SEARCH, *FIGHTER_MURABITO_STATUS_KIND_SPECIAL_N_POCKET, *FIGHTER_MURABITO_STATUS_KIND_SPECIAL_N_TAKE_OUT].contains(&status) {
             crate::custom::fastfall_helper(fighter);
@@ -30,8 +29,19 @@ fn murabito_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn murabito_jab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn kirby_murabitohat_frame(fighter: &mut L2CFighterCommon) {
+    unsafe {
+        let status = StatusModule::status_kind(fighter.module_accessor);
+        
+        if [*FIGHTER_KIRBY_STATUS_KIND_MURABITO_SPECIAL_N, *FIGHTER_KIRBY_STATUS_KIND_MURABITO_SPECIAL_N_SEARCH, *FIGHTER_KIRBY_STATUS_KIND_MURABITO_SPECIAL_N_POCKET, *FIGHTER_KIRBY_STATUS_KIND_MURABITO_SPECIAL_N_TAKE_OUT].contains(&status) {
+            crate::custom::fastfall_helper(fighter);
+        }
+        
+    }
+    
+}
+
+unsafe extern "C" fn murabito_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.9, 361, 25, 0, 15, 2.5, 0.0, 5.5, 6.5, Some(0.0), Some(5.5), Some(7.5), 1.0, 0.8, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
@@ -54,8 +64,7 @@ unsafe fn murabito_jab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_attack11end", category = ACMD_GAME )]
-unsafe fn murabito_jab_end_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_jab_end_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.4, 361, 135, 0, 60, 3.4, 0.0, 5.5, 8.0, None, None, None, 2.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
@@ -67,8 +76,7 @@ unsafe fn murabito_jab_end_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_attack12", category = ACMD_GAME )]
-unsafe fn murabito_jab2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_jab2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.9, 361, 25, 0, 15, 2.5, 0.0, 5.5, 6.5, None, None, None, 1.0, 0.8, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
@@ -91,8 +99,7 @@ unsafe fn murabito_jab2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_attack12end", category = ACMD_GAME )]
-unsafe fn murabito_jab2_end_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_jab2_end_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.4, 361, 135, 0, 60, 3.4, 0.0, 5.5, 8.0, None, None, None, 2.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
@@ -104,8 +111,7 @@ unsafe fn murabito_jab2_end_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn murabito_dashattack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_WORK_ID_FLAG_RESERVE_ATTACK_DISABLE_MINI_JUMP_ATTACK);
     }
@@ -119,16 +125,14 @@ unsafe fn murabito_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito_flowerpot", script = "game_throwed", category = ACMD_GAME )]
-unsafe fn flowerpot_thrown(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn flowerpot_thrown(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("have"), 7.3, 74, 60, 0, 50, 4.2, 0.0, 2.5, 0.0, None, None, None, 1.2, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_flower"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
         AttackModule::enable_safe_pos(fighter.module_accessor);
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_attacks3", category = ACMD_GAME )]
-unsafe fn murabito_ftilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_MURABITO_GENERATE_ARTICLE_UMBRELLA, false, 0);
     }
@@ -157,8 +161,7 @@ unsafe fn murabito_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn murabito_utilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_utilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -191,8 +194,10 @@ unsafe fn murabito_utilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 24.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.0);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("havel"), 7.1, 78, 77, 0, 44, 5.9, 0.0, 6.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("havel"), 7.1, 78, 77, 0, 44, 4.9, 0.0, 1.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("havel"), 7.1, 78, 70, 0, 54, 5.9, 0.0, 6.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("havel"), 7.1, 78, 70, 0, 54, 4.9, 0.0, 1.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 2.0, false);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 2.0, false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
@@ -202,8 +207,7 @@ unsafe fn murabito_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn murabito_dtilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -229,12 +233,11 @@ unsafe fn murabito_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn murabito_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.4);
-        ArticleModule::generate_article_enable(fighter.module_accessor, *FIGHTER_MURABITO_GENERATE_ARTICLE_BOWLING_BALL, false, 0);
+        ArticleModule::generate_article_enable(fighter.module_accessor, *FIGHTER_MURABITO_GENERATE_ARTICLE_BOWLING_BALL, false, -1);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
@@ -250,8 +253,7 @@ unsafe fn murabito_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito_bowlingball", script = "game_fall", category = ACMD_GAME )]
-unsafe fn bowling_ball(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn bowling_ball(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 16.6, 45, 95, 0, 70, 6.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
@@ -266,8 +268,7 @@ unsafe fn bowling_ball(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn murabito_usmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_MURABITO_GENERATE_ARTICLE_FIREWORK, false, -1);
@@ -290,8 +291,7 @@ unsafe fn murabito_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito_firework", script = "game_shoot", category = ACMD_GAME )]
-unsafe fn usmash_fireworks(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn usmash_fireworks(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     for _ in 0..4 {
         if macros::is_excute(fighter) {
@@ -320,8 +320,7 @@ unsafe fn usmash_fireworks(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn murabito_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -351,13 +350,12 @@ unsafe fn murabito_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn murabito_nair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_nair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("hip"), 9.4, 57, 85, 0, 20, 6.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_BODY);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("head"), 9.4, 57, 85, 0, 20, 7.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("hip"), 9.1, 57, 75, 0, 50, 6.0, 0.0, 0.0, 0.0, None, None, None, 1.1, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_BODY);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("head"), 9.1, 57, 75, 0, 50, 7.0, 0.0, 0.0, 0.0, None, None, None, 1.1, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 2.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 2.0, false);
     }
@@ -375,27 +373,79 @@ unsafe fn murabito_nair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn murabito_fair_smash_script(fighter: &mut L2CAgentBase) {
-    if macros::is_excute(fighter) {
+unsafe extern "C" fn murabito_fair_smash_script(fighter: &mut L2CAgentBase) {
+    /*if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_MURABITO_GENERATE_ARTICLE_SLINGSHOT, true, 0);
+    }*/
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        MotionModule::set_rate(fighter.module_accessor, 2.0);
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 3.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 4.0);
+    if macros::is_excute(fighter) {
+        MotionModule::set_rate(fighter.module_accessor, 1.0);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 13.0);
+    if macros::is_excute(fighter) {
+        macros::ATTACK(fighter, 0, 0, Hash40::new("haver"), 13.4, 48, 110, 0, 40, 3.4, 0.0, 1.0, 0.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 6, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("haver"), 13.4, 48, 110, 0, 40, 5.0, 0.0, 6.5, 0.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 6, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_OBJECT);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 2.0, false);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 2.0, false);
+    }
+    sv_animcmd::wait(fighter.lua_state_agent, 3.0);
+    if macros::is_excute(fighter) {
+        macros::ATTACK(fighter, 1, 0, Hash40::new("haver"), 13.4, 280, 100, 0, 25, 5.0, 0.0, 6.5, 0.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 6, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_OBJECT);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 2.0, false);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 19.0);
+    if macros::is_excute(fighter) {
+        AttackModule::clear_all(fighter.module_accessor);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 30.0);
     if macros::is_excute(fighter) {
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 33.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 36.0);
     if macros::is_excute(fighter) {
         CancelModule::enable_cancel(fighter.module_accessor);
     }
 }
 
-#[acmd_script( agent = "murabito_bullet", script = "game_shootf", category = ACMD_GAME )]
-unsafe fn slingshot_projectile_fair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_fair_effect_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 13.0);
+    if macros::is_excute(fighter) {
+        macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_attack_arc"), Hash40::new("top"), 0, 9, 5, 0, -40, -90, 1.05, true);
+        macros::LAST_EFFECT_SET_RATE(fighter, 1.3);
+        macros::LAST_EFFECT_SET_COLOR(fighter, 0.3, 0.3, 0.3);
+    }
+}
+
+unsafe extern "C" fn murabito_fair_sound_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 12.0);
+    if macros::is_excute(fighter) {
+        macros::PLAY_SE(fighter, Hash40::new("se_common_sword_swing_m"));
+    }
+}
+
+unsafe extern "C" fn murabito_fair_expression_script(fighter: &mut L2CAgentBase) {
+    if macros::is_excute(fighter) {
+        VisibilityModule::set_int64(fighter.module_accessor, Hash40::new("item").hash as i64, Hash40::new("item_axe").hash as i64);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 8.0);
+    if macros::is_excute(fighter) {
+        ControlModule::set_rumble(fighter.module_accessor, Hash40::new("rbkind_nohitm"), 0, false, *BATTLE_OBJECT_ID_INVALID as u32);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 41.0);
+    if macros::is_excute(fighter) {
+        VisibilityModule::set_int64(fighter.module_accessor, Hash40::new("item").hash as i64, Hash40::new("item_none").hash as i64);
+    }
+}
+
+unsafe extern "C" fn slingshot_projectile_fair(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.4, 361, 100, 0, 45, 5.0, 0.0, 0.0, 0.0, None, None, None, 1.25, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, -3.5, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
         AttackModule::enable_safe_pos(fighter.module_accessor);
@@ -406,10 +456,9 @@ unsafe fn slingshot_projectile_fair(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn murabito_bair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_bair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_MURABITO_GENERATE_ARTICLE_SLINGSHOT, true, 0);
+        ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_MURABITO_GENERATE_ARTICLE_SLINGSHOT, true, -1);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
@@ -421,8 +470,7 @@ unsafe fn murabito_bair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito_bullet", script = "game_shootb", category = ACMD_GAME )]
-unsafe fn slingshot_projectile_bair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn slingshot_projectile_bair(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 14.2, 361, 100, 0, 55, 5.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, -4.5, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
         AttackModule::enable_safe_pos(fighter.module_accessor);
@@ -433,8 +481,7 @@ unsafe fn slingshot_projectile_bair(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn murabito_uair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_uair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -484,8 +531,7 @@ unsafe fn murabito_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn murabito_dair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_dair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -546,8 +592,7 @@ unsafe fn murabito_dair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_catch", category = ACMD_GAME )]
-unsafe fn murabito_grab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_grab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -579,8 +624,7 @@ unsafe fn murabito_grab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn murabito_grabd_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_grabd_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -608,8 +652,7 @@ unsafe fn murabito_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn murabito_grabp_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_grabp_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.4);
@@ -637,8 +680,7 @@ unsafe fn murabito_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn murabito_fthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 11.1, 45, 40, 0, 70, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -653,8 +695,7 @@ unsafe fn murabito_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn murabito_bthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 9.1, 135, 120, 0, 43, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -670,8 +711,7 @@ unsafe fn murabito_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn murabito_uthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 6.8, 90, 70, 0, 40, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -690,8 +730,7 @@ unsafe fn murabito_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn murabito_dthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 6.5, 55, 60, 0, 50, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -714,23 +753,20 @@ unsafe fn murabito_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito_clayrocket", script = "game_fly", category = ACMD_GAME )]
-unsafe fn lloid_rocket_projectile(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lloid_rocket_projectile(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.1, 50, 75, 0, 65, 3.3, 0.0, 0.0, 0.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, -1, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
     }
 }
 
-#[acmd_script( agent = "murabito_clayrocket", script = "game_fall", category = ACMD_GAME )]
-unsafe fn lloid_rocket_projectile_falling(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lloid_rocket_projectile_falling(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.5, 50, 75, 0, 60, 3.0, 0.0, 0.0, 0.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, -1, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
     }
 }
 
-#[acmd_script( agent = "murabito_clayrocket", script = "game_burst", category = ACMD_GAME )]
-unsafe fn lloid_rocket_projectile_burst(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lloid_rocket_projectile_burst(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         VisibilityModule::set_whole(fighter.module_accessor, false);
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 15.0, 59, 90, 0, 65, 7.0, 0.0, 0.0, 0.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, -6, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_BOMB);
@@ -742,8 +778,7 @@ unsafe fn lloid_rocket_projectile_burst(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito_clayrocket", script = "game_lodgedburst", category = ACMD_GAME )]
-unsafe fn lloid_rocket_projectile_lodged_burst(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lloid_rocket_projectile_lodged_burst(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         VisibilityModule::set_whole(fighter.module_accessor, false);
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 15.0, 59, 90, 0, 65, 6.5, 0.0, 3.1, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, -1, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_BOMB);
@@ -755,8 +790,7 @@ unsafe fn lloid_rocket_projectile_lodged_burst(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_specialairhiflap1", category = ACMD_GAME )]
-unsafe fn murabito_upb_flap1_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_upb_flap1_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         JostleModule::set_status(fighter.module_accessor, false);
@@ -768,8 +802,7 @@ unsafe fn murabito_upb_flap1_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_specialairhiflap2", category = ACMD_GAME )]
-unsafe fn murabito_upb_flap2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_upb_flap2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         JostleModule::set_status(fighter.module_accessor, false);
@@ -781,15 +814,13 @@ unsafe fn murabito_upb_flap2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito_sprinkling_water", script = "game_flow", category = ACMD_GAME )]
-unsafe fn watercan_flowing(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn watercan_flowing(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 0.0, 55, 250, 0, 25, 2.9, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, false, true, true, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_OBJECT);
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_speciallw1", category = ACMD_GAME, low_priority )]
-unsafe fn murabito_downb_1_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_downb_1_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     macros::FT_MOTION_RATE(fighter, 0.661);
     if macros::is_excute(fighter) {
@@ -806,8 +837,7 @@ unsafe fn murabito_downb_1_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_specialairlw1failure", category = ACMD_GAME, low_priority )]
-unsafe fn murabito_downb_1_air_failure_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_downb_1_air_failure_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     macros::FT_MOTION_RATE(fighter, 0.75);
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
@@ -824,8 +854,7 @@ unsafe fn murabito_downb_1_air_failure_smash_script(fighter: &mut L2CAgentBase) 
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_speciallw3", category = ACMD_GAME )]
-unsafe fn murabito_downb_3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_downb_3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("haver"), 14.0, 361, 100, 0, 36, 5.0, 0.0, 6.5, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 9, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_OBJECT);
@@ -846,8 +875,7 @@ unsafe fn murabito_downb_3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_speciallw3hit", category = ACMD_GAME )]
-unsafe fn murabito_downb_3_hit_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_downb_3_hit_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.8);
@@ -858,8 +886,7 @@ unsafe fn murabito_downb_3_hit_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_specialairlw3hit", category = ACMD_GAME )]
-unsafe fn murabito_downb_3_air_hit_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_downb_3_air_hit_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.8);
@@ -870,8 +897,7 @@ unsafe fn murabito_downb_3_air_hit_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_specialairlw3", category = ACMD_GAME )]
-unsafe fn murabito_downb_3_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_downb_3_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("haver"), 14.0, 361, 100, 0, 36, 5.0, 0.0, 6.5, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 9, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_OBJECT);
@@ -892,8 +918,7 @@ unsafe fn murabito_downb_3_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito_tree", script = "game_fallen", category = ACMD_GAME )]
-unsafe fn tree_falling(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn tree_falling(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 14.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("tree"), 15.0, 60, 100, 0, 30, 7.0, 0.0, 17.5, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 6, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
@@ -902,8 +927,7 @@ unsafe fn tree_falling(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", script = "game_wait3", category = ACMD_GAME )]
-unsafe fn murabito_idle_3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_idle_3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 22.0);
     if macros::is_excute(fighter) {
         macros::PLAY_SE(fighter, Hash40::new("se_common_bomb_s"));
@@ -916,8 +940,7 @@ unsafe fn murabito_idle_3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "murabito", scripts = ["game_appeallwl", "game_appeallwr"], category = ACMD_GAME, low_priority )]
-unsafe fn murabito_downtaunt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn murabito_downtaunt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.5, 0, 40, 0, 25, 3.9, 0.0, 2.0, 3.0, Some(0.0), Some(2.0), Some(7.0), 0.5, 0.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 1.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
@@ -931,54 +954,81 @@ unsafe fn murabito_downtaunt_smash_script(fighter: &mut L2CAgentBase) {
 
 
 pub fn install() {
-    smashline::install_agent_frames!(
-        murabito_frame
-    );
-    smashline::install_acmd_scripts!(
-        murabito_jab_smash_script,
-        murabito_jab_end_smash_script,
-        murabito_jab2_smash_script,
-        murabito_jab2_end_smash_script,
-        murabito_dashattack_smash_script,
-        flowerpot_thrown,
-        murabito_ftilt_smash_script,
-        murabito_utilt_smash_script,
-        murabito_dtilt_smash_script,
-        murabito_fsmash_smash_script,
-        bowling_ball,
-        murabito_usmash_smash_script,
-        usmash_fireworks,
-        murabito_dsmash_smash_script,
-        murabito_nair_smash_script,
-        murabito_fair_smash_script,
-        slingshot_projectile_fair,
-        murabito_bair_smash_script,
-        slingshot_projectile_bair,
-        murabito_uair_smash_script,
-        murabito_dair_smash_script,
-        murabito_grab_smash_script,
-        murabito_grabd_smash_script,
-        murabito_grabp_smash_script,
-        murabito_fthrow_smash_script,
-        murabito_bthrow_smash_script,
-        murabito_uthrow_smash_script,
-        murabito_dthrow_smash_script,
-        lloid_rocket_projectile,
-        lloid_rocket_projectile_falling,
-        lloid_rocket_projectile_burst,
-        lloid_rocket_projectile_lodged_burst,
-        murabito_upb_flap1_smash_script,
-        murabito_upb_flap2_smash_script,
-        watercan_flowing,
-        murabito_downb_1_smash_script,
-        murabito_downb_1_air_failure_smash_script,
-        murabito_downb_3_smash_script,
-        murabito_downb_3_air_smash_script,
-        murabito_downb_3_hit_smash_script,
-        murabito_downb_3_air_hit_smash_script,
-        tree_falling,
-        murabito_idle_3_smash_script,
-        murabito_downtaunt_smash_script
-        
-    );
+    Agent::new("murabito")
+    .on_line(Main, murabito_frame) //opff
+    .game_acmd("game_attack11", murabito_jab_smash_script)
+    .game_acmd("game_attack11end", murabito_jab_end_smash_script)
+    .game_acmd("game_attack12", murabito_jab2_smash_script)
+    .game_acmd("game_attack12end", murabito_jab2_end_smash_script)
+    .game_acmd("game_attackdash", murabito_dashattack_smash_script)
+    .game_acmd("game_attacks3", murabito_ftilt_smash_script)
+    .game_acmd("game_attackhi3", murabito_utilt_smash_script)
+    .game_acmd("game_attacklw3", murabito_dtilt_smash_script)
+    .game_acmd("game_attacks4", murabito_fsmash_smash_script)
+    .game_acmd("game_attackhi4", murabito_usmash_smash_script)
+    .game_acmd("game_attacklw4", murabito_dsmash_smash_script)
+    .game_acmd("game_attackairn", murabito_nair_smash_script)
+    .game_acmd("game_attackairf", murabito_fair_smash_script)
+    .sound_acmd("sound_attackairf", murabito_fair_sound_script)
+    .effect_acmd("effect_attackairf", murabito_fair_effect_script)
+    .expression_acmd("expression_attackairf", murabito_fair_expression_script)
+    .game_acmd("game_attackairb", murabito_bair_smash_script)
+    .game_acmd("game_attackairhi", murabito_uair_smash_script)
+    .game_acmd("game_attackairlw", murabito_dair_smash_script)
+    .game_acmd("game_catch", murabito_grab_smash_script)
+    .game_acmd("game_catchdash", murabito_grabd_smash_script)
+    .game_acmd("game_catchturn", murabito_grabp_smash_script)
+    .game_acmd("game_throwf", murabito_fthrow_smash_script)
+    .game_acmd("game_throwb", murabito_bthrow_smash_script)
+    .game_acmd("game_throwhi", murabito_uthrow_smash_script)
+    .game_acmd("game_throwlw", murabito_dthrow_smash_script)
+    .game_acmd("game_specialairhiflap1", murabito_upb_flap1_smash_script)
+    .game_acmd("game_specialairhiflap2", murabito_upb_flap2_smash_script)
+    .game_acmd("game_speciallw1", murabito_downb_1_smash_script)
+    .game_acmd("game_specialairlw1failure", murabito_downb_1_air_failure_smash_script)
+    .game_acmd("game_speciallw3", murabito_downb_3_smash_script)
+    .game_acmd("game_specialairlw3", murabito_downb_3_air_smash_script)
+    .game_acmd("game_speciallw3hit", murabito_downb_3_hit_smash_script)
+    .game_acmd("game_specialairlw3hit", murabito_downb_3_air_hit_smash_script)
+    .game_acmd("game_appeallwl", murabito_downtaunt_smash_script)
+    .game_acmd("game_appeallwr", murabito_downtaunt_smash_script)
+    .game_acmd("game_wait3", murabito_idle_3_smash_script)
+    .install();
+
+    Agent::new("kirby")
+    .on_line(Main, kirby_murabitohat_frame)
+    .install();
+
+    Agent::new("murabito_flowerpot")
+    .game_acmd("game_throwed", flowerpot_thrown)
+    .install();
+
+    Agent::new("murabito_bowlingball")
+    .game_acmd("game_fall", bowling_ball)
+    .install();
+
+    Agent::new("murabito_firework")
+    .game_acmd("game_shoot", usmash_fireworks)
+    .install();
+
+    Agent::new("murabito_bullet")
+    .game_acmd("game_shootf", slingshot_projectile_fair)
+    .game_acmd("game_shootb", slingshot_projectile_bair)
+    .install();
+
+    Agent::new("murabito_clayrocket")
+    .game_acmd("game_fly", lloid_rocket_projectile)
+    .game_acmd("game_fall", lloid_rocket_projectile_falling)
+    .game_acmd("game_burst", lloid_rocket_projectile_burst)
+    .game_acmd("game_lodgedburst", lloid_rocket_projectile_lodged_burst)
+    .install();
+
+    Agent::new("murabito_sprinkling_water")
+    .game_acmd("game_flow", watercan_flowing)
+    .install();
+
+    Agent::new("murabito_tree")
+    .game_acmd("game_fallen", tree_falling)
+    .install();
+
 }

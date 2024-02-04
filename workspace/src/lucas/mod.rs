@@ -8,6 +8,7 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase, L2CFighterBase};
 use smashline::*;
 use smash_script::*;
 use smash::lib::L2CValue;
+use crate::custom::global_fighter_frame;
 
 pub static mut LUCAS_OFFENSE_UP : [bool; 8] = [false; 8];
 static mut LUCAS_OFFENSE_UP_COUNT : [i32; 8] = [0; 8];
@@ -16,15 +17,16 @@ static mut LUCAS_OFFENSE_UP_COUNT : [i32; 8] = [0; 8];
 static mut LUCAS_OFFENSE_UP_FRAME : [i32; 8] = [0; 8];
 static mut LUCAS_OFFENSE_UP_FRAME_CURRENT : [i32; 8] = [0; 8];
 
-// A Once-Per-Fighter-Frame that only applies to Lucas
-#[fighter_frame( agent = FIGHTER_KIND_LUCAS )]
-fn lucas_frame(fighter: &mut L2CFighterCommon) {
-    unsafe {
+static mut LUCAS_OFFENSE_UP_GRAPHIC :[bool; 8] = [false; 8];
 
+// A Once-Per-Fighter-Frame that only applies to Lucas
+unsafe extern "C" fn lucas_frame(fighter: &mut L2CFighterCommon) {
+    unsafe {
+        global_fighter_frame(fighter);
         let status = StatusModule::status_kind(fighter.module_accessor);
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
-        println!("It'sa me, Lucas, PK Love!");
+        //println!("It'sa me, Lucas, PK Love!");
         
         if [*FIGHTER_STATUS_KIND_SPECIAL_S].contains(&status) {
             crate::custom::fastfall_helper(fighter);
@@ -37,26 +39,27 @@ fn lucas_frame(fighter: &mut L2CFighterCommon) {
             }
         }
 
-        
 
         //Offense Up
         if LUCAS_OFFENSE_UP_COUNT[entry_id] >= 15 {
             LUCAS_OFFENSE_UP[entry_id] = true ;
         }
         if LUCAS_OFFENSE_UP[entry_id] {
-            println!("Offense Up is on");
-            LUCAS_OFFENSE_UP_FRAME[entry_id] += 1;
-
-            if LUCAS_OFFENSE_UP_FRAME[entry_id] == 9000 || LUCAS_OFFENSE_UP_FRAME_CURRENT[entry_id] != status {
+            if LUCAS_OFFENSE_UP_GRAPHIC[entry_id] {
                 if LUCAS_OFFENSE_UP_COUNT[entry_id] >= 25 {
                     macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_status_attack_up"), Hash40::new("top"), 0, 5.5, 0, 0, 0, 0, 1.1, true);
                 }
                 else {
                     macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_status_attack_up"), Hash40::new("top"), 0, 5.5, 0, 0, 0, 0, 0.7, true);
                 }
-                LUCAS_OFFENSE_UP_FRAME[entry_id] = 0
+                LUCAS_OFFENSE_UP_FRAME[entry_id] = 0;
+                LUCAS_OFFENSE_UP_GRAPHIC[entry_id] = false;
             }
-            LUCAS_OFFENSE_UP_FRAME_CURRENT[entry_id] = status ;
+            LUCAS_OFFENSE_UP_FRAME[entry_id] += 1;
+            if LUCAS_OFFENSE_UP_FRAME[entry_id] == 9000 || LUCAS_OFFENSE_UP_FRAME_CURRENT[entry_id] != status {
+                LUCAS_OFFENSE_UP_GRAPHIC[entry_id] = true;
+            }
+            LUCAS_OFFENSE_UP_FRAME_CURRENT[entry_id] = status;
 
 
         }
@@ -81,45 +84,55 @@ fn lucas_frame(fighter: &mut L2CFighterCommon) {
             DamageModule::set_damage_mul(fighter.module_accessor, 1.0);
         }
 
+        if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_DEATH_PREDICTION) {
+            DamageModule::heal(fighter.module_accessor, -4.0, 0);
+        }
+
 
     }
 }
 
 
 
-#[status_script(agent = "lucas", status = FIGHTER_STATUS_KIND_JUMP_AERIAL, condition = LUA_SCRIPT_STATUS_FUNC_STATUS_PRE)]
-unsafe fn lucas_jump_aerial_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
+//#[status_script(agent = "lucas", status = FIGHTER_STATUS_KIND_JUMP_AERIAL, condition = LUA_SCRIPT_STATUS_FUNC_STATUS_PRE)]
+unsafe extern "C" fn lucas_jump_aerial_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
     fighter.status_pre_JumpAerial()
 }
-#[status_script(agent = "lucas", status = FIGHTER_STATUS_KIND_JUMP_AERIAL, condition = LUA_SCRIPT_STATUS_FUNC_STATUS_MAIN)]
-unsafe fn lucas_jump_aerial_main(fighter: &mut L2CFighterCommon) -> L2CValue {
+
+//#[status_script(agent = "lucas", status = FIGHTER_STATUS_KIND_JUMP_AERIAL, condition = LUA_SCRIPT_STATUS_FUNC_STATUS_MAIN)]
+unsafe extern "C" fn lucas_jump_aerial_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     fighter.status_JumpAerial()
 }
-#[status_script(agent = "lucas", status = FIGHTER_STATUS_KIND_ATTACK_AIR, condition = LUA_SCRIPT_STATUS_FUNC_INIT_STATUS)]
-unsafe fn lucas_attack_aerial_init(fighter: &mut L2CFighterCommon) -> L2CValue {
+
+//#[status_script(agent = "lucas", status = FIGHTER_STATUS_KIND_ATTACK_AIR, condition = LUA_SCRIPT_STATUS_FUNC_INIT_STATUS)]
+unsafe extern "C" fn lucas_attack_aerial_init(fighter: &mut L2CFighterCommon) -> L2CValue {
     fighter.sub_attack_air_uniq_process_init()
 }
-#[status_script(agent = "lucas", status = FIGHTER_STATUS_KIND_ATTACK_AIR, condition = LUA_SCRIPT_STATUS_FUNC_STATUS_PRE)]
-unsafe fn lucas_attack_aerial_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
+
+//#[status_script(agent = "lucas", status = FIGHTER_STATUS_KIND_ATTACK_AIR, condition = LUA_SCRIPT_STATUS_FUNC_STATUS_PRE)]
+unsafe extern "C" fn lucas_attack_aerial_pre(fighter: &mut L2CFighterCommon) -> L2CValue {
     fighter.status_pre_AttackAir()
 }
-#[status_script(agent = "lucas", status = FIGHTER_STATUS_KIND_ATTACK_AIR, condition = LUA_SCRIPT_STATUS_FUNC_STATUS_MAIN)]
-unsafe fn lucas_attack_aerial_main(fighter: &mut L2CFighterCommon) -> L2CValue {
+
+//#[status_script(agent = "lucas", status = FIGHTER_STATUS_KIND_ATTACK_AIR, condition = LUA_SCRIPT_STATUS_FUNC_STATUS_MAIN)]
+unsafe extern "C" fn lucas_attack_aerial_main(fighter: &mut L2CFighterCommon) -> L2CValue {
     fighter.status_AttackAir()
 }
-#[status_script(agent = "lucas", status = FIGHTER_STATUS_KIND_ATTACK_AIR, condition = LUA_SCRIPT_STATUS_FUNC_EXEC_STATUS)]
-unsafe fn lucas_attack_aerial_exec(fighter: &mut L2CFighterCommon) -> L2CValue {
+
+//#[status_script(agent = "lucas", status = FIGHTER_STATUS_KIND_ATTACK_AIR, condition = LUA_SCRIPT_STATUS_FUNC_EXEC_STATUS)]
+unsafe extern "C" fn lucas_attack_aerial_exec(fighter: &mut L2CFighterCommon) -> L2CValue {
     fighter.sub_attack_air_uniq_process_exec()
 }
-#[status_script(agent = "lucas", status = FIGHTER_STATUS_KIND_ATTACK_AIR, condition = LUA_SCRIPT_STATUS_FUNC_EXIT_STATUS)]
-unsafe fn lucas_attack_aerial_exit(fighter: &mut L2CFighterCommon) -> L2CValue {
+
+//#[status_script(agent = "lucas", status = FIGHTER_STATUS_KIND_ATTACK_AIR, condition = LUA_SCRIPT_STATUS_FUNC_EXIT_STATUS)]
+unsafe extern "C" fn lucas_attack_aerial_exit(fighter: &mut L2CFighterCommon) -> L2CValue {
     fighter.sub_attack_air_uniq_process_exit()
 }
 
 
 
-#[weapon_frame( agent = WEAPON_KIND_LUCAS_PK_THUNDER )]
-pub fn lucas_pkthunder_weapon_frame(weapon : &mut L2CFighterBase) {
+//#[weapon_frame( agent = WEAPON_KIND_LUCAS_PK_THUNDER )]
+pub unsafe extern "C" fn lucas_pkthunder_weapon_frame(weapon : &mut L2CFighterBase) {
     unsafe {
         let status = StatusModule::status_kind(weapon.module_accessor);
         let owner_module_accessor = &mut *sv_battle_object::module_accessor((WorkModule::get_int(weapon.module_accessor, *WEAPON_INSTANCE_WORK_ID_INT_LINK_OWNER)) as u32);
@@ -141,11 +154,10 @@ unsafe fn offenseup_count(fighter: &mut L2CAgentBase, count_amount: i32) {
 
     if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) {
         LUCAS_OFFENSE_UP_COUNT[entry_id] += count_amount;
-    }
+    } 
 }
 
-#[acmd_script( agent = "lucas", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn lucas_jab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.5, 361, 35, 25, 35, 3.2, 0.0, 5.5, 5.8, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_KICK);
@@ -169,8 +181,7 @@ unsafe fn lucas_jab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_attack12", category = ACMD_GAME )]
-unsafe fn lucas_jab2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_jab2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.5, 361, 30, 20, 25, 2.8, 0.0, 5.5, 5.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_KICK);
@@ -188,8 +199,7 @@ unsafe fn lucas_jab2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_attack13", category = ACMD_GAME )]
-unsafe fn lucas_jab3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_jab3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.8, 31, 120, 0, 64, 4.0, 0.0, 6.5, 6.5, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_KICK);
@@ -202,8 +212,7 @@ unsafe fn lucas_jab3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn lucas_dashattack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -222,8 +231,7 @@ unsafe fn lucas_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_attacks3", category = ACMD_GAME )]
-unsafe fn lucas_ftilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 0.0, 3.0);
@@ -248,8 +256,7 @@ unsafe fn lucas_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_attacks3hi", category = ACMD_GAME )]
-unsafe fn lucas_ftilt2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_ftilt2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 0.0, 3.0);
@@ -274,8 +281,7 @@ unsafe fn lucas_ftilt2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_attacks3lw", category = ACMD_GAME )]
-unsafe fn lucas_ftilt3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_ftilt3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 0.0, 3.0);
@@ -300,8 +306,7 @@ unsafe fn lucas_ftilt3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn lucas_utilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_utilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.5, 120, 100, 60, 0, 3.8, 0.0, 6.0, 6.5, None, None, None, 0.33, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_PSI);
@@ -332,8 +337,7 @@ unsafe fn lucas_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn lucas_dtilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.1, 83, 70, 0, 35, 3.6, 0.0, 3.5, 4.5, Some(0.0), Some(3.6), Some(4.7), 1.1, 0.9, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, true, 1, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
@@ -354,8 +358,7 @@ unsafe fn lucas_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn lucas_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         VisibilityModule::set_int64(fighter.module_accessor, Hash40::new("bat").hash as i64, Hash40::new("bat_visible").hash as i64);
     }
@@ -383,8 +386,7 @@ unsafe fn lucas_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn lucas_usmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -446,8 +448,7 @@ unsafe fn lucas_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn lucas_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -489,8 +490,7 @@ unsafe fn lucas_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn lucas_nair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_nair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -524,8 +524,7 @@ unsafe fn lucas_nair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn lucas_fair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_fair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -557,8 +556,7 @@ unsafe fn lucas_fair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }   
 
-#[acmd_script( agent = "lucas", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn lucas_bair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_bair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -585,8 +583,7 @@ unsafe fn lucas_bair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn lucas_uair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_uair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -608,8 +605,7 @@ unsafe fn lucas_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn lucas_dair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_dair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
     }
@@ -617,8 +613,8 @@ unsafe fn lucas_dair_smash_script(fighter: &mut L2CAgentBase) {
     for _ in 0..3 {
         if macros::is_excute(fighter) {
             MotionModule::set_rate(fighter.module_accessor, 1.2);
-            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.1, 366, 90, 0, 42, 4.2, 0.0, -4.0, 0.3, None, None, None, 0.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_PSI);
-            macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 2.1, 366, 90, 0, 42, 3.2, 0.0, 1.0, 0.3, None, None, None, 0.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_PSI);
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.1, 366, 90, 0, 42, 4.6, 0.0, -4.0, 0.3, None, None, None, 0.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_PSI);
+            macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 2.1, 366, 90, 0, 42, 3.6, 0.0, 1.0, 0.3, None, None, None, 0.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_PSI);
         }
         sv_animcmd::wait(fighter.lua_state_agent, 3.0);
         if macros::is_excute(fighter) {
@@ -627,8 +623,8 @@ unsafe fn lucas_dair_smash_script(fighter: &mut L2CAgentBase) {
         sv_animcmd::wait(fighter.lua_state_agent, 5.0);
     }
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.7, 270, 110, 0, 10, 5.5, 0.0, -4.0, 0.3, None, None, None, 0.7, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_PSI);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 7.7, 361, 130, 0, 10, 3.5, 0.0, 1.0, 0.3, None, None, None, 0.7, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_PSI);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.7, 270, 110, 0, 10, 6.2, 0.0, -4.0, 0.3, None, None, None, 0.7, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_PSI);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 7.7, 361, 130, 0, 10, 4.2, 0.0, 1.0, 0.3, None, None, None, 0.7, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_PSI);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
@@ -642,8 +638,7 @@ unsafe fn lucas_dair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_catch", category = ACMD_GAME )]
-unsafe fn lucas_grab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_grab_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_LUCAS_GENERATE_ARTICLE_HIMOHEBI, false, -1);
         ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_LUCAS_GENERATE_ARTICLE_HIMOHEBI, Hash40::new("catch"), false, -1.0);
@@ -682,8 +677,7 @@ unsafe fn lucas_grab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn lucas_grabd_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_grabd_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_LUCAS_GENERATE_ARTICLE_HIMOHEBI, false, -1);
         ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_LUCAS_GENERATE_ARTICLE_HIMOHEBI, Hash40::new("catch_dash"), false, -1.0);
@@ -722,8 +716,7 @@ unsafe fn lucas_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn lucas_grabp_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_grabp_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_LUCAS_GENERATE_ARTICLE_HIMOHEBI, false, -1);
         ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_LUCAS_GENERATE_ARTICLE_HIMOHEBI, Hash40::new("catch_turn"), false, -1.0);
@@ -762,8 +755,7 @@ unsafe fn lucas_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_aircatch", category = ACMD_GAME )]
-unsafe fn lucas_zair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_zair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_LUCAS_GENERATE_ARTICLE_HIMOHEBI, false, -1);
         ArticleModule::change_motion(fighter.module_accessor, *FIGHTER_LUCAS_GENERATE_ARTICLE_HIMOHEBI, Hash40::new("shoot"), false, -1.0);
@@ -814,12 +806,11 @@ unsafe fn lucas_zair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn lucas_fthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
-        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 9.6, 48, 144, 0, 30, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 9.1, 48, 144, 0, 48, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 22.0);
@@ -835,8 +826,7 @@ unsafe fn lucas_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn lucas_bthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -858,8 +848,7 @@ unsafe fn lucas_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn lucas_uthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -879,8 +868,7 @@ unsafe fn lucas_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn lucas_dthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -904,8 +892,7 @@ unsafe fn lucas_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_cliffattack", category = ACMD_GAME )]
-unsafe fn lucas_ledge_attack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_ledge_attack_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 22.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 9.5, 45, 20, 0, 90, 5.0, 0.0, 5.0, 7.5, Some(0.0), Some(5.0), Some(-2.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 1, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
@@ -916,8 +903,7 @@ unsafe fn lucas_ledge_attack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas_pkfreeze", script = "game_bang", category = ACMD_GAME )]
-unsafe fn pk_freeze_explosion(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pk_freeze_explosion(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.0, 34, 60, 0, 35, 10.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_ice"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PSI);
     }
@@ -928,8 +914,7 @@ unsafe fn pk_freeze_explosion(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_specials", category = ACMD_GAME )]
-unsafe fn lucas_sideb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_sideb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 21.0);
     if macros::is_excute(fighter) {
         if ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_SPECIAL) {
@@ -942,25 +927,10 @@ unsafe fn lucas_sideb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_specialairs", category = ACMD_GAME )]
-unsafe fn lucas_sideb_air_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 21.0);
+unsafe extern "C" fn pk_fire_explosion(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        if ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_SPECIAL) {
-            KineticModule::add_speed(fighter.module_accessor, &smash::phx::Vector3f{x: 1.8, y: 0.1, z: 0.0});
-        }
-        else {
-            KineticModule::add_speed(fighter.module_accessor, &smash::phx::Vector3f{x: -1.8, y: 0.1, z: 0.0});
-        }
-        ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_LUCAS_GENERATE_ARTICLE_PK_FIRE, false, 0);
-    }
-}
-
-#[acmd_script( agent = "lucas_pkfire", script = "game_pillar", category = ACMD_GAME )]
-unsafe fn pk_fire_explosion(fighter: &mut L2CAgentBase) {
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 10.1, 135, 66, 0, 60, 7.0, 0.0, 2.0, 2.0, None, None, None, 0.0, 0.7, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PSI);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 6.3, 135, 0, 0, 60, 5.0, 0.0, 8.0, 9.0, None, None, None, 0.0, 0.7, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PSI);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 10.1, 100, 55, 0, 60, 7.0, 0.0, 2.0, 2.0, None, None, None, 0.3, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PSI);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 6.3, 100, 0, 0, 60, 5.0, 0.0, 8.0, 9.0, None, None, None, 0.3, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PSI);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 4.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 4.0, false);
     }
@@ -971,23 +941,20 @@ unsafe fn pk_fire_explosion(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas_pkthunder", script = "game_move", category = ACMD_GAME )]
-unsafe fn pkthunder_head(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pkthunder_head(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.5, 361, 50, 0, 70, 3.8, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.5, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 48, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_PSI);
     }
 }
 
-#[acmd_script( agent = "lucas_pkthunder", script = "game_movechild", category = ACMD_GAME )]
-unsafe fn pkthunder_tail(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pkthunder_tail(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 1, 1, Hash40::new("top"), 0.9, 80, 40, 0, 4, 2.5, 0.0, 0.0, 0.0, None, None, None, 0.5, 1.5, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 6, false, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_PSI);
         AttackModule::set_attack_composition_speed(fighter.module_accessor, 1, true);
     }
 }
 
-#[acmd_script( agent = "lucas", script = "game_specialairhi", category = ACMD_GAME )]
-unsafe fn lucas_upb_pkt2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_upb_pkt2_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         GroundModule::select_cliff_hangdata(fighter.module_accessor, *FIGHTER_LUCAS_CLIFF_HANG_DATA_SPECIAL_HI as u32);
     }
@@ -1048,8 +1015,7 @@ unsafe fn lucas_upb_pkt2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "lucas", scripts = ["game_speciallwend", "game_specialairlwend"], category = ACMD_GAME, low_priority )]
-unsafe fn lucas_downb_end_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_downb_end_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 9.0, 25, 98, 0, 40, 7.5, 0.0, 6.3, 7.0, Some(0.0), Some(6.3), Some(11.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 8, 0.0, 0, false, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_PSI);
@@ -1061,8 +1027,7 @@ unsafe fn lucas_downb_end_smash_script(fighter: &mut L2CAgentBase) {
 }
 
 
-#[acmd_script( agent = "lucas", scripts = ["game_appealhil", "game_appealhir"], category = ACMD_GAME, low_priority )]
-unsafe fn lucas_uptaunt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn lucas_uptaunt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 13.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.0, 0, 45, 0, 10, 15.1, 0.0, 4.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 1.0, 0, false, false, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_BODY);
@@ -1076,57 +1041,64 @@ unsafe fn lucas_uptaunt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-
-
 pub fn install() {
-    smashline::install_agent_frames!(
-        lucas_frame,
-        lucas_pkthunder_weapon_frame
-    );
-    smashline::install_acmd_scripts!(
-        lucas_jab_smash_script,
-        lucas_jab2_smash_script,
-        lucas_jab3_smash_script,
-        lucas_dashattack_smash_script,
-        lucas_ftilt_smash_script,
-        lucas_ftilt2_smash_script,
-        lucas_ftilt3_smash_script,
-        lucas_utilt_smash_script,
-        lucas_dtilt_smash_script,
-        lucas_fsmash_smash_script,
-        lucas_usmash_smash_script,
-        lucas_dsmash_smash_script,
-        lucas_nair_smash_script,
-        lucas_fair_smash_script,
-        lucas_bair_smash_script,
-        lucas_uair_smash_script,
-        lucas_dair_smash_script,
-        lucas_grab_smash_script,
-        lucas_grabd_smash_script,
-        lucas_grabp_smash_script,
-        lucas_zair_smash_script,
-        lucas_fthrow_smash_script,
-        lucas_bthrow_smash_script,
-        lucas_uthrow_smash_script,
-        lucas_dthrow_smash_script,
-        lucas_ledge_attack_smash_script,
-        pk_freeze_explosion,
-        lucas_sideb_smash_script,
-        lucas_sideb_air_smash_script,
-        pk_fire_explosion,
-        pkthunder_head,
-        pkthunder_tail,
-        lucas_upb_pkt2_smash_script,
-        lucas_downb_end_smash_script,
-        lucas_uptaunt_smash_script
-    );
-    smashline::install_status_scripts!(
-        lucas_jump_aerial_pre,
-        lucas_jump_aerial_main,
-        lucas_attack_aerial_pre,
-        lucas_attack_aerial_init,
-        lucas_attack_aerial_main,
-        lucas_attack_aerial_exec,
-        lucas_attack_aerial_exit
-    );
+    Agent::new("lucas")
+    .on_line(Main, lucas_frame) //opff
+
+    .status(Pre, *FIGHTER_STATUS_KIND_JUMP_AERIAL, lucas_jump_aerial_pre)
+    .status(Main, *FIGHTER_STATUS_KIND_JUMP_AERIAL, lucas_jump_aerial_main)
+    .status(Pre, *FIGHTER_STATUS_KIND_ATTACK_AIR, lucas_attack_aerial_pre)
+    .status(Init, *FIGHTER_STATUS_KIND_ATTACK_AIR, lucas_attack_aerial_init)
+    .status(Main, *FIGHTER_STATUS_KIND_ATTACK_AIR, lucas_attack_aerial_main)
+    .status(Exec, *FIGHTER_STATUS_KIND_ATTACK_AIR, lucas_attack_aerial_exec)
+    .status(Exit, *FIGHTER_STATUS_KIND_ATTACK_AIR, lucas_attack_aerial_exit)
+    .game_acmd("game_attack11", lucas_jab_smash_script)
+    .game_acmd("game_attack12", lucas_jab2_smash_script)
+    .game_acmd("game_attack13", lucas_jab3_smash_script)
+    .game_acmd("game_attackdash", lucas_dashattack_smash_script)
+    .game_acmd("game_attacks3", lucas_ftilt_smash_script)
+    .game_acmd("game_attacks3hi", lucas_ftilt2_smash_script)
+    .game_acmd("game_attacks3lw", lucas_ftilt3_smash_script)
+    .game_acmd("game_attackhi3", lucas_utilt_smash_script)
+    .game_acmd("game_attacklw3", lucas_dtilt_smash_script)
+    .game_acmd("game_attacks4", lucas_fsmash_smash_script)
+    .game_acmd("game_attackhi4", lucas_usmash_smash_script)
+    .game_acmd("game_attacklw4", lucas_dsmash_smash_script)
+    .game_acmd("game_attackairn", lucas_nair_smash_script)
+    .game_acmd("game_attackairf", lucas_fair_smash_script)
+    .game_acmd("game_attackairb", lucas_bair_smash_script)
+    .game_acmd("game_attackairhi", lucas_uair_smash_script)
+    .game_acmd("game_attackairlw", lucas_dair_smash_script)
+    .game_acmd("game_catch", lucas_grab_smash_script)
+    .game_acmd("game_catchdash", lucas_grabd_smash_script)
+    .game_acmd("game_catchturn", lucas_grabp_smash_script)
+    .game_acmd("game_aircatch", lucas_zair_smash_script)
+    .game_acmd("game_throwf", lucas_fthrow_smash_script)
+    .game_acmd("game_throwb", lucas_bthrow_smash_script)
+    .game_acmd("game_throwhi", lucas_uthrow_smash_script)
+    .game_acmd("game_throwlw", lucas_dthrow_smash_script)
+    .game_acmd("game_cliffattack", lucas_ledge_attack_smash_script)
+    .game_acmd("game_specials", lucas_sideb_smash_script)
+    .game_acmd("game_specialairs", lucas_sideb_smash_script)
+    .game_acmd("game_specialairhi", lucas_upb_pkt2_smash_script)
+    .game_acmd("game_speciallwend", lucas_downb_end_smash_script)
+    .game_acmd("game_specialairlwend", lucas_downb_end_smash_script)
+    .game_acmd("game_appealhil", lucas_uptaunt_smash_script)
+    .game_acmd("game_appealhir", lucas_uptaunt_smash_script)
+    .install();
+
+    Agent::new("lucas_pkfreeze")
+    .game_acmd("game_bang", pk_freeze_explosion)
+    .install();
+
+    Agent::new("lucas_pkfire")
+    .game_acmd("game_pillar", pk_fire_explosion)
+    .install();
+
+    Agent::new("lucas_pkthunder")
+    .on_line(Main, lucas_pkthunder_weapon_frame)
+    .game_acmd("game_move", pkthunder_head)
+    //.game_acmd("game_movechild", pkthunder_tail)
+    .install();
+
 }

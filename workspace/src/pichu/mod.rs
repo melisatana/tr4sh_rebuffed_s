@@ -7,12 +7,14 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
+use crate::custom::global_fighter_frame;
 
 pub static mut SELF_DAMAGE_METER : [f32; 8] = [0.0; 8]; //total stored self-damage
 static mut SELF_DAMAGE_FRAME : [i32; 8] = [0; 8]; //for effect frames
 static mut SELF_DAMAGE_FRAME_CURRENT_STATUS : [i32; 8] = [0; 8]; //for effect frames
 static mut PICHU_NEUTRALSPECIAL_FROMGROUND : [bool; 8] = [false; 8]; //if neutral special was started on the ground
 static mut PICHU_SELF_DAMAGE_GRACE : [i32; 8] = [0; 8];
+static mut PICHU_SELF_DAMAGE_GRAPHIC : [bool; 8] = [false; 8];
 
 static PICHU_GRACE_FRAMES : i32 = 60;
 
@@ -22,9 +24,9 @@ static PICHU_CHARGE_LV3 : f32 = -20.0;
 static PICHU_CHARGE_LV4 : f32 = -30.0;
 
 // A Once-Per-Fighter-Frame that only applies to Pichu. Neat!
-#[fighter_frame( agent = FIGHTER_KIND_PICHU )]
-fn pichu_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn pichu_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
 
@@ -77,10 +79,8 @@ fn pichu_frame(fighter: &mut L2CFighterCommon) {
             macros::SET_SPEED_EX(fighter, -0.7, 1.1, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
         } ;
 
-    
-        SELF_DAMAGE_FRAME[entry_id] += 1;
-        if SELF_DAMAGE_FRAME[entry_id] == 9000 || SELF_DAMAGE_FRAME_CURRENT_STATUS[entry_id] != status {
-            SELF_DAMAGE_FRAME[entry_id] = 0 ;
+
+        if PICHU_SELF_DAMAGE_GRAPHIC[entry_id] {
             if SELF_DAMAGE_METER[entry_id] <= PICHU_CHARGE_LV4 {
                 macros::EFFECT_FOLLOW(fighter, Hash40::new("pichu_elec2"), Hash40::new("top"), 0, 4, 0, 0, 0, 0, 2.0, true);
                 macros::LAST_EFFECT_SET_COLOR(fighter, 5.0, 0.5, 2.5);
@@ -98,11 +98,18 @@ fn pichu_frame(fighter: &mut L2CFighterCommon) {
                     macros::EFFECT_FOLLOW(fighter, Hash40::new("pichu_elec2"), Hash40::new("top"), 0, 4, 0, 0, 0, 0, 1.2, true);
                 }
             }
-            SELF_DAMAGE_FRAME_CURRENT_STATUS[entry_id] = status ;
+            SELF_DAMAGE_FRAME[entry_id] = 0 ;
+            PICHU_SELF_DAMAGE_GRAPHIC[entry_id] = false;
+        }
+        SELF_DAMAGE_FRAME[entry_id] += 1;
+        if SELF_DAMAGE_FRAME[entry_id] == 9000 || SELF_DAMAGE_FRAME_CURRENT_STATUS[entry_id] != status {
+            PICHU_SELF_DAMAGE_GRAPHIC[entry_id] = true;
+        
+            SELF_DAMAGE_FRAME_CURRENT_STATUS[entry_id] = status;
         }
 
 
-        if [*FIGHTER_PIKACHU_STATUS_KIND_SPECIAL_HI_WARP].contains(&status) {
+        if status == *FIGHTER_PIKACHU_STATUS_KIND_SPECIAL_HI_WARP || (status == *FIGHTER_PIKACHU_STATUS_KIND_SPECIAL_HI_END && MotionModule::frame(fighter.module_accessor) <= 8.0) {
             if SELF_DAMAGE_METER[entry_id] <= PICHU_CHARGE_LV2 {
                 if ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_ATTACK) {
                     StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_PIKACHU_STATUS_KIND_SPECIAL_LW_HIT, false);
@@ -111,13 +118,13 @@ fn pichu_frame(fighter: &mut L2CFighterCommon) {
         }
 
         if SELF_DAMAGE_METER[entry_id] <= PICHU_CHARGE_LV4 {
-            DamageModule::set_damage_mul(fighter.module_accessor, 0.75);
-        }
-        else if SELF_DAMAGE_METER[entry_id] <= PICHU_CHARGE_LV3 {
             DamageModule::set_damage_mul(fighter.module_accessor, 0.8);
         }
-        else if SELF_DAMAGE_METER[entry_id] <= PICHU_CHARGE_LV2 {
+        else if SELF_DAMAGE_METER[entry_id] <= PICHU_CHARGE_LV3 {
             DamageModule::set_damage_mul(fighter.module_accessor, 0.85);
+        }
+        else if SELF_DAMAGE_METER[entry_id] <= PICHU_CHARGE_LV2 {
+            DamageModule::set_damage_mul(fighter.module_accessor, 0.9);
         }
         else {
             DamageModule::set_damage_mul(fighter.module_accessor, 1.0);
@@ -139,8 +146,7 @@ fn pichu_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-#[fighter_frame( agent = FIGHTER_KIND_KIRBY )]
-fn kirby_pichuhat_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn kirby_pichuhat_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
@@ -165,8 +171,7 @@ fn kirby_pichuhat_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_guarddamage", category = ACMD_GAME )]
-unsafe fn pichu_shield(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_shield(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -193,8 +198,7 @@ unsafe fn pichu_shield(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_justshieldoff", category = ACMD_GAME )]
-unsafe fn pichu_perfectshield(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_perfectshield(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -221,14 +225,13 @@ unsafe fn pichu_perfectshield(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn pichu_jab(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_jab(fighter: &mut L2CAgentBase) {
     JostleModule::set_status(fighter.module_accessor, false);
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
         KineticModule::add_speed(fighter.module_accessor, &smash::phx::Vector3f{x: 0.3, y: 0.0, z: 0.0});
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.9, 0, 50, 0, 10, 3.7, 0.0, 3.0, 6.0, None, None, None, 0.5, 1.7, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_HEAD);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 1.9, 0, 50, 0, 20, 3.7, 0.0, 3.0, 10.0, None, None, None, 0.5, 1.7, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_HEAD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.9, 0, 50, 0, 10, 3.7, 0.0, 3.0, 6.0, None, None, None, 0.4, 1.7, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_HEAD);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 1.9, 0, 50, 0, 20, 3.7, 0.0, 3.0, 10.0, None, None, None, 0.4, 1.7, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_HEAD);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
@@ -241,8 +244,7 @@ unsafe fn pichu_jab(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn pichu_dashattack(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_dashattack(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
@@ -272,8 +274,7 @@ unsafe fn pichu_dashattack(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_attacks3", category = ACMD_GAME )]
-unsafe fn pichu_ftilt(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_ftilt(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
@@ -296,8 +297,7 @@ unsafe fn pichu_ftilt(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn pichu_utilt(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_utilt(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -308,9 +308,9 @@ unsafe fn pichu_utilt(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("tail1"), 6.5, 95, 80, 0, 34, 2.8, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_TAIL);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("tail2"), 6.5, 95, 80, 0, 34, 3.3, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_TAIL);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("tail3"), 6.5, 95, 80, 0, 34, 4.5, 2.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_TAIL);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("tail1"), 6.8, 95, 80, 0, 39, 2.8, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_TAIL);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("tail2"), 6.8, 95, 80, 0, 39, 3.3, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_TAIL);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("tail3"), 6.8, 95, 80, 0, 39, 4.5, 2.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_TAIL);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
@@ -319,8 +319,7 @@ unsafe fn pichu_utilt(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn pichu_dtilt(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_dtilt(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         macros::HIT_NODE(fighter, Hash40::new("tail1"), *HIT_STATUS_XLU);
@@ -341,8 +340,7 @@ unsafe fn pichu_dtilt(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn pichu_fsmash(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_fsmash(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -382,16 +380,15 @@ unsafe fn pichu_fsmash(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn pichu_usmash(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_usmash(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 9.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("neck"), 15.6, 95, 104, 0, 40, 5.8, 5.4, 0.5, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_HEAD);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("hip"), 15.6, 95, 104, 0, 40, 3.8, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_HEAD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("neck"), 14.7, 95, 108, 0, 40, 5.8, 5.4, 0.5, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_HEAD);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("hip"), 14.7, 95, 108, 0, 40, 3.8, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_HEAD);
         macros::HIT_NODE(fighter, Hash40::new("mimir1"), *HIT_STATUS_XLU);
         macros::HIT_NODE(fighter, Hash40::new("mimil1"), *HIT_STATUS_XLU);
     }
@@ -403,8 +400,7 @@ unsafe fn pichu_usmash(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn pichu_dsmash(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_dsmash(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
@@ -443,8 +439,7 @@ unsafe fn pichu_dsmash(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn pichu_nair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_nair(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -463,14 +458,13 @@ unsafe fn pichu_nair(fighter: &mut L2CAgentBase) {
         AttackModule::clear_all(fighter.module_accessor);
 		MotionModule::set_rate(fighter.module_accessor, 1.35);
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 35.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 32.0);
     if macros::is_excute(fighter) {
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn pichu_fair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_fair(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -513,8 +507,7 @@ unsafe fn pichu_fair(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn pichu_bair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_bair(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
@@ -562,8 +555,7 @@ unsafe fn pichu_bair(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn pichu_uair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_uair(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
@@ -593,8 +585,7 @@ unsafe fn pichu_uair(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn pichu_dair(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_dair(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -630,8 +621,7 @@ unsafe fn pichu_dair(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_landingairlw", category = ACMD_GAME )]
-unsafe fn pichu_dair_landing(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_dair_landing(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -645,8 +635,7 @@ unsafe fn pichu_dair_landing(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_catch", category = ACMD_GAME )]
-unsafe fn pichu_grab(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_grab(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         GrabModule::set_rebound(fighter.module_accessor, true);
@@ -665,8 +654,7 @@ unsafe fn pichu_grab(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn pichu_grabd(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_grabd(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -688,8 +676,7 @@ unsafe fn pichu_grabd(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn pichu_grabp(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_grabp(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -711,8 +698,7 @@ unsafe fn pichu_grabp(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_catchattack", category = ACMD_GAME )]
-unsafe fn pichu_pummel(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_pummel(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -729,22 +715,21 @@ unsafe fn pichu_pummel(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn pichu_fthrow(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_fthrow(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
-        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 6.0, 45, 110, 0, 45, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.0, 45, 144, 0, 70, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 11.0);
     if macros::is_excute(fighter) {
-        macros::FT_ADD_DAMAGE(fighter, 2.5);
-        SELF_DAMAGE_METER[entry_id] -= 2.5;
+        macros::FT_ADD_DAMAGE(fighter, 3.5);
+        SELF_DAMAGE_METER[entry_id] -= 3.5;
     }
     for _ in 0..4 {
         if macros::is_excute(fighter) {
-            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.8, 361, 100, 0, 0, 5.5, 0.0, 8.5, 4.7, None, None, None, 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_NONE);
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 0.8, 361, 100, 0, 0, 5.5, 0.0, 8.5, 4.7, None, None, None, 0.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_NONE);
             AttackModule::set_catch_only_all(fighter.module_accessor, true, false);
         }
         sv_animcmd::wait(fighter.lua_state_agent, 4.0);
@@ -764,10 +749,9 @@ unsafe fn pichu_fthrow(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn pichu_bthrow(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_bthrow(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 9.3, 135, 110, 0, 70, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 10.3, 155, 45, 0, 80, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 11.0);
@@ -790,8 +774,7 @@ unsafe fn pichu_bthrow(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn pichu_uthrow(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_uthrow(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.0, 90, 45, 0, 90, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -811,8 +794,7 @@ unsafe fn pichu_uthrow(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn pichu_dthrow(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_dthrow(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     
     if macros::is_excute(fighter) {
@@ -841,13 +823,12 @@ unsafe fn pichu_dthrow(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_specialn", category = ACMD_GAME )]
-unsafe fn pichu_neutralspecial(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_neutralspecial(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 18.0);
     if macros::is_excute(fighter) {
-        ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_PICHU_GENERATE_ARTICLE_DENGEKIDAMA, false, 0);
+        ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_PICHU_GENERATE_ARTICLE_DENGEKIDAMA, false, -1);
         PICHU_NEUTRALSPECIAL_FROMGROUND[entry_id] = false;
     }
     if macros::is_excute(fighter) {
@@ -856,13 +837,12 @@ unsafe fn pichu_neutralspecial(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_specialairn", category = ACMD_GAME )]
-unsafe fn pichu_neutralspecial_air(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_neutralspecial_air(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 18.0);
     if macros::is_excute(fighter) {
-        ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_PICHU_GENERATE_ARTICLE_DENGEKIDAMA, false, 0);
+        ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_PICHU_GENERATE_ARTICLE_DENGEKIDAMA, false, -1);
         PICHU_NEUTRALSPECIAL_FROMGROUND[entry_id] = false;
     }
     if macros::is_excute(fighter) {
@@ -871,8 +851,7 @@ unsafe fn pichu_neutralspecial_air(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_specials", category = ACMD_GAME )]
-unsafe fn pichu_sidespecial(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_sidespecial(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -897,16 +876,14 @@ unsafe fn pichu_sidespecial(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_specialhistart", category = ACMD_GAME )]
-unsafe fn pichu_upspecial_start(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_upspecial_start(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.5);
     }
 }
 
-#[acmd_script( agent = "pichu", script = "sound_specialhistart", category = ACMD_SOUND )]
-unsafe fn pichu_upspecialstart_sound(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_upspecialstart_sound(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         macros::PLAY_SE(fighter, Hash40::new("vc_pichu_special_h01"));
@@ -917,52 +894,7 @@ unsafe fn pichu_upspecialstart_sound(fighter: &mut L2CAgentBase) {
     }
 }
 
-
-#[acmd_script( agent = "pichu", script = "game_specialairhistart", category = ACMD_GAME )]
-unsafe fn pichu_upspecial_start_air(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.5);
-    }
-}
-
-#[acmd_script( agent = "pichu", script = "sound_specialairhistart", category = ACMD_SOUND )]
-unsafe fn pichu_upspecialstart_air_sound(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 6.0);
-    if macros::is_excute(fighter) {
-        macros::PLAY_SE(fighter, Hash40::new("vc_pichu_special_h01"));
-    }
-    sv_animcmd::wait(fighter.lua_state_agent, 1.0);
-    if macros::is_excute(fighter) {
-        macros::PLAY_SE(fighter, Hash40::new("se_pichu_special_h01"));
-    }
-}
-
-#[acmd_script( agent = "pichu", script = "game_specialhi1", category = ACMD_GAME )]
-unsafe fn pichu_upspecial_1(fighter: &mut L2CAgentBase) {
-    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
-
-    if macros::is_excute(fighter) {
-        macros::SEARCH(fighter, 0, 0, Hash40::new("top"), 5.5, 0.0, 4.0, 0.0, None, None, None, *COLLISION_KIND_MASK_ALL, *HIT_STATUS_MASK_NORMAL, 60, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false);
-        macros::FT_ADD_DAMAGE(fighter, 0.7);
-        SELF_DAMAGE_METER[entry_id] -= 0.7;
-        JostleModule::set_status(fighter.module_accessor, false);
-    }
-}
-
-#[acmd_script( agent = "pichu", script = "game_specialhi2", category = ACMD_GAME )]
-unsafe fn pichu_upspecial_2(fighter: &mut L2CAgentBase) {
-    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
-
-    if macros::is_excute(fighter) {
-        macros::FT_ADD_DAMAGE(fighter, 1.4);
-        SELF_DAMAGE_METER[entry_id] -= 1.4;
-        JostleModule::set_status(fighter.module_accessor, false);
-    }
-}
-
-#[acmd_script( agent = "pichu", script = "game_specialairhi1", category = ACMD_GAME )]
-unsafe fn pichu_upspecial_air_1(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_upspecial_1(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -972,8 +904,7 @@ unsafe fn pichu_upspecial_air_1(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_specialairhi2", category = ACMD_GAME )]
-unsafe fn pichu_upspecial_air_2(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_upspecial_2(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -983,8 +914,7 @@ unsafe fn pichu_upspecial_air_2(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", scripts = ["game_speciallwhit", "game_specialairlwhit"], category = ACMD_GAME, low_priority )]
-unsafe fn pichu_downspecial_hit(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_downspecial_hit(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     let thunder_damage;
     let thunder_kbg;
@@ -1028,8 +958,7 @@ unsafe fn pichu_downspecial_hit(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_finalattack", category = ACMD_GAME, low_priority )]
-unsafe fn pichu_final_loop(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_final_loop(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -1042,8 +971,7 @@ unsafe fn pichu_final_loop(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_finalattack2", category = ACMD_GAME, low_priority )]
-unsafe fn pichu_final_loop_2(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_final_loop_2(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -1056,8 +984,7 @@ unsafe fn pichu_final_loop_2(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", script = "game_finalattackfinish", category = ACMD_GAME, low_priority )]
-unsafe fn pichu_final_loop_finish(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_final_loop_finish(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -1070,8 +997,7 @@ unsafe fn pichu_final_loop_finish(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu", scripts = ["game_final2", "game_finalair2"], category = ACMD_GAME, low_priority )]
-unsafe fn pichu_final_finish(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_final_finish(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -1097,15 +1023,13 @@ unsafe fn pichu_final_finish(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu_dengekidama", script = "game_regular", category = ACMD_GAME )]
-unsafe fn pichu_thunderjolt(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_thunderjolt(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.0, 130, 30, 0, 70, 4.0, 0.0, 0.0, 0.0, None, None, None, 0.5, 0.7, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, -4.5, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_NONE);
     }
 }
 
-#[acmd_script( agent = "pichu_dengeki", script = "game_regular", category = ACMD_GAME )]
-unsafe fn pichu_thunderjolt_ground(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_thunderjolt_ground(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::EFFECT(fighter, Hash40::new("sys_hit_elec"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 0.6, 0, 0, 0, 0, 0, 0, false);
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.0, 130, 30, 0, 70, 10.0, 0.0, 0.0, 0.0, None, None, None, 0.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, -3, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_NONE);
@@ -1117,31 +1041,27 @@ unsafe fn pichu_thunderjolt_ground(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "pichu_kaminari", script = "game_regular", category = ACMD_GAME )]
-unsafe fn pichu_thunder(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_thunder(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         //beans
     }
 }
 
-#[acmd_script( agent = "pichu_cloud", script = "game_regular", category = ACMD_GAME )]
-unsafe fn pichu_thundercloud(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_thundercloud(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *WEAPON_PIKACHU_CLOUD_INSTANCE_WORK_ID_FLAG_ACTIVATE_KAMINARI);
     }
 }
 
-#[acmd_script( agent = "pichu_cloud", script = "effect_regular", category = ACMD_EFFECT )]
-unsafe fn pichu_thundercloud_effect(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_thundercloud_effect(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         //beans?
     }
 }
 
-#[acmd_script( agent = "pichu", scripts = ["game_appealhil", "game_appealhir"], category = ACMD_GAME, low_priority )]
-unsafe fn pichu_uptaunt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn pichu_uptaunt_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 13.0);
@@ -1152,57 +1072,75 @@ unsafe fn pichu_uptaunt_smash_script(fighter: &mut L2CAgentBase) {
 }
 
 
+//#[skyline::main(name = "tr4sh_rebuffed")]
 pub fn install() {
-    smashline::install_agent_frames!(
-        pichu_frame,
-        kirby_pichuhat_frame
-    );
-    smashline::install_acmd_scripts!(
-        pichu_shield,
-        pichu_perfectshield,
-        pichu_jab,
-        pichu_dashattack,
-        pichu_ftilt,
-        pichu_utilt,
-        pichu_dtilt,
-        pichu_fsmash,
-        pichu_dsmash,
-        pichu_usmash,
-        pichu_nair,
-        pichu_fair,
-        pichu_bair,
-        pichu_uair,
-        pichu_dair,
-        pichu_dair_landing,
-        pichu_grab,
-        pichu_grabd,
-        pichu_grabp,
-        pichu_pummel,
-        pichu_fthrow,
-        pichu_bthrow,
-        pichu_uthrow,
-        pichu_dthrow,
-        pichu_neutralspecial,
-        pichu_neutralspecial_air,
-        pichu_sidespecial,
-        pichu_upspecial_start,
-        pichu_upspecialstart_sound,
-        pichu_upspecial_start_air,
-        pichu_upspecialstart_air_sound,
-        pichu_upspecial_1,
-        pichu_upspecial_2,
-        pichu_upspecial_air_1,
-        pichu_upspecial_air_2,
-        pichu_downspecial_hit,
-        pichu_thunderjolt,
-        pichu_thunderjolt_ground,
-        pichu_thunder,
-        pichu_thundercloud,
-        pichu_thundercloud_effect,
-        pichu_final_loop,
-        pichu_final_loop_2,
-        pichu_final_loop_finish,
-        pichu_final_finish,
-        pichu_uptaunt_smash_script
-    );
+    Agent::new("pichu")
+      .on_line(Main, pichu_frame) //opff
+      .game_acmd("game_guarddamage", pichu_shield)
+      .game_acmd("game_justshieldoff", pichu_perfectshield)
+      .game_acmd("game_attack11", pichu_jab)
+      .game_acmd("game_attackdash", pichu_dashattack)
+      .game_acmd("game_attacks3", pichu_ftilt)
+      .game_acmd("game_attackhi3", pichu_utilt)
+      .game_acmd("game_attacklw3", pichu_dtilt)
+      .game_acmd("game_attacks4", pichu_fsmash)
+      .game_acmd("game_attackhi4", pichu_usmash)
+      .game_acmd("game_attacklw4", pichu_dsmash)
+      .game_acmd("game_attackairn", pichu_nair)
+      .game_acmd("game_attackairf", pichu_fair)
+      .game_acmd("game_attackairb", pichu_bair)
+      .game_acmd("game_attackairhi", pichu_uair)
+      .game_acmd("game_attackairlw", pichu_dair)
+      .game_acmd("game_landingairlw", pichu_dair_landing)
+      .game_acmd("game_catch", pichu_grab)
+      .game_acmd("game_catchdash", pichu_grabd)
+      .game_acmd("game_catchturn", pichu_grabp)
+      .game_acmd("game_catchattack", pichu_pummel)
+      .game_acmd("game_throwf", pichu_fthrow)
+      .game_acmd("game_throwb", pichu_bthrow)
+      .game_acmd("game_throwhi", pichu_uthrow)
+      .game_acmd("game_throwlw", pichu_dthrow)
+      .game_acmd("game_specialn", pichu_neutralspecial)
+      .game_acmd("game_specialairn", pichu_neutralspecial_air)
+      .game_acmd("game_specials", pichu_sidespecial)
+      .game_acmd("game_specialhistart", pichu_upspecial_start)
+      .game_acmd("game_specialairhistart", pichu_upspecial_start)
+      .sound_acmd("sound_specialhistart", pichu_upspecialstart_sound)
+      .sound_acmd("sound_specialairhistart", pichu_upspecialstart_sound)
+      .game_acmd("game_specialhi1", pichu_upspecial_1)
+      .game_acmd("game_specialairhi1", pichu_upspecial_1)
+      .game_acmd("game_specialhi2", pichu_upspecial_2)
+      .game_acmd("game_specialairhi2", pichu_upspecial_2)
+      .game_acmd("game_speciallwhit", pichu_downspecial_hit)
+      .game_acmd("game_specialairlwhit", pichu_downspecial_hit)
+      .game_acmd("game_finalattack", pichu_final_loop)
+      .game_acmd("game_finalattack2", pichu_final_loop_2)
+      .game_acmd("game_finalattackfinish", pichu_final_loop_finish)
+      .game_acmd("game_final2", pichu_final_finish)
+      .game_acmd("game_finalair2", pichu_final_finish)
+      .game_acmd("game_appealhil", pichu_uptaunt_smash_script)
+      .game_acmd("game_appealhir", pichu_uptaunt_smash_script)
+      .install();
+  
+      Agent::new("pichu_dengeki")
+      .game_acmd("game_regular", pichu_thunderjolt_ground)
+      .install();
+
+      Agent::new("pichu_dengekidama")
+      .game_acmd("game_regular", pichu_thunderjolt)
+      .install();
+  
+      Agent::new("pichu_kaminari")
+      .game_acmd("game_regular", pichu_thunder)
+      .install();
+
+      Agent::new("pichu_cloud")
+      .game_acmd("game_regular", pichu_thundercloud)
+      .effect_acmd("effect_regular", pichu_thundercloud_effect)
+      .install();
+
+      Agent::new("kirby")
+      .on_line(Main, kirby_pichuhat_frame)
+      .install();
+    
 }

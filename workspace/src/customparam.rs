@@ -23,6 +23,7 @@ use {
 	smashline::*,
 };
 
+//use super::*;
 //use smash2;
 
 //BomaExt, helps with various things
@@ -187,6 +188,15 @@ pub unsafe fn get_param_float_replace(module_accessor: u64, param_type: u64, par
 				}
 			}
 		}
+		if fighter_kind == *FIGHTER_KIND_SZEROSUIT {
+			if param_type == hash40("param_special_n") {
+				if param_hash == hash40("charge_speed") {
+					if crate::szerosuit::SZEROSUIT_PASSIVE_TIMER_READY[entry_id] {
+						return 10.0;
+					}
+				}
+			}
+		}
 		if fighter_kind == *FIGHTER_KIND_PZENIGAME {
 			if param_type == hash40("dash_speed") {
 				if crate::pzenigame::SQUIRTLE_TORRENT[entry_id] {
@@ -283,10 +293,19 @@ pub unsafe fn get_param_float_replace(module_accessor: u64, param_type: u64, par
 				}
 			}
 		}
+		if fighter_kind == *FIGHTER_KIND_MIIFIGHTER {
+			if param_type == hash40("param_special_n") {
+				if param_hash == hash40("n1_start_speed_x") {
+					if crate::miifighter::MIIFIGHTER_IRONBALL_OOPS[entry_id] {
+						return -2.45;
+					}
+				}
+			}
+		}
 		if fighter_kind == *FIGHTER_KIND_KAMUI {
 			if param_type == hash40("landing_attack_air_frame_lw") {
 				if crate::kamui::CORRIN_SLOW_DOWN_AIR[entry_id] {
-					return 32.0;
+					return 34.0;
 				}
 			}
     	}
@@ -429,6 +448,18 @@ pub unsafe fn get_param_float_replace(module_accessor: u64, param_type: u64, par
 				if param_hash == hash40("speed") {
 					if crate::mariod::DR_SLOW_PILL[entry_id] {
 					return 1.0;
+					}
+				}
+			}
+		}
+		if fighter_kind == *WEAPON_KIND_SZEROSUIT_PARALYZER_BULLET {
+			if param_type == hash40("param_paralyzer_bullet") {
+				if param_hash == hash40("speed_tame") {
+					if crate::szerosuit::SZEROSUIT_LASER_TOGGLE_TYPE[entry_id] == 1 {
+						return 2.7;
+					}
+					if crate::szerosuit::SZEROSUIT_LASER_TOGGLE_TYPE[entry_id] == 2 {
+						return 2.0;
 					}
 				}
 			}

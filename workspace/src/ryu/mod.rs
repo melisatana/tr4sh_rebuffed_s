@@ -7,14 +7,15 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
+use crate::custom::global_fighter_frame;
 
 // A Once-Per-Fighter-Frame that only applies to Ryu
-#[fighter_frame( agent = FIGHTER_KIND_RYU )]
-fn ryu_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn ryu_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         let status = StatusModule::status_kind(fighter.module_accessor);
 
-        println!("It'sa me, Ryu, Hadoken!");
+        //println!("It'sa me, Ryu, Hadoken!");
 
         if [*FIGHTER_STATUS_KIND_SPECIAL_N, *FIGHTER_RYU_STATUS_KIND_SPECIAL_N_COMMAND, *FIGHTER_RYU_STATUS_KIND_SPECIAL_N2_COMMAND].contains(&status) 
         && (MotionModule::frame(fighter.module_accessor) >= (4.0) && MotionModule::frame(fighter.module_accessor) <= (12.0)) {
@@ -29,8 +30,26 @@ fn ryu_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_attack11nears", category = ACMD_GAME )]
-unsafe fn ryu_heavyjab_near_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn kirby_ryuhat_frame(fighter: &mut L2CFighterCommon) {
+    unsafe {
+        let status = StatusModule::status_kind(fighter.module_accessor);
+
+        if [*FIGHTER_STATUS_KIND_SPECIAL_N, *FIGHTER_KIRBY_STATUS_KIND_RYU_SPECIAL_N_COMMAND, *FIGHTER_KIRBY_STATUS_KIND_RYU_SPECIAL_N2_COMMAND].contains(&status) 
+        && (MotionModule::frame(fighter.module_accessor) >= (4.0) && MotionModule::frame(fighter.module_accessor) <= (12.0)) {
+            if ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_GUARD) {
+                WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_GUARD_ON);
+                WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ESCAPE_AIR);
+                fighter.sub_transition_group_check_air_escape();
+                fighter.sub_transition_group_check_ground_guard();
+            }
+        }
+
+
+    }
+
+}
+
+unsafe extern "C" fn ryu_heavyjab_near_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_ATTACK_FLAG_HIT_CANCEL);
@@ -71,8 +90,7 @@ unsafe fn ryu_heavyjab_near_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_attack11s", category = ACMD_GAME )]
-unsafe fn ryu_heavyjab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_heavyjab_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
     }
@@ -88,8 +106,7 @@ unsafe fn ryu_heavyjab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_attack11w", category = ACMD_GAME )]
-unsafe fn ryu_jab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_jab_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_ATTACK_FLAG_HIT_CANCEL);
@@ -121,8 +138,7 @@ unsafe fn ryu_jab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_attack12", category = ACMD_GAME )]
-unsafe fn ryu_jab2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_jab2_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_ATTACK_FLAG_HIT_CANCEL);
@@ -144,8 +160,7 @@ unsafe fn ryu_jab2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_attack13", category = ACMD_GAME )]
-unsafe fn ryu_jab3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_jab3_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_ATTACK_FLAG_HIT_CANCEL);
@@ -153,7 +168,7 @@ unsafe fn ryu_jab3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.5, 45, 50, 0, 50, 5.1, 0.0, 13.0, 7.8, Some(0.0), Some(13.0), Some(3.0), 1.7, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_RYU_PUNCH, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 5.5, 45, 50, 0, 50, 3.0, 0.0, 7.0, 3.0, None, None, None, 1.7, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_RYU_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 5.5, 45, 50, 0, 50, 3.7, 0.0, 7.0, 3.5, None, None, None, 1.7, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_RYU_PUNCH, *ATTACK_REGION_PUNCH);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
@@ -167,8 +182,7 @@ unsafe fn ryu_jab3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn ryu_dashattack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
     }
@@ -184,8 +198,7 @@ unsafe fn ryu_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_attacks3w", category = ACMD_GAME )]
-unsafe fn ryu_ftilt_kick_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_ftilt_kick_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
     }
@@ -215,8 +228,7 @@ unsafe fn ryu_ftilt_kick_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_attacks3s", category = ACMD_GAME )]
-unsafe fn ryu_ftilt_strong_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_ftilt_strong_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
     }
@@ -251,8 +263,7 @@ unsafe fn ryu_ftilt_strong_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_attacknearw", category = ACMD_GAME )]
-unsafe fn ryu_ftilt_close_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_ftilt_close_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.0);
@@ -279,8 +290,7 @@ unsafe fn ryu_ftilt_close_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_attackhi3w", category = ACMD_GAME )]
-unsafe fn ryu_utilt_light_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_utilt_light_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
@@ -315,8 +325,7 @@ unsafe fn ryu_utilt_light_smash_script(fighter: &mut L2CAgentBase) {
     
 }
 
-#[acmd_script( agent = "ryu", script = "game_attackhi3s", category = ACMD_GAME )]
-unsafe fn ryu_utilt_strong_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_utilt_strong_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_ATTACK_FLAG_HIT_CANCEL);
@@ -361,8 +370,7 @@ unsafe fn ryu_utilt_strong_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_attacklw3w", category = ACMD_GAME )]
-unsafe fn ryu_dtilt_light_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_dtilt_light_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_WORK_ID_FLAG_RESERVE_ATTACK_DISABLE_MINI_JUMP_ATTACK);
     }
@@ -399,8 +407,7 @@ unsafe fn ryu_dtilt_light_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_attacklw3s", category = ACMD_GAME )]
-unsafe fn ryu_dtilt_strong_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_dtilt_strong_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2195121);
@@ -425,8 +432,7 @@ unsafe fn ryu_dtilt_strong_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn ryu_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -445,8 +451,7 @@ unsafe fn ryu_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn ryu_usmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -475,8 +480,7 @@ unsafe fn ryu_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn ryu_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_ATTACK_FLAG_HIT_CANCEL);
@@ -509,8 +513,7 @@ unsafe fn ryu_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn ryu_nair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_nair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_ATTACK_FLAG_HIT_CANCEL);
@@ -546,8 +549,7 @@ unsafe fn ryu_nair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn ryu_fair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_fair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_ATTACK_FLAG_HIT_CANCEL);
@@ -577,8 +579,7 @@ unsafe fn ryu_fair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn ryu_bair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_bair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_ATTACK_FLAG_HIT_CANCEL);
@@ -601,8 +602,7 @@ unsafe fn ryu_bair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn ryu_uair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_uair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_ATTACK_FLAG_HIT_CANCEL);
@@ -640,8 +640,7 @@ unsafe fn ryu_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn ryu_dair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_dair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_ATTACK_FLAG_HIT_CANCEL);
@@ -673,8 +672,7 @@ unsafe fn ryu_dair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_catch", category = ACMD_GAME )]
-unsafe fn ryu_grab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_grab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         GrabModule::set_rebound(fighter.module_accessor, true);
@@ -693,8 +691,7 @@ unsafe fn ryu_grab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn ryu_grabd_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_grabd_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -716,8 +713,7 @@ unsafe fn ryu_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn ryu_grabp_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_grabp_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -739,8 +735,7 @@ unsafe fn ryu_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn ryu_fthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 8.4, 275, 90, 0, 25, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -761,8 +756,7 @@ unsafe fn ryu_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn ryu_bthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 9.2, 52, 110, 0, 75, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -780,8 +774,7 @@ unsafe fn ryu_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn ryu_uthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 12.0, 88, 55, 0, 55, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -811,8 +804,7 @@ unsafe fn ryu_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn ryu_dthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 4.5, 70, 100, 0, 58, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -834,8 +826,7 @@ unsafe fn ryu_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_specialn", category = ACMD_GAME )]
-unsafe fn ryu_neutralb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_neutralb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.833333333);
@@ -863,8 +854,7 @@ unsafe fn ryu_neutralb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_specialairn", category = ACMD_GAME )]
-unsafe fn ryu_neutralb_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_neutralb_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.833333333);
@@ -892,8 +882,7 @@ unsafe fn ryu_neutralb_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu_hadoken", script = "game_movew", category = ACMD_GAME )]
-unsafe fn hadoken_weak(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn hadoken_weak(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 10.5, 0, 10, 0, 37, 3.5, 0.0, 0.5, -0.5, Some(0.0), Some(-5.2), Some(-0.5), 1.8, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_RYU_PUNCH, *ATTACK_REGION_ENERGY);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 10.5, 0, 10, 0, 37, 2.8, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(-2.0), 1.8, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_RYU_PUNCH, *ATTACK_REGION_ENERGY);
@@ -915,8 +904,7 @@ unsafe fn hadoken_weak(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu_hadoken", script = "game_movem", category = ACMD_GAME )]
-unsafe fn hadoken_medium(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn hadoken_medium(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.5, 0, 10, 0, 67, 3.5, 0.0, 0.5, -0.5, Some(0.0), Some(-5.2), Some(-0.5), 1.8, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_RYU_PUNCH, *ATTACK_REGION_ENERGY);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 11.5, 0, 10, 0, 67, 2.8, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(-2.5), 1.8, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_RYU_PUNCH, *ATTACK_REGION_ENERGY);
@@ -938,8 +926,7 @@ unsafe fn hadoken_medium(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu_hadoken", script = "game_moves", category = ACMD_GAME )]
-unsafe fn hadoken_strong(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn hadoken_strong(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.5, 0, 60, 0, 67, 3.5, 0.0, 0.5, -0.5, Some(0.0), Some(-5.2), Some(-0.5), 1.8, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_RYU_PUNCH, *ATTACK_REGION_ENERGY);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 12.5, 0, 60, 0, 67, 2.8, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(-3.0), 1.8, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_RYU_PUNCH, *ATTACK_REGION_ENERGY);
@@ -957,8 +944,7 @@ unsafe fn hadoken_strong(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu_hadoken", script = "game_movespw", category = ACMD_GAME )]
-unsafe fn shakunetsu_weak(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shakunetsu_weak(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.4, 80, 10, 0, 42, 3.5, 0.0, -5.2, 0.0, Some(0.0), Some(-5.2), Some(0.0), 0.25, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 2, true, true, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 1.4, 366, 10, 0, 40, 3.5, 0.0, 0.5, 0.0, Some(0.0), Some(-5.2), Some(0.0), 0.25, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 2, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);
@@ -975,8 +961,7 @@ unsafe fn shakunetsu_weak(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu_hadoken", script = "game_movespw_last", category = ACMD_GAME )]
-unsafe fn shakunetsu_weak_explode(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shakunetsu_weak_explode(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
     }
@@ -987,8 +972,7 @@ unsafe fn shakunetsu_weak_explode(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu_hadoken", script = "game_movespm", category = ACMD_GAME )]
-unsafe fn shakunetsu_medium(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shakunetsu_medium(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.4, 80, 10, 0, 42, 3.5, 0.0, -5.2, 0.0, Some(0.0), Some(-5.2), Some(0.0), 0.25, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 2, true, true, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 1.4, 366, 10, 0, 40, 3.5, 0.0, 0.5, 0.0, Some(0.0), Some(-5.2), Some(0.0), 0.25, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 2, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);
@@ -1005,8 +989,7 @@ unsafe fn shakunetsu_medium(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu_hadoken", script = "game_movespm_last", category = ACMD_GAME )]
-unsafe fn shakunetsu_medium_explode(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shakunetsu_medium_explode(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
     }
@@ -1017,8 +1000,7 @@ unsafe fn shakunetsu_medium_explode(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu_hadoken", script = "game_movesps", category = ACMD_GAME )]
-unsafe fn shakunetsu_strong(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shakunetsu_strong(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.4, 80, 10, 0, 42, 3.5, 0.0, -5.2, 0.0, Some(0.0), Some(-5.2), Some(0.0), 0.25, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 2, true, true, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 1.4, 366, 10, 0, 40, 3.5, 0.0, 0.5, 0.0, Some(0.0), Some(-5.2), Some(0.0), 0.25, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 2, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);
@@ -1035,8 +1017,7 @@ unsafe fn shakunetsu_strong(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu_hadoken", script = "game_movesps_last", category = ACMD_GAME )]
-unsafe fn shakunetsu_strong_explode(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shakunetsu_strong_explode(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
     }
@@ -1047,8 +1028,7 @@ unsafe fn shakunetsu_strong_explode(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", scripts = ["game_specialsstart", "game_specialairsstart"], category = ACMD_GAME, low_priority )]
-unsafe fn ryu_sideb_start_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_sideb_start_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area_xy(fighter.module_accessor, 1.0, 3.5, 8.5, 8.5);
@@ -1069,8 +1049,7 @@ unsafe fn ryu_sideb_start_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_specials", category = ACMD_GAME )]
-unsafe fn ryu_sideb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_sideb_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS_BOTH_SIDES);
         FighterAreaModuleImpl::enable_fix_jostle_area_xy(fighter.module_accessor, 5.5, 3.0, 9.0, 3.0);
@@ -1126,8 +1105,7 @@ unsafe fn ryu_sideb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_specialairs", category = ACMD_GAME )]
-unsafe fn ryu_sideb_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_sideb_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS_BOTH_SIDES);
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("kneel"), HitStatus(*HIT_STATUS_XLU), 0);
@@ -1182,8 +1160,7 @@ unsafe fn ryu_sideb_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_specialhi", category = ACMD_GAME )]
-unsafe fn ryu_upb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_upb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
@@ -1244,8 +1221,7 @@ unsafe fn ryu_upb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_specialairhi", category = ACMD_GAME )]
-unsafe fn ryu_upb_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_upb_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
@@ -1306,8 +1282,7 @@ unsafe fn ryu_upb_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_specialhicommand", category = ACMD_GAME )]
-unsafe fn ryu_upb_input_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_upb_input_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("armr"), HitStatus(*HIT_STATUS_XLU), 0);
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("shoulderr"), HitStatus(*HIT_STATUS_XLU), 0);
@@ -1376,8 +1351,7 @@ unsafe fn ryu_upb_input_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_specialairhicommand", category = ACMD_GAME )]
-unsafe fn ryu_upb_input_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_upb_input_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("armr"), HitStatus(*HIT_STATUS_XLU), 0);
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("shoulderr"), HitStatus(*HIT_STATUS_XLU), 0);
@@ -1446,24 +1420,21 @@ unsafe fn ryu_upb_input_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_specialhifall", category = ACMD_GAME )]
-unsafe fn ryu_upb_fall_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_upb_fall_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS_BOTH_SIDES);
         macros::FT_MOTION_RATE(fighter, 0.5);
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_specialairhiend", category = ACMD_GAME )]
-unsafe fn ryu_upb_air_end_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_upb_air_end_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS_BOTH_SIDES);
         macros::FT_MOTION_RATE(fighter, 0.5);
     }
 }
     
-#[acmd_script( agent = "ryu", script = "game_speciallw", category = ACMD_GAME )]
-unsafe fn ryu_downb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_downb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.625);
@@ -1512,8 +1483,7 @@ unsafe fn ryu_downb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_specialairlw", category = ACMD_GAME )]
-unsafe fn ryu_downb_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_downb_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.625);
@@ -1562,8 +1532,7 @@ unsafe fn ryu_downb_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_speciallwturn", category = ACMD_GAME )]
-unsafe fn ryu_downb_turn_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_downb_turn_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         PostureModule::reverse_lr(fighter.module_accessor);
@@ -1613,8 +1582,7 @@ unsafe fn ryu_downb_turn_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ryu", script = "game_specialairlwturn", category = ACMD_GAME )]
-unsafe fn ryu_downb_turn_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ryu_downb_turn_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         PostureModule::reverse_lr(fighter.module_accessor);
@@ -1663,65 +1631,71 @@ unsafe fn ryu_downb_turn_air_smash_script(fighter: &mut L2CAgentBase) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_WORK_ID_SPECIAL_LW_FLAG_REVERSE_MATERIAL_ANIM);
     }
 }
-
 
 pub fn install() {
-    smashline::install_agent_frames!(
-        ryu_frame
-    );
-    smashline::install_acmd_scripts!(
-        ryu_heavyjab_near_smash_script,
-        ryu_heavyjab_smash_script,
-        ryu_jab_smash_script,
-        ryu_jab2_smash_script,
-        ryu_jab3_smash_script,
-        ryu_dashattack_smash_script,
-        ryu_ftilt_kick_smash_script,
-        ryu_ftilt_strong_smash_script,
-        ryu_ftilt_close_smash_script,
-        ryu_utilt_light_smash_script,
-        ryu_utilt_strong_smash_script,
-        ryu_dtilt_light_smash_script,
-        ryu_dtilt_strong_smash_script,
-        ryu_fsmash_smash_script,
-        ryu_usmash_smash_script,
-        ryu_dsmash_smash_script,
-        ryu_nair_smash_script,
-        ryu_fair_smash_script,
-        ryu_bair_smash_script,
-        ryu_uair_smash_script,
-        ryu_dair_smash_script,
-        ryu_grab_smash_script,
-        ryu_grabd_smash_script,
-        ryu_grabp_smash_script,
-        ryu_fthrow_smash_script,
-        ryu_bthrow_smash_script,
-        ryu_uthrow_smash_script,
-        ryu_dthrow_smash_script,
-        ryu_neutralb_smash_script,
-        ryu_neutralb_air_smash_script,
-        hadoken_weak,
-        hadoken_medium,
-        hadoken_strong,
-        shakunetsu_weak,
-        shakunetsu_weak_explode,
-        shakunetsu_medium,
-        shakunetsu_medium_explode,
-        shakunetsu_strong,
-        shakunetsu_strong_explode,
-        ryu_sideb_start_smash_script,
-        ryu_sideb_smash_script,
-        ryu_sideb_air_smash_script,
-        ryu_upb_smash_script,
-        ryu_upb_air_smash_script,
-        ryu_upb_input_smash_script,
-        ryu_upb_input_air_smash_script,
-        ryu_upb_fall_smash_script,
-        ryu_upb_air_end_smash_script,
-        ryu_downb_smash_script,
-        ryu_downb_air_smash_script,
-        ryu_downb_turn_smash_script,
-        ryu_downb_turn_air_smash_script
-        
-    );
+    Agent::new("ryu")
+    .on_line(Main, ryu_frame) //opff
+    .game_acmd("game_attack11s", ryu_heavyjab_smash_script)
+    .game_acmd("game_attack11nears", ryu_heavyjab_near_smash_script)
+    .game_acmd("game_attack11w", ryu_jab_smash_script)
+    .game_acmd("game_attack12", ryu_jab2_smash_script)
+    .game_acmd("game_attack13", ryu_jab3_smash_script)
+    .game_acmd("game_attackdash", ryu_dashattack_smash_script)
+    .game_acmd("game_attacks3w", ryu_ftilt_kick_smash_script)
+    .game_acmd("game_attacks3s", ryu_ftilt_strong_smash_script)
+    .game_acmd("game_attacknearw", ryu_ftilt_close_smash_script)
+    .game_acmd("game_attackhi3w", ryu_utilt_light_smash_script)
+    .game_acmd("game_attackhi3s", ryu_utilt_strong_smash_script)
+    .game_acmd("game_attacklw3w", ryu_dtilt_light_smash_script)
+    .game_acmd("game_attacklw3s", ryu_dtilt_strong_smash_script)
+    .game_acmd("game_attacks4", ryu_fsmash_smash_script)
+    .game_acmd("game_attackhi4", ryu_usmash_smash_script)
+    .game_acmd("game_attacklw4", ryu_dsmash_smash_script)
+    .game_acmd("game_attackairn", ryu_nair_smash_script)
+    .game_acmd("game_attackairf", ryu_fair_smash_script)
+    .game_acmd("game_attackairb", ryu_bair_smash_script)
+    .game_acmd("game_attackairhi", ryu_uair_smash_script)
+    .game_acmd("game_attackairlw", ryu_dair_smash_script)
+    .game_acmd("game_catch", ryu_grab_smash_script)
+    .game_acmd("game_catchdash", ryu_grabd_smash_script)
+    .game_acmd("game_catchturn", ryu_grabp_smash_script)
+    .game_acmd("game_throwf", ryu_fthrow_smash_script)
+    .game_acmd("game_throwb", ryu_bthrow_smash_script)
+    .game_acmd("game_throwhi", ryu_uthrow_smash_script)
+    .game_acmd("game_throwlw", ryu_dthrow_smash_script)
+    .game_acmd("game_specialn", ryu_neutralb_smash_script)
+    .game_acmd("game_specialairn", ryu_neutralb_air_smash_script)
+    .game_acmd("game_specialsstart", ryu_sideb_start_smash_script)
+    .game_acmd("game_specialairsstart", ryu_sideb_start_smash_script)
+    .game_acmd("game_specials", ryu_sideb_smash_script)
+    .game_acmd("game_specialairs", ryu_sideb_air_smash_script)
+    .game_acmd("game_specialhi1", ryu_upb_smash_script)
+    .game_acmd("game_specialairhi", ryu_upb_air_smash_script)
+    .game_acmd("game_specialhicommand", ryu_upb_input_smash_script)
+    .game_acmd("game_specialairhicommand", ryu_upb_input_air_smash_script)
+    .game_acmd("game_specialairhiend", ryu_upb_air_end_smash_script)
+    .game_acmd("game_specialhifall", ryu_upb_fall_smash_script)
+    .game_acmd("game_speciallw", ryu_downb_smash_script)
+    .game_acmd("game_specialairlw", ryu_downb_air_smash_script)
+    .game_acmd("game_speciallwturn", ryu_downb_turn_smash_script)
+    .game_acmd("game_specialairlwturn", ryu_downb_turn_air_smash_script)
+    .install();
+
+    Agent::new("kirby")
+    .on_line(Main, kirby_ryuhat_frame)
+    .install();
+
+    Agent::new("ryu_hadoken")
+    .game_acmd("game_movew", hadoken_weak)
+    .game_acmd("game_movem", hadoken_medium)
+    .game_acmd("game_moves", hadoken_strong)
+    .game_acmd("game_movespw", shakunetsu_weak)
+    .game_acmd("game_movespw_last", shakunetsu_weak_explode)
+    .game_acmd("game_movespm", shakunetsu_medium)
+    .game_acmd("game_movespm_last", shakunetsu_medium_explode)
+    .game_acmd("game_movesps", shakunetsu_strong)
+    .game_acmd("game_movesps_last", shakunetsu_strong_explode)
+    .install();
+
+
 }

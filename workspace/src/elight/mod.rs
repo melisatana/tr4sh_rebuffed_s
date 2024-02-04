@@ -7,6 +7,7 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase, L2CFighterBase};
 use smashline::*;
 use smash_script::*;
+use crate::custom::global_fighter_frame;
 
 static mut MYTHRA_FSMASH_FULLCHARGE: [bool; 8] = [false; 8];
 
@@ -16,13 +17,13 @@ pub static mut MYTHRA_UTHROW_SPEED_TIMER : [i32; 8] = [0; 8];
 pub static mut MYTHRA_LIGHTSPEED_ACTIVATE : [bool; 8] = [false; 8];
 
 // A Once-Per-Fighter-Frame that only applies to Mythra
-#[fighter_frame( agent = FIGHTER_KIND_ELIGHT )]
-fn elight_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn elight_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         let status = StatusModule::status_kind(fighter.module_accessor);
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
-        println!("It'sa me, Mythra, I hate Rex >:)");
+        //println!("It'sa me, Mythra, I hate Rex >:)");
         
 
         if MYTHRA_UTHROW_SPEED_TIMER[entry_id] > 0 {
@@ -37,15 +38,19 @@ fn elight_frame(fighter: &mut L2CFighterCommon) {
 
         if MYTHRA_UTHROW_SPEED[entry_id] {
             DamageModule::set_damage_mul(fighter.module_accessor, 0.9);
-            AttackModule::set_power_mul(fighter.module_accessor, 1.05);
             //AttackModule::set_reaction_mul(fighter.module_accessor, 0.9); knockback multiplier
         }
         else {
             DamageModule::set_damage_mul(fighter.module_accessor, 1.0);
-            AttackModule::set_power_mul(fighter.module_accessor, 1.0);
         }
 
-        if sv_information::is_ready_go() == false || [*FIGHTER_STATUS_KIND_WIN, *FIGHTER_STATUS_KIND_LOSE, *FIGHTER_STATUS_KIND_DEAD].contains(&status) {
+        if sv_information::is_ready_go() == false 
+        || [*FIGHTER_STATUS_KIND_WIN, 
+            *FIGHTER_STATUS_KIND_LOSE, 
+            *FIGHTER_STATUS_KIND_DEAD, 
+            *FIGHTER_STATUS_KIND_CAPTURE_WAIT,
+            *FIGHTER_STATUS_KIND_CAPTURE_PULLED, 
+            *FIGHTER_STATUS_KIND_CAPTURE_PULLED_YOSHI].contains(&status) {
             MYTHRA_UTHROW_SPEED[entry_id] = false ;
             MYTHRA_UTHROW_SPEED_TIMER[entry_id] = 0 ;
             MYTHRA_LIGHTSPEED_ACTIVATE[entry_id] = false;
@@ -75,15 +80,15 @@ fn elight_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-#[weapon_frame( agent = WEAPON_KIND_ELIGHT_SPREADBULLET )]
-pub fn mythra_chromadust_weapon_frame(weapon : &mut L2CFighterBase) {
+//#[weapon_frame( agent = WEAPON_KIND_ELIGHT_SPREADBULLET )]
+pub unsafe extern "C" fn mythra_chromadust_weapon_frame(weapon : &mut L2CFighterBase) {
     unsafe {
         GroundModule::set_passable_check(weapon.module_accessor, true);
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_escapen", category = ACMD_GAME )]
-unsafe fn mythra_spotdodge_smash_script(fighter: &mut L2CAgentBase) {
+
+unsafe extern "C" fn mythra_spotdodge_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
@@ -101,8 +106,7 @@ unsafe fn mythra_spotdodge_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_escapef", category = ACMD_GAME )]
-unsafe fn mythra_rollf_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_rollf_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if MYTHRA_UTHROW_SPEED[entry_id] {
@@ -133,9 +137,7 @@ unsafe fn mythra_rollf_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-
-#[acmd_script( agent = "elight", script = "game_escapeb", category = ACMD_GAME )]
-unsafe fn mythra_rollb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_rollb_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if MYTHRA_UTHROW_SPEED[entry_id] {
@@ -160,8 +162,7 @@ unsafe fn mythra_rollb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn mythra_jab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -189,8 +190,7 @@ unsafe fn mythra_jab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_attack12", category = ACMD_GAME )]
-unsafe fn mythra_jab2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_jab2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::IS_EXIST_ARTICLE(fighter, *FIGHTER_ELIGHT_GENERATE_ARTICLE_ESWORD) {
         if macros::is_excute(fighter) {
@@ -211,19 +211,19 @@ unsafe fn mythra_jab2_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.2, 361, 15, 15, 20, 3.0, 0.0, 8.0, 7.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 2.2, 361, 15, 15, 20, 3.0, 0.0, 8.0, 9.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 2.2, 361, 15, 10, 10, 4.0, 0.0, 8.0, 11.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 8.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 8.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 12.0, false);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 2.2, 180, 15, 10, 10, 4.0, 0.0, 8.0, 11.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 3.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 3.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 3.0, false);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.2, 361, 15, 0, 20, 3.0, 0.0, 8.0, 7.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 2.2, 361, 15, 0, 20, 3.0, 0.0, 8.0, 9.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 2.2, 361, 15, 0, 10, 4.0, 0.0, 8.0, 13.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 8.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 8.0, false);
-        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 12.0, false);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.2, 361, 15, 15, 20, 3.0, 0.0, 8.0, 7.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 2.2, 361, 15, 15, 20, 3.0, 0.0, 8.0, 9.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 2.2, 180, 15, 10, 10, 4.0, 0.0, 8.0, 13.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 3.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 3.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 3.0, false);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
@@ -243,16 +243,15 @@ unsafe fn mythra_jab2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 13.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_ENABLE_100);
-        MotionModule::set_rate(fighter.module_accessor, 1.2);
+        MotionModule::set_rate(fighter.module_accessor, 1.8);
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 30.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 23.0);
     if macros::is_excute(fighter) {
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_ENABLE_100);
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_attack100", category = ACMD_GAME )]
-unsafe fn mythra_jab100_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_jab100_smash_script(fighter: &mut L2CAgentBase) {
     for _ in 0..i32::MAX {
         if macros::is_excute(fighter) {
             macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.0, 361, 15, 0, 7, 6.0, 0.0, 7.0, 10.0, Some(0.0), Some(7.0), Some(15.0), 0.4, 0.7, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_MAGIC);
@@ -304,9 +303,7 @@ unsafe fn mythra_jab100_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-
-#[acmd_script( agent = "elight", script = "game_attack100end", category = ACMD_GAME )]
-unsafe fn mythra_jab100end_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_jab100end_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
@@ -322,8 +319,7 @@ unsafe fn mythra_jab100end_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn mythra_dashattack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -368,8 +364,7 @@ unsafe fn mythra_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_attacks3", category = ACMD_GAME )]
-unsafe fn mythra_ftilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -425,8 +420,7 @@ unsafe fn mythra_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn mythra_utilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_utilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -510,8 +504,7 @@ unsafe fn mythra_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn mythra_dtilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     MotionModule::set_rate(fighter.module_accessor, 2.0);
     if macros::IS_EXIST_ARTICLE(fighter, *FIGHTER_ELIGHT_GENERATE_ARTICLE_ESWORD) {
@@ -530,10 +523,10 @@ unsafe fn mythra_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.7, 100, 86, 0, 30, 3.3, 0.0, 2.0, 8.0, None, None, None, 0.75, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.4, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 5.7, 100, 86, 0, 30, 2.7, 0.0, 2.0, 13.0, None, None, None, 0.75, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.4, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 5.7, 100, 86, 0, 30, 2.3, 0.0, 2.0, 16.5, None, None, None, 0.75, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.4, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 5.7, 100, 86, 0, 30, 3.3, 0.0, 2.0, 4.0, None, None, None, 0.75, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.4, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.7, 100, 86, 0, 38, 3.3, 0.0, 2.0, 8.0, None, None, None, 0.75, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.4, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 5.7, 100, 86, 0, 38, 2.7, 0.0, 2.0, 13.0, None, None, None, 0.75, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.4, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 5.7, 100, 86, 0, 38, 2.3, 0.0, 2.0, 16.5, None, None, None, 0.75, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.4, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 5.7, 100, 86, 0, 38, 3.3, 0.0, 2.0, 4.0, None, None, None, 0.75, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.4, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
@@ -560,8 +553,7 @@ unsafe fn mythra_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_attacks4charge", category = ACMD_GAME )]
-unsafe fn mythra_fsmash_charge_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_fsmash_charge_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -574,9 +566,7 @@ unsafe fn mythra_fsmash_charge_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-
-#[acmd_script( agent = "elight", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn mythra_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -677,8 +667,7 @@ unsafe fn mythra_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn mythra_usmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::IS_EXIST_ARTICLE(fighter, *FIGHTER_ELIGHT_GENERATE_ARTICLE_ESWORD) {
         if macros::is_excute(fighter) {
@@ -776,8 +765,7 @@ unsafe fn mythra_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn mythra_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::IS_EXIST_ARTICLE(fighter, *FIGHTER_ELIGHT_GENERATE_ARTICLE_ESWORD) {
         if macros::is_excute(fighter) {
@@ -808,7 +796,6 @@ unsafe fn mythra_dsmash_smash_script(fighter: &mut L2CAgentBase) {
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 3.5, 145, 100, 20, 25, 3.0, 0.0, 7.0, -12.0, Some(0.0), Some(7.0), Some(-4.0), 0.75, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
         macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 4.5, 367, 100, 25, 25, 4.0, 0.0, 7.0, 15.0, Some(0.0), Some(7.0), Some(3.0), 0.75, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_A, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
         macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 3.5, 367, 100, 25, 25, 3.0, 0.0, 7.0, -12.0, Some(0.0), Some(7.0), Some(-4.0), 0.75, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_A, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
-    
     }
     sv_animcmd::frame(fighter.lua_state_agent, 13.0);
     if macros::is_excute(fighter) {
@@ -816,8 +803,8 @@ unsafe fn mythra_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 6.5, 106, 50, 0, 55, 4.8, 0.0, 7.0, -15.0, Some(0.0), Some(7.0), Some(-3.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 5.5, 106, 50, 0, 55, 3.7, 0.0, 7.0, 12.0, Some(0.0), Some(7.0), Some(4.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 6.5, 104, 50, 0, 55, 4.8, 0.0, 7.0, -15.0, Some(0.0), Some(7.0), Some(-3.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 5.5, 104, 50, 0, 55, 3.7, 0.0, 7.0, 12.0, Some(0.0), Some(7.0), Some(4.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 20.0);
     if macros::is_excute(fighter) {
@@ -841,8 +828,7 @@ unsafe fn mythra_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn mythra_nair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_nair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::IS_EXIST_ARTICLE(fighter, *FIGHTER_ELIGHT_GENERATE_ARTICLE_ESWORD) {
         if macros::is_excute(fighter) {
@@ -889,23 +875,15 @@ unsafe fn mythra_nair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 39.0);
     if macros::is_excute(fighter) {
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 47.0);
-    if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS_BOTH_SIDES);
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_landingairn", category = ACMD_GAME )]
-unsafe fn mythra_nair_landing_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_nair_landing_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-    if macros::is_excute(fighter) {
-        //beans lmao
-    }
 }
 
-#[acmd_script( agent = "elight", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn mythra_fair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_fair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -973,8 +951,7 @@ unsafe fn mythra_fair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn mythra_bair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_bair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -1043,8 +1020,7 @@ unsafe fn mythra_bair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn mythra_uair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_uair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -1108,8 +1084,7 @@ unsafe fn mythra_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn mythra_dair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_dair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         
@@ -1159,7 +1134,7 @@ unsafe fn mythra_dair_smash_script(fighter: &mut L2CAgentBase) {
         macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 8.8, 50, 90, 0, 20, 2.7, 0.0, 4.0, -19.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
         macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 8.8, 50, 90, 0, 20, 3.3, 0.0, 8.0, -8.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 19.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 20.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -1185,8 +1160,7 @@ unsafe fn mythra_dair_smash_script(fighter: &mut L2CAgentBase) {
     }    
 }
 
-#[acmd_script( agent = "elight", script = "game_catch", category = ACMD_GAME )]
-unsafe fn mythra_grab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_grab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         GrabModule::set_rebound(fighter.module_accessor, true);
@@ -1205,8 +1179,7 @@ unsafe fn mythra_grab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn mythra_grabd_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_grabd_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.25);
@@ -1228,8 +1201,7 @@ unsafe fn mythra_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn mythra_grabp_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_grabp_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.25);
@@ -1251,8 +1223,7 @@ unsafe fn mythra_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn mythra_fthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 4.5, 40, 120, 0, 58, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -1272,8 +1243,7 @@ unsafe fn mythra_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn mythra_bthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.0, 50, 35, 0, 72, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -1297,8 +1267,7 @@ unsafe fn mythra_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn mythra_uthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 4.8, 78, 70, 0, 45, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -1319,8 +1288,7 @@ unsafe fn mythra_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn mythra_dthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_LEAVE_NEAR_OTTOTTO(fighter, -2.5, 2.5);
@@ -1371,8 +1339,7 @@ unsafe fn mythra_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_specialn", category = ACMD_GAME, low_priority )]
-unsafe fn mythra_neutralb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_neutralb_smash_script(fighter: &mut L2CAgentBase) {
     if macros::IS_EXIST_ARTICLE(fighter, *FIGHTER_ELIGHT_GENERATE_ARTICLE_ESWORD) {
         if macros::is_excute(fighter) {
             ArticleModule::add_motion_partial(fighter.module_accessor, *FIGHTER_ELIGHT_GENERATE_ARTICLE_ESWORD, *WEAPON_ELIGHT_ESWORD_MOTION_PART_SET_KIND_OPEM_CLOSE, Hash40::new("to_open"), 10.0, 10.0, false, false, 0.0, false, true, false);
@@ -1536,14 +1503,7 @@ unsafe fn mythra_neutralb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-//first hit 3.3%
-//second hit 2.9%
-//third hit 3.1%
-//fourth hit 10%
-
-
-#[acmd_script( agent = "elight", script = "game_specialairn", category = ACMD_GAME, low_priority )]
-unsafe fn mythra_neutralb_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_neutralb_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::IS_EXIST_ARTICLE(fighter, *FIGHTER_ELIGHT_GENERATE_ARTICLE_ESWORD) {
         if macros::is_excute(fighter) {
             ArticleModule::add_motion_partial(fighter.module_accessor, *FIGHTER_ELIGHT_GENERATE_ARTICLE_ESWORD, *WEAPON_ELIGHT_ESWORD_MOTION_PART_SET_KIND_OPEM_CLOSE, Hash40::new("to_open"), 10.0, 10.0, false, false, 0.0, false, true, false);
@@ -1725,11 +1685,7 @@ unsafe fn mythra_neutralb_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-
-
-
-#[acmd_script( agent = "elight", script = "game_specialn2", category = ACMD_GAME, low_priority )]
-unsafe fn mythra_neutralb_2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_neutralb_2_smash_script(fighter: &mut L2CAgentBase) {
     if macros::IS_EXIST_ARTICLE(fighter, *FIGHTER_ELIGHT_GENERATE_ARTICLE_ESWORD) {
         if macros::is_excute(fighter) {
             ArticleModule::add_motion_partial(fighter.module_accessor, *FIGHTER_ELIGHT_GENERATE_ARTICLE_ESWORD, *WEAPON_ELIGHT_ESWORD_MOTION_PART_SET_KIND_OPEM_CLOSE, Hash40::new("to_open"), 10.0, 10.0, false, false, 0.0, false, true, false);
@@ -1944,8 +1900,7 @@ unsafe fn mythra_neutralb_2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_specialairn2", category = ACMD_GAME, low_priority )]
-unsafe fn mythra_neutralb_2_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_neutralb_2_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::IS_EXIST_ARTICLE(fighter, *FIGHTER_ELIGHT_GENERATE_ARTICLE_ESWORD) {
         if macros::is_excute(fighter) {
             ArticleModule::add_motion_partial(fighter.module_accessor, *FIGHTER_ELIGHT_GENERATE_ARTICLE_ESWORD, *WEAPON_ELIGHT_ESWORD_MOTION_PART_SET_KIND_OPEM_CLOSE, Hash40::new("to_open"), 10.0, 10.0, false, false, 0.0, false, true, false);
@@ -2160,8 +2115,7 @@ unsafe fn mythra_neutralb_2_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight_bunshin", script = "game_specials1", category = ACMD_GAME )]
-unsafe fn mythra_sideb_1_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_sideb_1_smash_script(fighter: &mut L2CAgentBase) {
     if macros::IS_EXIST_ARTICLE(fighter, *FIGHTER_ELIGHT_GENERATE_ARTICLE_ESWORD) {
         if macros::is_excute(fighter) {
             ArticleModule::add_motion_partial(fighter.module_accessor, *WEAPON_ELIGHT_BUNSHIN_GENERATE_ARTICLE_ESWORD, *WEAPON_ELIGHT_ESWORD_MOTION_PART_SET_KIND_OPEM_CLOSE, Hash40::new("to_open"), 10.0, 10.0, false, false, 0.0, false, true, false);
@@ -2194,8 +2148,7 @@ unsafe fn mythra_sideb_1_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight_bunshin", script = "game_specialairs1", category = ACMD_GAME )]
-unsafe fn mythra_sideb_1_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_sideb_1_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::IS_EXIST_ARTICLE(fighter, *FIGHTER_ELIGHT_GENERATE_ARTICLE_ESWORD) {
         if macros::is_excute(fighter) {
             ArticleModule::add_motion_partial(fighter.module_accessor, *WEAPON_ELIGHT_BUNSHIN_GENERATE_ARTICLE_ESWORD, *WEAPON_ELIGHT_ESWORD_MOTION_PART_SET_KIND_OPEM_CLOSE, Hash40::new("to_open"), 10.0, 10.0, false, false, 0.0, false, true, false);
@@ -2228,8 +2181,7 @@ unsafe fn mythra_sideb_1_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight_bunshin", script = "game_specials2", category = ACMD_GAME )]
-unsafe fn mythra_sideb_2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_sideb_2_smash_script(fighter: &mut L2CAgentBase) {
     if macros::IS_EXIST_ARTICLE(fighter, *FIGHTER_ELIGHT_GENERATE_ARTICLE_ESWORD) {
         if macros::is_excute(fighter) {
             ArticleModule::add_motion_partial(fighter.module_accessor, *WEAPON_ELIGHT_BUNSHIN_GENERATE_ARTICLE_ESWORD, *WEAPON_ELIGHT_ESWORD_MOTION_PART_SET_KIND_OPEM_CLOSE, Hash40::new("to_open"), 10.0, 10.0, false, false, 0.0, false, true, false);
@@ -2258,8 +2210,7 @@ unsafe fn mythra_sideb_2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight_bunshin", script = "game_specialairs2", category = ACMD_GAME )]
-unsafe fn mythra_sideb_2_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_sideb_2_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::IS_EXIST_ARTICLE(fighter, *FIGHTER_ELIGHT_GENERATE_ARTICLE_ESWORD) {
         if macros::is_excute(fighter) {
             ArticleModule::add_motion_partial(fighter.module_accessor, *WEAPON_ELIGHT_BUNSHIN_GENERATE_ARTICLE_ESWORD, *WEAPON_ELIGHT_ESWORD_MOTION_PART_SET_KIND_OPEM_CLOSE, Hash40::new("to_open"), 10.0, 10.0, false, false, 0.0, false, true, false);
@@ -2288,8 +2239,7 @@ unsafe fn mythra_sideb_2_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight_bunshin", script = "game_specials3", category = ACMD_GAME )]
-unsafe fn mythra_sideb_3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_sideb_3_smash_script(fighter: &mut L2CAgentBase) {
     if macros::IS_EXIST_ARTICLE(fighter, *FIGHTER_ELIGHT_GENERATE_ARTICLE_ESWORD) {
         if macros::is_excute(fighter) {
             ArticleModule::add_motion_partial(fighter.module_accessor, *WEAPON_ELIGHT_BUNSHIN_GENERATE_ARTICLE_ESWORD, *WEAPON_ELIGHT_ESWORD_MOTION_PART_SET_KIND_OPEM_CLOSE, Hash40::new("to_open"), 10.0, 10.0, false, false, 0.0, false, true, false);
@@ -2318,8 +2268,7 @@ unsafe fn mythra_sideb_3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight_bunshin", script = "game_specialairs3", category = ACMD_GAME )]
-unsafe fn mythra_sideb_3_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_sideb_3_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::IS_EXIST_ARTICLE(fighter, *FIGHTER_ELIGHT_GENERATE_ARTICLE_ESWORD) {
         if macros::is_excute(fighter) {
             ArticleModule::add_motion_partial(fighter.module_accessor, *WEAPON_ELIGHT_BUNSHIN_GENERATE_ARTICLE_ESWORD, *WEAPON_ELIGHT_ESWORD_MOTION_PART_SET_KIND_OPEM_CLOSE, Hash40::new("to_open"), 10.0, 10.0, false, false, 0.0, false, true, false);
@@ -2348,8 +2297,7 @@ unsafe fn mythra_sideb_3_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight_bunshin", script = "game_specials4", category = ACMD_GAME )]
-unsafe fn mythra_sideb_4_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_sideb_4_smash_script(fighter: &mut L2CAgentBase) {
     if macros::IS_EXIST_ARTICLE(fighter, *FIGHTER_ELIGHT_GENERATE_ARTICLE_ESWORD) {
         if macros::is_excute(fighter) {
             ArticleModule::add_motion_partial(fighter.module_accessor, *WEAPON_ELIGHT_BUNSHIN_GENERATE_ARTICLE_ESWORD, *WEAPON_ELIGHT_ESWORD_MOTION_PART_SET_KIND_OPEM_CLOSE, Hash40::new("to_open"), 10.0, 10.0, false, false, 0.0, false, true, false);
@@ -2376,8 +2324,7 @@ unsafe fn mythra_sideb_4_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight_bunshin", script = "game_specialairs4", category = ACMD_GAME )]
-unsafe fn mythra_sideb_4_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_sideb_4_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::IS_EXIST_ARTICLE(fighter, *FIGHTER_ELIGHT_GENERATE_ARTICLE_ESWORD) {
         if macros::is_excute(fighter) {
             ArticleModule::add_motion_partial(fighter.module_accessor, *WEAPON_ELIGHT_BUNSHIN_GENERATE_ARTICLE_ESWORD, *WEAPON_ELIGHT_ESWORD_MOTION_PART_SET_KIND_OPEM_CLOSE, Hash40::new("to_open"), 10.0, 10.0, false, false, 0.0, false, true, false);
@@ -2404,8 +2351,7 @@ unsafe fn mythra_sideb_4_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight_bunshin", script = "game_specials5", category = ACMD_GAME )]
-unsafe fn mythra_sideb_5_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_sideb_5_smash_script(fighter: &mut L2CAgentBase) {
     if macros::IS_EXIST_ARTICLE(fighter, *FIGHTER_ELIGHT_GENERATE_ARTICLE_ESWORD) {
         if macros::is_excute(fighter) {
             ArticleModule::add_motion_partial(fighter.module_accessor, *WEAPON_ELIGHT_BUNSHIN_GENERATE_ARTICLE_ESWORD, *WEAPON_ELIGHT_ESWORD_MOTION_PART_SET_KIND_OPEM_CLOSE, Hash40::new("to_open"), 10.0, 10.0, false, false, 0.0, false, true, false);
@@ -2422,8 +2368,7 @@ unsafe fn mythra_sideb_5_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight_bunshin", script = "game_specialairs5", category = ACMD_GAME )]
-unsafe fn mythra_sideb_5_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_sideb_5_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::IS_EXIST_ARTICLE(fighter, *FIGHTER_ELIGHT_GENERATE_ARTICLE_ESWORD) {
         if macros::is_excute(fighter) {
             ArticleModule::add_motion_partial(fighter.module_accessor, *WEAPON_ELIGHT_BUNSHIN_GENERATE_ARTICLE_ESWORD, *WEAPON_ELIGHT_ESWORD_MOTION_PART_SET_KIND_OPEM_CLOSE, Hash40::new("to_open"), 10.0, 10.0, false, false, 0.0, false, true, false);
@@ -2440,8 +2385,7 @@ unsafe fn mythra_sideb_5_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_specialsstart", category = ACMD_GAME )]
-unsafe fn mythra_sideb_start_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_sideb_start_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.5);
@@ -2467,8 +2411,7 @@ unsafe fn mythra_sideb_start_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_specialairsstart", category = ACMD_GAME )]
-unsafe fn mythra_sideb_start_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_sideb_start_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.5);
@@ -2494,8 +2437,7 @@ unsafe fn mythra_sideb_start_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_specialairhijump", category = ACMD_GAME )]
-unsafe fn mythra_upb_jump_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_upb_jump_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS);
@@ -2557,23 +2499,20 @@ unsafe fn mythra_upb_jump_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "elight_spreadbullet", script = "game_fly", category = ACMD_GAME )]
-unsafe fn chroma_dust_projectile(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn chroma_dust_projectile(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.5, 52, 85, 0, 65, 2.0, 0.0, 0.0, 0.0, None, None, None, 0.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, -2, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_MAGIC);
     }
 }
 
-#[acmd_script( agent = "elight_exprosiveshot", script = "game_burst", category = ACMD_GAME )]
-unsafe fn ray_of_punishment_burst(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ray_of_punishment_burst(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ControlModule::set_rumble(fighter.module_accessor, Hash40::new("rbkind_beams"), 0, false, 0);
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.1, 290, 79, 0, 22, 11.0, 0.0, 3.0, 0.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 20, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_MAGIC);
     }
 }
 
-#[acmd_script( agent = "elight", script = "game_catchcut", category = ACMD_GAME, low_priority )]
-unsafe fn mythra_catch_cut_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn mythra_catch_cut_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
     
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -2602,65 +2541,67 @@ unsafe fn mythra_catch_cut_smash_script(fighter: &mut L2CAgentBase) {
         
 }
 
-
-
-
-
 pub fn install() {
-    smashline::install_agent_frames!(
-        elight_frame,
-        mythra_chromadust_weapon_frame
-    );
-    smashline::install_acmd_scripts!(
-        mythra_spotdodge_smash_script,
-        mythra_rollf_smash_script,
-        mythra_rollb_smash_script,
-        mythra_jab_smash_script,
-        mythra_jab2_smash_script,
-        mythra_jab100_smash_script,
-        mythra_jab100end_smash_script,
-        mythra_dashattack_smash_script,
-        mythra_ftilt_smash_script,
-        mythra_utilt_smash_script,
-        mythra_dtilt_smash_script,
-        mythra_fsmash_charge_smash_script,
-        mythra_fsmash_smash_script,
-        mythra_usmash_smash_script,
-        mythra_dsmash_smash_script,
-        mythra_nair_smash_script,
-        mythra_nair_landing_smash_script,
-        mythra_fair_smash_script,
-        mythra_bair_smash_script,
-        mythra_uair_smash_script,
-        mythra_dair_smash_script,
-        mythra_grab_smash_script,
-        mythra_grabd_smash_script,
-        mythra_grabp_smash_script,
-        mythra_fthrow_smash_script,
-        mythra_bthrow_smash_script,
-        mythra_uthrow_smash_script,
-        mythra_dthrow_smash_script,
-        mythra_neutralb_smash_script,
-        mythra_neutralb_air_smash_script,
-        mythra_neutralb_2_smash_script,
-        mythra_neutralb_2_air_smash_script,
-        mythra_sideb_1_smash_script,
-        mythra_sideb_1_air_smash_script,
-        mythra_sideb_2_smash_script,
-        mythra_sideb_2_air_smash_script,
-        mythra_sideb_3_smash_script,
-        mythra_sideb_3_air_smash_script,
-        mythra_sideb_4_smash_script,
-        mythra_sideb_4_air_smash_script,
-        mythra_sideb_5_smash_script,
-        mythra_sideb_5_air_smash_script,
-        mythra_sideb_start_smash_script,
-        mythra_sideb_start_air_smash_script,
-        mythra_upb_jump_smash_script,
-        chroma_dust_projectile,
-        ray_of_punishment_burst,
-        mythra_catch_cut_smash_script
+    Agent::new("elight")
+    .on_line(Main, elight_frame) //opff
+    .game_acmd("game_escapen", mythra_spotdodge_smash_script)
+    .game_acmd("game_escapef", mythra_rollf_smash_script)
+    .game_acmd("game_escapeb", mythra_rollb_smash_script)
+    .game_acmd("game_attack11", mythra_jab_smash_script)
+    .game_acmd("game_attack12", mythra_jab2_smash_script)
+    .game_acmd("game_attack100", mythra_jab100_smash_script)
+    .game_acmd("game_attack100end", mythra_jab100end_smash_script)
+    .game_acmd("game_attackdash", mythra_dashattack_smash_script)
+    .game_acmd("game_attacks3", mythra_ftilt_smash_script)
+    .game_acmd("game_attackhi3", mythra_utilt_smash_script)
+    .game_acmd("game_attacklw3", mythra_dtilt_smash_script)
+    .game_acmd("game_attacks4charge", mythra_fsmash_charge_smash_script)
+    .game_acmd("game_attacks4", mythra_fsmash_smash_script)
+    .game_acmd("game_attackhi4", mythra_usmash_smash_script)
+    .game_acmd("game_attacklw4", mythra_dsmash_smash_script)
+    .game_acmd("game_attackairn", mythra_nair_smash_script)
+    .game_acmd("game_landingairn", mythra_nair_landing_smash_script)
+    .game_acmd("game_attackairf", mythra_fair_smash_script)
+    .game_acmd("game_attackairb", mythra_bair_smash_script)
+    .game_acmd("game_attackairhi", mythra_uair_smash_script)
+    .game_acmd("game_attackairlw", mythra_dair_smash_script)
+    .game_acmd("game_catch", mythra_grab_smash_script)
+    .game_acmd("game_catchdash", mythra_grabd_smash_script)
+    .game_acmd("game_catchturn", mythra_grabp_smash_script)
+    .game_acmd("game_throwf", mythra_fthrow_smash_script)
+    .game_acmd("game_throwb", mythra_bthrow_smash_script)
+    .game_acmd("game_throwhi", mythra_uthrow_smash_script)
+    .game_acmd("game_throwlw", mythra_dthrow_smash_script)
+    .game_acmd("game_specialn", mythra_neutralb_smash_script)
+    .game_acmd("game_specialairn", mythra_neutralb_air_smash_script)
+    .game_acmd("game_specialn2", mythra_neutralb_2_smash_script)
+    .game_acmd("game_specialairn2", mythra_neutralb_2_air_smash_script)
+    .game_acmd("game_specialsstart", mythra_sideb_start_smash_script)
+    .game_acmd("game_specialairsstart", mythra_sideb_start_air_smash_script)
+    .game_acmd("game_specialairhijump", mythra_upb_jump_smash_script)
+    .game_acmd("game_catchcut", mythra_catch_cut_smash_script)
+    .install();
 
-        
-    );
+    Agent::new("eflame_bunshin")
+    .game_acmd("game_specials1", mythra_sideb_1_smash_script)
+    .game_acmd("game_specialairs1", mythra_sideb_1_air_smash_script)
+    .game_acmd("game_specials2", mythra_sideb_2_smash_script)
+    .game_acmd("game_specialairs2", mythra_sideb_2_air_smash_script)
+    .game_acmd("game_specials3", mythra_sideb_3_smash_script)
+    .game_acmd("game_specialairs3", mythra_sideb_3_air_smash_script)
+    .game_acmd("game_specials4", mythra_sideb_4_smash_script)
+    .game_acmd("game_specialairs4", mythra_sideb_4_air_smash_script)
+    .game_acmd("game_specials5", mythra_sideb_5_smash_script)
+    .game_acmd("game_specialairs5", mythra_sideb_5_air_smash_script)
+    .install();
+
+    Agent::new("elight_spreadbullet")
+    .on_line(Main, mythra_chromadust_weapon_frame)
+    .game_acmd("game_fly", chroma_dust_projectile)
+    .install();
+
+    Agent::new("elight_exprosiveshot")
+    .game_acmd("game_burst", ray_of_punishment_burst)
+    .install();
+
 }

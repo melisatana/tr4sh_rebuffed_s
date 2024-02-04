@@ -8,14 +8,15 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 use smash::hash40;
+use crate::custom::global_fighter_frame;
 
 // A Once-Per-Fighter-Frame that only applies to Diddy Kong
-#[fighter_frame( agent = FIGHTER_KIND_DIDDY )]
-fn diddy_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn diddy_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         let status = StatusModule::status_kind(fighter.module_accessor);
 
-        println!("It'sa me, Diddy Kong, ukiiii! (this is abhorrently racist so he had to be censored)");
+        //println!("It'sa me, Diddy Kong, ukiiii! (this is abhorrently racist so he had to be censored)");
 
         if [*FIGHTER_DIDDY_STATUS_KIND_SPECIAL_HI_CHARGE].contains(&status) {
             if ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_GUARD) {
@@ -26,8 +27,7 @@ fn diddy_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn diddy_jab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.5, 361, 25, 20, 25, 3.8, 0.0, 5.5, 4.0, None, None, None, 1.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
@@ -49,8 +49,7 @@ unsafe fn diddy_jab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_attack12", category = ACMD_GAME )]
-unsafe fn diddy_jab2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_jab2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.5, 361, 25, 15, 20, 3.3, 0.0, 5.5, 4.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
@@ -65,8 +64,7 @@ unsafe fn diddy_jab2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_attack13", category = ACMD_GAME )]
-unsafe fn diddy_jab3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_jab3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.4, 361, 90, 0, 65, 3.1, 0.0, 6.0, 4.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
@@ -80,8 +78,7 @@ unsafe fn diddy_jab3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn diddy_dashattack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.25);
@@ -118,8 +115,7 @@ unsafe fn diddy_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_attacks3", category = ACMD_GAME )]
-unsafe fn diddy_ftilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -160,8 +156,7 @@ unsafe fn diddy_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_attacks3hi", category = ACMD_GAME )]
-unsafe fn diddy_ftilt2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_ftilt2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -202,8 +197,7 @@ unsafe fn diddy_ftilt2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_attacks3lw", category = ACMD_GAME )]
-unsafe fn diddy_ftilt3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_ftilt3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -244,8 +238,7 @@ unsafe fn diddy_ftilt3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn diddy_utilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_utilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -273,8 +266,7 @@ unsafe fn diddy_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "effect_attackhi3", category = ACMD_EFFECT, low_priority )]
-unsafe fn diddy_utilt_effect_script(agent: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_utilt_effect_script(agent: &mut L2CAgentBase) {
     sv_animcmd::frame(agent.lua_state_agent, 6.0);
     if macros::is_excute(agent) {
         macros::EFFECT_FOLLOW_FLIP(agent, Hash40::new("diddy_attack_arc"), Hash40::new("diddy_attack_arc"), Hash40::new("top"), -1, 17, -1.5, 40, 59, 151, 1.2, true, *EF_FLIP_YZ);
@@ -289,8 +281,7 @@ unsafe fn diddy_utilt_effect_script(agent: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn diddy_dtilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 6.8, 70, 90, 0, 25, 4.0, 0.0, 1.8, 17.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.2, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
@@ -303,8 +294,7 @@ unsafe fn diddy_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn diddy_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -337,8 +327,7 @@ unsafe fn diddy_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn diddy_usmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -392,8 +381,7 @@ unsafe fn diddy_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn diddy_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -429,8 +417,7 @@ unsafe fn diddy_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn diddy_nair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_nair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -456,8 +443,7 @@ unsafe fn diddy_nair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn diddy_fair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_fair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -480,8 +466,7 @@ unsafe fn diddy_fair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn diddy_bair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_bair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -506,8 +491,7 @@ unsafe fn diddy_bair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn diddy_uair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_uair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -525,8 +509,7 @@ unsafe fn diddy_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn diddy_dair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_dair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -552,8 +535,7 @@ unsafe fn diddy_dair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_catch", category = ACMD_GAME )]
-unsafe fn diddy_grab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_grab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         GrabModule::set_rebound(fighter.module_accessor, true);
@@ -572,8 +554,7 @@ unsafe fn diddy_grab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn diddy_grabd_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_grabd_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -595,8 +576,7 @@ unsafe fn diddy_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn diddy_grabp_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_grabp_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -618,8 +598,7 @@ unsafe fn diddy_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn diddy_fthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 11.4, 38, 35, 0, 80, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -636,8 +615,7 @@ unsafe fn diddy_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn diddy_bthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 8.9, 42, 120, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -656,8 +634,7 @@ unsafe fn diddy_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn diddy_uthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 4.5, 87, 65, 0, 65, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -680,8 +657,7 @@ unsafe fn diddy_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn diddy_dthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 7.0, 122, 50, 0, 67, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -698,8 +674,7 @@ unsafe fn diddy_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_specialnshoot", category = ACMD_GAME )]
-unsafe fn diddy_neutralb_shoot_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_neutralb_shoot_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_DIDDY_GENERATE_ARTICLE_ITEM_PEANUTS, false, -1);
@@ -710,20 +685,7 @@ unsafe fn diddy_neutralb_shoot_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_specialairnshoot", category = ACMD_GAME )]
-unsafe fn diddy_neutralb_shoot_air_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 3.0);
-    if macros::is_excute(fighter) {
-        ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_DIDDY_GENERATE_ARTICLE_ITEM_PEANUTS, false, -1);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 5.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.7692307);
-    }
-}
-
-#[acmd_script( agent = "diddy", script = "game_specialnblow", category = ACMD_GAME )]
-unsafe fn diddy_neutralb_blowup_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_neutralb_blowup_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 43.0, 361, 92, 0, 30, 14.2, 0.0, 8.5, 7.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 100, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_BOMB);
@@ -738,24 +700,7 @@ unsafe fn diddy_neutralb_blowup_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_specialairnblow", category = ACMD_GAME )]
-unsafe fn diddy_neutralb_blowup_air_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 43.0, 361, 92, 0, 30, 14.2, 0.0, 8.5, 7.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 100, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_BOMB);
-    }
-    sv_animcmd::wait(fighter.lua_state_agent, 7.0);
-    if macros::is_excute(fighter) {
-        AttackModule::clear_all(fighter.module_accessor);
-    }
-    sv_animcmd::wait(fighter.lua_state_agent, 1.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.740740740);
-    }
-}
-
-#[acmd_script( agent = "diddy", script = "game_specialsstart", category = ACMD_GAME )]
-unsafe fn diddy_sideb_start_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_sideb_start_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.5);
@@ -766,20 +711,7 @@ unsafe fn diddy_sideb_start_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_specialairsstart", category = ACMD_GAME )]
-unsafe fn diddy_sideb_start_air_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.5);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 6.0);
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 1.0);
-    }
-}
-
-#[acmd_script( agent = "diddy", script = "game_specialairsjump", category = ACMD_GAME )]
-unsafe fn diddy_sideb_jump_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_sideb_jump_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         macros::CATCH(fighter, 0, Hash40::new("top"), 3.0, 0.0, 2.5, 4.5, None, None, None, *FIGHTER_STATUS_KIND_CLUNG_DIDDY, *COLLISION_SITUATION_MASK_GA);
@@ -791,8 +723,7 @@ unsafe fn diddy_sideb_jump_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_specialairskick", category = ACMD_GAME )]
-unsafe fn diddy_sideb_kick_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_sideb_kick_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("legl"), 13.5, 361, 75, 0, 50, 3.5, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.3, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
@@ -804,8 +735,7 @@ unsafe fn diddy_sideb_kick_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_specialsstickjump2", category = ACMD_GAME )]
-unsafe fn diddy_sideb_throw_jump_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_sideb_throw_jump_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.0, 270, 130, 0, 25, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 2.0, 361, 50, 0, 0, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -822,8 +752,7 @@ unsafe fn diddy_sideb_throw_jump_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_specialsstickattack2", category = ACMD_GAME )]
-unsafe fn diddy_sideb_throw_attack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_sideb_throw_attack_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 1, 8.0, 120, 68, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 1, 4.0, 361, 50, 0, 0, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -845,8 +774,7 @@ unsafe fn diddy_sideb_throw_attack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_specialairhijump", category = ACMD_GAME )]
-unsafe fn diddy_upb_yump_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_upb_yump_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         JostleModule::set_status(fighter.module_accessor, false);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_DIDDY_STATUS_SPECIAL_HI_FLAG_BOBY_ROLL_START);
@@ -875,8 +803,7 @@ unsafe fn diddy_upb_yump_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy_barreljet", script = "game_fly", category = ACMD_GAME )]
-unsafe fn barreljet_flying_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn barreljet_flying_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("rot"), 4.0, 361, 100, 0, 10, 2.8, 0.0, 0.7, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
         macros::ATTACK(fighter, 1, 0, Hash40::new("rot"), 4.0, 361, 100, 0, 10, 3.4, 4.5, 0.3, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
@@ -887,8 +814,7 @@ unsafe fn barreljet_flying_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_speciallw", category = ACMD_GAME )]
-unsafe fn diddy_downb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn diddy_downb_smash_script(fighter: &mut L2CAgentBase) {
     let rand_num = smash::app::sv_math::rand(hash40("fighter"), 15);
 
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
@@ -912,75 +838,54 @@ unsafe fn diddy_downb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "diddy", script = "game_specialairlw", category = ACMD_GAME )]
-unsafe fn diddy_downb_air_smash_script(fighter: &mut L2CAgentBase) {
-    let rand_num = smash::app::sv_math::rand(hash40("fighter"), 15);
-
-    sv_animcmd::frame(fighter.lua_state_agent, 3.0);
-    if rand_num == 0 {
-        if macros::is_excute(fighter) {
-            ItemModule::have_item(fighter.module_accessor, ItemKind(*ITEM_KIND_BANANAGUN), 0, 0, false, false);
-        }
-    }
-    else {
-        if macros::is_excute(fighter) {
-            ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_DIDDY_GENERATE_ARTICLE_ITEM_BANANA, false, -1);
-        }
-        sv_animcmd::frame(fighter.lua_state_agent, 14.0);
-        if macros::is_excute(fighter) {
-            WorkModule::on_flag(fighter.module_accessor, *FIGHTER_DIDDY_STATUS_SPECIAL_LW_FLAG_ITEM_THROW);
-        }
-        sv_animcmd::frame(fighter.lua_state_agent, 20.0);
-        if macros::is_excute(fighter) {
-            ArticleModule::shoot(fighter.module_accessor, *FIGHTER_DIDDY_GENERATE_ARTICLE_ITEM_BANANA, ArticleOperationTarget(*ARTICLE_OPE_TARGET_ALL), false);
-        }
-    }
-}
 
 pub fn install() {
-    smashline::install_agent_frames!(
-        diddy_frame
-    );
-    smashline::install_acmd_scripts!(
-        diddy_jab_smash_script,
-        diddy_jab2_smash_script,
-        diddy_jab3_smash_script,
-        diddy_dashattack_smash_script,
-        diddy_ftilt_smash_script,
-        diddy_ftilt2_smash_script,
-        diddy_ftilt3_smash_script,
-        diddy_utilt_smash_script,
-        diddy_utilt_effect_script,
-        diddy_dtilt_smash_script,
-        diddy_fsmash_smash_script,
-        diddy_usmash_smash_script,
-        diddy_dsmash_smash_script,
-        diddy_nair_smash_script,
-        diddy_fair_smash_script,
-        diddy_bair_smash_script,
-        diddy_uair_smash_script,
-        diddy_dair_smash_script,
-        diddy_grab_smash_script,
-        diddy_grabd_smash_script,
-        diddy_grabp_smash_script,
-        diddy_fthrow_smash_script,
-        diddy_bthrow_smash_script,
-        diddy_uthrow_smash_script,
-        diddy_dthrow_smash_script,
-        diddy_neutralb_shoot_smash_script,
-        diddy_neutralb_shoot_air_smash_script,
-        diddy_neutralb_blowup_smash_script,
-        diddy_neutralb_blowup_air_smash_script,
-        diddy_sideb_start_smash_script,
-        diddy_sideb_start_air_smash_script,
-        diddy_sideb_jump_smash_script,
-        diddy_sideb_kick_smash_script,
-        diddy_sideb_throw_jump_smash_script,
-        diddy_sideb_throw_attack_smash_script,
-        diddy_upb_yump_smash_script,
-        barreljet_flying_smash_script,
-        diddy_downb_smash_script,
-        diddy_downb_air_smash_script
-        
-    );
+    Agent::new("diddy")
+    .on_line(Main, diddy_frame) //opff
+    .game_acmd("game_attack11", diddy_jab_smash_script)
+    .game_acmd("game_attack12", diddy_jab2_smash_script)
+    .game_acmd("game_attack13", diddy_jab3_smash_script)
+    .game_acmd("game_attackdash", diddy_dashattack_smash_script)
+    .game_acmd("game_attacks3", diddy_ftilt_smash_script)
+    .game_acmd("game_attacks3hi", diddy_ftilt2_smash_script)
+    .game_acmd("game_attacks3lw", diddy_ftilt3_smash_script)
+    .game_acmd("game_attackhi3", diddy_utilt_smash_script)
+    .effect_acmd("effect_attackhi3", diddy_utilt_effect_script)
+    .game_acmd("game_attacklw3", diddy_dtilt_smash_script)
+    .game_acmd("game_attacks4", diddy_fsmash_smash_script)
+    .game_acmd("game_attacks4hi", diddy_fsmash_smash_script)
+    .game_acmd("game_attacks4lw", diddy_fsmash_smash_script)
+    .game_acmd("game_attackhi4", diddy_usmash_smash_script)
+    .game_acmd("game_attacklw4", diddy_dsmash_smash_script)
+    .game_acmd("game_attackairn", diddy_nair_smash_script)
+    .game_acmd("game_attackairf", diddy_fair_smash_script)
+    .game_acmd("game_attackairb", diddy_bair_smash_script)
+    .game_acmd("game_attackairhi", diddy_uair_smash_script)
+    .game_acmd("game_attackairlw", diddy_dair_smash_script)
+    .game_acmd("game_catch", diddy_grab_smash_script)
+    .game_acmd("game_catchdash", diddy_grabd_smash_script)
+    .game_acmd("game_catchturn", diddy_grabp_smash_script)
+    .game_acmd("game_throwf", diddy_fthrow_smash_script)
+    .game_acmd("game_throwb", diddy_bthrow_smash_script)
+    .game_acmd("game_throwhi", diddy_uthrow_smash_script)
+    .game_acmd("game_throwlw", diddy_dthrow_smash_script)
+    .game_acmd("game_specialnshoot", diddy_neutralb_shoot_smash_script)
+    .game_acmd("game_specialairnshoot", diddy_neutralb_shoot_smash_script)
+    .game_acmd("game_specialnblow", diddy_neutralb_blowup_smash_script)
+    .game_acmd("game_specialairnblow", diddy_neutralb_blowup_smash_script)
+    .game_acmd("game_specialsstart", diddy_sideb_start_smash_script)
+    .game_acmd("game_specialairsstart", diddy_sideb_start_smash_script)
+    .game_acmd("game_specialairsjump", diddy_sideb_jump_smash_script)
+    .game_acmd("game_specialairskick", diddy_sideb_kick_smash_script)
+    .game_acmd("game_specialsstickattack2", diddy_sideb_throw_attack_smash_script)
+    .game_acmd("game_specialsstickjump2", diddy_sideb_throw_jump_smash_script)
+    .game_acmd("game_specialairhijump", diddy_upb_yump_smash_script)
+    .game_acmd("game_speciallw", diddy_downb_smash_script)
+    .game_acmd("game_specialairlw", diddy_downb_smash_script)
+    .install();
+
+    Agent::new("diddy_barreljet")
+    .game_acmd("game_fly", barreljet_flying_smash_script)
+    .install();
+
 }

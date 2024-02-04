@@ -14,7 +14,7 @@ use smash_script::*;
 fn koopag_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
 
-        println!("gwaaaaaaah!");
+        //println!("gwaaaaaaah!");
 
     
     }

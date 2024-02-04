@@ -2,17 +2,43 @@ use smash::hash40;
 use smash::app::lua_bind::*;
 use smash::lib::lua_const::*;
 use smash::app::utility::get_kind;
-use smash::lua2cpp::{L2CFighterCommon, L2CFighterBase};
+use smash::lua2cpp::{L2CFighterCommon };
 use smashline::*;
 use smash::app::*;
 use smash::phx::Hash40;
 use smash_script::*;
 use smash::lib::L2CValue;
 //use super::*;
-use crate::customparam::BomaExt;
+//use crate::customparam::BomaExt;
+
+
+pub trait BomaExt {
+    unsafe fn is_fighter(&mut self) -> bool;
+    unsafe fn is_status_one_of(&mut self, kinds: &[i32]) -> bool;
+    unsafe fn is_weapon(&mut self) -> bool;
+    unsafe fn kind(&mut self) -> i32;
+}
+
+impl BomaExt for BattleObjectModuleAccessor {
+    unsafe fn is_fighter(&mut self) -> bool {
+        return smash::app::utility::get_category(self) == *BATTLE_OBJECT_CATEGORY_FIGHTER;
+    }
+    unsafe fn is_status_one_of(&mut self, kinds: &[i32]) -> bool {
+        let kind = StatusModule::status_kind(self);
+        return kinds.contains(&kind);
+    }
+    unsafe fn is_weapon(&mut self) -> bool {
+        return smash::app::utility::get_category(self) == *BATTLE_OBJECT_CATEGORY_WEAPON;
+    }
+    unsafe fn kind(&mut self) -> i32 {
+        return smash::app::utility::get_kind(self);
+    }
+}
+
 
 static DEBUG_ALLOW_MOMENTUM_JUMPS : bool = false;
-//pub static mut CAN_HITFALL : [bool; 8] = [false; 8];
+
+
 
 //handles whether or not you can fast fall, thanks WuBoy
 pub unsafe fn fastfall_helper(fighter: &mut L2CFighterCommon) {
@@ -61,18 +87,6 @@ unsafe fn can_z_nair(fighter: &mut L2CFighterCommon) -> bool {
     return true;
 }
 
-//dash dance handler, disables the code below for 0 momentum backdashes
-unsafe fn dashdance_handler(fighter: &mut L2CFighterCommon) -> bool {
-    let fighter_kind = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_KIND);
-
-    if [
-        *FIGHTER_KIND_SAMUSD
-    ].contains(&fighter_kind) {
-        return false;
-    }
-    return true;
-}
-
 //z-nair code
 #[skyline::hook(replace = smash::lua2cpp::L2CFighterCommon_sub_transition_group_check_air_escape)]
 pub unsafe fn escape_air_subtransition(fighter: &mut L2CFighterCommon) -> L2CValue {
@@ -87,6 +101,19 @@ pub unsafe fn escape_air_subtransition(fighter: &mut L2CFighterCommon) -> L2CVal
     }
     original!()(fighter)
 }
+
+//dash dance handler, disables the code below for 0 momentum backdashes
+unsafe fn dashdance_handler(fighter: &mut L2CFighterCommon) -> bool {
+    let fighter_kind = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_KIND);
+
+    if [
+        *FIGHTER_KIND_SAMUSD
+    ].contains(&fighter_kind) {
+        return false;
+    }
+    return true;
+}
+
 
 //WuBor Code to not break shield on hold. Does not work for Jigglypuff or Shulk
 #[skyline::hook(replace = smash::lua2cpp::L2CFighterCommon_status_guard_main_common)]
@@ -116,6 +143,69 @@ unsafe fn status_guard_main_common(fighter: &mut L2CFighterCommon) -> L2CValue {
     false.into()
 }
 
+//stop buffering dodges when landing
+#[skyline::hook(replace = smash::lua2cpp::L2CFighterCommon_status_Landing_MainSub)]
+pub unsafe fn status_landing_main_sub(fighter: &mut L2CFighterCommon) -> L2CValue {
+    
+    let boma = smash::app::sv_system::battle_object_module_accessor(fighter.lua_state_agent);
+
+    if StatusModule::prev_status_kind(boma, 0) == *FIGHTER_STATUS_KIND_ESCAPE_AIR || ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_GUARD) {
+        ControlModule::clear_command_one(boma, *FIGHTER_PAD_COMMAND_CATEGORY1, *FIGHTER_PAD_CMD_CAT1_ESCAPE);
+        ControlModule::clear_command_one(boma, *FIGHTER_PAD_COMMAND_CATEGORY1, *FIGHTER_PAD_CMD_CAT1_ESCAPE_F);
+        ControlModule::clear_command_one(boma, *FIGHTER_PAD_COMMAND_CATEGORY1, *FIGHTER_PAD_CMD_CAT1_ESCAPE_B);
+    }
+    original!()(fighter)
+}
+
+
+//WuBor taunt on platforms code but it makes confetti instead
+#[skyline::hook(replace = smash::lua2cpp::L2CFighterCommon_status_Rebirth_Main)]
+unsafe extern "C" fn status_rebirth_main(fighter: &mut L2CFighterCommon) -> L2CValue {
+    if fighter.sub_rebirth_common().get_bool() {
+        return 1.into();
+    }
+    rebirth_motion_handler(fighter);
+    if fighter.sub_air_check_fall_common().get_bool() {
+        return 1.into();
+    }
+    if !fighter.global_table[0x8].get_bool() {
+        fighter.sub_rebirth_uniq_process_exec_fix_pos();
+    }
+    0.into()
+}
+
+unsafe extern "C" fn rebirth_motion_handler(fighter: &mut L2CFighterCommon) {
+    let mot = MotionModule::motion_kind(fighter.module_accessor);
+    if appeal_motion_uniq_handler(fighter) {
+        let kind = fighter.global_table[0x2].get_i32();
+        if MotionModule::is_end(fighter.module_accessor) {
+            if [*FIGHTER_KIND_CHROM].contains(&kind) && ![hash40("wait"), hash40("wait_2"), hash40("wait_3"), hash40("wait_4")].contains(&mot) {
+                MotionModule::change_motion(fighter.module_accessor, Hash40::new("wait_4"), 0.0, 1.0, false, 0.0, false, false);
+            }
+            else if [*FIGHTER_KIND_SAMUSD, *FIGHTER_KIND_ELIGHT].contains(&kind) && [hash40("down_stand_d")].contains(&mot) {
+                MotionModule::change_motion(fighter.module_accessor, Hash40::new("wait_4"), 0.0, 1.0, false, 0.0, false, false);
+            }
+            else {
+                fighter.sub_wait_motion(false.into());
+            }
+        }
+    }
+}
+
+unsafe extern "C" fn appeal_motion_uniq_handler(fighter: &mut L2CFighterCommon) -> bool {
+    let hi = ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_HI);
+    let lw = ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_LW);
+    let s = ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_R) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_L);
+    
+    if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_STATUS_REBIRTH_FLAG_MOVE_END) {
+        if hi || s || lw {
+            macros::EFFECT(fighter, Hash40::new("sys_kusudama"), Hash40::new("top"), 0, 28, 0, 0, 0, 0, 0.75, 0, 0, 0, 0, 0, 0, false); //confetti 2
+            //StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_DEAD, false);
+        }
+    }
+    true
+}
+
 // hdr code for b reverses
 //=================================================================
 //== FighterStatusModuleImpl::set_fighter_status_data
@@ -133,10 +223,10 @@ unsafe fn set_fighter_status_data_hook(boma: &mut BattleObjectModuleAccessor, ar
         || boma.kind() == *FIGHTER_KIND_LINK && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW, *FIGHTER_LINK_STATUS_KIND_SPECIAL_LW_BLAST]) 
         || boma.kind() == *FIGHTER_KIND_KIRBY && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_S])
         || boma.kind() == *FIGHTER_KIND_PURIN && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_N, *FIGHTER_STATUS_KIND_SPECIAL_HI, *FIGHTER_STATUS_KIND_SPECIAL_LW])
-        || boma.kind() == *FIGHTER_KIND_CAPTAIN && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
+        || boma.kind() == *FIGHTER_KIND_CAPTAIN && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_N, *FIGHTER_STATUS_KIND_SPECIAL_LW])
 
         || boma.kind() == *FIGHTER_KIND_FALCO && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
-        || boma.kind() == *FIGHTER_KIND_GANON && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
+        || boma.kind() == *FIGHTER_KIND_GANON && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_N, *FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_YOUNGLINK && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW]) 
         || boma.kind() == *FIGHTER_KIND_MARTH && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_LUCINA && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
@@ -150,7 +240,7 @@ unsafe fn set_fighter_status_data_hook(boma: &mut BattleObjectModuleAccessor, ar
         || boma.kind() == *FIGHTER_KIND_DEDEDE && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_S])
         || boma.kind() == *FIGHTER_KIND_PZENIGAME && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_N])
         || boma.kind() == *FIGHTER_KIND_SNAKE && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_HI])
-
+        || boma.kind() == *FIGHTER_KIND_WARIO && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
 
         || boma.kind() == *FIGHTER_KIND_MURABITO && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_LITTLEMAC && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_N, *FIGHTER_LITTLEMAC_STATUS_KIND_SPECIAL_N2, *FIGHTER_LITTLEMAC_STATUS_KIND_SPECIAL_N_START, *FIGHTER_STATUS_KIND_SPECIAL_LW])
@@ -159,7 +249,7 @@ unsafe fn set_fighter_status_data_hook(boma: &mut BattleObjectModuleAccessor, ar
         || boma.kind() == *FIGHTER_KIND_GEKKOUGA && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_SHULK && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_PALUTENA && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
-        || boma.kind() == *FIGHTER_KIND_CLOUD && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW]) 
+        || boma.kind() == *FIGHTER_KIND_CLOUD && boma.is_status_one_of(&[*FIGHTER_CLOUD_STATUS_KIND_SPECIAL_HI2, *FIGHTER_STATUS_KIND_SPECIAL_LW]) 
         || boma.kind() == *FIGHTER_KIND_KAMUI && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_S, *FIGHTER_STATUS_KIND_SPECIAL_LW])
 
         || boma.kind() == *FIGHTER_KIND_SHIZUE && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW, *FIGHTER_SHIZUE_STATUS_KIND_SPECIAL_LW_SET, *FIGHTER_SHIZUE_STATUS_KIND_SPECIAL_LW_FAILURE]) 
@@ -184,24 +274,6 @@ unsafe fn set_fighter_status_data_hook(boma: &mut BattleObjectModuleAccessor, ar
 
     original!()(boma, arg2, treaded_kind, arg4, arg5, arg6, log_mask_flag, new_status_attr, power_up_attack_bit, arg10)
 }
-
-
-
-//stop buffering dodges when landing
-#[skyline::hook(replace = smash::lua2cpp::L2CFighterCommon_status_Landing_MainSub)]
-pub unsafe fn status_landing_main_sub(fighter: &mut L2CFighterCommon) -> L2CValue {
-    
-    
-    let boma = smash::app::sv_system::battle_object_module_accessor(fighter.lua_state_agent);
-
-    if StatusModule::prev_status_kind(boma, 0) == *FIGHTER_STATUS_KIND_ESCAPE_AIR || ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_GUARD) {
-        ControlModule::clear_command_one(boma, *FIGHTER_PAD_COMMAND_CATEGORY1, *FIGHTER_PAD_CMD_CAT1_ESCAPE);
-        ControlModule::clear_command_one(boma, *FIGHTER_PAD_COMMAND_CATEGORY1, *FIGHTER_PAD_CMD_CAT1_ESCAPE_F);
-        ControlModule::clear_command_one(boma, *FIGHTER_PAD_COMMAND_CATEGORY1, *FIGHTER_PAD_CMD_CAT1_ESCAPE_B);
-    }
-    original!()(fighter)
-}
-
 
 //determines who cannot cancel jab1 into ftilt
 unsafe fn can_jab1_cancel_to_ftilt(fighter: &mut L2CFighterCommon) -> bool {
@@ -331,8 +403,7 @@ unsafe fn can_jab2_cancel_to_dtilt(fighter: &mut L2CFighterCommon) -> bool {
 
 
 // Use this for general per-frame fighter-level hooks
-#[fighter_frame_callback]
-pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
+pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
     unsafe {
         let module_accessor = smash::app::sv_system::battle_object_module_accessor(fighter.lua_state_agent);
         let status = StatusModule::status_kind(fighter.module_accessor);
@@ -342,7 +413,7 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
         let stickx_directional = stickx * lr;
         let fighter_kind = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_KIND);
         //let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
-        
+            
         if StatusModule::is_situation_changed(module_accessor) {
             let situation_kind = &format!("{}", StatusModule::situation_kind(module_accessor));
             println!(
@@ -358,12 +429,6 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
             );
         }
 
-        //flag check for hitfalling
-        if WorkModule::is_flag(fighter.module_accessor, crate::consts::FIGHTER_STATUS_ATTACK_WORK_FLAG_HITFALL) {
-            crate::consts::common_attack_hitfall_flag(fighter);
-        }
-        
-        
         //momentum jumps (currently disabled)
         if [*FIGHTER_STATUS_KIND_JUMP_SQUAT, *FIGHTER_STATUS_KIND_JUMP].contains(&status) && DEBUG_ALLOW_MOMENTUM_JUMPS 
         && WorkModule::is_flag(module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_JUMP_NO_LIMIT) == false {
@@ -371,34 +436,20 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
         };
 
 
-        //salty confetti
-        if 
-            [*FIGHTER_STATUS_KIND_DAMAGE, 
-            *FIGHTER_STATUS_KIND_DAMAGE_AIR, 
-            *FIGHTER_STATUS_KIND_DAMAGE_FLY, 
-            *FIGHTER_STATUS_KIND_DAMAGE_FLY_ROLL, 
-            *FIGHTER_STATUS_KIND_DAMAGE_FLY_METEOR, 
-            *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_D, 
-            *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_U, 
-            *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_LR, 
-            *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_JUMP_BOARD,
-            *FIGHTER_STATUS_KIND_FURAFURA,
-            *FIGHTER_STATUS_KIND_ICE]
-            .contains(&status) {
-            if ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_HI) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_LW) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_L) || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_R) {
-                macros::EFFECT(fighter, Hash40::new("sys_kusudama"), Hash40::new("top"), 0, 28, 0, 0, 0, 0, 0.75, 0, 0, 0, 0, 0, 0, false); //confetti!
-            }
-        }
+        //flag check for hitfalling
+        if WorkModule::is_flag(fighter.module_accessor, crate::consts::FIGHTER_STATUS_ATTACK_WORK_FLAG_HITFALL) {
+            crate::consts::common_attack_hitfall_flag(fighter);
+        }            
+        
 
-
-        //Shield dropping through platforms using the taunt button or holding the stick diagonal down
+        //Shield dropping through platforms using the taunt button or holding the stick diagonal down (works)
         if [*FIGHTER_STATUS_KIND_GUARD, *FIGHTER_STATUS_KIND_GUARD_DAMAGE, *FIGHTER_STATUS_KIND_GUARD_ON].contains(&status) {
             if GroundModule::is_passable_ground(fighter.module_accessor) {
                 if (ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_HI) 
                 || ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_LW) 
                 || ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_L) 
                 || ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_R)) 
-                
+                    
                 || (sticky <= -0.65 && (stickx >= 0.4 || stickx <= -0.4)) {
                     GroundModule::pass_floor(fighter.module_accessor);
                 }
@@ -413,8 +464,36 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
             }
         }
 
+        //Shield drop while your shield is being hit by holding down
+        if status == *FIGHTER_STATUS_KIND_GUARD_DAMAGE {
+            if sticky <= -0.7 {
+                GroundModule::pass_floor(fighter.module_accessor);
+            }
+        }
 
-        //fall through platforms by holding down during an aerial
+
+        //salty confetti (works)
+        if [*FIGHTER_STATUS_KIND_DAMAGE, 
+        *FIGHTER_STATUS_KIND_DAMAGE_AIR, 
+        *FIGHTER_STATUS_KIND_DAMAGE_FLY, 
+        *FIGHTER_STATUS_KIND_DAMAGE_FLY_ROLL, 
+        *FIGHTER_STATUS_KIND_DAMAGE_FLY_METEOR, 
+        *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_D, 
+        *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_U, 
+        *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_LR, 
+        *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_JUMP_BOARD,
+        *FIGHTER_STATUS_KIND_FURAFURA,
+        *FIGHTER_STATUS_KIND_ICE].contains(&status) {
+            if ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_HI) 
+            || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_LW) 
+            || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_L) 
+            || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_R) {
+                macros::EFFECT(fighter, Hash40::new("sys_kusudama"), Hash40::new("top"), 0, 28, 0, 0, 0, 0, 0.75, 0, 0, 0, 0, 0, 0, false); //confetti!
+            }
+        }
+
+
+        //fall through platforms by holding down during an aerial/zair (works)
         if [*FIGHTER_STATUS_KIND_ATTACK_AIR, 
             *FIGHTER_STATUS_KIND_AIR_LASSO,
             *FIGHTER_TRAIL_STATUS_KIND_ATTACK_AIR_F, 
@@ -429,7 +508,7 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
             }
         }
 
-        //DACUS (allows dash attacks to cancel into Up/Down Smash)
+        //DACUS (allows dash attacks to cancel into Up/Down Smash) (works)
         if MotionModule::motion_kind(module_accessor) == hash40("attack_dash") && MotionModule::frame(module_accessor) <= (9.0) {
             if sticky > 0.5 && ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_ATTACK) {
                 StatusModule::change_status_request_from_script(module_accessor, *FIGHTER_STATUS_KIND_ATTACK_HI4_START, true);
@@ -439,28 +518,45 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
             }
         }
 
-        //perfect pivot on dash/turndash
-        if (MotionModule::motion_kind(module_accessor) == hash40("dash") || MotionModule::motion_kind(module_accessor) == hash40("turn_dash")) && MotionModule::frame(module_accessor) <= (40.0) {
-            if stickx_directional < -0.25 { //-0.5
+        
+        //perfect pivot on dash (does not work properly)
+        if MotionModule::motion_kind(module_accessor) == hash40("dash") && MotionModule::frame(module_accessor) <= (15.0) {
+            if stickx_directional < -0.5 && sticky > 0.65 { //-0.5
+                StatusModule::change_status_request_from_script(module_accessor, *FIGHTER_STATUS_KIND_TURN, true);
+                println!("Perfect pivot lets go!");
+            };
+        };
+
+        
+        //perfect pivot on turndash (does not work properly)
+        if MotionModule::motion_kind(module_accessor) == hash40("turn_dash") && MotionModule::frame(module_accessor) <= (15.0) {
+            if stickx_directional < -0.5 && sticky > 0.65 { //-0.5
                 StatusModule::change_status_request_from_script(module_accessor, *FIGHTER_STATUS_KIND_TURN, true);
                 println!("Perfect pivot lets go!");
             };
         };
 
 
-        //Shield after starting a dash
+        //backdashes on non-FGCs have set speed, allowing them to dashdance normally (works)
+        if dashdance_handler(fighter) && [*FIGHTER_STATUS_KIND_TURN_DASH].contains(&status) && MotionModule::frame(fighter.module_accessor) <= (1.0) {
+            macros::SET_SPEED_EX(fighter, 0.3, 0.0, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
+        }
+
+
+        //Shield after starting a dash (works but had to be modified)
         if [*FIGHTER_STATUS_KIND_DASH, *FIGHTER_STATUS_KIND_TURN_DASH].contains(&status) {
             if sticky <= -0.6 {
                 StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_SQUAT, true);
             }
             if MotionModule::frame(fighter.module_accessor) >= 4.0 {
-                if ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_GUARD) {
+                if ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_GUARD) && ControlModule::check_button_off(fighter.module_accessor, *CONTROL_PAD_BUTTON_CATCH) {
                     StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_GUARD_ON, false);
                 }
             }
         }
 
-        //Shield or crouch after starting a brake
+            
+        //Shield or crouch after starting a brake (works I think)
         if [*FIGHTER_STATUS_KIND_RUN_BRAKE, *FIGHTER_STATUS_KIND_TURN_RUN_BRAKE].contains(&status) {
             if sticky <= -0.6 {
                 StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_SQUAT, true);
@@ -468,62 +564,85 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
             if MotionModule::frame(fighter.module_accessor) >= 6.0 {
                 if ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_GUARD) {
                     StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_GUARD_ON, false);
-                }
-                
+                }        
             }
         }
 
 
-        //cancel Jab1 with Ftilt
+        //cancel Jab1 with Ftilt (works)
         if MotionModule::motion_kind(fighter.module_accessor) == hash40("attack_11") {
-            if can_jab1_cancel_to_ftilt(fighter) && AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false {
+            let hitlag_frame = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_HIT_STOP_ATTACK_SUSPEND_FRAME);
+            if can_jab1_cancel_to_ftilt(fighter) 
+            && AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) 
+            && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false 
+            && hitlag_frame <= 0 {
                 WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_S3);
                 fighter.sub_transition_group_check_ground_attack();
             }
         }
 
-        //cancel Jab1 with Utilt
+        //cancel Jab1 with Utilt (works)
         if MotionModule::motion_kind(fighter.module_accessor) == hash40("attack_11") {
-            if can_jab1_cancel_to_utilt(fighter) && AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false {
+            let hitlag_frame = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_HIT_STOP_ATTACK_SUSPEND_FRAME);
+            if can_jab1_cancel_to_utilt(fighter) 
+            && AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) 
+            && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false 
+            && hitlag_frame <= 0 {
                 WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_HI3);
                 fighter.sub_transition_group_check_ground_attack();
             }
         }
 
-        //cancel Jab1 with Dtilt
+        //cancel Jab1 with Dtilt (works)
         if MotionModule::motion_kind(fighter.module_accessor) == hash40("attack_11") {
-            if can_jab1_cancel_to_dtilt(fighter) && AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false {
+            let hitlag_frame = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_HIT_STOP_ATTACK_SUSPEND_FRAME);
+            if can_jab1_cancel_to_dtilt(fighter) 
+            && AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) 
+            && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false 
+            && hitlag_frame <= 0 {
                 WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_LW3);
                 fighter.sub_transition_group_check_ground_attack();
             }
         }
 
-        //cancel Jab2 with Ftilt
+        //cancel Jab2 with Ftilt (works)
         if MotionModule::motion_kind(fighter.module_accessor) == hash40("attack_12") {
-            if can_jab2_cancel_to_ftilt(fighter) && AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false {
+            let hitlag_frame = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_HIT_STOP_ATTACK_SUSPEND_FRAME);
+            if can_jab2_cancel_to_ftilt(fighter) 
+            && AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) 
+            && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false 
+            && hitlag_frame <= 0 {
                 WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_S3);
                 fighter.sub_transition_group_check_ground_attack();
             }
         }
 
-        //cancel Jab2 with Utilt
+        //cancel Jab2 with Utilt (works)
         if MotionModule::motion_kind(fighter.module_accessor) == hash40("attack_12") {
-            if can_jab2_cancel_to_utilt(fighter) && AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false {
+            let hitlag_frame = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_HIT_STOP_ATTACK_SUSPEND_FRAME);
+            if can_jab2_cancel_to_utilt(fighter) 
+            && AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) 
+            && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false 
+            && hitlag_frame <= 0 {
                 WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_HI3);
                 fighter.sub_transition_group_check_ground_attack();
             }
         }
 
-        //cancel Jab2 with Dtilt
+        //cancel Jab2 with Dtilt (works)
         if MotionModule::motion_kind(fighter.module_accessor) == hash40("attack_12") {
-            if can_jab2_cancel_to_dtilt(fighter) && AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false {
+            let hitlag_frame = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_HIT_STOP_ATTACK_SUSPEND_FRAME);
+            if can_jab2_cancel_to_dtilt(fighter) 
+            && AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) 
+            && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false 
+            && hitlag_frame <= 0 {
                 WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_LW3);
                 fighter.sub_transition_group_check_ground_attack();
             }
         }
+
         
-
-        //global ledge cancelling on aerial landings, light/heavy landing, special fall landings and taunts 
+        //global ledge cancelling on aerial landings, light/heavy landing, special fall landings and taunts (works, experimenting with idle doing this)
         if [*FIGHTER_STATUS_KIND_LANDING_ATTACK_AIR, 
         *FIGHTER_STATUS_KIND_LANDING, 
         *FIGHTER_STATUS_KIND_LANDING_LIGHT, 
@@ -534,24 +653,18 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
         }
 
 
-        //fastfall in tumble and zair
+        //fastfall in tumble and zair (works)
         if [*FIGHTER_STATUS_KIND_DAMAGE_FALL, *FIGHTER_STATUS_KIND_AIR_LASSO].contains(&status) {
             fastfall_helper(fighter);
         }
 
 
-        //disables jostle on pivot grabs
+        //disables jostle on pivot grabs (works)
         if [*FIGHTER_STATUS_KIND_CATCH_TURN].contains(&status) {
             JostleModule::set_status(fighter.module_accessor, false);
         }
 
-        //backdashes on non-FGCs have zero speed, allowing them to dashdance normally
-        if dashdance_handler(fighter) && [*FIGHTER_STATUS_KIND_TURN_DASH].contains(&status) && MotionModule::frame(fighter.module_accessor) <= (1.0) {
-            macros::SET_SPEED_EX(fighter, 0.0, 0.0, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
-        }
-
-
-        //act out of ledge faster
+        //act out of ledge faster (works)
         let fighter_kind = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_KIND);
         if [*FIGHTER_STATUS_KIND_CLIFF_CATCH_MOVE,
         *FIGHTER_STATUS_KIND_CLIFF_CATCH,
@@ -563,7 +676,7 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
             }
         }
 
-        //cancel tech roll with Smash Attacks
+        //cancel techs with Smash Attacks (works)
         if status == *FIGHTER_STATUS_KIND_PASSIVE_FB {
             if MotionModule::frame(module_accessor) > 14.0 {
                 WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_S4_START);
@@ -573,27 +686,75 @@ pub fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
             }
         }
 
-        //cancel standard tech with Smash Attacks and Jab
         if status == *FIGHTER_STATUS_KIND_PASSIVE {
             if MotionModule::frame(module_accessor) > 10.0 {
                 WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_S4_START);
                 WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_HI4_START);
                 WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_LW4_START);
-                if fighter_kind == *FIGHTER_KIND_METAKNIGHT {
-                    WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_100);
-                }
-                else {
-                    WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK);
-                }
                 fighter.sub_transition_group_check_ground_attack();
             }
         }
 
-        //being thrown forces an item drop
-
+        //being thrown forces an item drop (works)
         if status == *FIGHTER_STATUS_KIND_THROWN {
             ItemModule::drop_item(fighter.module_accessor, 0.0, 0.0, 0);
         }
+
+
+        //airdodges can be canceled with a wall jump
+        if [*FIGHTER_STATUS_KIND_ESCAPE_AIR, *FIGHTER_STATUS_KIND_ESCAPE_AIR_SLIDE].contains(&status)  {
+            let touch_right = GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_RIGHT_SIDE as u32);
+            let touch_left = GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_LEFT_SIDE as u32);
+            let touch_side =  GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_SIDE as u32);
+            if touch_left || touch_right || touch_side {
+                if stickx_directional <= -0.5 { 
+                    StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_WALL_JUMP, false);
+                }
+            }
+        }
+
+        
+
+        //Hold buffer clears after 12 frames
+        /*let control_pad = [
+        *CONTROL_PAD_BUTTON_APPEAL_HI, 
+        *CONTROL_PAD_BUTTON_APPEAL_LW, 
+        *CONTROL_PAD_BUTTON_APPEAL_S_L, 
+        *CONTROL_PAD_BUTTON_APPEAL_S_R, 
+        *CONTROL_PAD_BUTTON_ATTACK, 
+        *CONTROL_PAD_BUTTON_ATTACK_RAW, 
+        *CONTROL_PAD_BUTTON_CATCH, 
+        *CONTROL_PAD_BUTTON_CSTICK_ON,
+        *CONTROL_PAD_BUTTON_FLICK_JUMP, 
+        *CONTROL_PAD_BUTTON_GUARD, 
+        *CONTROL_PAD_BUTTON_GUARD_HOLD, 
+        *CONTROL_PAD_BUTTON_INVALID, 
+        *CONTROL_PAD_BUTTON_JUMP, 
+        *CONTROL_PAD_BUTTON_JUMP_MINI, 
+        *CONTROL_PAD_BUTTON_SMASH, 
+        *CONTROL_PAD_BUTTON_SPECIAL, 
+        *CONTROL_PAD_BUTTON_SPECIAL_RAW, 
+        *CONTROL_PAD_BUTTON_SPECIAL_RAW2, 
+        *CONTROL_PAD_BUTTON_STOCK_SHARE, 
+        *CONTROL_PAD_BUTTON_TERM, 
+        *CONTROL_PAD_CLATTER_CAUSE_NONE, 
+        *CONTROL_PAD_CLATTER_FLOWER, 
+        *CONTROL_PAD_CLATTER_MAIN, 
+        *CONTROL_PAD_CLATTER_NONE,
+        *CONTROL_PAD_CLATTER_TERM, 
+        *CONTROL_PAD_STICK_REVERSE_ALL, 
+        *CONTROL_PAD_STICK_REVERSE_NONE, 
+        *CONTROL_PAD_STICK_REVERSE_X, 
+        *CONTROL_PAD_STICK_REVERSE_Y];
+        for i in control_pad {
+            if ControlModule::get_trigger_count(module_accessor, i as u8) > 12 && ControlModule::check_button_on(module_accessor, i)
+            && ![*FIGHTER_STATUS_KIND_GUARD, *FIGHTER_STATUS_KIND_GUARD_ON, *FIGHTER_STATUS_KIND_GUARD_DAMAGE, *FIGHTER_STATUS_KIND_GUARD_OFF].contains(&status) {
+                ControlModule::reset_trigger(module_accessor);
+                ControlModule::clear_command(module_accessor, true);
+            }
+        }*/
+
+
 
     }
 }
@@ -652,7 +813,7 @@ unsafe fn add_motion_2nd_hook(boma: &mut BattleObjectModuleAccessor, motion_kind
 
 
 // Use this for general per-frame weapon-level hooks
-#[weapon_frame_callback]
+/*#[weapon_frame_callback]
 pub fn global_weapon_frame(fighter_base : &mut L2CFighterBase) {
     unsafe {
         let module_accessor = smash::app::sv_system::battle_object_module_accessor(fighter_base.lua_state_agent);
@@ -662,7 +823,7 @@ pub fn global_weapon_frame(fighter_base : &mut L2CFighterBase) {
             println!("[Weapon Hook] Frame : {}", frame);
         }
     }
-}
+}*/
 
 
 
@@ -671,25 +832,24 @@ fn nro_hook(info: &skyline::nro::NroInfo) {
         skyline::install_hooks!(
             status_landing_main_sub,
             escape_air_subtransition,
-            status_guard_main_common
+            status_guard_main_common,
+            status_rebirth_main
         );
     }
 }
 
+
 pub fn install() {
     
-    smashline::install_agent_frame_callbacks!(
-        global_fighter_frame,
-        global_weapon_frame
-    );
+    Agent::new("common")
+    .on_line(Main, global_fighter_frame)
+    .install();
+
     skyline::install_hooks!(
         set_fighter_status_data_hook,
         change_kinetic_hook,
         add_motion_2nd_hook
     );
-    /*smashline::install_status_scripts!(
-        status_pre_escape_air
-    );*/
     skyline::nro::add_hook(nro_hook);
     
 }

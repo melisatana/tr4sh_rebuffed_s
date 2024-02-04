@@ -7,13 +7,14 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase, L2CFighterBase};
 use smashline::*;
 use smash_script::*;
+use crate::custom::global_fighter_frame;
 
 static mut EDGE_FLARE_IS_HITSTUN : [bool; 8] = [false; 8];
 
 // A Once-Per-Fighter-Frame that only applies to Sephiroth
-#[fighter_frame( agent = FIGHTER_KIND_EDGE )]
-fn edge_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn edge_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         let status = StatusModule::status_kind(fighter.module_accessor);
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
@@ -41,8 +42,8 @@ fn edge_frame(fighter: &mut L2CFighterCommon) {
 
 }
 
-#[weapon_frame( agent = WEAPON_KIND_EDGE_FIRE )]
-pub fn edge_gigaflare_weapon_frame(weapon : &mut L2CFighterBase) {
+//#[weapon_frame( agent = WEAPON_KIND_EDGE_FIRE )]
+pub unsafe extern "C" fn edge_gigaflare_weapon_frame(weapon : &mut L2CFighterBase) {
     unsafe {
         let status = StatusModule::status_kind(weapon.module_accessor);
         let owner_module_accessor = &mut *sv_battle_object::module_accessor((WorkModule::get_int(weapon.module_accessor, *WEAPON_INSTANCE_WORK_ID_INT_LINK_OWNER)) as u32);
@@ -69,10 +70,7 @@ pub fn edge_gigaflare_weapon_frame(weapon : &mut L2CFighterBase) {
     }
 }
 
-
-
-#[acmd_script( agent = "edge", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn edge_jab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_jab_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 2.0, 3.0);
     }
@@ -100,8 +98,7 @@ unsafe fn edge_jab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_attack12", category = ACMD_GAME )]
-unsafe fn edge_jab2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_jab2_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 4.0, 3.0);
     }
@@ -128,8 +125,7 @@ unsafe fn edge_jab2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_attack13", category = ACMD_GAME )]
-unsafe fn edge_jab3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_jab3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.8, 34, 105, 0, 70, 3.8, 0.0, 7.5, 5.8, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_SWORD);
@@ -150,8 +146,7 @@ unsafe fn edge_jab3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn edge_dashattack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -172,8 +167,7 @@ unsafe fn edge_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_attacks3", category = ACMD_GAME )]
-unsafe fn edge_ftilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -202,8 +196,7 @@ unsafe fn edge_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_attacks3hi", category = ACMD_GAME )]
-unsafe fn edge_ftilt2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_ftilt2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -231,8 +224,7 @@ unsafe fn edge_ftilt2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_attacks3lw", category = ACMD_GAME )]
-unsafe fn edge_ftilt3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_ftilt3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -260,8 +252,7 @@ unsafe fn edge_ftilt3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn edge_utilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_utilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 3.5);
@@ -310,8 +301,7 @@ unsafe fn edge_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn edge_dtilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -341,8 +331,7 @@ unsafe fn edge_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn edge_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -391,8 +380,7 @@ unsafe fn edge_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn edge_usmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -451,8 +439,7 @@ unsafe fn edge_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn edge_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 3.0);
@@ -498,8 +485,7 @@ unsafe fn edge_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn edge_nair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_nair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -530,8 +516,7 @@ unsafe fn edge_nair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn edge_fair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_fair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -568,8 +553,7 @@ unsafe fn edge_fair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_attackairfwall", category = ACMD_GAME )]
-unsafe fn edge_fair_wallstab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_fair_wallstab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_NONE);
@@ -588,8 +572,7 @@ unsafe fn edge_fair_wallstab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn edge_bair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_bair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -615,8 +598,7 @@ unsafe fn edge_bair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn edge_uair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_uair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -655,8 +637,7 @@ unsafe fn edge_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }   
 
-#[acmd_script( agent = "edge", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn edge_dair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_dair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::SET_SPEED_EX(fighter, 0.0, 1.0, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
         FighterAreaModuleImpl::enable_fix_jostle_area_xy(fighter.module_accessor, 1.0, 4.0, 8.0, 3.0);
@@ -687,8 +668,7 @@ unsafe fn edge_dair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_landingairlw", category = ACMD_GAME )]
-unsafe fn edge_dair_landing_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_dair_landing_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.0, 361, 70, 0, 70, 2.8, 0.0, 2.7, 6.5, Some(0.0), Some(2.7), Some(-6.5), 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_NONE);
         macros::ATTACK(fighter, 1, 0, Hash40::new("swordl1"), 7.0, 270, 73, 0, 58, 2.2, 3.0, -2.0, 0.0, Some(24.0), Some(-2.0), Some(1.5), 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_bury"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
@@ -699,8 +679,7 @@ unsafe fn edge_dair_landing_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_catch", category = ACMD_GAME )]
-unsafe fn edge_grab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_grab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         GrabModule::set_rebound(fighter.module_accessor, true);
@@ -720,8 +699,7 @@ unsafe fn edge_grab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn edge_grabd_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_grabd_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -743,8 +721,7 @@ unsafe fn edge_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn edge_grabp_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_grabp_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -766,8 +743,7 @@ unsafe fn edge_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn edge_fthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.0, 28, 68, 0, 70, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -787,8 +763,7 @@ unsafe fn edge_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn edge_bthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 3.5, 65, 90, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_B, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -816,8 +791,7 @@ unsafe fn edge_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn edge_uthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.1, 98, 122, 0, 70, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -849,8 +823,7 @@ unsafe fn edge_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn edge_dthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.5, 51, 84, 0, 64, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -871,8 +844,7 @@ unsafe fn edge_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", scripts = ["game_specialnstart", "game_specialairnstart"], category = ACMD_GAME, low_priority )]
-unsafe fn edge_neutralb_charge_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_neutralb_charge_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
         WorkModule::set_int(fighter.module_accessor, *FIGHTER_EDGE_SPECIAL_N_S, *FIGHTER_EDGE_STATUS_SPECIAL_N_WORK_INT_CHARGE_KIND);
@@ -899,8 +871,7 @@ unsafe fn edge_neutralb_charge_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", scripts = ["game_specialn1", "game_specialairn1"], category = ACMD_GAME, low_priority )]
-unsafe fn edge_neutralb_1_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_neutralb_1_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 13.0);
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_EDGE_GENERATE_ARTICLE_FIRE, false, -1);
@@ -915,8 +886,7 @@ unsafe fn edge_neutralb_1_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", scripts = ["game_specialn2", "game_specialairn2"], category = ACMD_GAME, low_priority )]
-unsafe fn edge_neutralb_2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_neutralb_2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 13.0);
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_EDGE_GENERATE_ARTICLE_FIRE, false, -1);
@@ -931,8 +901,7 @@ unsafe fn edge_neutralb_2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge_fire", script = "game_bursts", category = ACMD_GAME )]
-unsafe fn flare_explode(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn flare_explode(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ControlModule::set_rumble(fighter.module_accessor, Hash40::new("rbkind_furafura"), 9, false, 0);
     }
@@ -949,8 +918,7 @@ unsafe fn flare_explode(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge_fire", script = "game_burstm", category = ACMD_GAME )]
-unsafe fn megaflare_explode(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn megaflare_explode(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ControlModule::set_rumble(fighter.module_accessor, Hash40::new("rbkind_furafura"), 14, false, 0);
     }
@@ -975,8 +943,7 @@ unsafe fn megaflare_explode(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge_fire", script = "game_burstl", category = ACMD_GAME )]
-unsafe fn gigaflare_explode(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gigaflare_explode(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ControlModule::set_rumble(fighter.module_accessor, Hash40::new("rbkind_furafura"), 16, false, 0);
     }
@@ -1011,8 +978,7 @@ unsafe fn gigaflare_explode(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge_flare1", script = "game_fly", category = ACMD_GAME, low_priority )]
-unsafe fn shadowflare_fly(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shadowflare_fly(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         AttackModule::disable_tip(fighter.module_accessor);
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.5, 361, 30, 0, 10, 3.5, 0.0, -1.0, 0.0, Some(0.0), Some(-1.0), Some(-8.0), 0.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 9, -1.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_MAGIC);
@@ -1022,8 +988,7 @@ unsafe fn shadowflare_fly(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_specialhi1", category = ACMD_GAME )]
-unsafe fn edge_upb_slash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_upb_slash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
         JostleModule::set_status(fighter.module_accessor, false);
@@ -1038,8 +1003,7 @@ unsafe fn edge_upb_slash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_specialhi2end", category = ACMD_GAME )]
-unsafe fn edge_upb_octaslash_end_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_upb_octaslash_end_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("rot"), 9.3, 361, 109, 0, 68, 10.0, 0.0, 0.0, 6.0, None, None, None, 2.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
@@ -1053,8 +1017,7 @@ unsafe fn edge_upb_octaslash_end_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", script = "game_specialairhi2end", category = ACMD_GAME )]
-unsafe fn edge_upb_octaslash_end_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_upb_octaslash_end_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 4.0, 3.0);
     }
@@ -1080,8 +1043,7 @@ unsafe fn edge_upb_octaslash_end_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge_flash", script = "game_attack", category = ACMD_GAME )]
-unsafe fn scintilla_projectile(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn scintilla_projectile(fighter: &mut L2CAgentBase) {
     //WorkModule::is_flag(fighter.module_accessor, *WEAPON_EDGE_FLASH_INSTANCE_WORK_ID_FLAG_HIT);
     //if(methodlib::L2CValue::operator==(lib::L2CValueconst&)const(false, false)){;
     if WorkModule::is_flag(fighter.module_accessor, *WEAPON_EDGE_FLASH_INSTANCE_WORK_ID_FLAG_HIT) == false {
@@ -1118,8 +1080,7 @@ unsafe fn scintilla_projectile(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "edge", scripts = ["game_appeallwl", "game_appeallwr"], category = ACMD_GAME, low_priority )]
-unsafe fn edge_uptaunt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn edge_downtaunt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 15.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 0.85);
@@ -1131,50 +1092,63 @@ unsafe fn edge_uptaunt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
+
 pub fn install() {
-    smashline::install_agent_frames!(
-        edge_frame,
-        edge_gigaflare_weapon_frame
-    );
-    smashline::install_acmd_scripts!(
-        edge_jab_smash_script,
-        edge_jab2_smash_script,
-        edge_jab3_smash_script,
-        edge_dashattack_smash_script,
-        edge_ftilt_smash_script,
-        edge_ftilt2_smash_script,
-        edge_ftilt3_smash_script,
-        edge_utilt_smash_script,
-        edge_dtilt_smash_script,
-        edge_fsmash_smash_script,
-        edge_usmash_smash_script,
-        edge_dsmash_smash_script,
-        edge_nair_smash_script,
-        edge_fair_smash_script,
-        edge_fair_wallstab_smash_script,
-        edge_bair_smash_script,
-        edge_uair_smash_script,
-        edge_dair_smash_script,
-        edge_dair_landing_smash_script,
-        edge_grab_smash_script,
-        edge_grabd_smash_script,
-        edge_grabp_smash_script,
-        edge_fthrow_smash_script,
-        edge_bthrow_smash_script,
-        edge_uthrow_smash_script,
-        edge_dthrow_smash_script,
-        edge_neutralb_charge_smash_script,
-        edge_neutralb_1_smash_script,
-        edge_neutralb_2_smash_script,
-        flare_explode,
-        megaflare_explode,
-        gigaflare_explode,
-        shadowflare_fly,
-        edge_upb_slash_smash_script,
-        edge_upb_octaslash_end_smash_script,
-        edge_upb_octaslash_end_air_smash_script,
-        scintilla_projectile,
-        edge_uptaunt_smash_script
-        
-    );
+    Agent::new("edge")
+    .on_line(Main, edge_frame) //opff
+    .game_acmd("game_attack11", edge_jab_smash_script)
+    .game_acmd("game_attack12", edge_jab2_smash_script)
+    .game_acmd("game_attack13", edge_jab3_smash_script)
+    .game_acmd("game_attackdash", edge_dashattack_smash_script)
+    .game_acmd("game_attacks3", edge_ftilt_smash_script)
+    .game_acmd("game_attacks3hi", edge_ftilt2_smash_script)
+    .game_acmd("game_attacks3lw", edge_ftilt3_smash_script)
+    .game_acmd("game_attackhi3", edge_utilt_smash_script)
+    .game_acmd("game_attacklw3", edge_dtilt_smash_script)
+    .game_acmd("game_attacks4", edge_fsmash_smash_script)
+    .game_acmd("game_attackhi4", edge_usmash_smash_script)
+    .game_acmd("game_attacklw4", edge_dsmash_smash_script)
+    .game_acmd("game_attackairn", edge_nair_smash_script)
+    .game_acmd("game_attackairf", edge_fair_smash_script)
+    .game_acmd("game_attackairfwall", edge_fair_wallstab_smash_script)
+    .game_acmd("game_attackairb", edge_bair_smash_script)
+    .game_acmd("game_attackairhi", edge_uair_smash_script)
+    .game_acmd("game_attackairlw", edge_dair_smash_script)
+    .game_acmd("game_landingairlw", edge_dair_landing_smash_script)
+    .game_acmd("game_catch", edge_grab_smash_script)
+    .game_acmd("game_catchdash", edge_grabd_smash_script)
+    .game_acmd("game_catchturn", edge_grabp_smash_script)
+    .game_acmd("game_throwf", edge_fthrow_smash_script)
+    .game_acmd("game_throwb", edge_bthrow_smash_script)
+    .game_acmd("game_throwhi", edge_uthrow_smash_script)
+    .game_acmd("game_throwlw", edge_dthrow_smash_script)
+    .game_acmd("game_specialnstart", edge_neutralb_charge_smash_script)
+    .game_acmd("game_specialairnstart", edge_neutralb_charge_smash_script)
+    .game_acmd("game_specialn1", edge_neutralb_1_smash_script)
+    .game_acmd("game_specialairn1", edge_neutralb_1_smash_script)
+    .game_acmd("game_specialn2", edge_neutralb_2_smash_script)
+    .game_acmd("game_specialairn2", edge_neutralb_2_smash_script)
+    .game_acmd("game_specialhi1", edge_upb_slash_smash_script)
+    .game_acmd("game_specialhi2end", edge_upb_octaslash_end_smash_script)
+    .game_acmd("game_specialairhi2end", edge_upb_octaslash_end_air_smash_script)
+    .game_acmd("game_appeallwl", edge_downtaunt_smash_script)
+    .game_acmd("game_appeallwr", edge_downtaunt_smash_script)
+    .install();
+
+    Agent::new("edge_fire")
+    .on_line(Main, edge_gigaflare_weapon_frame)
+    .game_acmd("game_bursts", flare_explode)
+    .game_acmd("game_burstm", megaflare_explode)
+    .game_acmd("game_burstl", gigaflare_explode)
+    .install();
+
+
+    Agent::new("edge_flare1")
+    .game_acmd("game_fly", shadowflare_fly)
+    .install();
+
+    Agent::new("edge_flash")
+    .game_acmd("game_attack", scintilla_projectile)
+    .install();
+
 }

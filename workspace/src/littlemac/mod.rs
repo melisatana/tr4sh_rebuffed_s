@@ -7,6 +7,7 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
+use crate::custom::global_fighter_frame;
 
 
 static mut LITTLEMAC_DOWNB_PRESSED : [bool; 8] = [false; 8];
@@ -16,13 +17,13 @@ static mut LITTLEMAC_NEUTRALB_CHARGE_START : [bool; 8] = [false; 8];
 static mut LITTLEMAC_NEUTRALB_CHARGEUP : [f32; 8] = [0.0; 8];
 
 // A Once-Per-Fighter-Frame that only applies to Little Mac
-#[fighter_frame( agent = FIGHTER_KIND_LITTLEMAC )]
-fn littlemac_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn littlemac_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
         
-        println!("It'sa me, Little Mac, it's time to Punch-Out!!");
+        //println!("It'sa me, Little Mac, it's time to Punch-Out!!");
 
         if WorkModule::get_float(fighter.module_accessor, *FIGHTER_LITTLEMAC_INSTANCE_WORK_ID_FLOAT_KO_GAGE) < 0.0 {
             WorkModule::set_float(fighter.module_accessor, 0.0, *FIGHTER_LITTLEMAC_INSTANCE_WORK_ID_FLOAT_KO_GAGE);
@@ -58,8 +59,7 @@ fn littlemac_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-#[fighter_frame( agent = FIGHTER_KIND_KIRBY )]
-fn kirby_littlemachat_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn kirby_littlemachat_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
@@ -77,9 +77,7 @@ fn kirby_littlemachat_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-
-#[acmd_script( agent = "littlemac", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn littlemac_jab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_WORK_ID_FLAG_RESERVE_ATTACK_DISABLE_MINI_JUMP_ATTACK);
@@ -103,8 +101,7 @@ unsafe fn littlemac_jab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_attack12", category = ACMD_GAME )]
-unsafe fn littlemac_jab2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_jab2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_WORK_ID_FLAG_RESERVE_ATTACK_DISABLE_MINI_JUMP_ATTACK);
@@ -137,8 +134,7 @@ unsafe fn littlemac_jab2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_attack13", category = ACMD_GAME )]
-unsafe fn littlemac_jab3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_jab3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.0);
@@ -155,8 +151,7 @@ unsafe fn littlemac_jab3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_attack100", category = ACMD_GAME )]
-unsafe fn littlemac_jab100_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_jab100_smash_script(fighter: &mut L2CAgentBase) {
     for _ in 0..i32::MAX {
         if macros::is_excute(fighter) {
             macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 0.6, 361, 8, 0, 10, 7.0, 0.0, 8.0, 10.5, Some(0.0), Some(8.0), Some(10.5), 0.5, 0.2, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_rush"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
@@ -254,8 +249,7 @@ unsafe fn littlemac_jab100_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_attack100end", category = ACMD_GAME )]
-unsafe fn littlemac_jab100end_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_jab100end_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
@@ -271,8 +265,7 @@ unsafe fn littlemac_jab100end_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn littlemac_dashattack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 0.0, 361, 100, 20, 0, 3.0, 0.0, 6.0, 7.0, Some(0.0), Some(6.0), Some(3.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, true, true, false, *COLLISION_SITUATION_MASK_G_d, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_NONE);
@@ -295,8 +288,7 @@ unsafe fn littlemac_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_attacks3", category = ACMD_GAME )]
-unsafe fn littlemac_ftilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("arml"), 4.2, 60, 100, 22, 0, 3.4, 3.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
@@ -340,8 +332,7 @@ unsafe fn littlemac_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn littlemac_utilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_utilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("armr"), 9.2, 96, 80, 0, 30, 4.7, 3.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
@@ -369,8 +360,7 @@ unsafe fn littlemac_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn littlemac_dtilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_WORK_ID_FLAG_RESERVE_ATTACK_DISABLE_MINI_JUMP_ATTACK);
         JostleModule::set_status(fighter.module_accessor, false);
@@ -399,15 +389,13 @@ unsafe fn littlemac_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_attacks4charge", category = ACMD_GAME )]
-unsafe fn littlemac_fsmash_charge_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_fsmash_charge_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0.0);
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn littlemac_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -432,8 +420,7 @@ unsafe fn littlemac_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_attacks4hi", category = ACMD_GAME )]
-unsafe fn littlemac_fsmash2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_fsmash2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -461,8 +448,7 @@ unsafe fn littlemac_fsmash2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_attacks4lw", category = ACMD_GAME )]
-unsafe fn littlemac_fsmash3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_fsmash3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -488,15 +474,13 @@ unsafe fn littlemac_fsmash3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_attackhi4charge", category = ACMD_GAME )]
-unsafe fn littlemac_usmash_charge_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_usmash_charge_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0.0);
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn littlemac_usmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -526,15 +510,13 @@ unsafe fn littlemac_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_attacklw4charge", category = ACMD_GAME )]
-unsafe fn littlemac_dsmash_charge_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_dsmash_charge_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0.0);
     }
 }
     
-#[acmd_script( agent = "littlemac", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn littlemac_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -584,8 +566,7 @@ unsafe fn littlemac_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn littlemac_nair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_nair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -604,8 +585,7 @@ unsafe fn littlemac_nair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn littlemac_fair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_fair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 4.0);
@@ -632,8 +612,7 @@ unsafe fn littlemac_fair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn littlemac_bair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_bair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -659,8 +638,7 @@ unsafe fn littlemac_bair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn littlemac_uair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_uair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -683,8 +661,7 @@ unsafe fn littlemac_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn littlemac_dair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_dair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -703,8 +680,7 @@ unsafe fn littlemac_dair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_catch", category = ACMD_GAME )]
-unsafe fn littlemac_grab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_grab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -726,8 +702,7 @@ unsafe fn littlemac_grab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn littlemac_grabd_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_grabd_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.25);
@@ -749,8 +724,7 @@ unsafe fn littlemac_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn littlemac_grabp_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_grabp_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.25);
@@ -772,8 +746,7 @@ unsafe fn littlemac_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn littlemac_fthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 4.1, 290, 115, 0, 25, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -792,8 +765,7 @@ unsafe fn littlemac_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn littlemac_bthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 4.0, 45, 170, 0, 50, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -814,8 +786,7 @@ unsafe fn littlemac_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn littlemac_uthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.2, 85, 85, 0, 80, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -834,8 +805,7 @@ unsafe fn littlemac_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn littlemac_dthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 3.0, 60, 88, 0, 50, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -858,9 +828,7 @@ unsafe fn littlemac_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-
-#[acmd_script( agent = "littlemac", scripts = ["game_specialnstart", "game_specialairnstart"], category = ACMD_GAME, low_priority )]
-unsafe fn littlemac_neutralb_start_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_neutralb_start_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -878,8 +846,7 @@ unsafe fn littlemac_neutralb_start_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", scripts = ["game_specialndash", "game_specialairndash"], category = ACMD_GAME, low_priority )]
-unsafe fn littlemac_neutralb_dash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_neutralb_dash_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
@@ -905,8 +872,7 @@ unsafe fn littlemac_neutralb_dash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", scripts = ["game_specialndashturn", "game_specialairndashturn"], category = ACMD_GAME, low_priority )]
-unsafe fn littlemac_neutralb_dash_turn_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_neutralb_dash_turn_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
@@ -936,8 +902,7 @@ unsafe fn littlemac_neutralb_dash_turn_smash_script(fighter: &mut L2CAgentBase) 
     }
 }
 
-#[acmd_script( agent = "littlemac", scripts = ["game_specialnmaxdash", "game_specialairnmaxdash"], category = ACMD_GAME, low_priority )]
-unsafe fn littlemac_neutralb_dash_max_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_neutralb_dash_max_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0);
@@ -971,8 +936,7 @@ unsafe fn littlemac_neutralb_dash_max_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", scripts = ["game_specialnmaxdashturn", "game_specialairnmaxdashturn"], category = ACMD_GAME, low_priority )]
-unsafe fn littlemac_neutralb_dash_max_turn_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_neutralb_dash_max_turn_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0);
@@ -1010,16 +974,14 @@ unsafe fn littlemac_neutralb_dash_max_turn_smash_script(fighter: &mut L2CAgentBa
     }
 }
 
-#[acmd_script( agent = "littlemac", scripts = ["game_specialnmaxdashend", "game_specialairnmaxdashend"], category = ACMD_GAME, low_priority )]
-unsafe fn littlemac_neutralb_dash_max_end_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_neutralb_dash_max_end_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.7142857);
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_specialn2", category = ACMD_GAME )]
-unsafe fn littlemac_neutralb_ko_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_neutralb_ko_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0);
@@ -1027,8 +989,8 @@ unsafe fn littlemac_neutralb_ko_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 9.0);
     if macros::is_excute(fighter) {
         AttackModule::set_damage_shake_scale(fighter.module_accessor, 0.67);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("armr"), 34.0, 80, 90, 0, 25, 4.8, 3.0, 0.0, 0.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 0, false, false, false, true, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 34.0, 80, 90, 0, 25, 4.8, 0.0, 9.0, 5.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 0, false, false, false, true, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("armr"), 34.0, 80, 90, 0, 25, 5.3, 3.0, 0.0, 0.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 0, false, false, false, true, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 34.0, 80, 90, 0, 25, 5.3, 0.0, 9.0, 5.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 0, false, false, false, true, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_PUNCH);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
@@ -1054,8 +1016,7 @@ unsafe fn littlemac_neutralb_ko_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_specialairn2", category = ACMD_GAME )]
-unsafe fn littlemac_neutralb_ko_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_neutralb_ko_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0);
@@ -1063,9 +1024,9 @@ unsafe fn littlemac_neutralb_ko_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 9.0);
     if macros::is_excute(fighter) {
         AttackModule::set_damage_shake_scale(fighter.module_accessor, 0.67);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("armr"), 30.0, 80, 90, 0, 25, 5.3, 3.0, 0.0, 0.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 0, false, false, false, true, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("armr"), 30.0, 80, 90, 0, 25, 3.7, -1.0, 0.0, 0.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 0, false, false, false, true, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("shoulderr"), 30.0, 80, 90, 0, 25, 3.7, 0.0, 0.0, 0.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 0, false, false, false, true, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("armr"), 30.0, 80, 90, 0, 25, 5.8, 3.0, 0.0, 0.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 0, false, false, false, true, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("armr"), 30.0, 80, 90, 0, 25, 4.3, -1.0, 0.0, 0.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 0, false, false, false, true, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("shoulderr"), 30.0, 80, 90, 0, 25, 4.3, 0.0, 0.0, 0.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 0, false, false, false, true, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_PUNCH);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 15.0);
     if macros::is_excute(fighter) {
@@ -1083,8 +1044,7 @@ unsafe fn littlemac_neutralb_ko_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_specialairsblow", category = ACMD_GAME )]
-unsafe fn littlemac_sideb_attack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_sideb_attack_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS_BOTH_SIDES);
     }
@@ -1113,8 +1073,7 @@ unsafe fn littlemac_sideb_attack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_specialhi", category = ACMD_GAME )]
-unsafe fn littlemac_upb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_upb_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::SA_SET(fighter, *SITUATION_KIND_AIR);
     }
@@ -1140,8 +1099,7 @@ unsafe fn littlemac_upb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_speciallwhit", category = ACMD_GAME )]
-unsafe fn littlemac_downb_attack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_downb_attack_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -1197,8 +1155,7 @@ unsafe fn littlemac_downb_attack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", script = "game_specialairlwhit", category = ACMD_GAME )]
-unsafe fn littlemac_downb_attack_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_downb_attack_air_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -1255,8 +1212,7 @@ unsafe fn littlemac_downb_attack_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "littlemac", scripts = ["game_appeallwl", "game_appeallwr"], category = ACMD_GAME, low_priority )]
-unsafe fn littlemac_downtaunt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn littlemac_downtaunt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
         if ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_LW) {
@@ -1267,53 +1223,61 @@ unsafe fn littlemac_downtaunt_smash_script(fighter: &mut L2CAgentBase) {
 
 
 pub fn install() {
-    smashline::install_agent_frames!(
-        littlemac_frame,
-        kirby_littlemachat_frame
-    );
-    smashline::install_acmd_scripts!(
-        littlemac_jab_smash_script,
-        littlemac_jab2_smash_script,
-        littlemac_jab3_smash_script,
-        littlemac_jab100_smash_script,
-        littlemac_jab100end_smash_script,
-        littlemac_dashattack_smash_script,
-        littlemac_ftilt_smash_script,
-        littlemac_utilt_smash_script,
-        littlemac_dtilt_smash_script,
-        littlemac_fsmash_charge_smash_script,
-        littlemac_fsmash_smash_script,
-        littlemac_fsmash2_smash_script,
-        littlemac_fsmash3_smash_script,
-        littlemac_usmash_charge_smash_script,
-        littlemac_usmash_smash_script,
-        littlemac_dsmash_charge_smash_script,
-        littlemac_dsmash_smash_script,
-        littlemac_nair_smash_script,
-        littlemac_fair_smash_script,
-        littlemac_bair_smash_script,
-        littlemac_uair_smash_script,
-        littlemac_dair_smash_script,
-        littlemac_grab_smash_script,
-        littlemac_grabd_smash_script,
-        littlemac_grabp_smash_script,
-        littlemac_fthrow_smash_script,
-        littlemac_bthrow_smash_script,
-        littlemac_uthrow_smash_script,
-        littlemac_dthrow_smash_script,
-        littlemac_neutralb_start_smash_script,
-        littlemac_neutralb_dash_smash_script,
-        littlemac_neutralb_dash_turn_smash_script,
-        littlemac_neutralb_dash_max_smash_script,
-        littlemac_neutralb_dash_max_turn_smash_script,
-        littlemac_neutralb_dash_max_end_smash_script,
-        littlemac_neutralb_ko_smash_script,
-        littlemac_neutralb_ko_air_smash_script,
-        littlemac_sideb_attack_smash_script,
-        littlemac_upb_smash_script,
-        littlemac_downb_attack_smash_script,
-        littlemac_downb_attack_air_smash_script,
-        littlemac_downtaunt_smash_script
-        
-    );
+    Agent::new("littlemac")
+    .on_line(Main, littlemac_frame) //opff
+    .game_acmd("game_attack11", littlemac_jab_smash_script)
+    .game_acmd("game_attack12", littlemac_jab2_smash_script)
+    .game_acmd("game_attack13", littlemac_jab3_smash_script)
+    .game_acmd("game_attack100", littlemac_jab100_smash_script)
+    .game_acmd("game_attack100end", littlemac_jab100end_smash_script)
+    .game_acmd("game_attackdash", littlemac_dashattack_smash_script)
+    .game_acmd("game_attacks3", littlemac_ftilt_smash_script)
+    .game_acmd("game_attackhi3", littlemac_utilt_smash_script)
+    .game_acmd("game_attacklw3", littlemac_dtilt_smash_script)
+    .game_acmd("game_attacks4charge", littlemac_fsmash_charge_smash_script)
+    .game_acmd("game_attacks4", littlemac_fsmash_smash_script)
+    .game_acmd("game_attacks4hi", littlemac_fsmash2_smash_script)
+    .game_acmd("game_attacks4lw", littlemac_fsmash3_smash_script)
+    .game_acmd("game_attackhi4charge", littlemac_usmash_charge_smash_script)
+    .game_acmd("game_attackhi4", littlemac_usmash_smash_script)
+    .game_acmd("game_attacklw4charge", littlemac_dsmash_charge_smash_script)
+    .game_acmd("game_attacklw4", littlemac_dsmash_smash_script)
+    .game_acmd("game_attackairn", littlemac_nair_smash_script)
+    .game_acmd("game_attackairf", littlemac_fair_smash_script)
+    .game_acmd("game_attackairb", littlemac_bair_smash_script)
+    .game_acmd("game_attackairhi", littlemac_uair_smash_script)
+    .game_acmd("game_attackairlw", littlemac_dair_smash_script)
+    .game_acmd("game_catch", littlemac_grab_smash_script)
+    .game_acmd("game_catchdash", littlemac_grabd_smash_script)
+    .game_acmd("game_catchturn", littlemac_grabp_smash_script)
+    .game_acmd("game_throwf", littlemac_fthrow_smash_script)
+    .game_acmd("game_throwb", littlemac_bthrow_smash_script)
+    .game_acmd("game_throwhi", littlemac_uthrow_smash_script)
+    .game_acmd("game_throwlw", littlemac_dthrow_smash_script)
+    .game_acmd("game_specialnstart", littlemac_neutralb_start_smash_script)
+    .game_acmd("game_specialairnstart", littlemac_neutralb_start_smash_script)
+    .game_acmd("game_specialndash", littlemac_neutralb_dash_smash_script)
+    .game_acmd("game_specialairndash", littlemac_neutralb_dash_max_turn_smash_script)
+    .game_acmd("game_specialndashturn", littlemac_neutralb_dash_turn_smash_script)
+    .game_acmd("game_specialairndashturn", littlemac_neutralb_dash_turn_smash_script)
+    .game_acmd("game_specialnmaxdash", littlemac_neutralb_dash_max_smash_script)
+    .game_acmd("game_specialairnmaxdash", littlemac_neutralb_dash_max_smash_script)
+    .game_acmd("game_specialnmaxdashturn", littlemac_neutralb_dash_max_turn_smash_script)
+    .game_acmd("game_specialairnmaxdashturn", littlemac_neutralb_dash_max_turn_smash_script)
+    .game_acmd("game_specialnmaxdashend", littlemac_neutralb_dash_max_end_smash_script)
+    .game_acmd("game_specialairnmaxdashend", littlemac_neutralb_dash_max_end_smash_script)
+    .game_acmd("game_specialn2", littlemac_neutralb_ko_smash_script)
+    .game_acmd("game_specialairn2", littlemac_neutralb_ko_air_smash_script)
+    .game_acmd("game_specialairsblow", littlemac_sideb_attack_smash_script)
+    .game_acmd("game_specialhi", littlemac_upb_smash_script)
+    .game_acmd("game_speciallwhit", littlemac_downb_attack_smash_script)
+    .game_acmd("game_specialairlwhit", littlemac_downb_attack_air_smash_script)
+    .game_acmd("game_appeallwl", littlemac_downtaunt_smash_script)
+    .game_acmd("game_appeallwr", littlemac_downtaunt_smash_script)
+    .install();
+
+    Agent::new("kirby")
+    .on_line(Main, kirby_littlemachat_frame)
+    .install();
+
 }

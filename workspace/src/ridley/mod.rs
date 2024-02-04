@@ -7,19 +7,20 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
+use crate::custom::global_fighter_frame;
 
 static mut RIDLEY_DOWNB_CANCANCEL : [bool; 8] = [false; 8];
 
 
 // A Once-Per-Fighter-Frame that only applies to Ridley
-#[fighter_frame( agent = FIGHTER_KIND_RIDLEY )]
-fn ridley_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn ridley_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
         let stickx = ControlModule::get_stick_x(fighter.module_accessor);
 
-        println!("SKREEEEEEEEEEEEEEE");
+        //println!("SKREEEEEEEEEEEEEEE");
 
         if RIDLEY_DOWNB_CANCANCEL[entry_id] {
             if status == *FIGHTER_STATUS_KIND_SPECIAL_LW {
@@ -53,8 +54,7 @@ fn ridley_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-#[fighter_frame( agent = FIGHTER_KIND_KIRBY )]
-fn kirby_ridleyhat_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn kirby_ridleyhat_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
         let status = StatusModule::status_kind(fighter.module_accessor);
 
@@ -66,14 +66,13 @@ fn kirby_ridleyhat_frame(fighter: &mut L2CFighterCommon) {
 }
 
 
-#[acmd_script( agent = "ridley", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn ridley_jab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.4, 361, 20, 20, 30, 3.9, 0.0, 7.0, 9.5, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 3.4, 180, 10, 10, 25, 3.9, 0.0, 7.0, 13.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 3.4, 180, 15, 16, 25, 4.2, 0.0, 7.0, 16.5, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 3.4, 361, 15, 16, 25, 4.2, 0.0, 7.0, 16.5, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.4, 361, 20, 20, 30, 4.2, 0.0, 7.0, 9.5, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 3.4, 180, 10, 10, 25, 4.2, 0.0, 7.0, 13.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 3.4, 180, 15, 16, 25, 4.6, 0.0, 7.0, 16.5, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 3.4, 361, 15, 16, 25, 4.6, 0.0, 7.0, 16.5, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PUNCH);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 1.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 1.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 2, 1.0, false);
@@ -90,13 +89,12 @@ unsafe fn ridley_jab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_attack12", category = ACMD_GAME )]
-unsafe fn ridley_jab2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_jab2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.1, 361, 20, 22, 30, 4.2, 0.0, 7.0, 9.5, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 3.1, 180, 20, 14, 25, 4.4, 0.0, 7.0, 13.5, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 3.1, 180, 20, 18, 25, 4.6, 0.0, 7.0, 18.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.1, 361, 20, 22, 30, 4.6, 0.0, 7.0, 9.5, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 3.1, 180, 20, 14, 25, 4.8, 0.0, 7.0, 13.5, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 3.1, 180, 20, 18, 25, 5.0, 0.0, 7.0, 18.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PUNCH);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 1.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 1.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 2, 1.0, false);
@@ -120,8 +118,7 @@ unsafe fn ridley_jab2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_attack13", category = ACMD_GAME )]
-unsafe fn ridley_jab3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_jab3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 6.1, 38, 125, 0, 50, 5.3, 0.0, 7.5, 10.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_BITE);
@@ -134,8 +131,7 @@ unsafe fn ridley_jab3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_attack100", category = ACMD_GAME )]
-unsafe fn ridley_jab100_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_jab100_smash_script(fighter: &mut L2CAgentBase) {
     for _ in 0..i32::MAX {
         if macros::is_excute(fighter) {
             macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 0.9, 361, 10, 0, 14, 6.0, 0.0, 7.5, 11.0, None, None, None, 0.5, 0.7, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_TAIL);
@@ -233,8 +229,7 @@ unsafe fn ridley_jab100_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_attack100end", category = ACMD_GAME )]
-unsafe fn ridley_jab100end_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_jab100end_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
@@ -252,13 +247,12 @@ unsafe fn ridley_jab100end_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn ridley_dashattack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 4.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.0);
     }
@@ -266,7 +260,6 @@ unsafe fn ridley_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.3, 80, 100, 0, 70, 8.0, 0.0, 6.5, 14.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_BITE);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 13.3, 80, 100, 0, 70, 6.7, 0.0, 6.5, 9.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_BITE);
-    
     }
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
@@ -275,8 +268,7 @@ unsafe fn ridley_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", scripts = ["game_attacks3", "game_attacks3hi", "game_attacks3lw"], category = ACMD_GAME, low_priority )]
-unsafe fn ridley_ftilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -297,8 +289,15 @@ unsafe fn ridley_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn ridley_utilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_utilt_smash_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        MotionModule::set_rate(fighter.module_accessor, 1.5);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 6.0);
+    if macros::is_excute(fighter) {
+        MotionModule::set_rate(fighter.module_accessor, 1.0);
+    }
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("head"), HitStatus(*HIT_STATUS_XLU), 0);
@@ -328,8 +327,7 @@ unsafe fn ridley_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn ridley_dtilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -352,33 +350,38 @@ unsafe fn ridley_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn ridley_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
-        MotionModule::set_rate(fighter.module_accessor, 2.0);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 15.0);
-    if macros::is_excute(fighter) {
-        MotionModule::set_rate(fighter.module_accessor, 1.0);
+        MotionModule::set_rate(fighter.module_accessor, 2.5);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 17.0);
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 6.0, 7.0);
+        MotionModule::set_rate(fighter.module_accessor, 1.0);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 18.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 19.4, 361, 97, 0, 50, 9.0, 0.0, 8.0, 14.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_BOMB);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 1.7, 366, 100, 60, 0, 9.0, 0.0, 8.0, 14.0, None, None, None, 0.6, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 1, -1.0, 2, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_BOMB);
         shield!(fighter, *MA_MSC_CMD_REFLECTOR, *COLLISION_KIND_REFLECTOR, 0, Hash40::new("top"), 6.5, 0, 17.0, 11.0, 0, 4.0, 11.0, 1.5, 1.5, 50, false, 2.0, *FIGHTER_REFLECTOR_GROUP_HOMERUNBAT);
     }
-    sv_animcmd::wait(fighter.lua_state_agent, 4.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 28.0);
+    if macros::is_excute(fighter) {
+        MotionModule::set_rate(fighter.module_accessor, 0.9);
+        AttackModule::clear_all(fighter.module_accessor);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 30.0);
+    if macros::is_excute(fighter) {
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 11.8, 361, 119, 0, 54, 10.3, 0.0, 8.0, 14.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_BOMB);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 32.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
-        MotionModule::set_rate(fighter.module_accessor, 0.9);
+        MotionModule::set_rate(fighter.module_accessor, 0.75);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
@@ -390,8 +393,28 @@ unsafe fn ridley_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn ridley_usmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_fsmash_effect_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 4.0);
+    if macros::is_excute(fighter) {
+        macros::EFFECT(fighter, Hash40::new("sys_smash_flash"), Hash40::new("top"), -2, 15.5, -3.5, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 17.0);
+    if macros::is_excute(fighter) {
+        macros::EFFECT(fighter, Hash40::new("sys_attack_speedline"), Hash40::new("top"), 0, 11.5, -9, 0, 0, 0, 1.2, 0, 0, 0, 0, 0, 0, true);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 18.0);
+    if macros::is_excute(fighter) {
+        macros::LANDING_EFFECT(fighter, Hash40::new("sys_h_smoke_a"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, false);
+        macros::EFFECT_FOLLOW(fighter, Hash40::new("ridley_smash_bomb"), Hash40::new("top"), 0, 8.5, 15, 0, 0, 0, 1.2, true);
+        macros::LAST_EFFECT_SET_RATE(fighter, 0.9);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 34.0);
+    if macros::is_excute(fighter) {
+        macros::EFFECT(fighter, Hash40::new("ridley_mouth_fire"), Hash40::new("top"), 0, 11, 8.5, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
+    }
+}
+
+unsafe extern "C" fn ridley_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -412,8 +435,7 @@ unsafe fn ridley_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn ridley_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -438,8 +460,7 @@ unsafe fn ridley_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn ridley_nair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_nair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -466,8 +487,7 @@ unsafe fn ridley_nair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn ridley_fair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_fair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -493,8 +513,7 @@ unsafe fn ridley_fair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "effect_attackairf", category = ACMD_EFFECT, low_priority )]
-unsafe fn ridley_fair_effect_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_fair_effect_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         macros::EFFECT_FOLLOW_FLIP(fighter, Hash40::new("ridley_scratch"), Hash40::new("ridley_scratch"), Hash40::new("top"), -1, 11.5, 8.5,/*5.5*/ 8.5, 5.7, 33.2, 1.2, true, *EF_FLIP_YZ);
@@ -502,17 +521,14 @@ unsafe fn ridley_fair_effect_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "sound_attackairf", category = ACMD_SOUND, low_priority )]
-unsafe fn ridley_fair_sound_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_fair_sound_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         macros::PLAY_SE(fighter, Hash40::new("se_ridley_swing_m"));
     }
 }
 
-
-#[acmd_script( agent = "ridley", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn ridley_bair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_bair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -539,11 +555,18 @@ unsafe fn ridley_bair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn ridley_uair_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 5.0);
+unsafe extern "C" fn ridley_uair_smash_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        MotionModule::set_rate(fighter.module_accessor, 2.0);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         JostleModule::set_status(fighter.module_accessor, false);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 8.0);
+    if macros::is_excute(fighter) {
+        MotionModule::set_rate(fighter.module_accessor, 1.0);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
@@ -570,8 +593,7 @@ unsafe fn ridley_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn ridley_dair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_dair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::SET_SPEED_EX(fighter, 0.0, 1.0, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
     }
@@ -600,8 +622,7 @@ unsafe fn ridley_dair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_catch", category = ACMD_GAME )]
-unsafe fn ridley_grab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_grab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -623,8 +644,7 @@ unsafe fn ridley_grab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn ridley_grabd_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_grabd_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -646,8 +666,7 @@ unsafe fn ridley_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn ridley_grabp_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_grabp_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -669,8 +688,7 @@ unsafe fn ridley_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn ridley_fthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 10.8, 38, 53, 0, 66, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -687,8 +705,7 @@ unsafe fn ridley_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn ridley_bthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 8.1, 42, 121, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -707,8 +724,7 @@ unsafe fn ridley_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn ridley_uthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 4.5, 89, 90, 0, 55, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -739,8 +755,7 @@ unsafe fn ridley_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn ridley_dthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 7.1, 53, 70, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -765,22 +780,13 @@ unsafe fn ridley_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_specialnstart", category = ACMD_GAME )]
-unsafe fn ridley_neutralb_start_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_neutralb_start_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.7142857);
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_specialairnstart", category = ACMD_GAME )]
-unsafe fn ridley_neutralb_start_air_smash_script(fighter: &mut L2CAgentBase) {
-    if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.7142857);
-    }
-}
-
-#[acmd_script( agent = "ridley_breath", script = "game_fly", category = ACMD_GAME )]
-unsafe fn fireball_projectile(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn fireball_projectile(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.9, 361, 30, 0, 17, 2.5, 0.0, 0.0, 0.0, None, None, None, 0.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, -2, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_NONE);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 11.0, false);
@@ -792,8 +798,7 @@ unsafe fn fireball_projectile(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_specialsstart", category = ACMD_GAME )]
-unsafe fn ridley_sideb_start_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_sideb_start_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     macros::FT_MOTION_RATE(fighter, 0.6666666667);
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
@@ -843,8 +848,7 @@ unsafe fn ridley_sideb_start_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_specialairsstart", category = ACMD_GAME )]
-unsafe fn ridley_sideb_start_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_sideb_start_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     macros::FT_MOTION_RATE(fighter, 0.6666666667);
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
@@ -891,8 +895,7 @@ unsafe fn ridley_sideb_start_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_specialsdragcliff", category = ACMD_GAME )]
-unsafe fn ridley_sideb_throw_cliff_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_sideb_throw_cliff_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 7.0, 50, 100, 0, 75, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 50, 90, 0, 75, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -913,8 +916,7 @@ unsafe fn ridley_sideb_throw_cliff_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_specialairsdragjump", category = ACMD_GAME )]
-unsafe fn ridley_sideb_throw_drag_jump_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_sideb_throw_drag_jump_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 4.0, 80, 24, 0, 75, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 45, 46, 0, 85, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -943,8 +945,7 @@ unsafe fn ridley_sideb_throw_drag_jump_smash_script(fighter: &mut L2CAgentBase) 
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_specialairsfalljump", category = ACMD_GAME )]
-unsafe fn ridley_sideb_throw_fall_jump_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_sideb_throw_fall_jump_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 7.0, 75, 55, 0, 65, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 75, 75, 0, 55, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -975,8 +976,7 @@ unsafe fn ridley_sideb_throw_fall_jump_smash_script(fighter: &mut L2CAgentBase) 
     }
 }
 
-#[acmd_script( agent = "ridley", scripts = ["game_specialhistart", "game_specialairhistart"], category = ACMD_GAME, low_priority )]
-unsafe fn ridley_upb_start_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_upb_start_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.25);
@@ -987,17 +987,14 @@ unsafe fn ridley_upb_start_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-
-#[acmd_script( agent = "ridley", script = "game_specialairhihover", category = ACMD_GAME )]
-unsafe fn ridley_upb_hover_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_upb_hover_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.5);
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_specialairhichargef", category = ACMD_GAME )]
-unsafe fn ridley_upb_charge_forward_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_upb_charge_forward_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("wingr2"), HitStatus(*HIT_STATUS_XLU), 0);
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("wingl2"), HitStatus(*HIT_STATUS_XLU), 0);
@@ -1010,8 +1007,7 @@ unsafe fn ridley_upb_charge_forward_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_specialairhichargeb", category = ACMD_GAME )]
-unsafe fn ridley_upb_charge_backward_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_upb_charge_backward_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("wingr2"), HitStatus(*HIT_STATUS_XLU), 0);
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("wingl2"), HitStatus(*HIT_STATUS_XLU), 0);
@@ -1025,8 +1021,7 @@ unsafe fn ridley_upb_charge_backward_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_specialairhichargehi", category = ACMD_GAME )]
-unsafe fn ridley_upb_charge_up_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_upb_charge_up_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("wingr2"), HitStatus(*HIT_STATUS_XLU), 0);
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("wingl2"), HitStatus(*HIT_STATUS_XLU), 0);
@@ -1040,8 +1035,7 @@ unsafe fn ridley_upb_charge_up_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_specialairhichargelw", category = ACMD_GAME )]
-unsafe fn ridley_upb_charge_down_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_upb_charge_down_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         JostleModule::set_status(fighter.module_accessor, false);
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 19.9, 285, 89, 0, 30, 8.9, 0.0, 4.5, 2.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
@@ -1052,8 +1046,7 @@ unsafe fn ridley_upb_charge_down_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", script = "game_specialhilandinglw", category = ACMD_GAME, low_priority )]
-unsafe fn ridley_upb_down_landing_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_upb_down_landing_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::CORRECT(fighter, *GROUND_CORRECT_KIND_GROUND_CLIFF_STOP);
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.0, 62, 70, 0, 80, 6.5, 0.0, 3.0, 10.0, Some(0.0), Some(3.0), Some(17.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_bury"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
@@ -1065,8 +1058,7 @@ unsafe fn ridley_upb_down_landing_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ridley", scripts = ["game_speciallwstab", "game_specialairlwstab"], category = ACMD_GAME, low_priority )]
-unsafe fn ridley_downb_stab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ridley_downb_stab_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -1112,56 +1104,63 @@ unsafe fn ridley_downb_stab_smash_script(fighter: &mut L2CAgentBase) {
 }
 
 
-
-
 pub fn install() {
-    smashline::install_agent_frames!(
-        ridley_frame,
-        kirby_ridleyhat_frame
-    );
-    smashline::install_acmd_scripts!(
-        ridley_jab_smash_script,
-        ridley_jab2_smash_script,
-        ridley_jab3_smash_script,
-        ridley_jab100_smash_script,
-        ridley_jab100end_smash_script,
-        ridley_dashattack_smash_script,
-        ridley_ftilt_smash_script,
-        ridley_utilt_smash_script,
-        ridley_dtilt_smash_script,
-        ridley_fsmash_smash_script,
-        ridley_usmash_smash_script,
-        ridley_dsmash_smash_script,
-        ridley_nair_smash_script,
-        ridley_fair_smash_script,
-        ridley_fair_effect_script,
-        ridley_fair_sound_script,
-        ridley_bair_smash_script,
-        ridley_uair_smash_script,
-        ridley_dair_smash_script,
-        ridley_grab_smash_script,
-        ridley_grabd_smash_script,
-        ridley_grabp_smash_script,
-        ridley_fthrow_smash_script,
-        ridley_bthrow_smash_script,
-        ridley_uthrow_smash_script,
-        ridley_dthrow_smash_script,
-        ridley_neutralb_start_smash_script,
-        ridley_neutralb_start_air_smash_script,
-        fireball_projectile,
-        ridley_sideb_start_smash_script,
-        ridley_sideb_start_air_smash_script,
-        ridley_sideb_throw_cliff_smash_script,
-        ridley_sideb_throw_drag_jump_smash_script,
-        ridley_sideb_throw_fall_jump_smash_script,
-        ridley_upb_start_smash_script,
-        ridley_upb_hover_smash_script,
-        ridley_upb_charge_forward_smash_script,
-        ridley_upb_charge_backward_smash_script,
-        ridley_upb_charge_up_smash_script,
-        ridley_upb_charge_down_smash_script,
-        ridley_upb_down_landing_smash_script,
-        ridley_downb_stab_smash_script
-        
-    );
+    Agent::new("ridley")
+    .on_line(Main, ridley_frame) //opff
+    .game_acmd("game_attack11", ridley_jab_smash_script)
+    .game_acmd("game_attack12", ridley_jab2_smash_script)
+    .game_acmd("game_attack13", ridley_jab3_smash_script)
+    .game_acmd("game_attack100", ridley_jab100_smash_script)
+    .game_acmd("game_attack100end", ridley_jab100end_smash_script)
+    .game_acmd("game_attackdash", ridley_dashattack_smash_script)
+    .game_acmd("game_attacks3", ridley_ftilt_smash_script)
+    .game_acmd("game_attacks3hi", ridley_ftilt_smash_script)
+    .game_acmd("game_attacks3lw", ridley_ftilt_smash_script)
+    .game_acmd("game_attackhi3", ridley_utilt_smash_script)
+    .game_acmd("game_attacklw3", ridley_dtilt_smash_script)
+    .game_acmd("game_attacks4", ridley_fsmash_smash_script)
+    .effect_acmd("effect_attacks4", ridley_fsmash_effect_script)
+    .game_acmd("game_attackhi4", ridley_usmash_smash_script)
+    .game_acmd("game_attacklw4", ridley_dsmash_smash_script)
+    .game_acmd("game_attackairn", ridley_nair_smash_script)
+    .game_acmd("game_attackairf", ridley_fair_smash_script)
+    .effect_acmd("effect_attackairf", ridley_fair_effect_script)
+    .sound_acmd("sound_attackairf", ridley_fair_sound_script)
+    .game_acmd("game_attackairb", ridley_bair_smash_script)
+    .game_acmd("game_attackairhi", ridley_uair_smash_script)
+    .game_acmd("game_attackairlw", ridley_dair_smash_script)
+    .game_acmd("game_catch", ridley_grab_smash_script)
+    .game_acmd("game_catchdash", ridley_grabd_smash_script)
+    .game_acmd("game_catchturn", ridley_grabp_smash_script)
+    .game_acmd("game_throwf", ridley_fthrow_smash_script)
+    .game_acmd("game_throwb", ridley_bthrow_smash_script)
+    .game_acmd("game_throwhi", ridley_uthrow_smash_script)
+    .game_acmd("game_throwlw", ridley_dthrow_smash_script)
+    .game_acmd("game_specialnstart", ridley_neutralb_start_smash_script)
+    .game_acmd("game_specialairnstart", ridley_neutralb_start_smash_script)
+    .game_acmd("game_specialsstart", ridley_sideb_start_smash_script)
+    .game_acmd("game_specialairsstart", ridley_sideb_start_air_smash_script)
+    .game_acmd("game_specialsdragcliff", ridley_sideb_throw_cliff_smash_script)
+    .game_acmd("game_specialairsdragjump", ridley_sideb_throw_drag_jump_smash_script)
+    .game_acmd("game_specialairsfalljump", ridley_sideb_throw_fall_jump_smash_script)
+    .game_acmd("game_specialhistart", ridley_upb_start_smash_script)
+    .game_acmd("game_specialairhistart", ridley_upb_start_smash_script)
+    .game_acmd("game_specialairhihover", ridley_upb_hover_smash_script)
+    .game_acmd("game_specialairhichargef", ridley_upb_charge_forward_smash_script)
+    .game_acmd("game_specialairhichargeb", ridley_upb_charge_backward_smash_script)
+    .game_acmd("game_specialairhichargehi", ridley_upb_charge_up_smash_script)
+    .game_acmd("game_specialairhichargelw", ridley_upb_charge_down_smash_script)
+    .game_acmd("game_specialhilandinglw", ridley_upb_down_landing_smash_script)
+    .game_acmd("game_speciallwstab", ridley_downb_stab_smash_script)
+    .game_acmd("game_specialairlwstab", ridley_downb_stab_smash_script)
+    .install();
+
+    Agent::new("kirby")
+    .on_line(Main, kirby_ridleyhat_frame)
+    .install();
+
+    Agent::new("ridley_breath")
+    .game_acmd("game_fly", fireball_projectile)
+    .install();
+
 }

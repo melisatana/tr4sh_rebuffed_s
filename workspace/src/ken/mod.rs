@@ -7,84 +7,15 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
-use smash::lib::L2CValue;
-
-
-
-/// determines the command inputs
-/// inputs divided into command normals (A) and command specials (B)
-/// NOTE: order is important! early order has higher priority
-/*pub unsafe extern "C" fn ken_check_special_command(fighter: &mut L2CFighterCommon) -> L2CValue {
-    let cat1 =  fighter.global_table[0x20].get_i32();
-    let cat4 = fighter.global_table[0x23].get_i32();
-    let is_special = fighter.is_cat_flag(FIGHTER_PAD_CMD_CAT1_FLAG_WALK);
-    let is_normal = fighter.is_cat_flag(
-        FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_N | 
-        FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_HI3 | 
-        FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_S3 | 
-        FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_LW3 | 
-        FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_HI4 | 
-        FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_S4 | 
-        FIGHTER_PAD_CMD_CAT1_FLAG_ATTACK_LW4
-    );
-
-    // shoryu
-    if is_special
-    && cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SPECIAL_HI_COMMAND != 0
-    && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_HI_COMMAND)
-    && fighter.sub_transition_term_id_cont_disguise(fighter.global_table[0x3A].clone()).get_bool() {
-        fighter.change_status(FIGHTER_RYU_STATUS_KIND_SPECIAL_HI_COMMAND.into(), true.into());
-        return true.into();
-    }
-
-    // hado
-    if is_special
-    && cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SPECIAL_N_COMMAND != 0
-    && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_N_COMMAND)
-    && fighter.sub_transition_term_id_cont_disguise(fighter.global_table[0x38].clone()).get_bool() {
-        fighter.change_status(FIGHTER_RYU_STATUS_KIND_SPECIAL_N_COMMAND.into(), true.into());
-        return true.into();
-    }
-
-    // tatsu
-    if is_special
-    && cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SPECIAL_S_COMMAND != 0
-    && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_S_COMMAND)
-    && fighter.sub_transition_term_id_cont_disguise(fighter.global_table[0x39].clone()).get_bool()
-    && FighterSpecializer_Ryu::check_special_air_s_command(fighter.module_accessor) {
-        fighter.change_status(FIGHTER_RYU_STATUS_KIND_SPECIAL_S_COMMAND.into(), true.into());
-        return true.into();
-    }
-
-    // roundhouse
-    if is_normal
-    && cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_SPECIAL_N2_COMMAND != 0
-    && fighter.is_situation(*SITUATION_KIND_GROUND)
-    && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_N2_COMMAND) {
-        fighter.change_status(FIGHTER_RYU_STATUS_KIND_ATTACK_COMMAND2.into(), true.into());
-        return true.into();
-    }
-
-
-    // crescent kick
-    if is_normal
-    && cat4 & *FIGHTER_PAD_CMD_CAT4_FLAG_ATTACK_COMMAND1 != 0
-    && fighter.is_situation(*SITUATION_KIND_GROUND)
-    && WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ATTACK_COMMAND1) {
-        fighter.change_status(FIGHTER_RYU_STATUS_KIND_ATTACK_COMMAND1.into(), true.into());
-        return true.into();
-    }
-
-    false.into()
-}*/
+use crate::custom::global_fighter_frame;
 
 // A Once-Per-Fighter-Frame that only applies to Ken
-#[fighter_frame( agent = FIGHTER_KIND_KEN )]
-fn ken_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn ken_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         let status = StatusModule::status_kind(fighter.module_accessor);
 
-        println!("It'sa me, Ken, Shoryuken!!");
+        //println!("It'sa me, Ken, Shoryuken!!");
 
         if [*FIGHTER_STATUS_KIND_ATTACK_DASH].contains(&status) {
             if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false {
@@ -118,8 +49,27 @@ fn ken_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_attack11nears", category = ACMD_GAME )]
-unsafe fn ken_heavyjab_close_smash_script(fighter: &mut L2CAgentBase) {
+
+unsafe extern "C" fn kirby_kenhat_frame(fighter: &mut L2CFighterCommon) {
+    unsafe {
+        let status = StatusModule::status_kind(fighter.module_accessor);
+
+        if [*FIGHTER_STATUS_KIND_SPECIAL_N, *FIGHTER_KIRBY_STATUS_KIND_RYU_SPECIAL_N_COMMAND, *FIGHTER_KIRBY_STATUS_KIND_RYU_SPECIAL_N2_COMMAND].contains(&status) 
+        && (MotionModule::frame(fighter.module_accessor) >= (4.0) && MotionModule::frame(fighter.module_accessor) <= (12.0)) {
+            if ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_GUARD) {
+                WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_GUARD_ON);
+                WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ESCAPE_AIR);
+                fighter.sub_transition_group_check_air_escape();
+                fighter.sub_transition_group_check_ground_guard();
+            }
+        }
+
+
+    }
+
+}
+
+unsafe extern "C" fn ken_heavyjab_close_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_ATTACK_FLAG_HIT_CANCEL);
@@ -160,8 +110,7 @@ unsafe fn ken_heavyjab_close_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_attack11s", category = ACMD_GAME )]
-unsafe fn ken_heavyjab_far_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_heavyjab_far_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
     }
@@ -197,8 +146,7 @@ unsafe fn ken_heavyjab_far_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_attack11w", category = ACMD_GAME )]
-unsafe fn ken_jab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_jab_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_ATTACK_FLAG_HIT_CANCEL);
@@ -230,8 +178,7 @@ unsafe fn ken_jab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_attack12", category = ACMD_GAME )]
-unsafe fn ken_jab2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_jab2_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_ATTACK_FLAG_HIT_CANCEL);
@@ -253,8 +200,7 @@ unsafe fn ken_jab2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_attack13", category = ACMD_GAME )]
-unsafe fn ken_jab3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_jab3_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_ATTACK_FLAG_HIT_CANCEL);
@@ -262,7 +208,7 @@ unsafe fn ken_jab3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.5, 55, 50, 0, 50, 5.1, 0.0, 13.0, 7.8, Some(0.0), Some(13.0), Some(3.0), 1.7, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KEN_PUNCH, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 4.5, 55, 50, 0, 50, 3.0, 0.0, 7.0, 3.0, None, None, None, 1.7, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KEN_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 4.5, 55, 50, 0, 50, 3.7, 0.0, 7.0, 3.5, None, None, None, 1.7, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KEN_PUNCH, *ATTACK_REGION_PUNCH);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
@@ -276,8 +222,7 @@ unsafe fn ken_jab3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn ken_dashattack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
     }
@@ -296,8 +241,7 @@ unsafe fn ken_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_attacks3w", category = ACMD_GAME )]
-unsafe fn ken_ftilt_kick_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_ftilt_kick_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
     }
@@ -327,8 +271,7 @@ unsafe fn ken_ftilt_kick_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_attacks3s", category = ACMD_GAME )]
-unsafe fn ken_ftilt_punch_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_ftilt_punch_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
     }
@@ -352,8 +295,7 @@ unsafe fn ken_ftilt_punch_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_attacknearw", category = ACMD_GAME )]
-unsafe fn ken_ftilt_close_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_ftilt_close_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.0);
@@ -380,8 +322,7 @@ unsafe fn ken_ftilt_close_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_attackhi3w", category = ACMD_GAME )]
-unsafe fn ken_utilt_light_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_utilt_light_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
@@ -415,8 +356,7 @@ unsafe fn ken_utilt_light_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_attackhi3s", category = ACMD_GAME )]
-unsafe fn ken_utilt_strong_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_utilt_strong_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_ATTACK_FLAG_HIT_CANCEL);
@@ -457,8 +397,7 @@ unsafe fn ken_utilt_strong_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_attacklw3w", category = ACMD_GAME )]
-unsafe fn ken_dtilt_light_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_dtilt_light_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_WORK_ID_FLAG_RESERVE_ATTACK_DISABLE_MINI_JUMP_ATTACK);
     }
@@ -495,8 +434,7 @@ unsafe fn ken_dtilt_light_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_attacklw3s", category = ACMD_GAME )]
-unsafe fn ken_dtilt_strong_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_dtilt_strong_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.23);
@@ -521,8 +459,7 @@ unsafe fn ken_dtilt_strong_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn ken_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 3.0);
@@ -535,8 +472,8 @@ unsafe fn ken_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 13.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 14.7, 361, 110, 0, 30, 3.5, 0.0, 12.5, 2.3, Some(0.0), Some(11.5), Some(4.5), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KEN_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("kneer"), 14.7, 361, 110, 0, 30, 3.8, 3.5, 0.0, 0.0, Some(7.0), Some(0.0), Some(0.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KEN_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 14.7, 361, 110, 0, 30, 3.5, 0.0, 12.5, 2.3, Some(0.0), Some(11.5), Some(4.5), 1.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KEN_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("kneer"), 14.7, 361, 110, 0, 30, 3.8, 3.5, 0.0, 0.0, Some(7.0), Some(0.0), Some(0.0), 1.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KEN_KICK, *ATTACK_REGION_KICK);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
@@ -545,8 +482,7 @@ unsafe fn ken_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn ken_usmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -575,8 +511,7 @@ unsafe fn ken_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn ken_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_ATTACK_FLAG_HIT_CANCEL);
@@ -610,8 +545,7 @@ unsafe fn ken_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_attackcommand1", category = ACMD_GAME )]
-unsafe fn ken_nata_otoshi_geri_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_nata_otoshi_geri_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
     }
@@ -636,8 +570,7 @@ unsafe fn ken_nata_otoshi_geri_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_attackcommand2", category = ACMD_GAME )]
-unsafe fn ken_oosoto_mawashi_geri_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_oosoto_mawashi_geri_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
     }
@@ -659,16 +592,14 @@ unsafe fn ken_oosoto_mawashi_geri_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "sound_attackcommand2", category = ACMD_SOUND )]
-unsafe fn ken_oosoto_mawashi_geri_sound_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_oosoto_mawashi_geri_sound_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 9.0);
     if macros::is_excute(fighter) {
         macros::PLAY_SE(fighter, Hash40::new("se_ken_swing_kick_l"));
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_attackcommand3", category = ACMD_GAME )]
-unsafe fn ken_inazuma_kick_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_inazuma_kick_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
     }
@@ -697,27 +628,27 @@ unsafe fn ken_inazuma_kick_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn ken_nair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_nair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_ATTACK_FLAG_HIT_CANCEL);
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 2.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
+        HitModule::set_status_joint(fighter.module_accessor, Hash40::new("legr"), HitStatus(*HIT_STATUS_XLU), 0);
+        HitModule::set_status_joint(fighter.module_accessor, Hash40::new("kneer"), HitStatus(*HIT_STATUS_XLU), 0);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.0, 54, 87, 0, 35, 3.5, 0.0, 7.5, 10.5, Some(0.0), Some(8.0), Some(3.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KEN_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 8.0, 54, 87, 0, 35, 3.5, 0.0, 5.5, -0.7, Some(0.0), Some(5.5), Some(-3.5), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KEN_KICK, *ATTACK_REGION_KNEE);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 9.0);
-    if macros::is_excute(fighter) {
-        MotionModule::set_rate(fighter.module_accessor, 1.25);
+        MotionModule::set_rate(fighter.module_accessor, 0.9);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.2, 54, 87, 0, 35, 3.5, 0.0, 7.5, 10.5, Some(0.0), Some(8.0), Some(3.0), 1.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KEN_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 8.2, 54, 87, 0, 35, 3.5, 0.0, 5.5, -0.7, Some(0.0), Some(5.5), Some(-3.5), 1.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KEN_KICK, *ATTACK_REGION_KNEE);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 20.0);
     if macros::is_excute(fighter) {
+        HitModule::set_status_all(fighter.module_accessor, HitStatus(*HIT_STATUS_NORMAL), 0);
+        MotionModule::set_rate(fighter.module_accessor, 1.3);
         AttackModule::clear_all(fighter.module_accessor);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 28.0);
@@ -728,27 +659,25 @@ unsafe fn ken_nair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn ken_fair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_fair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_ATTACK_FLAG_HIT_CANCEL);
-        MotionModule::set_rate(fighter.module_accessor, 0.74626865);
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 5.5);
+    sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.3, 50, 108, 0, 45, 4.5, 0.0, 5.5, 10.6, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 7, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KEN_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 13.3, 50, 108, 0, 45, 4.0, 0.0, 5.5, 2.5, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 7, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KEN_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("handr"), 13.4, 50, 120, 0, 25, 4.3, 1.0, 0.0, 0.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 7, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KEN_PUNCH, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("handr"), 13.4, 50, 120, 0, 25, 4.3, -5.0, 0.0, 0.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 7, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KEN_PUNCH, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 13.4, 50, 120, 0, 25, 3.3, 0.0, 7.5, 5.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 7, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KEN_PUNCH, *ATTACK_REGION_KICK);
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 7.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 11.0);
     if macros::is_excute(fighter) {
-        MotionModule::set_rate(fighter.module_accessor, 1.66666667);
+        AttackModule::clear_all(fighter.module_accessor);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 15.0);
     if macros::is_excute(fighter) {
-        MotionModule::set_rate(fighter.module_accessor, 1.3);
-        AttackModule::clear_all(fighter.module_accessor);
+        MotionModule::set_rate(fighter.module_accessor, 1.2);
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_ATTACK_FLAG_HIT_CANCEL);
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
     }
@@ -758,8 +687,26 @@ unsafe fn ken_fair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn ken_bair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_fair_effect_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 5.0);
+    if macros::is_excute(fighter) {
+        macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_attack_line"), Hash40::new("top"), -4.0, 12.7, -2.4, 0, 0, 0, 1.0, true);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 6.0);
+    if macros::is_excute(fighter) {
+        macros::EFFECT_FOLLOW_ALPHA(fighter, Hash40::new("sys_attack_impact"), Hash40::new("handr"), 0, 0, 0, 0, 0, 0, 1.1, false, 0.8);
+    }
+}
+
+unsafe extern "C" fn ken_fair_sound_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 5.0);
+    if macros::is_excute(fighter) {
+        macros::PLAY_SE(fighter, Hash40::new("se_ken_swing_kick_l"));
+        macros::PLAY_SEQUENCE(fighter, Hash40::new("seq_ken_rnd_attack_l"));
+    }
+}
+
+unsafe extern "C" fn ken_bair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_ATTACK_FLAG_HIT_CANCEL);
@@ -782,8 +729,7 @@ unsafe fn ken_bair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn ken_uair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_uair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_ATTACK_FLAG_HIT_CANCEL);
@@ -794,7 +740,7 @@ unsafe fn ken_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.8, 75, 88, 0, 32, 5.7, 0.0, 12.5, 5.0, Some(0.0), Some(19.5), Some(7.5), 1.25, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KEN_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.6, 75, 88, 0, 37, 5.7, 0.0, 12.5, 5.0, Some(0.0), Some(19.5), Some(7.5), 1.25, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KEN_KICK, *ATTACK_REGION_KICK);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 2.0, false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 10.0);
@@ -810,8 +756,7 @@ unsafe fn ken_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn ken_dair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_dair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_STATUS_ATTACK_FLAG_HIT_CANCEL);
@@ -843,8 +788,7 @@ unsafe fn ken_dair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_catch", category = ACMD_GAME )]
-unsafe fn ken_grab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_grab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         GrabModule::set_rebound(fighter.module_accessor, true);
@@ -863,8 +807,7 @@ unsafe fn ken_grab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn ken_grabd_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_grabd_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -886,8 +829,7 @@ unsafe fn ken_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn ken_grabp_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_grabp_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.2);
@@ -909,8 +851,7 @@ unsafe fn ken_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn ken_fthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 8.0, 275, 90, 0, 25, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -930,8 +871,7 @@ unsafe fn ken_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn ken_bthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 10.8, 52, 110, 0, 75, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -948,8 +888,7 @@ unsafe fn ken_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn ken_uthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 12.0, 88, 55, 0, 55, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -979,8 +918,7 @@ unsafe fn ken_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn ken_dthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 4.5, 60, 107, 0, 58, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -1002,8 +940,7 @@ unsafe fn ken_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_specialn", category = ACMD_GAME )]
-unsafe fn ken_neutralb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_neutralb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.8333333333);
@@ -1031,8 +968,7 @@ unsafe fn ken_neutralb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_specialairn", category = ACMD_GAME )]
-unsafe fn ken_neutralb_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_neutralb_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.8333333333);
@@ -1060,8 +996,7 @@ unsafe fn ken_neutralb_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken_hadoken", script = "game_movew", category = ACMD_GAME )]
-unsafe fn hadoken_weak(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn hadoken_weak(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.5, 120, 10, 0, 45, 3.5, 0.0, 0.5, -0.5, Some(0.0), Some(-5.2), Some(-0.5), 1.4, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KEN_PUNCH, *ATTACK_REGION_ENERGY);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 7.5, 120, 10, 0, 65, 2.8, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(-2.0), 1.4, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_A, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KEN_PUNCH, *ATTACK_REGION_ENERGY);
@@ -1074,8 +1009,7 @@ unsafe fn hadoken_weak(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken_hadoken", script = "game_movem", category = ACMD_GAME )]
-unsafe fn hadoken_medium(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn hadoken_medium(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.0, 120, 10, 0, 50, 3.5, 0.0, 0.5, -0.5, Some(0.0), Some(-5.2), Some(-0.5), 1.8, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KEN_PUNCH, *ATTACK_REGION_ENERGY);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 8.0, 120, 10, 0, 65, 2.8, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(-2.5), 1.8, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_A, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KEN_PUNCH, *ATTACK_REGION_ENERGY);
@@ -1088,8 +1022,7 @@ unsafe fn hadoken_medium(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken_hadoken", script = "game_moves", category = ACMD_GAME )]
-unsafe fn hadoken_strong(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn hadoken_strong(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.5, 120, 10, 0, 55, 3.5, 0.0, 0.5, -0.5, Some(0.0), Some(-5.2), Some(-0.5), 1.8, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KEN_PUNCH, *ATTACK_REGION_ENERGY);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 8.5, 120, 10, 0, 65, 2.8, 0.0, 0.0, 0.0, Some(0.0), Some(0.0), Some(-3.0), 1.8, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_A, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KEN_PUNCH, *ATTACK_REGION_ENERGY);
@@ -1102,8 +1035,7 @@ unsafe fn hadoken_strong(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_specialsstart", category = ACMD_GAME )]
-unsafe fn ken_sideb_start_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_sideb_start_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area_xy(fighter.module_accessor, 1.0, 3.5, 8.5, 8.5);
@@ -1121,27 +1053,7 @@ unsafe fn ken_sideb_start_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_specialairsstart", category = ACMD_GAME )]
-unsafe fn ken_sideb_start_air_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 7.0);
-    if macros::is_excute(fighter) {
-        FighterAreaModuleImpl::enable_fix_jostle_area_xy(fighter.module_accessor, 1.0, 3.5, 8.5, 8.5);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 8.0);
-    if macros::is_excute(fighter) {
-        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.0, 0, 50, 100, 0, 4.5, 0.0, 9.0, 4.5, Some(0.0), Some(9.0), Some(4.5), 1.5, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 0, 0.0, 4, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KEN_KICK, *ATTACK_REGION_KICK);
-        FighterAreaModuleImpl::enable_fix_jostle_area_xy(fighter.module_accessor, 3.0, 3.5, 8.5, 4.5);
-    }
-    sv_animcmd::wait(fighter.lua_state_agent, 2.0);
-    if macros::is_excute(fighter) {
-        AttackModule::set_target_category(fighter.module_accessor, 0, *COLLISION_CATEGORY_MASK_NO_IF as u32);
-        AttackModule::set_size(fighter.module_accessor, 0, 0.1);
-    }
-}
-
-#[acmd_script( agent = "ken", script = "game_specials", category = ACMD_GAME )]
-unsafe fn ken_sideb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_sideb_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area_xy(fighter.module_accessor, 5.5, 3.0, 9.0, 3.0);
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("kneer"), HitStatus(*HIT_STATUS_XLU), 0);
@@ -1209,8 +1121,7 @@ unsafe fn ken_sideb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_specialairs", category = ACMD_GAME )]
-unsafe fn ken_sideb_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_sideb_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area_xy(fighter.module_accessor, 5.5, 3.0, 9.0, 3.0);
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("kneer"), HitStatus(*HIT_STATUS_XLU), 0);
@@ -1278,8 +1189,7 @@ unsafe fn ken_sideb_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_specialhi", category = ACMD_GAME )]
-unsafe fn ken_upb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_upb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
@@ -1338,8 +1248,7 @@ unsafe fn ken_upb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_specialairhi", category = ACMD_GAME )]
-unsafe fn ken_upb_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_upb_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
@@ -1398,8 +1307,7 @@ unsafe fn ken_upb_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_specialhicommand", category = ACMD_GAME )]
-unsafe fn ken_upb_input_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_upb_input_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("armr"), HitStatus(*HIT_STATUS_XLU), 0);
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("shoulderr"), HitStatus(*HIT_STATUS_XLU), 0);
@@ -1462,8 +1370,7 @@ unsafe fn ken_upb_input_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_specialairhicommand", category = ACMD_GAME )]
-unsafe fn ken_upb_input_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_upb_input_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("armr"), HitStatus(*HIT_STATUS_XLU), 0);
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("shoulderr"), HitStatus(*HIT_STATUS_XLU), 0);
@@ -1526,24 +1433,21 @@ unsafe fn ken_upb_input_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_specialhifall", category = ACMD_GAME )]
-unsafe fn ken_upb_fall_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_upb_fall_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS_BOTH_SIDES);
         macros::FT_MOTION_RATE(fighter, 0.5);
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_specialairhiend", category = ACMD_GAME )]
-unsafe fn ken_upb_air_end_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_upb_air_end_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS_BOTH_SIDES);
         macros::FT_MOTION_RATE(fighter, 0.5);
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_speciallw", category = ACMD_GAME )]
-unsafe fn ken_downb_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_downb_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.5);
@@ -1592,8 +1496,7 @@ unsafe fn ken_downb_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_specialairlw", category = ACMD_GAME )]
-unsafe fn ken_downb_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_downb_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.5);
@@ -1642,8 +1545,7 @@ unsafe fn ken_downb_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_speciallwturn", category = ACMD_GAME )]
-unsafe fn ken_downb_turn_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_downb_turn_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         PostureModule::reverse_lr(fighter.module_accessor);
@@ -1693,8 +1595,7 @@ unsafe fn ken_downb_turn_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", script = "game_specialairlwturn", category = ACMD_GAME )]
-unsafe fn ken_downb_turn_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_downb_turn_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         PostureModule::reverse_lr(fighter.module_accessor);
@@ -1744,8 +1645,7 @@ unsafe fn ken_downb_turn_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "ken", scripts = ["game_final2", "game_finalair2"], category = ACMD_GAME, low_priority )]
-unsafe fn ken_final_shinryuken_start(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn ken_final_shinryuken_start(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
     }
@@ -1796,9 +1696,7 @@ unsafe fn ken_final_shinryuken_start(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 90.0);
 }
 
-
-#[acmd_script( agent = "ken_shinryuken", script = "game_final", category = ACMD_GAME, low_priority )]
-unsafe fn shinryuken_projectile(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn shinryuken_projectile(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 2.0, 110, 120, 130, 0, 11.0, 0.0, -20.0, 0.0, Some(0.0), Some(80.0), Some(0.0), 0.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, true, f32::NAN, 0.0, 2, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_NONE);
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.0, 367, 100, 100, 0, 11.0, 0.0, 80.0, 0.0, None, None, None, 0.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, true, f32::NAN, 0.0, 2, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_NONE);
@@ -1821,65 +1719,77 @@ unsafe fn shinryuken_projectile(fighter: &mut L2CAgentBase) {
     }
 }
 
+
 pub fn install() {
-    smashline::install_agent_frames!(
-        ken_frame
-    );
-    smashline::install_acmd_scripts!(
-        ken_heavyjab_close_smash_script,
-        ken_heavyjab_far_smash_script,
-        ken_jab_smash_script,
-        ken_jab2_smash_script,
-        ken_jab3_smash_script,
-        ken_dashattack_smash_script,
-        ken_ftilt_kick_smash_script,
-        ken_ftilt_punch_smash_script,
-        ken_ftilt_close_smash_script,
-        ken_utilt_light_smash_script,
-        ken_utilt_strong_smash_script,
-        ken_dtilt_light_smash_script,
-        ken_dtilt_strong_smash_script,
-        ken_fsmash_smash_script,
-        ken_usmash_smash_script,
-        ken_dsmash_smash_script,
-        ken_nata_otoshi_geri_smash_script,
-        ken_oosoto_mawashi_geri_smash_script,
-        ken_oosoto_mawashi_geri_sound_script,
-        ken_inazuma_kick_smash_script,
-        ken_nair_smash_script,
-        ken_fair_smash_script,
-        ken_bair_smash_script,
-        ken_uair_smash_script,
-        ken_dair_smash_script,
-        ken_grab_smash_script,
-        ken_grabd_smash_script,
-        ken_grabp_smash_script,
-        ken_fthrow_smash_script,
-        ken_bthrow_smash_script,
-        ken_uthrow_smash_script,
-        ken_dthrow_smash_script,
-        ken_neutralb_smash_script,
-        ken_neutralb_air_smash_script,
-        hadoken_weak,
-        hadoken_medium,
-        hadoken_strong,
-        ken_sideb_start_smash_script,
-        ken_sideb_start_air_smash_script,
-        ken_sideb_smash_script,
-        ken_sideb_air_smash_script,
-        ken_upb_smash_script,
-        ken_upb_air_smash_script,
-        ken_upb_input_smash_script,
-        ken_upb_input_air_smash_script,
-        ken_upb_fall_smash_script,
-        ken_upb_air_end_smash_script,
-        ken_downb_smash_script,
-        ken_downb_air_smash_script,
-        ken_downb_turn_smash_script,
-        ken_downb_turn_air_smash_script,
-        ken_final_shinryuken_start,
-        shinryuken_projectile
-        
-        
-    );
+    Agent::new("ken")
+    .on_line(Main, ken_frame) //opff
+    .game_acmd("game_attack11s", ken_heavyjab_far_smash_script)
+    .game_acmd("game_attack11nears", ken_heavyjab_close_smash_script)
+    .game_acmd("game_attack11w", ken_jab_smash_script)
+    .game_acmd("game_attack12", ken_jab2_smash_script)
+    .game_acmd("game_attack13", ken_jab3_smash_script)
+    .game_acmd("game_attackdash", ken_dashattack_smash_script)
+    .game_acmd("game_attacks3w", ken_ftilt_kick_smash_script)
+    .game_acmd("game_attacks3s", ken_ftilt_punch_smash_script)
+    .game_acmd("game_attacknearw", ken_ftilt_close_smash_script)
+    .game_acmd("game_attackhi3w", ken_utilt_light_smash_script)
+    .game_acmd("game_attackhi3s", ken_utilt_strong_smash_script)
+    .game_acmd("game_attacklw3w", ken_dtilt_light_smash_script)
+    .game_acmd("game_attacklw3s", ken_dtilt_strong_smash_script)
+    .game_acmd("game_attacks4", ken_fsmash_smash_script)
+    .game_acmd("game_attackhi4", ken_usmash_smash_script)
+    .game_acmd("game_attacklw4", ken_dsmash_smash_script)
+    .game_acmd("game_attackcommand1", ken_nata_otoshi_geri_smash_script)
+    .game_acmd("game_attackcommand2", ken_oosoto_mawashi_geri_smash_script)
+    .sound_acmd("sound_attackcommand2", ken_oosoto_mawashi_geri_sound_script)
+    .game_acmd("game_attackcommand3", ken_inazuma_kick_smash_script)
+    .game_acmd("game_attackairn", ken_nair_smash_script)
+    .game_acmd("game_attackairf", ken_fair_smash_script)
+    .effect_acmd("effect_attackairf", ken_fair_effect_script)
+    .sound_acmd("sound_attackairf", ken_fair_sound_script)
+    .game_acmd("game_attackairb", ken_bair_smash_script)
+    .game_acmd("game_attackairhi", ken_uair_smash_script)
+    .game_acmd("game_attackairlw", ken_dair_smash_script)
+    .game_acmd("game_catch", ken_grab_smash_script)
+    .game_acmd("game_catchdash", ken_grabd_smash_script)
+    .game_acmd("game_catchturn", ken_grabp_smash_script)
+    .game_acmd("game_throwf", ken_fthrow_smash_script)
+    .game_acmd("game_throwb", ken_bthrow_smash_script)
+    .game_acmd("game_throwhi", ken_uthrow_smash_script)
+    .game_acmd("game_throwlw", ken_dthrow_smash_script)
+    .game_acmd("game_specialn", ken_neutralb_smash_script)
+    .game_acmd("game_specialairn", ken_neutralb_air_smash_script)
+    .game_acmd("game_specialsstart", ken_sideb_start_smash_script)
+    .game_acmd("game_specialairsstart", ken_sideb_start_smash_script)
+    .game_acmd("game_specials", ken_sideb_smash_script)
+    .game_acmd("game_specialairs", ken_sideb_air_smash_script)
+    .game_acmd("game_specialhi1", ken_upb_smash_script)
+    .game_acmd("game_specialairhi", ken_upb_air_smash_script)
+    .game_acmd("game_specialhicommand", ken_upb_input_smash_script)
+    .game_acmd("game_specialairhicommand", ken_upb_input_air_smash_script)
+    .game_acmd("game_specialairhiend", ken_upb_air_end_smash_script)
+    .game_acmd("game_specialhifall", ken_upb_fall_smash_script)
+    .game_acmd("game_speciallw", ken_downb_smash_script)
+    .game_acmd("game_specialairlw", ken_downb_air_smash_script)
+    .game_acmd("game_speciallwturn", ken_downb_turn_smash_script)
+    .game_acmd("game_specialairlwturn", ken_downb_turn_air_smash_script)
+    .game_acmd("game_final2", ken_final_shinryuken_start)
+    .game_acmd("game_finalair2", ken_final_shinryuken_start)
+    .install();
+
+    Agent::new("kirby")
+    .on_line(Main, kirby_kenhat_frame)
+    .install();
+
+    Agent::new("ken_hadoken")
+    .game_acmd("game_movew", hadoken_weak)
+    .game_acmd("game_movem", hadoken_medium)
+    .game_acmd("game_moves", hadoken_strong)
+    .install();
+
+    Agent::new("ken_shinryuken")
+    .game_acmd("game_final", shinryuken_projectile)
+    .install();
+
+
 }

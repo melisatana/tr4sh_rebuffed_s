@@ -7,22 +7,24 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
+use crate::custom::global_fighter_frame;
 
 
 pub static mut GAOGAEN_REVENGE_CURRENT_POWER_LEVEL : [i32; 8] = [0; 8]; //0 = None, 1 = Lv1, 2 = Lv2, 3 = Lv3, 4 = Lv 4, 5 = Lv 5
 static mut GAOGAEN_REVENGE_FRAME : [i32; 8] = [0; 8];
 static mut GAOGAEN_REVENGE_FRAME_CURRENT : [i32; 8] = [0; 8];
+static mut GAOGAEN_REVENGE_GRAPHIC : [bool; 8] = [false; 8];
 
 static GAOGAEN_POWER_LEVELS : i32 = 6;
 
 // A Once-Per-Fighter-Frame that only applies to Incineroar
-#[fighter_frame( agent = FIGHTER_KIND_GAOGAEN )]
-fn gaogaen_frame(fighter: &mut L2CFighterCommon) {
+unsafe extern "C" fn gaogaen_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+        global_fighter_frame(fighter);
         let status = StatusModule::status_kind(fighter.module_accessor);
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
-        println!("It'sa me, Incineroar, grawwwwww!!");
+        //println!("It'sa me, Incineroar, grawwwwww!!");
 
         if GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 5 {
             AttackModule::set_power_mul(fighter.module_accessor, 1.2);
@@ -68,10 +70,15 @@ fn gaogaen_frame(fighter: &mut L2CFighterCommon) {
         }
 
         if GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] >= 1 {
-            GAOGAEN_REVENGE_FRAME[entry_id] += 1 ;
-            if GAOGAEN_REVENGE_FRAME[entry_id] == 9000 || GAOGAEN_REVENGE_FRAME_CURRENT[entry_id] != status {
+
+            if GAOGAEN_REVENGE_GRAPHIC[entry_id] {
                 macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_assist_steam_max"), Hash40::new("top"), 0, 7.5, 0, 0, 0, 0, 1.5, true);
                 GAOGAEN_REVENGE_FRAME[entry_id] = 0 ;
+                GAOGAEN_REVENGE_GRAPHIC[entry_id] = false;
+            }
+            GAOGAEN_REVENGE_FRAME[entry_id] += 1 ;
+            if GAOGAEN_REVENGE_FRAME[entry_id] == 9000 || GAOGAEN_REVENGE_FRAME_CURRENT[entry_id] != status {
+                GAOGAEN_REVENGE_GRAPHIC[entry_id] = true;
             }
             GAOGAEN_REVENGE_FRAME_CURRENT[entry_id] = status ;
         }
@@ -82,8 +89,7 @@ fn gaogaen_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_justshieldoff", category = ACMD_GAME )]
-unsafe fn gaogaen_perfectshield_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_perfectshield_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
@@ -97,8 +103,7 @@ unsafe fn gaogaen_perfectshield_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_attack11", category = ACMD_GAME )]
-unsafe fn gaogaen_jab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.1, 361, 30, 25, 30, 4.2, 0.0, 8.5, 4.0, None, None, None, 1.1, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_SLAP, *ATTACK_REGION_PUNCH);
@@ -113,8 +118,7 @@ unsafe fn gaogaen_jab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_attack12", category = ACMD_GAME )]
-unsafe fn gaogaen_jab2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_jab2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 5.0, 6.0);
@@ -138,8 +142,7 @@ unsafe fn gaogaen_jab2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_attack13", category = ACMD_GAME )]
-unsafe fn gaogaen_jab3_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_jab3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 6.9, 27, 80, 0, 70, 3.8, 0.0, 8.0, 3.0, None, None, None, 1.1, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_ELBOW);
@@ -156,8 +159,7 @@ unsafe fn gaogaen_jab3_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_attackdash", category = ACMD_GAME )]
-unsafe fn gaogaen_dashattack_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -186,8 +188,7 @@ unsafe fn gaogaen_dashattack_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", scripts = ["game_attacks3", "game_attacks3hi", "game_attacks3lw"], category = ACMD_GAME, low_priority )]
-unsafe fn gaogaen_ftilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -208,8 +209,7 @@ unsafe fn gaogaen_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_attackhi3", category = ACMD_GAME )]
-unsafe fn gaogaen_utilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_utilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 5.1, 1.5);
@@ -247,8 +247,7 @@ unsafe fn gaogaen_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_attacklw3", category = ACMD_GAME )]
-unsafe fn gaogaen_dtilt_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -285,8 +284,7 @@ unsafe fn gaogaen_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_attacks4", category = ACMD_GAME )]
-unsafe fn gaogaen_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -318,8 +316,7 @@ unsafe fn gaogaen_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_attacks4shit", category = ACMD_GAME )]
-unsafe fn gaogaen_fsmash_hit_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_fsmash_hit_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -332,8 +329,7 @@ unsafe fn gaogaen_fsmash_hit_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_attackhi4", category = ACMD_GAME )]
-unsafe fn gaogaen_usmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -367,8 +363,7 @@ unsafe fn gaogaen_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_attackhi4hit", category = ACMD_GAME )]
-unsafe fn gaogaen_usmash_hit_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_usmash_hit_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -381,8 +376,7 @@ unsafe fn gaogaen_usmash_hit_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_attacklw4", category = ACMD_GAME )]
-unsafe fn gaogaen_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         JostleModule::set_status(fighter.module_accessor, false);
@@ -427,8 +421,7 @@ unsafe fn gaogaen_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_attacklw4hit", category = ACMD_GAME )]
-unsafe fn gaogaen_dsmash_hit_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_dsmash_hit_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if macros::is_excute(fighter) {
@@ -441,35 +434,33 @@ unsafe fn gaogaen_dsmash_hit_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_attackairn", category = ACMD_GAME )]
-unsafe fn gaogaen_nair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_nair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.9, 74, 90, 0, 30, 9.2, 0.0, 6.2, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_BODY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.4, 74, 90, 0, 30, 9.2, 0.0, 6.2, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_BODY);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 3.0, false);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.3);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.9, 74, 70, 0, 50, 8.2, 0.0, 6.2, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_BODY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.8, 74, 70, 0, 50, 8.2, 0.0, 6.2, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_BODY);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 3.0, false);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 26.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 36.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 33.0);
     if macros::is_excute(fighter) {
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_attackairf", category = ACMD_GAME )]
-unsafe fn gaogaen_fair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_fair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 2.0);
@@ -501,8 +492,7 @@ unsafe fn gaogaen_fair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_attackairb", category = ACMD_GAME )]
-unsafe fn gaogaen_bair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_bair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -523,8 +513,7 @@ unsafe fn gaogaen_bair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_attackairhi", category = ACMD_GAME )]
-unsafe fn gaogaen_uair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_uair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -536,7 +525,7 @@ unsafe fn gaogaen_uair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
-        MotionModule::set_rate(fighter.module_accessor, 1.27);
+        MotionModule::set_rate(fighter.module_accessor, 1.3);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 26.0);
     if macros::is_excute(fighter) {
@@ -548,8 +537,7 @@ unsafe fn gaogaen_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_attackairlw", category = ACMD_GAME )]
-unsafe fn gaogaen_dair_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_dair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         JostleModule::set_status(fighter.module_accessor, false);
@@ -582,8 +570,7 @@ unsafe fn gaogaen_dair_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_catch", category = ACMD_GAME )]
-unsafe fn gaogaen_grab_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_grab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.25);
@@ -606,8 +593,7 @@ unsafe fn gaogaen_grab_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_catchdash", category = ACMD_GAME )]
-unsafe fn gaogaen_grabd_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_grabd_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.3);
@@ -630,8 +616,7 @@ unsafe fn gaogaen_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_catchturn", category = ACMD_GAME )]
-unsafe fn gaogaen_grabp_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_grabp_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.3);
@@ -654,8 +639,7 @@ unsafe fn gaogaen_grabp_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_throwf", category = ACMD_GAME )]
-unsafe fn gaogaen_fthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 12.0, 45, 82, 0, 82, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -708,8 +692,7 @@ unsafe fn gaogaen_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_throwb", category = ACMD_GAME )]
-unsafe fn gaogaen_bthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_GAOGAEN_INSTANCE_WORK_ID_FLAG_IS_REVENGE) == true {
         if macros::is_excute(fighter) {
             macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 10.0, 274, 160, 0, 57, 0.0, 1.0, *ATTACK_LR_CHECK_B, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -750,8 +733,7 @@ unsafe fn gaogaen_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_throwhi", category = ACMD_GAME )]
-unsafe fn gaogaen_uthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_GAOGAEN_INSTANCE_WORK_ID_FLAG_IS_REVENGE) == true {
         if macros::is_excute(fighter) {
             macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 14.6, 88, 75, 0, 80, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -779,8 +761,7 @@ unsafe fn gaogaen_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_throwlw", category = ACMD_GAME )]
-unsafe fn gaogaen_dthrow_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 8.5, 60, 47, 0, 55, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -788,16 +769,9 @@ unsafe fn gaogaen_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 15.0);
     if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_GAOGAEN_INSTANCE_WORK_ID_FLAG_IS_REVENGE) == true {
         if macros::is_excute(fighter) {
-            if DamageModule::damage(fighter.module_accessor, 0) < 5.5 {
-                DamageModule::add_damage(fighter.module_accessor, -1.0 * DamageModule::damage(fighter.module_accessor, 0), 0);
-                macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
-                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_recovery"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
-            }
-            else {
-                DamageModule::add_damage(fighter.module_accessor, -5.5, 0);
-                macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
-                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_recovery"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
-            }
+            DamageModule::heal(fighter.module_accessor, -5.5, 0);
+            macros::PLAY_SE(fighter, Hash40::new("se_common_lifeup"));
+            macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_recovery"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 1, true);
         }
     }
     sv_animcmd::frame(fighter.lua_state_agent, 23.0);
@@ -818,8 +792,7 @@ unsafe fn gaogaen_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_specialn", category = ACMD_GAME )]
-unsafe fn gaogaen_speen_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_speen_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         GroundModule::correct(fighter.module_accessor, GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
@@ -827,6 +800,7 @@ unsafe fn gaogaen_speen_smash_script(fighter: &mut L2CAgentBase) {
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 17.0, 45, 67, 0, 80, 5.8, 0.0, 11.0, 4.0, Some(0.0), Some(11.0), Some(8.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 15, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
         macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 17.0, 45, 67, 0, 80, 5.4, 0.0, 11.0, -4.0, Some(0.0), Some(11.0), Some(-4.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 15, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
         macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 17.0, 45, 67, 0, 80, 4.6, 0.0, 8.0, 2.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 15, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATK_SET_SHIELD_SETOFF_MUL_arg4(fighter, 0, 1, 2, 0.5);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
@@ -838,6 +812,7 @@ unsafe fn gaogaen_speen_smash_script(fighter: &mut L2CAgentBase) {
         }
     }
     sv_animcmd::frame(fighter.lua_state_agent, 58.0);
+    macros::FT_MOTION_RATE(fighter, 1.1764705);
     if macros::is_excute(fighter) {
         HitModule::set_status_all(fighter.module_accessor, HitStatus(*HIT_STATUS_NORMAL), 0);
         AttackModule::clear_all(fighter.module_accessor);
@@ -857,14 +832,14 @@ unsafe fn gaogaen_speen_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_specialairn", category = ACMD_GAME )]
-unsafe fn gaogaen_speen_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_speen_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         shield!(fighter, *MA_MSC_CMD_REFLECTOR, *COLLISION_KIND_REFLECTOR, 0, Hash40::new("top"), 5.0, 0.0, 10.0, 10.0, 0, 11.0, -7.0, 1.5, 2.0, 50, false, 1.0, *FIGHTER_REFLECTOR_GROUP_HOMERUNBAT);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 17.0, 45, 67, 0, 80, 5.8, 0.0, 11.0, 4.0, Some(0.0), Some(11.0), Some(8.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 15, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
         macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 17.0, 45, 67, 0, 80, 5.4, 0.0, 11.0, -4.0, Some(0.0), Some(11.0), Some(-4.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 15, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
         macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 17.0, 45, 67, 0, 80, 4.6, 0.0, 8.0, 2.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 15, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATK_SET_SHIELD_SETOFF_MUL_arg4(fighter, 0, 1, 2, 0.5);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
@@ -883,13 +858,15 @@ unsafe fn gaogaen_speen_air_smash_script(fighter: &mut L2CAgentBase) {
         sv_animcmd::wait(fighter.lua_state_agent, 1.0);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 58.0);
+    macros::FT_MOTION_RATE(fighter, 1.1764705);
     if macros::is_excute(fighter) {
         HitModule::set_status_all(fighter.module_accessor, HitStatus(*HIT_STATUS_NORMAL), 0);
         AttackModule::clear_all(fighter.module_accessor);
         shield!(fighter, *MA_MSC_CMD_SHIELD_OFF, *COLLISION_KIND_REFLECTOR, 0, *FIGHTER_REFLECTOR_GROUP_HOMERUNBAT);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GAOGAEN_STATUS_SPECIAL_N_FLAG_END_ROTATION);
+
     }
-    if WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_KIND) == *FIGHTER_KIND_KIRBY{
+    if WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_KIND) == *FIGHTER_KIND_KIRBY {
         if macros::is_excute(fighter) {
             AttackModule::clear_all(fighter.module_accessor);
             shield!(fighter, *MA_MSC_CMD_SHIELD_OFF, *COLLISION_KIND_REFLECTOR, 0, *FIGHTER_REFLECTOR_GROUP_HOMERUNBAT);
@@ -902,8 +879,7 @@ unsafe fn gaogaen_speen_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_specialsstart", category = ACMD_GAME )]
-unsafe fn gaogaen_sideb_dash_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_sideb_dash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GAOGAEN_STATUS_SPECIAL_S_FLAG_MOVE_START);
@@ -952,8 +928,7 @@ unsafe fn gaogaen_sideb_dash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_specialairsstart", category = ACMD_GAME )]
-unsafe fn gaogaen_sideb_dash_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_sideb_dash_air_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GAOGAEN_STATUS_SPECIAL_S_FLAG_MOVE_START);
@@ -1003,8 +978,7 @@ unsafe fn gaogaen_sideb_dash_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_specialslariat", category = ACMD_GAME )]
-unsafe fn gaogaen_sideb_lariat_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_sideb_lariat_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_DAMAGE_POWER, 20.0);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 0.0, 145, 454, 0, 20, 0.0, 1.0, *ATTACK_LR_CHECK_B, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -1038,8 +1012,7 @@ unsafe fn gaogaen_sideb_lariat_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_specialairslariat", category = ACMD_GAME )]
-unsafe fn gaogaen_sideb_lariat_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_sideb_lariat_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_DAMAGE_POWER, 20.0);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 0.0, 145, 454, 0, 20, 0.0, 1.0, *ATTACK_LR_CHECK_B, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -1073,8 +1046,7 @@ unsafe fn gaogaen_sideb_lariat_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_specialsshoulder", category = ACMD_GAME )]
-unsafe fn gaogaen_sideb_shoulder_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_sideb_shoulder_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_DAMAGE_POWER, 20.0);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 0.0, 105, 280, 0, 70, 0.0, 1.0, *ATTACK_LR_CHECK_B, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -1117,8 +1089,7 @@ unsafe fn gaogaen_sideb_shoulder_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_specialairsshoulder", category = ACMD_GAME )]
-unsafe fn gaogaen_sideb_shoulder_air_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_sideb_shoulder_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_DAMAGE_POWER, 20.0);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 0.0, 105, 280, 0, 70, 0.0, 1.0, *ATTACK_LR_CHECK_B, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -1161,8 +1132,7 @@ unsafe fn gaogaen_sideb_shoulder_air_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_specialairhifall", category = ACMD_GAME )]
-unsafe fn gaogaen_upb_fall_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_upb_fall_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS);
@@ -1195,8 +1165,7 @@ unsafe fn gaogaen_upb_fall_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_specialairhifall2", category = ACMD_GAME )]
-unsafe fn gaogaen_upb_fall2_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_upb_fall2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS);
@@ -1229,8 +1198,7 @@ unsafe fn gaogaen_upb_fall2_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "game_specialhibound", category = ACMD_GAME )]
-unsafe fn gaogaen_upb_bounce_smash_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_upb_bounce_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_NONE);
@@ -1251,8 +1219,7 @@ unsafe fn gaogaen_upb_bounce_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", script = "effect_specialhibound", category = ACMD_EFFECT )]
-unsafe fn gaogaen_upb_bounce_effect_script(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_upb_bounce_effect_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_GAOGAEN_INSTANCE_WORK_ID_FLAG_IS_REVENGE) == true {
             macros::EFFECT(fighter, Hash40::new("sys_bomb_b"), Hash40::new("top"), 12, 0, 0, 0, 0, 0, 1.4, 0, 0, 0, 0, 0, 0, false);
@@ -1263,13 +1230,11 @@ unsafe fn gaogaen_upb_bounce_effect_script(fighter: &mut L2CAgentBase) {
     }
 }
 
-#[acmd_script( agent = "gaogaen", scripts = ["effect_appealhil", "effect_appealhir"], category = ACMD_EFFECT, low_priority )]
-unsafe fn gaogaen_uptaunt_effect(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_uptaunt_effect(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
 }
 
-#[acmd_script( agent = "gaogaen", scripts = ["sound_appealhil", "sound_appealhir"], category = ACMD_SOUND, low_priority )]
-unsafe fn gaogaen_uptaunt_sound(fighter: &mut L2CAgentBase) {
+unsafe extern "C" fn gaogaen_uptaunt_sound(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::PLAY_SE(fighter, Hash40::new("se_gaogaen_appeal_h01"));
@@ -1282,51 +1247,52 @@ unsafe fn gaogaen_uptaunt_sound(fighter: &mut L2CAgentBase) {
 
 
 pub fn install() {
-    smashline::install_agent_frames!(
-        gaogaen_frame
-    );
-    smashline::install_acmd_scripts!(
-        gaogaen_perfectshield_smash_script,
-        gaogaen_jab_smash_script,
-        gaogaen_jab2_smash_script,
-        gaogaen_jab3_smash_script,
-        gaogaen_dashattack_smash_script,
-        gaogaen_ftilt_smash_script,
-        gaogaen_utilt_smash_script,
-        gaogaen_dtilt_smash_script,
-        gaogaen_fsmash_smash_script,
-        gaogaen_fsmash_hit_smash_script,
-        gaogaen_usmash_smash_script,
-        gaogaen_usmash_hit_smash_script,
-        gaogaen_dsmash_smash_script,
-        gaogaen_dsmash_hit_smash_script,
-        gaogaen_nair_smash_script,
-        gaogaen_fair_smash_script,
-        gaogaen_bair_smash_script,
-        gaogaen_uair_smash_script,
-        gaogaen_dair_smash_script,
-        gaogaen_grab_smash_script,
-        gaogaen_grabd_smash_script,
-        gaogaen_grabp_smash_script,
-        gaogaen_fthrow_smash_script,
-        gaogaen_bthrow_smash_script,
-        gaogaen_uthrow_smash_script,
-        gaogaen_dthrow_smash_script,
-        gaogaen_speen_smash_script,
-        gaogaen_speen_air_smash_script,
-        gaogaen_sideb_dash_smash_script,
-        gaogaen_sideb_dash_air_smash_script,
-        gaogaen_sideb_lariat_smash_script,
-        gaogaen_sideb_lariat_air_smash_script,
-        gaogaen_sideb_shoulder_smash_script,
-        gaogaen_sideb_shoulder_air_smash_script,
-        gaogaen_upb_fall_smash_script,
-        gaogaen_upb_fall2_smash_script,
-        gaogaen_upb_bounce_smash_script,
-        gaogaen_upb_bounce_effect_script,
-        gaogaen_uptaunt_effect,
-        gaogaen_uptaunt_sound
+    Agent::new("gaogaen")
+    .on_line(Main, gaogaen_frame) //opff
+    .game_acmd("game_justshieldoff", gaogaen_perfectshield_smash_script)
+    .game_acmd("game_attack11", gaogaen_jab_smash_script)
+    .game_acmd("game_attack12", gaogaen_jab2_smash_script)
+    .game_acmd("game_attack13", gaogaen_jab3_smash_script)
+    .game_acmd("game_attackdash", gaogaen_dashattack_smash_script)
+    .game_acmd("game_attacks3", gaogaen_ftilt_smash_script)
+    .game_acmd("game_attacks3hi", gaogaen_ftilt_smash_script)
+    .game_acmd("game_attacks3lw", gaogaen_ftilt_smash_script)
+    .game_acmd("game_attackhi3", gaogaen_utilt_smash_script)
+    .game_acmd("game_attacklw3", gaogaen_dtilt_smash_script)
+    .game_acmd("game_attacks4", gaogaen_fsmash_smash_script)
+    .game_acmd("game_attacks4shit", gaogaen_fsmash_hit_smash_script)
+    .game_acmd("game_attackhi4", gaogaen_usmash_smash_script)
+    .game_acmd("game_attackhi4hit", gaogaen_usmash_hit_smash_script)
+    .game_acmd("game_attacklw4", gaogaen_dsmash_smash_script)
+    .game_acmd("game_attacklw4hit", gaogaen_dsmash_hit_smash_script)
+    .game_acmd("game_attackairn", gaogaen_nair_smash_script)
+    .game_acmd("game_attackairf", gaogaen_fair_smash_script)
+    .game_acmd("game_attackairb", gaogaen_bair_smash_script)
+    .game_acmd("game_attackairhi", gaogaen_uair_smash_script)
+    .game_acmd("game_attackairlw", gaogaen_dair_smash_script)
+    .game_acmd("game_catch", gaogaen_grab_smash_script)
+    .game_acmd("game_catchdash", gaogaen_grabd_smash_script)
+    .game_acmd("game_catchturn", gaogaen_grabp_smash_script)
+    .game_acmd("game_throwf", gaogaen_fthrow_smash_script)
+    .game_acmd("game_throwb", gaogaen_bthrow_smash_script)
+    .game_acmd("game_throwhi", gaogaen_uthrow_smash_script)
+    .game_acmd("game_throwlw", gaogaen_dthrow_smash_script)
+    .game_acmd("game_specialn", gaogaen_speen_smash_script)
+    .game_acmd("game_specialairn", gaogaen_speen_air_smash_script)
+    .game_acmd("game_specialsstart", gaogaen_sideb_dash_smash_script)
+    .game_acmd("game_specialairsstart", gaogaen_sideb_dash_air_smash_script)
+    .game_acmd("game_specialsshoulder", gaogaen_sideb_shoulder_smash_script)
+    .game_acmd("game_specialairsshoulder", gaogaen_sideb_shoulder_air_smash_script)
+    .game_acmd("game_specialslariat", gaogaen_sideb_lariat_smash_script)
+    .game_acmd("game_specialairslariat", gaogaen_sideb_lariat_air_smash_script)
+    .game_acmd("game_specialairhifall", gaogaen_upb_fall_smash_script)
+    .game_acmd("game_specialairhifall2", gaogaen_upb_fall2_smash_script)
+    .game_acmd("game_specialhibound", gaogaen_upb_bounce_smash_script)
+    .effect_acmd("effect_specialhibound", gaogaen_upb_bounce_effect_script)
+    .sound_acmd("sound_appealhil", gaogaen_uptaunt_sound)
+    .sound_acmd("sound_appealhir", gaogaen_uptaunt_sound)
+    .effect_acmd("effect_appealhil", gaogaen_uptaunt_effect)
+    .effect_acmd("effect_appealhir", gaogaen_uptaunt_effect)
+    .install();
 
-        
-    );
 }
