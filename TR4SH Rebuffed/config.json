@@ -1,5 +1,37 @@
 {
 	"new-dir-files": {
+		"fighter/link/c00": [
+			"fighter/link/motion/body/c00/c01attacks3hi.nuanmb",
+			"fighter/link/motion/body/c00/c01attacks3lw.nuanmb"
+		],
+		"fighter/link/c01": [
+			"fighter/link/motion/body/c01/c01attacks3hi.nuanmb",
+			"fighter/link/motion/body/c01/c01attacks3lw.nuanmb"
+		],
+		"fighter/link/c02": [
+			"fighter/link/motion/body/c02/c01attacks3hi.nuanmb",
+			"fighter/link/motion/body/c02/c01attacks3lw.nuanmb"
+		],
+		"fighter/link/c03": [
+			"fighter/link/motion/body/c03/c01attacks3hi.nuanmb",
+			"fighter/link/motion/body/c03/c01attacks3lw.nuanmb"
+		],
+		"fighter/link/c04": [
+			"fighter/link/motion/body/c04/c01attacks3hi.nuanmb",
+			"fighter/link/motion/body/c04/c01attacks3lw.nuanmb"
+		],
+		"fighter/link/c05": [
+			"fighter/link/motion/body/c05/c01attacks3hi.nuanmb",
+			"fighter/link/motion/body/c05/c01attacks3lw.nuanmb"
+		],
+		"fighter/link/c06": [
+			"fighter/link/motion/body/c06/c01attacks3hi.nuanmb",
+			"fighter/link/motion/body/c06/c01attacks3lw.nuanmb"
+		],
+		"fighter/link/c07": [
+			"fighter/link/motion/body/c07/c01attacks3hi.nuanmb",
+			"fighter/link/motion/body/c07/c01attacks3lw.nuanmb"
+		],
 		"fighter/zelda/c00": [
 			"fighter/zelda/motion/body/c00/c03attacks4hi.nuanmb",
 			"fighter/zelda/motion/body/c00/c03attacks4lw.nuanmb"
@@ -63,6 +95,80 @@
 		"fighter/roy/c07": [
 			"fighter/roy/motion/body/c07/c01attacks3hi.nuanmb",
 			"fighter/roy/motion/body/c07/c01attacks3lw.nuanmb"
+		],
+		"fighter/lucario/c00": [
+			"fighter/lucario/motion/body/c00/c03attacks4hi.nuanmb",
+			"fighter/lucario/motion/body/c00/c03attacks4lw.nuanmb"
+		],
+		"fighter/lucario/c01": [
+			"fighter/lucario/motion/body/c01/c03attacks4hi.nuanmb",
+			"fighter/lucario/motion/body/c01/c03attacks4lw.nuanmb"
+		],
+		"fighter/lucario/c02": [
+			"fighter/lucario/motion/body/c02/c03attacks4hi.nuanmb",
+			"fighter/lucario/motion/body/c02/c03attacks4lw.nuanmb"
+		],
+		"fighter/lucario/c03": [
+			"fighter/lucario/motion/body/c03/c03attacks4hi.nuanmb",
+			"fighter/lucario/motion/body/c03/c03attacks4lw.nuanmb"
+		],
+		"fighter/lucario/c04": [
+			"fighter/lucario/motion/body/c04/c03attacks4hi.nuanmb",
+			"fighter/lucario/motion/body/c04/c03attacks4lw.nuanmb"
+		],
+		"fighter/lucario/c05": [
+			"fighter/lucario/motion/body/c05/c03attacks4hi.nuanmb",
+			"fighter/lucario/motion/body/c05/c03attacks4lw.nuanmb"
+		],
+		"fighter/lucario/c06": [
+			"fighter/lucario/motion/body/c06/c03attacks4hi.nuanmb",
+			"fighter/lucario/motion/body/c06/c03attacks4lw.nuanmb"
+		],
+		"fighter/lucario/c07": [
+			"fighter/lucario/motion/body/c07/c03attacks4hi.nuanmb",
+			"fighter/lucario/motion/body/c07/c03attacks4lw.nuanmb"
+		],
+		"fighter/shulk/c00": [
+			"fighter/shulk/motion/body/c00/c01attacks3hi.nuanmb",
+			"fighter/shulk/motion/body/c00/c01attacks3lw.nuanmb",
+			"fighter/shulk/motion/body/c00/b02escapen_dab.nuanmb"
+		],
+		"fighter/shulk/c01": [
+			"fighter/shulk/motion/body/c01/c01attacks3hi.nuanmb",
+			"fighter/shulk/motion/body/c01/c01attacks3lw.nuanmb",
+			"fighter/shulk/motion/body/c01/b02escapen_dab.nuanmb"
+		],
+		"fighter/shulk/c02": [
+			"fighter/shulk/motion/body/c02/c01attacks3hi.nuanmb",
+			"fighter/shulk/motion/body/c02/c01attacks3lw.nuanmb",
+			"fighter/shulk/motion/body/c02/b02escapen_dab.nuanmb"
+		],
+		"fighter/shulk/c03": [
+			"fighter/shulk/motion/body/c03/c01attacks3hi.nuanmb",
+			"fighter/shulk/motion/body/c03/c01attacks3lw.nuanmb",
+			"fighter/shulk/motion/body/c03/b02escapen_dab.nuanmb"
+		],
+		"fighter/shulk/c04": [
+			"fighter/shulk/motion/body/c04/c01attacks3hi.nuanmb",
+			"fighter/shulk/motion/body/c04/c01attacks3lw.nuanmb",
+			"fighter/shulk/motion/body/c04/b02escapen_dab.nuanmb"
+		],
+		"fighter/shulk/c05": [
+			"fighter/shulk/motion/body/c05/c01attacks3hi.nuanmb",
+			"fighter/shulk/motion/body/c05/c01attacks3lw.nuanmb",
+			"fighter/shulk/motion/body/c05/b02escapen_dab.nuanmb"
+		],
+		"fighter/shulk/c06": [
+			"fighter/shulk/motion/body/c06/c01attacks3hi.nuanmb",
+			"fighter/shulk/motion/body/c06/c01attacks3lw.nuanmb",
+			"fighter/shulk/motion/body/c06/b02escapen_dab.nuanmb"
+		],
+		"fighter/shulk/c07": [
+			"fighter/shulk/motion/body/c07/c01attacks3hi.nuanmb",
+			"fighter/shulk/motion/body/c07/c01attacks3lw.nuanmb",
+			"fighter/shulk/motion/body/c07/b02escapen_dab.nuanmb"
 		]
+
+		
 	}
 }
