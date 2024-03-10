@@ -96,6 +96,30 @@
 			"fighter/roy/motion/body/c07/c01attacks3hi.nuanmb",
 			"fighter/roy/motion/body/c07/c01attacks3lw.nuanmb"
 		],
+		"fighter/lucina/c00": [
+			"fighter/lucina/motion/body/c00/c00attack13.nuanmb"
+		],
+		"fighter/lucina/c01": [
+			"fighter/lucina/motion/body/c01/c00attack13.nuanmb"
+		],
+		"fighter/lucina/c02": [
+			"fighter/lucina/motion/body/c02/c00attack13.nuanmb"
+		],
+		"fighter/lucina/c03": [
+			"fighter/lucina/motion/body/c03/c00attack13.nuanmb"
+		],
+		"fighter/lucina/c04": [
+			"fighter/lucina/motion/body/c04/c00attack13.nuanmb"
+		],
+		"fighter/lucina/c05": [
+			"fighter/lucina/motion/body/c05/c00attack13.nuanmb"
+		],
+		"fighter/lucina/c06": [
+			"fighter/lucina/motion/body/c06/c00attack13.nuanmb"
+		],
+		"fighter/lucina/c07": [
+			"fighter/lucina/motion/body/c07/c00attack13.nuanmb"
+		],
 		"fighter/lucario/c00": [
 			"fighter/lucario/motion/body/c00/c03attacks4hi.nuanmb",
 			"fighter/lucario/motion/body/c00/c03attacks4lw.nuanmb"
