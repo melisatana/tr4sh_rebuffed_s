@@ -1147,7 +1147,7 @@ pub fn install() {
     .game_acmd("game_throwhi", roy_uthrow_smash_script)
     .game_acmd("game_throwlw", roy_dthrow_smash_script)
     .game_acmd("game_specialnturn", roy_neutralb_turn_smash_script)
-    .game_acmd("game_specialnairturn", roy_neutralb_turn_smash_script)
+    .game_acmd("game_specialairnturn", roy_neutralb_turn_smash_script)
     .game_acmd("game_specialnend", roy_neutralb_1_smash_script)
     .game_acmd("game_specialairnend", roy_neutralb_1_smash_script)
     .game_acmd("game_specialnend2", roy_neutralb_2_smash_script)

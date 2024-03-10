@@ -90,17 +90,17 @@ pub unsafe fn get_param_float_replace(module_accessor: u64, param_type: u64, par
 		if fighter_kind == *FIGHTER_KIND_PIKACHU {
 			if param_type == hash40("dash_speed") {
 				if crate::pikachu::PIKACHU_DOWNB_STATIC_IS_HIT[entry_id] {
-					return 2.4;
+					return 2.5;
 				}
 			}
 			if param_type == hash40("run_speed_max") {
 				if crate::pikachu::PIKACHU_DOWNB_STATIC_IS_HIT[entry_id] {
-					return 2.33;
+					return 2.4;
 				}
 			}
 			if param_type == hash40("air_speed_x_stable") {
 				if crate::pikachu::PIKACHU_DOWNB_STATIC_IS_HIT[entry_id] {
-					return 1.19;
+					return 1.21;
 				}
 			}
 			if param_type == hash40("weight") {
@@ -377,6 +377,27 @@ pub unsafe fn get_param_float_replace(module_accessor: u64, param_type: u64, par
 					}
 					if crate::gaogaen::GAOGAEN_REVENGE_CURRENT_POWER_LEVEL[entry_id] == 1 {
 						return 0.08;
+					}
+				}
+			}
+		}
+		if fighter_kind == *FIGHTER_KIND_EDGE {
+			if param_type == hash40("param_special_hi") {
+				if param_hash == hash40("rush_speed") {
+					if WorkModule::is_flag(boma, *FIGHTER_EDGE_INSTANCE_WORK_ID_FLAG_ONE_WINGED_ACTIVATED) {
+						return 15.0;
+					}
+				}
+				if param_hash == hash40("charged_rush_speed") {
+					if WorkModule::is_flag(boma, *FIGHTER_EDGE_INSTANCE_WORK_ID_FLAG_ONE_WINGED_ACTIVATED) {
+						return 7.7;
+					}
+				}
+			}
+			if param_type == hash40("param_special_lw") {
+				if param_hash == hash40("shield_max") {
+					if WorkModule::is_flag(boma, *FIGHTER_EDGE_INSTANCE_WORK_ID_FLAG_ONE_WINGED_ACTIVATED) {
+						return 35.0;
 					}
 				}
 			}

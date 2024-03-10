@@ -18,7 +18,6 @@ unsafe extern "C" fn duckhunt_frame(fighter: &mut L2CFighterCommon) {
 
         //println!("woof, or something");
 
-
         if status == *FIGHTER_STATUS_KIND_SPECIAL_S {
             crate::custom::fastfall_helper(fighter);
         }

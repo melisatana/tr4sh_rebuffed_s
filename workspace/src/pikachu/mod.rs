@@ -182,9 +182,9 @@ unsafe extern "C" fn pikachu_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("tail1"), 7.8, 103, 81, 0, 42, 2.3, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_SLAP, *ATTACK_REGION_TAIL);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("tail3"), 7.8, 103, 81, 0, 42, 4.1, 0.0, 0.0, -1.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_SLAP, *ATTACK_REGION_TAIL);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("tail4"), 7.8, 103, 81, 0, 42, 3.7, 0.0, 0.0, 2.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_SLAP, *ATTACK_REGION_TAIL);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("tail1"), 8.1, 103, 81, 0, 42, 2.3, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_SLAP, *ATTACK_REGION_TAIL);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("tail3"), 8.1, 103, 81, 0, 42, 4.1, 0.0, 0.0, -1.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_SLAP, *ATTACK_REGION_TAIL);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("tail4"), 8.1, 103, 81, 0, 42, 3.7, 0.0, 0.0, 2.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_SLAP, *ATTACK_REGION_TAIL);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
@@ -207,6 +207,8 @@ unsafe extern "C" fn pikachu_dtilt_smash_script(fighter: &mut L2CAgentBase) {
 }
 
 unsafe extern "C" fn pikachu_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+        
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.5);
@@ -219,55 +221,171 @@ unsafe extern "C" fn pikachu_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 15.0);
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 17.3, 40, 85, 0, 50, 3.1, 0.0, 7.0, 9.2, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_NONE);
+    if PIKACHU_DOWNB_STATIC_TIMER[entry_id] > 0 {
+        sv_animcmd::frame(fighter.lua_state_agent, 15.0);
+        if macros::is_excute(fighter) {
+            macros::PLAY_SE(fighter, Hash40::new("se_pikachu_special_l03"));
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 18.7, 40, 90, 0, 50, 5.5, 0.0, 7.0, 9.2, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_NONE);
+        }
+        sv_animcmd::frame(fighter.lua_state_agent, 16.0);
+        if macros::is_excute(fighter) {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 18.7, 40, 90, 0, 50, 5.5, 0.0, 7.0, 13.2, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_NONE);
+        }
+        sv_animcmd::frame(fighter.lua_state_agent, 17.0);
+        if macros::is_excute(fighter) {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 21.5, 40, 83, 0, 60, 6.8, 0.0, 7.0, 19.1, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_NONE);
+        }
+        sv_animcmd::frame(fighter.lua_state_agent, 18.0);
+        if macros::is_excute(fighter) {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 21.5, 40, 83, 0, 60, 6.8, 0.0, 7.0, 23.6, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_NONE);
+        }
+        sv_animcmd::frame(fighter.lua_state_agent, 20.0);
+        if macros::is_excute(fighter) {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 14.1, 45, 22, 0, 30, 8.2, 0.0, 7.0, 29.0, None, None, None, 1.3, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_NONE);
+        }
+        sv_animcmd::frame(fighter.lua_state_agent, 24.0);
+        if macros::is_excute(fighter) {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 14.1, 45, 22, 0, 30, 9.1, 0.0, 7.0, 31.0, None, None, None, 1.3, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_NONE);
+        }
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 16.0);
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 17.3, 40, 85, 0, 50, 3.1, 0.0, 7.0, 11.2, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_NONE);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 17.0);
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 19.9, 40, 85, 0, 60, 4.4, 0.0, 7.0, 14.6, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_NONE);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 18.0);
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 19.9, 40, 85, 0, 60, 4.4, 0.0, 7.0, 18.6, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_NONE);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 20.0);
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.1, 45, 22, 0, 30, 6.2, 0.0, 7.0, 23.0, None, None, None, 1.3, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_NONE);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 24.0);
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.1, 45, 22, 0, 30, 5.6, 0.0, 7.0, 25.0, None, None, None, 1.3, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_NONE);
+    else {
+        sv_animcmd::frame(fighter.lua_state_agent, 15.0);
+        if macros::is_excute(fighter) {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 17.3, 40, 94, 0, 50, 3.1, 0.0, 7.0, 9.2, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_NONE);
+        }
+        sv_animcmd::frame(fighter.lua_state_agent, 16.0);
+        if macros::is_excute(fighter) {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 17.3, 40, 94, 0, 50, 3.1, 0.0, 7.0, 11.2, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_NONE);
+        }
+        sv_animcmd::frame(fighter.lua_state_agent, 17.0);
+        if macros::is_excute(fighter) {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 19.9, 40, 89, 0, 60, 4.4, 0.0, 7.0, 14.6, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_NONE);
+        }
+        sv_animcmd::frame(fighter.lua_state_agent, 18.0);
+        if macros::is_excute(fighter) {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 19.9, 40, 89, 0, 60, 4.4, 0.0, 7.0, 18.6, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_NONE);
+        }
+        sv_animcmd::frame(fighter.lua_state_agent, 20.0);
+        if macros::is_excute(fighter) {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.1, 45, 22, 0, 30, 6.2, 0.0, 7.0, 23.0, None, None, None, 1.3, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_NONE);
+        }
+        sv_animcmd::frame(fighter.lua_state_agent, 24.0);
+        if macros::is_excute(fighter) {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.1, 45, 22, 0, 30, 6.4, 0.0, 7.0, 25.0, None, None, None, 1.3, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_NONE);
+        }
     }
     sv_animcmd::frame(fighter.lua_state_agent, 31.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
+        PIKACHU_DOWNB_STATIC_TIMER[entry_id] = 0;
+        PIKACHU_DOWNB_STATIC_IS_HIT[entry_id] = false ;
+        
+    }
+}
+
+unsafe extern "C" fn pikachu_fsmash_effect_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+    
+    sv_animcmd::frame(fighter.lua_state_agent, 2.0);
+    if macros::is_excute(fighter) {
+        macros::EFFECT(fighter, Hash40::new("sys_smash_flash"), Hash40::new("top"), 0, 6, 7, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
+        macros::EFFECT_FOLLOW_NO_STOP(fighter, Hash40::new("pikachu_cheek2"), Hash40::new("head"), 0, 0, 0, 0, -90, -90, 1, true);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 15.0);
+    if macros::is_excute(fighter) {
+        macros::LANDING_EFFECT(fighter, Hash40::new("sys_atk_smoke"), Hash40::new("top"), 2, 0, 0, 0, 0, 0, 0.9, 0, 0, 0, 0, 0, 0, false);
+        macros::EFFECT_FOLLOW(fighter, Hash40::new("pikachu_cheek2"), Hash40::new("head"), 0, 0, 0, 0, -90, -90, 1, true);
+        macros::EFFECT_FOLLOW_NO_STOP(fighter, Hash40::new("pikachu_cheek_elec"), Hash40::new("head"), 0, 0, 0, 0, -90, -90, 1, true);
+        if PIKACHU_DOWNB_STATIC_TIMER[entry_id] > 0 {
+            macros::EFFECT_FOLLOW_NO_STOP(fighter, Hash40::new("pikachu_elec_shock"), Hash40::new("top"), 0, 7, 10.5, 0, 0, 0, 1.5, true);
+            macros::EFFECT_FOLLOW_NO_STOP(fighter, Hash40::new("pikachu_kaminari_hit2"), Hash40::new("head"), 0, 0.0, 0, 0, 90, 0, 0.65, true);
+            macros::LAST_EFFECT_SET_RATE(fighter, 1.2);
+        }
+        else {
+            macros::EFFECT_FOLLOW_NO_STOP(fighter, Hash40::new("pikachu_elec_shock"), Hash40::new("top"), 0, 7, 10.5, 0, 0, 0, 1, true);
+        }
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 29.0);
+    if macros::is_excute(fighter) {
+        macros::EFFECT_OFF_KIND(fighter, Hash40::new("pikachu_cheek_elec"), false, true);
+        macros::EFFECT_OFF_KIND(fighter, Hash40::new("pikachu_kaminari_hit2"), false, true);
+        macros::EFFECT_OFF_KIND(fighter, Hash40::new("pikachu_kaminari_hit"), false, true);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 30.0);
+    if macros::is_excute(fighter) {
+        macros::EFFECT_OFF_KIND(fighter, Hash40::new("pikachu_elec_shock"), false, true);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 37.0);
+    if macros::is_excute(fighter) {
+        macros::EFFECT_OFF_KIND(fighter, Hash40::new("pikachu_cheek2"), false, true);
     }
 }
 
 unsafe extern "C" fn pikachu_usmash_smash_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+    
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("tail1"), 15.6, 87, 94, 0, 50, 3.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_SLAP, *ATTACK_REGION_TAIL);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("tail3"), 15.6, 87, 94, 0, 50, 4.0, 0.0, 0.0, -1.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_SLAP, *ATTACK_REGION_TAIL);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("tail4"), 15.6, 87, 94, 0, 50, 4.0, 0.0, 0.0, 3.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_SLAP, *ATTACK_REGION_TAIL);
+        if PIKACHU_DOWNB_STATIC_TIMER[entry_id] > 0 {
+            macros::PLAY_SE(fighter, Hash40::new("se_pikachu_special_l03"));
+            macros::ATTACK(fighter, 0, 0, Hash40::new("tail1"), 17.9, 87, 89, 0, 50, 3.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_TAIL);
+            macros::ATTACK(fighter, 1, 0, Hash40::new("tail3"), 17.9, 87, 89, 0, 50, 4.0, 0.0, 0.0, -1.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_TAIL);
+            macros::ATTACK(fighter, 2, 0, Hash40::new("tail4"), 17.9, 87, 89, 0, 50, 4.0, 0.0, 0.0, 3.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_TAIL);
+        }
+        else {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("tail1"), 15.6, 87, 94, 0, 50, 3.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_SLAP, *ATTACK_REGION_TAIL);
+            macros::ATTACK(fighter, 1, 0, Hash40::new("tail3"), 15.6, 87, 94, 0, 50, 4.0, 0.0, 0.0, -1.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_SLAP, *ATTACK_REGION_TAIL);
+            macros::ATTACK(fighter, 2, 0, Hash40::new("tail4"), 15.6, 87, 94, 0, 50, 4.0, 0.0, 0.0, 3.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_SLAP, *ATTACK_REGION_TAIL);    
+        }
     }
     sv_animcmd::frame(fighter.lua_state_agent, 19.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
         MotionModule::set_rate(fighter.module_accessor, 1.3);
+        PIKACHU_DOWNB_STATIC_TIMER[entry_id] = 0;
+        PIKACHU_DOWNB_STATIC_IS_HIT[entry_id] = false ;
+    }
+}
+
+unsafe extern "C" fn pikachu_usmash_effect_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+    
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        macros::EFFECT(fighter, Hash40::new("sys_smash_flash"), Hash40::new("top"), 0, 12, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
+        macros::FOOT_EFFECT(fighter, Hash40::new("sys_dash_smoke"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 0.75, 0, 0, 0, 0, 0, 0, false);
+        if PIKACHU_DOWNB_STATIC_TIMER[entry_id] > 0 {
+            macros::EFFECT_FOLLOW_NO_STOP(fighter, Hash40::new("pikachu_cheek"), Hash40::new("head"), 0, 0, 0, 0, -90, -90, 1, true);
+            macros::EFFECT_FOLLOW_NO_STOP(fighter, Hash40::new("pikachu_elec"), Hash40::new("tail4"), 5, 0, 0, 0, 0, 0, 1, true);
+            macros::EFFECT_FOLLOW_NO_STOP(fighter, Hash40::new("pikachu_kaminari_hit2"), Hash40::new("tail4"), 0, -2, 0, 0, 90, 0, 0.6, true);
+            macros::LAST_EFFECT_SET_RATE(fighter, 1.2);
+        }
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 11.0);
+    if macros::is_excute(fighter) {
+        macros::EFFECT_FOLLOW(fighter, Hash40::new("pikachu_tail_arc"), Hash40::new("top"), 0, 12, -1.5, 0, 20, 90, 1, true);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 19.0);
+    if macros::is_excute(fighter) {
+        if PIKACHU_DOWNB_STATIC_TIMER[entry_id] > 0 {
+            macros::EFFECT_OFF_KIND(fighter, Hash40::new("pikachu_elec"), false, false);
+            macros::EFFECT_OFF_KIND(fighter, Hash40::new("pikachu_cheek"), false, false);
+    
+        }
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 30.0);
+    if macros::is_excute(fighter) {
+        macros::LANDING_EFFECT(fighter, Hash40::new("sys_landing_smoke"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 0.9, 0, 0, 0, 0, 0, 0, false);
     }
 }
 
 unsafe extern "C" fn pikachu_dsmash_smash_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+    
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_START_SMASH_HOLD);
@@ -275,10 +393,18 @@ unsafe extern "C" fn pikachu_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     for _ in 0..5 {
         if macros::is_excute(fighter) {
-            macros:: ATTACK(fighter, 0, 0, Hash40::new("top"), 2.0, 178, 30, 0, 65, 4.0, 0.0, 5.0, -8.0, None, None, None, 0.5, 0.5, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 1, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_BODY);
-            macros:: ATTACK(fighter, 1, 0, Hash40::new("top"), 2.0, 178, 30, 0, 65, 4.0, 0.0, 5.0, 8.0, None, None, None, 0.5, 0.5, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 1, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_BODY);
-            macros:: ATTACK(fighter, 2, 0, Hash40::new("top"), 2.0, 90, 30, 0, 30, 2.8, 0.0, 4.0, 0.0, None, None, None, 0.5, 0.5, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 1, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_BODY);
-            AttackModule::set_no_damage_fly_smoke_all(fighter.module_accessor, true, false);
+            if PIKACHU_DOWNB_STATIC_TIMER[entry_id] > 0 {
+                macros:: ATTACK(fighter, 0, 0, Hash40::new("top"), 2.7, 178, 30, 0, 65, 4.0, 0.0, 5.0, -8.0, None, None, None, 0.5, 0.5, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 1, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_BODY);
+                macros:: ATTACK(fighter, 1, 0, Hash40::new("top"), 2.7, 178, 30, 0, 65, 4.0, 0.0, 5.0, 8.0, None, None, None, 0.5, 0.5, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 1, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_BODY);
+                macros:: ATTACK(fighter, 2, 0, Hash40::new("top"), 2.7, 90, 30, 0, 30, 2.8, 0.0, 4.0, 0.0, None, None, None, 0.5, 0.5, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 1, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_BODY);
+                AttackModule::set_no_damage_fly_smoke_all(fighter.module_accessor, true, false);    
+            }
+            else {
+                macros:: ATTACK(fighter, 0, 0, Hash40::new("top"), 2.0, 178, 30, 0, 65, 4.0, 0.0, 5.0, -8.0, None, None, None, 0.5, 0.5, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 1, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_BODY);
+                macros:: ATTACK(fighter, 1, 0, Hash40::new("top"), 2.0, 178, 30, 0, 65, 4.0, 0.0, 5.0, 8.0, None, None, None, 0.5, 0.5, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 1, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_BODY);
+                macros:: ATTACK(fighter, 2, 0, Hash40::new("top"), 2.0, 90, 30, 0, 30, 2.8, 0.0, 4.0, 0.0, None, None, None, 0.5, 0.5, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 1, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_BODY);
+                AttackModule::set_no_damage_fly_smoke_all(fighter.module_accessor, true, false);    
+            }
         }
         sv_animcmd::wait(fighter.lua_state_agent, 2.0);
         if macros::is_excute(fighter) {
@@ -287,12 +413,92 @@ unsafe extern "C" fn pikachu_dsmash_smash_script(fighter: &mut L2CAgentBase) {
         sv_animcmd::wait(fighter.lua_state_agent, 1.0);
     }
     if macros::is_excute(fighter) {
-        macros:: ATTACK(fighter, 0, 0, Hash40::new("top"), 7.7, 37, 152, 0, 60, 10.0, 0.0, 6.4, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 3, 0.3, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_BODY);
+        if PIKACHU_DOWNB_STATIC_TIMER[entry_id] > 0 {
+            macros::PLAY_SE(fighter, Hash40::new("se_pikachu_special_l03"));
+            macros:: ATTACK(fighter, 0, 0, Hash40::new("top"), 10.7, 37, 125, 0, 60, 10.0, 0.0, 6.9, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 3, 0.3, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_BODY);
+        }
+        else {
+            macros:: ATTACK(fighter, 0, 0, Hash40::new("top"), 7.7, 37, 152, 0, 60, 10.0, 0.0, 6.4, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 3, 0.3, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_BODY);
+        }
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
         MotionModule::set_rate(fighter.module_accessor, 1.3);
+        PIKACHU_DOWNB_STATIC_TIMER[entry_id] = 0;
+        PIKACHU_DOWNB_STATIC_IS_HIT[entry_id] = false ;
+    }
+}
+
+unsafe extern "C" fn pikachu_dsmash_effect_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+    
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        macros::EFFECT(fighter, Hash40::new("sys_smash_flash"), Hash40::new("tail3"), 0, 0, 3, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, true);
+        macros::EFFECT_FOLLOW_NO_STOP(fighter, Hash40::new("pikachu_cheek"), Hash40::new("head"), 0, 0, 0, 0, -90, -90, 1, true);
+        if PIKACHU_DOWNB_STATIC_TIMER[entry_id] > 0 {
+            macros::LAST_EFFECT_SET_COLOR(fighter, 5.0, 0.5, 2.5);
+        }
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 6.0);
+    if macros::is_excute(fighter) {
+        macros::EFFECT_FOLLOW_NO_STOP(fighter, Hash40::new("pikachu_cheek"), Hash40::new("head"), 0, 0, 0, 0, -90, -90, 1, true);
+        if PIKACHU_DOWNB_STATIC_TIMER[entry_id] > 0 {
+            macros::LAST_EFFECT_SET_COLOR(fighter, 5.0, 0.5, 2.5);
+        }
+        macros::EFFECT_FOLLOW_NO_STOP(fighter, Hash40::new("pikachu_elec2"), Hash40::new("top"), 0, 5, 7, 0, 0, 0, 1, true);
+        if PIKACHU_DOWNB_STATIC_TIMER[entry_id] > 0 {
+            macros::LAST_EFFECT_SET_COLOR(fighter, 5.0, 0.5, 2.5);
+        }
+        macros::EFFECT_FOLLOW_NO_STOP(fighter, Hash40::new("pikachu_elec2"), Hash40::new("top"), 0, 5, -7, 0, 180, 0, 1, true);
+        if PIKACHU_DOWNB_STATIC_TIMER[entry_id] > 0 {
+            macros::LAST_EFFECT_SET_COLOR(fighter, 5.0, 0.5, 2.5);
+        }
+        macros::EFFECT_FOLLOW_NO_STOP(fighter, Hash40::new("pikachu_elec"), Hash40::new("tail3"), 2, 0, 3, 0, 0, 0, 1, true);
+        if PIKACHU_DOWNB_STATIC_TIMER[entry_id] > 0 {
+            macros::LAST_EFFECT_SET_COLOR(fighter, 5.0, 0.5, 2.5);
+        }
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 8.0);
+    if macros::is_excute(fighter) {
+        macros::EFFECT_FOLLOW_FLIP(fighter, Hash40::new("pikachu_tail_arc"), Hash40::new("pikachu_tail_arc"), Hash40::new("top"), 0, 3, 0, 0, -100, 0, 1.2, true, *EF_FLIP_YZ);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 14.0);
+    if macros::is_excute(fighter) {
+        macros::EFFECT_FLIP(fighter, Hash40::new("sys_whirlwind_l"), Hash40::new("sys_whirlwind_r"), Hash40::new("top"), 0, 0.0, 0, 0, 0, 0, 1.1, 0, 0, 0, 0, 0, 0, false, *EF_FLIP_NONE);
+        macros::LAST_EFFECT_SET_ALPHA(fighter, 0.5);
+        macros::LAST_EFFECT_SET_RATE(fighter, 0.9);
+        if PIKACHU_DOWNB_STATIC_TIMER[entry_id] > 0 {
+            macros::LAST_EFFECT_SET_COLOR(fighter, 5.0, 0.5, 2.5);
+        }
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 15.0);
+    if macros::is_excute(fighter) {
+        macros::EFFECT_FOLLOW_FLIP(fighter, Hash40::new("pikachu_tail_arc"), Hash40::new("pikachu_tail_arc"), Hash40::new("top"), 0, 3, 1, 0, 90, 0, 1.2, true, *EF_FLIP_YZ);
+        macros::EFFECT_OFF_KIND(fighter, Hash40::new("pikachu_elec2"), false, true);
+        macros::LANDING_EFFECT(fighter, Hash40::new("null"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 0.75, 0, 0, 0, 0, 0, 0, false);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 20.0);
+    if macros::is_excute(fighter) {
+        macros::EFFECT_FOLLOW_NO_STOP(fighter, Hash40::new("pikachu_elec2"), Hash40::new("top"), 0, 9, 0, 0, 0, 0, 1.3, true);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 21.0);
+    if PIKACHU_DOWNB_STATIC_TIMER[entry_id] > 0 {
+        macros::EFFECT_FOLLOW_NO_STOP(fighter, Hash40::new("pikachu_kaminari_hit2"), Hash40::new("head"), 0, 0, 0, 0, 90, 0, 0.6, true);
+        macros::LAST_EFFECT_SET_RATE(fighter, 1.2);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 26.0);
+    if macros::is_excute(fighter) {
+        macros::EFFECT_OFF_KIND(fighter, Hash40::new("pikachu_elec2"), false, true);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 30.0);
+    if macros::is_excute(fighter) {
+        macros::EFFECT_OFF_KIND(fighter, Hash40::new("pikachu_elec"), false, true);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 35.0);
+    if macros::is_excute(fighter) {
+        macros::EFFECT_OFF_KIND(fighter, Hash40::new("pikachu_cheek"), false, true);
     }
 }
 
@@ -782,8 +988,11 @@ pub fn install() {
       .game_acmd("game_attackhi3", pikachu_utilt_smash_script)
       .game_acmd("game_attacklw3", pikachu_dtilt_smash_script)
       .game_acmd("game_attacks4", pikachu_fsmash_smash_script)
+      .effect_acmd("effect_attacks4", pikachu_fsmash_effect_script)
       .game_acmd("game_attackhi4", pikachu_usmash_smash_script)
+      .effect_acmd("effect_attackhi4", pikachu_usmash_effect_script)
       .game_acmd("game_attacklw4", pikachu_dsmash_smash_script)
+      .effect_acmd("effect_attacklw4", pikachu_dsmash_effect_script)
       .game_acmd("game_attackairn", pikachu_nair_smash_script)
       .effect_acmd("effect_attackairn", pikachu_nair_effect_script)
       .game_acmd("game_attackairf", pikachu_fair_smash_script)

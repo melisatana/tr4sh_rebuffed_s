@@ -22,6 +22,7 @@ unsafe extern "C" fn miifighter_frame(fighter: &mut L2CFighterCommon) {
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
         let stickx = ControlModule::get_stick_x(fighter.module_accessor);
+        let sticky = ControlModule::get_stick_y(fighter.module_accessor);
         let lr = PostureModule::lr(fighter.module_accessor);
         let stickx_directional = stickx * lr;
 
@@ -47,6 +48,22 @@ unsafe extern "C" fn miifighter_frame(fighter: &mut L2CFighterCommon) {
         if status == *FIGHTER_MIIFIGHTER_STATUS_KIND_SPECIAL_N3_TURN && 22.0 < frame && frame < 46.0 && stickx_directional <= -0.5 {
             StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_MIIFIGHTER_STATUS_KIND_SPECIAL_N3_TURN, true);
         }
+
+
+        if [
+            *FIGHTER_MIIFIGHTER_STATUS_KIND_SPECIAL_HI1_2, 
+            *FIGHTER_MIIFIGHTER_STATUS_KIND_SPECIAL_HI1_3, 
+            *FIGHTER_MIIFIGHTER_STATUS_KIND_SPECIAL_LW1_GROUND, 
+            *FIGHTER_MIIFIGHTER_STATUS_KIND_SPECIAL_LW1_AIR
+            ].contains(&status) {
+            if sticky <= -0.5 {
+                GroundModule::set_passable_check(fighter.module_accessor, true);
+            }
+            else {
+                GroundModule::set_passable_check(fighter.module_accessor, false);
+            }
+        }
+
 
     }
 }
@@ -115,7 +132,7 @@ unsafe extern "C" fn miifighter_jab100_smash_script(fighter: &mut L2CAgentBase) 
             WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_100_CONTINUE_CHECK);
         }
         sv_animcmd::frame(fighter.lua_state_agent, 3.0);
-            if macros::is_excute(fighter) {
+        if macros::is_excute(fighter) {
             macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 0.5, 361, 10, 0, 7, 4.0, 0.0, 6.5, 8.0, Some(0.0), Some(6.5), Some(15.5), 0.6, 0.4, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_rush"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
         }
         sv_animcmd::wait(fighter.lua_state_agent, 1.0);
@@ -133,7 +150,7 @@ unsafe extern "C" fn miifighter_jab100_smash_script(fighter: &mut L2CAgentBase) 
             WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_FLAG_100_CONTINUE_CHECK);
         }
         sv_animcmd::frame(fighter.lua_state_agent, 7.0);
-            if macros::is_excute(fighter) {
+        if macros::is_excute(fighter) {
             macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 0.5, 361, 10, 0, 7, 4.0, 0.0, 6.5, 8.0, Some(0.0), Some(6.5), Some(15.5), 0.6, 0.4, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_rush"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
         }
         sv_animcmd::wait(fighter.lua_state_agent, 1.0);
@@ -1236,6 +1253,34 @@ unsafe extern "C" fn miifighter_sideb_suplex_throwlanding_dash_script(fighter: &
     }
 }
 
+
+unsafe extern "C" fn miifighter_upb_axekick_rising_script(agent: &mut L2CAgentBase) {
+    sv_animcmd::frame(agent.lua_state_agent, 1.0);
+    if macros::is_excute(agent) {
+        macros::ATTACK(agent, 0, 0, Hash40::new("top"), 4.0, 86, 100, 79, 0, 3.5, 0.0, 3.5, 7.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(agent, 1, 0, Hash40::new("top"), 4.0, 96, 100, 79, 0, 3.5, 0.0, 3.5, 16.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(agent, 2, 0, Hash40::new("top"), 4.0, 83, 100, 63, 0, 3.5, 0.0, 11.0, 7.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(agent, 3, 0, Hash40::new("top"), 4.0, 96, 100, 63, 0, 3.5, 0.0, 11.0, 16.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+    }
+    sv_animcmd::frame(agent.lua_state_agent, 5.0);
+    if macros::is_excute(agent) {
+        notify_event_msc_cmd!(agent, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS_BOTH_SIDES);
+    }
+    sv_animcmd::frame(agent.lua_state_agent, 7.0);
+    if macros::is_excute(agent) {
+        AttackModule::clear_all(agent.module_accessor);
+        WorkModule::on_flag(agent.module_accessor, *FIGHTER_MIIFIGHTER_STATUS_WORK_ID_FLAG_TENCHI_KICK_SHIFT_RESERVE);
+    }
+    sv_animcmd::frame(agent.lua_state_agent, 19.0);
+    if macros::is_excute(agent) {
+        WorkModule::on_flag(agent.module_accessor, *FIGHTER_MIIFIGHTER_STATUS_WORK_ID_FLAG_TENCHI_KICK_SHIFT);
+    }
+    sv_animcmd::frame(agent.lua_state_agent, 34.0);
+    if macros::is_excute(agent) {
+        WorkModule::off_flag(agent.module_accessor, *FIGHTER_MIIFIGHTER_STATUS_WORK_ID_FLAG_TENCHI_KICK_SHIFT);
+    }
+}
+
 unsafe extern "C" fn miifighter_upb_axekick_falling_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS_BOTH_SIDES);
@@ -1720,6 +1765,8 @@ pub fn install() {
     .game_acmd("game_specials3dash", miifighter_sideb_suplex_dash_script)
     .game_acmd("game_specialairs3dash", miifighter_sideb_suplex_air_dash_script)
     .game_acmd("game_specialairs3landing", miifighter_sideb_suplex_throwlanding_dash_script)
+    .game_acmd("game_specialhi12", miifighter_upb_axekick_rising_script)
+    .game_acmd("game_specialairhi12", miifighter_upb_axekick_rising_script)
     .game_acmd("game_specialhi13", miifighter_upb_axekick_falling_script)
     .game_acmd("game_specialairhi13", miifighter_upb_axekick_falling_air_script)
     .game_acmd("game_specialhi14", miifighter_upb_axekick_landing_script)

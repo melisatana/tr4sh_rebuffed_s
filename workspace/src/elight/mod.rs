@@ -64,6 +64,12 @@ unsafe extern "C" fn elight_frame(fighter: &mut L2CFighterCommon) {
             }
         }
 
+        if [*FIGHTER_STATUS_KIND_ATTACK_S3, *FIGHTER_STATUS_KIND_ATTACK_HI3, *FIGHTER_STATUS_KIND_ATTACK_LW3].contains(&status) {
+            if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false {
+                WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_SPECIAL_LW);
+                fighter.sub_transition_group_check_ground_special();
+            }
+        }
 
         if [*FIGHTER_STATUS_KIND_GUARD].contains(&status) {
             if MYTHRA_UTHROW_SPEED_TIMER[entry_id] == 0 && ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_SPECIAL) {
@@ -602,6 +608,11 @@ unsafe extern "C" fn mythra_fsmash_smash_script(fighter: &mut L2CAgentBase) {
             macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 13.7, 361, 92, 0, 41, 2.8, 0.0, 21.0, 11.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_SWORD);
             macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 13.7, 361, 92, 0, 41, 2.4, 0.0, 21.0, 11.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_SWORD);
             macros::ATTACK(fighter, 4, 0, Hash40::new("top"), 13.7, 361, 92, 0, 41, 3.3, 0.0, 8.0, 5.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_SWORD);
+            AttackModule::set_no_finish_camera(fighter.module_accessor, 0, true, false);
+            AttackModule::set_no_finish_camera(fighter.module_accessor, 1, true, false);
+            AttackModule::set_no_finish_camera(fighter.module_accessor, 2, true, false);
+            AttackModule::set_no_finish_camera(fighter.module_accessor, 3, true, false);
+            AttackModule::set_no_finish_camera(fighter.module_accessor, 4, true, false);
         }
         else {
             macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.7, 361, 92, 0, 41, 3.7, 0.0, 12.0, 8.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
@@ -619,6 +630,11 @@ unsafe extern "C" fn mythra_fsmash_smash_script(fighter: &mut L2CAgentBase) {
             macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 13.7, 361, 92, 0, 41, 2.8, 0.0, 11.0, 19.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_SWORD);
             macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 13.7, 361, 92, 0, 41, 2.4, 0.0, 13.0, 22.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_SWORD);
             macros::ATTACK(fighter, 4, 0, Hash40::new("top"), 13.7, 361, 92, 0, 41, 3.3, 0.0, 5.0, 7.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_SWORD);
+            AttackModule::set_no_finish_camera(fighter.module_accessor, 0, true, false);
+            AttackModule::set_no_finish_camera(fighter.module_accessor, 1, true, false);
+            AttackModule::set_no_finish_camera(fighter.module_accessor, 2, true, false);
+            AttackModule::set_no_finish_camera(fighter.module_accessor, 3, true, false);
+            AttackModule::set_no_finish_camera(fighter.module_accessor, 4, true, false);
         }
         else {
             macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.7, 361, 92, 0, 41, 3.7, 0.0, 7.0, 12.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
@@ -636,6 +652,11 @@ unsafe extern "C" fn mythra_fsmash_smash_script(fighter: &mut L2CAgentBase) {
             macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 13.7, 361, 92, 0, 41, 2.8, 0.0, 2.0, 20.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_SWORD);
             macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 13.7, 361, 92, 0, 41, 2.4, 0.0, 2.0, 23.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_SWORD);
             macros::ATTACK(fighter, 4, 0, Hash40::new("top"), 13.7, 361, 92, 0, 41, 3.3, 0.0, 2.0, 5.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_SWORD);
+            AttackModule::set_no_finish_camera(fighter.module_accessor, 0, true, false);
+            AttackModule::set_no_finish_camera(fighter.module_accessor, 1, true, false);
+            AttackModule::set_no_finish_camera(fighter.module_accessor, 2, true, false);
+            AttackModule::set_no_finish_camera(fighter.module_accessor, 3, true, false);
+            AttackModule::set_no_finish_camera(fighter.module_accessor, 4, true, false);
         }
         else {
             macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.7, 361, 92, 0, 41, 3.7, 0.0, 2.0, 11.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
@@ -2582,7 +2603,7 @@ pub fn install() {
     .game_acmd("game_catchcut", mythra_catch_cut_smash_script)
     .install();
 
-    Agent::new("eflame_bunshin")
+    Agent::new("elight_bunshin")
     .game_acmd("game_specials1", mythra_sideb_1_smash_script)
     .game_acmd("game_specialairs1", mythra_sideb_1_air_smash_script)
     .game_acmd("game_specials2", mythra_sideb_2_smash_script)

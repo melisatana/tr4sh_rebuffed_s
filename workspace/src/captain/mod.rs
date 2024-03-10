@@ -153,7 +153,7 @@ unsafe extern "C" fn kirby_captainhat_frame(fighter: &mut L2CFighterCommon) {
         }
         let frame = MotionModule::frame(fighter.module_accessor);
         if status == *FIGHTER_KIRBY_STATUS_KIND_CAPTAIN_SPECIAL_N_TURN && 22.0 < frame && frame < 41.0 && stickx_directional <= -0.5 {
-            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_CAPTAIN_STATUS_KIND_SPECIAL_N_TURN, true);
+            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_KIRBY_STATUS_KIND_CAPTAIN_SPECIAL_N_TURN, true);
         }
 
     }

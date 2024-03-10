@@ -122,6 +122,11 @@ unsafe extern "C" fn kirby_zsshat_frame(fighter: &mut L2CFighterCommon) {
             }
         }
 
+        if sv_information::is_ready_go() == false || [*FIGHTER_STATUS_KIND_WIN, *FIGHTER_STATUS_KIND_LOSE].contains(&status) {
+            SZEROSUIT_LASER_TOGGLE_TYPE[entry_id] = 0;
+        }
+
+
 
         
     }
@@ -508,6 +513,33 @@ unsafe extern "C" fn szerosuit_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
+unsafe extern "C" fn szerosuit_dsmash_charge_effect_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
+    sv_animcmd::frame(fighter.lua_state_agent, 5.0);
+    if macros::is_excute(fighter) {
+        if SZEROSUIT_LASER_TOGGLE_TYPE[entry_id] == 1 {
+            macros::EFFECT_FOLLOW(fighter, Hash40::new("szero_pl_hold"), Hash40::new("haver"), 0, 1.3, 3, 0, 0, 0, 0.75, true);
+            macros::LAST_EFFECT_SET_COLOR(fighter, 5.0, 0.5, 0.0);
+        
+        }
+        else if SZEROSUIT_LASER_TOGGLE_TYPE[entry_id] == 2 {
+            macros::EFFECT_FOLLOW(fighter, Hash40::new("szero_pl_hold"), Hash40::new("haver"), 0, 1.3, 3, 0, 0, 0, 0.75, true);
+            macros::LAST_EFFECT_SET_COLOR(fighter, 0.1, 1.0, 10.0);
+        
+        }
+        else {
+            macros::EFFECT_FOLLOW(fighter, Hash40::new("szero_pl_hold"), Hash40::new("haver"), 0, 1.3, 3, 0, 0, 0, 0.75, true);
+        }
+        macros::FOOT_EFFECT(fighter, Hash40::new("sys_run_smoke"), Hash40::new("top"), 2, 0, 0, 0, 0, 0, 1, 15, 0, 4, 0, 0, 0, false);
+    }
+    sv_animcmd::wait(fighter.lua_state_agent, 5.0);
+    if macros::is_excute(fighter) {
+        macros::FOOT_EFFECT(fighter, Hash40::new("sys_run_smoke"), Hash40::new("top"), 2, 0, 0, 0, 0, 0, 1, 15, 0, 4, 0, 0, 0, false);
+    }
+    sv_animcmd::wait(fighter.lua_state_agent, 5.0);
+}
+
 unsafe extern "C" fn szerosuit_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
@@ -523,12 +555,32 @@ unsafe extern "C" fn szerosuit_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 20.0);
     if macros::is_excute(fighter) {
         if SZEROSUIT_PASSIVE_TIMER_READY[entry_id] {
-            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.0, 290, 90, 0, 0, 5.0, 0.0, 3.0, 19.0, Some(0.0), Some(3.0), Some(2.0), 0.6, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 6, 0.0, 0, false, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
-            macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 11.0, 290, 85, 0, 0, 7.7, 0.0, 3.0, 23.0, Some(0.0), Some(3.0), Some(4.0), 0.6, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 6, 0.0, 0, false, true, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);     
+            if SZEROSUIT_LASER_TOGGLE_TYPE[entry_id] == 1 {
+                macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 16.0, 31, 90, 0, 30, 5.0, 0.0, 3.0, 19.0, Some(0.0), Some(3.0), Some(2.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);
+                macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 16.0, 31, 90, 0, 30, 7.7, 0.0, 3.0, 23.0, Some(0.0), Some(3.0), Some(4.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, true, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);     
+            }
+            else if SZEROSUIT_LASER_TOGGLE_TYPE[entry_id] == 2 {
+                macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 10.0, 70, 85, 0, 20, 5.0, 0.0, 3.0, 19.0, Some(0.0), Some(3.0), Some(2.0), 0.8, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_ice"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FREEZE, *ATTACK_REGION_ENERGY);
+                macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 10.0, 70, 85, 0, 20, 7.7, 0.0, 3.0, 23.0, Some(0.0), Some(3.0), Some(4.0), 0.8, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, true, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_ice"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FREEZE, *ATTACK_REGION_ENERGY);     
+            }
+            else {
+                macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.0, 290, 90, 0, 0, 5.0, 0.0, 3.0, 19.0, Some(0.0), Some(3.0), Some(2.0), 0.6, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 6, 0.0, 0, false, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
+                macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 11.0, 290, 85, 0, 0, 7.7, 0.0, 3.0, 23.0, Some(0.0), Some(3.0), Some(4.0), 0.6, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 6, 0.0, 0, false, true, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);     
+            }
         }
         else {
-            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 10.0, 290, 90, 0, 0, 4.0, 0.0, 3.0, 13.0, Some(0.0), Some(3.0), Some(8.0), 0.6, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 6, 0.0, 0, false, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
-            macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 8.0, 290, 85, 0, 0, 7.0, 0.0, 3.0, 17.0, Some(0.0), Some(3.0), Some(10.0), 0.6, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 6, 0.0, 0, false, true, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
+            if SZEROSUIT_LASER_TOGGLE_TYPE[entry_id] == 1 {
+                macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 14.0, 31, 90, 0, 30, 4.0, 0.0, 3.0, 13.0, Some(0.0), Some(3.0), Some(8.0), 0.6, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);
+                macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 14.0, 31, 90, 0, 30, 7.0, 0.0, 3.0, 17.0, Some(0.0), Some(3.0), Some(10.0), 0.6, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, true, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);      
+            }
+            else if SZEROSUIT_LASER_TOGGLE_TYPE[entry_id] == 2 {
+                macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.5, 60, 85, 0, 20, 4.0, 0.0, 3.0, 13.0, Some(0.0), Some(3.0), Some(8.0), 0.8, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_ice"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FREEZE, *ATTACK_REGION_ENERGY);
+                macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 8.5, 60, 85, 0, 20, 7.0, 0.0, 3.0, 17.0, Some(0.0), Some(3.0), Some(10.0), 0.8, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, true, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_ice"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FREEZE, *ATTACK_REGION_ENERGY);
+            }
+            else {
+                macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 10.0, 290, 90, 0, 0, 4.0, 0.0, 3.0, 13.0, Some(0.0), Some(3.0), Some(8.0), 0.6, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 6, 0.0, 0, false, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
+                macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 8.0, 290, 85, 0, 0, 7.0, 0.0, 3.0, 17.0, Some(0.0), Some(3.0), Some(10.0), 0.6, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 6, 0.0, 0, false, true, false, false, false, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);    
+            }
         }
     }
     sv_animcmd::wait(fighter.lua_state_agent, 5.0);
@@ -550,15 +602,46 @@ unsafe extern "C" fn szerosuit_dsmash_effect_script(fighter: &mut L2CAgentBase) 
     }
     sv_animcmd::frame(fighter.lua_state_agent, 19.0);
     if macros::is_excute(fighter) {
-        macros::EFFECT_FOLLOW(fighter, Hash40::new("szero_pl_shot"), Hash40::new("haver"), 0, 1.3, 3, 0, 0, 0, 0.3, true);
+        if SZEROSUIT_LASER_TOGGLE_TYPE[entry_id] == 1 {
+            macros::EFFECT_FOLLOW(fighter, Hash40::new("szero_pl_shot"), Hash40::new("haver"), 0, 1.3, 3, 0, 0, 0, 0.3, true);
+            macros::LAST_EFFECT_SET_COLOR(fighter, 5.0, 0.5, 0.0);
+        }
+        else if SZEROSUIT_LASER_TOGGLE_TYPE[entry_id] == 2 {
+            macros::EFFECT_FOLLOW(fighter, Hash40::new("szero_pl_shot"), Hash40::new("haver"), 0, 1.3, 3, 0, 0, 0, 0.3, true);
+            macros::LAST_EFFECT_SET_COLOR(fighter, 0.1, 1.0, 10.0);
+        }
+        else {
+            macros::EFFECT_FOLLOW(fighter, Hash40::new("szero_pl_shot"), Hash40::new("haver"), 0, 1.3, 3, 0, 0, 0, 0.3, true);
+        }
     }
     sv_animcmd::frame(fighter.lua_state_agent, 20.0);
     if macros::is_excute(fighter) {
         if SZEROSUIT_PASSIVE_TIMER_READY[entry_id] {
-            macros::EFFECT_FOLLOW(fighter, Hash40::new("szero_atk_lw4"), Hash40::new("top"), 0, 0, 15, 0, 0, 0, 1.64, true);
+            if SZEROSUIT_LASER_TOGGLE_TYPE[entry_id] == 1 {
+                macros::EFFECT_FOLLOW(fighter, Hash40::new("szero_atk_lw4"), Hash40::new("top"), 0, 0, 15, 0, 0, 0, 1.64, true);
+                macros::LAST_EFFECT_SET_COLOR(fighter, 5.0, 0.5, 0.0);
+            
+            }
+            else if SZEROSUIT_LASER_TOGGLE_TYPE[entry_id] == 2 {
+                macros::EFFECT_FOLLOW(fighter, Hash40::new("szero_atk_lw4"), Hash40::new("top"), 0, 0, 15, 0, 0, 0, 1.64, true);
+                macros::LAST_EFFECT_SET_COLOR(fighter, 0.1, 1.0, 10.0);
+            }
+            else {
+                macros::EFFECT_FOLLOW(fighter, Hash40::new("szero_atk_lw4"), Hash40::new("top"), 0, 0, 15, 0, 0, 0, 1.64, true);
+            }
         }
         else {
-            macros::EFFECT_FOLLOW(fighter, Hash40::new("szero_atk_lw4"), Hash40::new("top"), 0, 0, 15, 0, 0, 0, 1, true);
+            if SZEROSUIT_LASER_TOGGLE_TYPE[entry_id] == 1 {
+                macros::EFFECT_FOLLOW(fighter, Hash40::new("szero_atk_lw4"), Hash40::new("top"), 0, 0, 15, 0, 0, 0, 1, true);
+                macros::LAST_EFFECT_SET_COLOR(fighter, 5.0, 0.5, 0.0);
+            }
+            else if SZEROSUIT_LASER_TOGGLE_TYPE[entry_id] == 2 {
+                macros::EFFECT_FOLLOW(fighter, Hash40::new("szero_atk_lw4"), Hash40::new("top"), 0, 0, 15, 0, 0, 0, 1, true);
+                macros::LAST_EFFECT_SET_COLOR(fighter, 0.1, 1.0, 10.0);
+            }
+            else {
+                macros::EFFECT_FOLLOW(fighter, Hash40::new("szero_atk_lw4"), Hash40::new("top"), 0, 0, 15, 0, 0, 0, 1, true);
+            }
         }
     }
     sv_animcmd::frame(fighter.lua_state_agent, 21.0);
@@ -1652,6 +1735,7 @@ pub fn install() {
     .game_acmd("game_attacks4hi", szerosuit_fsmash2_smash_script)
     .game_acmd("game_attacks4lw", szerosuit_fsmash3_smash_script)
     .game_acmd("game_attackhi4", szerosuit_usmash_smash_script)
+    .effect_acmd("effect_attacklw4charge", szerosuit_dsmash_charge_effect_script)
     .game_acmd("game_attacklw4", szerosuit_dsmash_smash_script)
     .effect_acmd("effect_attacklw4", szerosuit_dsmash_effect_script)
     .game_acmd("game_attackairn", szerosuit_nair_smash_script)

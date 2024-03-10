@@ -68,7 +68,6 @@ mod dolly;
 mod ryu;
 mod ken;
 mod krool;
-
 mod gekkouga;
 mod metaknight;
 mod rockman;

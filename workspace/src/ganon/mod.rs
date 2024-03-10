@@ -1081,49 +1081,7 @@ unsafe extern "C" fn ganon_upb_ascent_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 14.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 0.8, 367, 90, 50, 50, 7.0, 0.0, 18.0, 4.0, None, None, None, 0.7, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 4, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PUNCH);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 18.0);
-    if macros::is_excute(fighter) {
-        notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS_BOTH_SIDES);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 29.0);
-    if macros::is_excute(fighter) {
-        AttackModule::clear_all(fighter.module_accessor);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 34.0);
-    if macros::is_excute(fighter) {
-        macros::CATCH(fighter, 0, Hash40::new("armr"), 9.0, 6.0, 0.0, 0.0, None, None, None, *FIGHTER_STATUS_KIND_CLUNG_GANON, *COLLISION_SITUATION_MASK_GA);
-        macros::CATCH(fighter, 1, Hash40::new("armr"), 6.0, -1.0, 0.0, 0.0, None, None, None, *FIGHTER_STATUS_KIND_CLUNG_GANON, *COLLISION_SITUATION_MASK_GA);
-        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 6.0, 0, 50, 0, 70, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_NONE);
-    }
-    sv_animcmd::wait(fighter.lua_state_agent, 3.0);
-    if macros::is_excute(fighter) {
-        GrabModule::clear_all(fighter.module_accessor);
-        AttackModule::clear_all(fighter.module_accessor);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 46.0);
-    if macros::is_excute(fighter) {
-        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GANON_STATUS_SPECIAL_HI_FLAG_IS_CHECK_DIVE);
-    }
-}
-
-unsafe extern "C" fn ganon_upb_ascent_air_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 6.0);
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.8, 100, 90, 60, 50, 7.0, 0.0, 6.8, 5.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 5, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PUNCH);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 9.0);
-    if macros::is_excute(fighter) {
-        AttackModule::clear_all(fighter.module_accessor);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 12.0);
-    if macros::is_excute(fighter) {
-        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_SUPER_JUMP_PUNCH_FLAG_MOVE_TRANS);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 14.0);
-    if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 0.8, 367, 90, 50, 50, 7.0, 0.0, 18.0, 4.0, None, None, None, 0.7, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 4, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 0.8, 367, 90, 50, 50, 7.0, 0.0, 18.0, 5.0, None, None, None, 0.7, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 4, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PUNCH);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 18.0);
     if macros::is_excute(fighter) {
@@ -1149,6 +1107,7 @@ unsafe extern "C" fn ganon_upb_ascent_air_smash_script(fighter: &mut L2CAgentBas
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_GANON_STATUS_SPECIAL_HI_FLAG_IS_CHECK_DIVE);
     }
 }
+
 
 unsafe extern "C" fn ganon_upb_throw_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
@@ -1293,27 +1252,21 @@ pub fn install() {
       .game_acmd("game_throwhi", ganon_uthrow_smash_script)
       .game_acmd("game_throwlw", ganon_dthrow_smash_script)
       .game_acmd("game_cliffattack", ganon_ledge_attack_smash_script)
-
-
       .game_acmd("game_specialn", ganon_neutralb_smash_script)
       .game_acmd("game_specialairn", ganon_neutralb_air_smash_script)
       .game_acmd("game_specialnturn", ganon_neutralb_turn_smash_script)
       .game_acmd("game_specialairnturn", ganon_neutralb_air_turn_smash_script)
-
       .game_acmd("game_specialsstart", ganon_sideb_dash_smash_script)
       .game_acmd("game_specialairsstart", ganon_sideb_dash_air_smash_script)
       .game_acmd("game_specials", ganon_sideb_smash_script)
       .game_acmd("game_specialairs", ganon_sideb_air_smash_script)
       .game_acmd("game_specialairsfall", ganon_sideb_air_fall_smash_script)
-
       .game_acmd("game_specialhi", ganon_upb_ascent_smash_script)
-      .game_acmd("game_specialairhi", ganon_upb_ascent_air_smash_script)
+      .game_acmd("game_specialairhi", ganon_upb_ascent_smash_script)
       .game_acmd("game_specialhithrow", ganon_upb_throw_smash_script)
-
       .game_acmd("game_speciallw", ganon_downb_smash_script)
       .game_acmd("game_specialairlw", ganon_downb_air_smash_script)
       .game_acmd("game_speciallwend", ganon_downb_end_smash_script)
-
       .game_acmd("game_speciallwendair", ganon_downb_groundtoair_end_smash_script)
       .game_acmd("game_specialairlwendair", ganon_downb_air_falling_script)
       .game_acmd("game_specialairlwend", ganon_downb_air_landing_smash_script)
