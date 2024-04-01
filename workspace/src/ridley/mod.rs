@@ -66,6 +66,20 @@ unsafe extern "C" fn kirby_ridleyhat_frame(fighter: &mut L2CFighterCommon) {
 }
 
 
+unsafe extern "C" fn ridley_air_jump_1(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 20.0);
+    if macros::is_excute(fighter) {
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_JUMP_FLY_NEXT);
+    }
+}
+
+unsafe extern "C" fn ridley_air_jump_2(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 20.0);
+    if macros::is_excute(fighter) {
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_JUMP_FLY_NEXT);
+    }
+}
+
 unsafe extern "C" fn ridley_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
@@ -1123,6 +1137,8 @@ unsafe extern "C" fn ridley_downb_stab_smash_script(fighter: &mut L2CAgentBase) 
 pub fn install() {
     Agent::new("ridley")
     .on_line(Main, ridley_frame) //opff
+    .game_acmd("game_jumpaerialf1", ridley_air_jump_1)
+    .game_acmd("game_jumpaerialf2", ridley_air_jump_2)
     .game_acmd("game_attack11", ridley_jab_smash_script)
     .game_acmd("game_attack12", ridley_jab2_smash_script)
     .game_acmd("game_attack13", ridley_jab3_smash_script)

@@ -38,6 +38,42 @@ unsafe extern "C" fn metaknight_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
+
+unsafe extern "C" fn metaknight_air_jump_1(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 20.0);
+    if macros::is_excute(fighter) {
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_JUMP_FLY_NEXT);
+    }
+}
+
+unsafe extern "C" fn metaknight_air_jump_2(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 20.0);
+    if macros::is_excute(fighter) {
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_JUMP_FLY_NEXT);
+    }
+}
+
+unsafe extern "C" fn metaknight_air_jump_3(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 20.0);
+    if macros::is_excute(fighter) {
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_JUMP_FLY_NEXT);
+    }
+}
+
+unsafe extern "C" fn metaknight_air_jump_4(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 20.0);
+    if macros::is_excute(fighter) {
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_JUMP_FLY_NEXT);
+    }
+}
+
+unsafe extern "C" fn metaknight_air_jump_5(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 20.0);
+    if macros::is_excute(fighter) {
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_JUMP_FLY_NEXT);
+    }
+}
+
 unsafe extern "C" fn metaknight_jab100(fighter: &mut L2CAgentBase) {
     for _ in 0..i32::MAX {
         if macros::is_excute(fighter) {
@@ -1276,6 +1312,11 @@ unsafe extern "C" fn metaknight_downspecial_air_b(fighter: &mut L2CAgentBase) {
 pub fn install() {
     Agent::new("metaknight")
     .on_line(Main, metaknight_frame) //opff
+    .game_acmd("game_jumpaerialf1", metaknight_air_jump_1)
+    .game_acmd("game_jumpaerialf2", metaknight_air_jump_2)
+    .game_acmd("game_jumpaerialf3", metaknight_air_jump_3)
+    .game_acmd("game_jumpaerialf4", metaknight_air_jump_4)
+    .game_acmd("game_jumpaerialf5", metaknight_air_jump_5)
     .game_acmd("game_attack100", metaknight_jab100)
     .game_acmd("game_attack100end", metaknight_jab100end)
     .game_acmd("game_attackdash", metaknight_dashattack)

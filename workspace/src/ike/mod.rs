@@ -1003,6 +1003,10 @@ unsafe extern "C" fn ike_sideb_attack_air_smash_script(fighter: &mut L2CAgentBas
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS_BOTH_SIDES);
     }
+    sv_animcmd::frame(fighter.lua_state_agent, 31.0);
+    if macros::is_excute(fighter) {
+        StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_FALL, false);
+    }
 }
 
 unsafe extern "C" fn ike_upb_1_smash_script(fighter: &mut L2CAgentBase) {

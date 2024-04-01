@@ -462,6 +462,7 @@ pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
             );
         }
 
+
         //momentum jumps (currently disabled)
         if [*FIGHTER_STATUS_KIND_JUMP_SQUAT, *FIGHTER_STATUS_KIND_JUMP].contains(&status) && DEBUG_ALLOW_MOMENTUM_JUMPS 
         && WorkModule::is_flag(module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_JUMP_NO_LIMIT) == false {
@@ -473,7 +474,6 @@ pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
         if WorkModule::is_flag(fighter.module_accessor, crate::consts::FIGHTER_STATUS_ATTACK_WORK_FLAG_HITFALL) {
             crate::consts::common_attack_hitfall_flag(fighter);
         }            
-        
 
         //Shield dropping through platforms using the taunt button or holding the stick diagonal down 
         if [*FIGHTER_STATUS_KIND_GUARD, *FIGHTER_STATUS_KIND_GUARD_DAMAGE, *FIGHTER_STATUS_KIND_GUARD_ON].contains(&status) {

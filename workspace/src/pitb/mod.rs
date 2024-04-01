@@ -44,6 +44,27 @@ unsafe extern "C" fn darkpit_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
+unsafe extern "C" fn darkpit_air_jump_1(fighter: &mut L2CAgentBase) {
+	sv_animcmd::frame(fighter.lua_state_agent, 19.0);
+    if macros::is_excute(fighter) {
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_JUMP_FLY_NEXT);
+    }
+}
+
+unsafe extern "C" fn darkpit_air_jump_2(fighter: &mut L2CAgentBase) {
+	sv_animcmd::frame(fighter.lua_state_agent, 19.0);
+    if macros::is_excute(fighter) {
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_JUMP_FLY_NEXT);
+    }
+}
+
+unsafe extern "C" fn darkpit_air_jump_3(fighter: &mut L2CAgentBase) {
+	sv_animcmd::frame(fighter.lua_state_agent, 19.0);
+    if macros::is_excute(fighter) {
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_JUMP_FLY_NEXT);
+    }
+}
+
 unsafe extern "C" fn darkpit_jab(fighter: &mut L2CAgentBase) {
 	sv_animcmd::frame(fighter.lua_state_agent, 5.0);
 	if macros::is_excute(fighter) {
@@ -971,6 +992,9 @@ unsafe extern "C" fn darkpit_sidetaunt_right(fighter: &mut L2CAgentBase) {
 pub fn install() {
     Agent::new("pitb")
     .on_line(Main, darkpit_frame) //opff
+	.game_acmd("game_jumpaerialf1", darkpit_air_jump_1)
+	.game_acmd("game_jumpaerialf2", darkpit_air_jump_2)
+	.game_acmd("game_jumpaerialf3", darkpit_air_jump_3)
     .game_acmd("game_attack11", darkpit_jab)
     .game_acmd("game_attack12", darkpit_jab2)
 	.game_acmd("game_attack13", darkpit_jab3)
