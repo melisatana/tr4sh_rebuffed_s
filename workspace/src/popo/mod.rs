@@ -8,6 +8,9 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
+
+pub static mut NANA_BOMA: [u64; 8] = [0; 8];
 
 // A Once-Per-Fighter-Frame that only applies to Popo
 unsafe extern "C" fn popo_frame(fighter: &mut L2CFighterCommon) {
@@ -15,6 +18,8 @@ unsafe extern "C" fn popo_frame(fighter: &mut L2CFighterCommon) {
         global_fighter_frame(fighter);
         let status = StatusModule::status_kind(fighter.module_accessor);
         let sticky = ControlModule::get_stick_y(fighter.module_accessor);
+        let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+        
 
         //println!("It'sa me, Popo, but where is Nana?");
 
@@ -28,6 +33,21 @@ unsafe extern "C" fn popo_frame(fighter: &mut L2CFighterCommon) {
             else {
                 GroundModule::set_passable_check(fighter.module_accessor, false);
             }
+        }
+
+        /*if LinkModule::is_link(fighter.module_accessor, *FIGHTER_POPO_LINK_NO_PARTNER) {
+            AttackModule::set_power_mul(fighter.module_accessor, 1.25);
+        }*/
+
+
+        let fighter_kind = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_KIND);
+        if fighter_kind  == *FIGHTER_KIND_NANA {
+            let nana_boma_deez = smash::app::sv_system::battle_object_module_accessor(fighter.lua_state_agent);
+            NANA_BOMA[entry_id] = (&mut *nana_boma_deez as *mut BattleObjectModuleAccessor) as u64;
+        }
+
+        if NANA_BOMA[entry_id] == *FIGHTER_STATUS_KIND_DEAD as u64 {
+            AttackModule::set_power_mul(fighter.module_accessor, 1.25);
         }
 
     }
@@ -56,6 +76,7 @@ unsafe extern "C" fn nana_frame(fighter: &mut L2CFighterCommon) {
 
     }
 }
+
 
 unsafe extern "C" fn popo_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
@@ -112,9 +133,9 @@ unsafe extern "C" fn popo_jab_smash_script_nana(fighter: &mut L2CAgentBase) {
 unsafe extern "C" fn popo_jab2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.5, 75, 85, 0, 50, 3.5, 0.0, 5.5, 5.5, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_HAMMER);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 4.5, 75, 85, 0, 50, 3.5, 0.0, 5.5, 9.0, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_HAMMER);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 4.5, 75, 85, 0, 50, 3.8, 0.0, 5.5, 13.0, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_HAMMER);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.5, 75, 85, 0, 65, 3.5, 0.0, 5.5, 5.5, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_HAMMER);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 4.5, 75, 85, 0, 65, 3.5, 0.0, 5.5, 9.0, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_HAMMER);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 4.5, 75, 85, 0, 65, 3.8, 0.0, 5.5, 13.0, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_HAMMER);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
@@ -126,9 +147,9 @@ unsafe extern "C" fn popo_jab2_smash_script(fighter: &mut L2CAgentBase) {
 unsafe extern "C" fn popo_jab2_smash_script_nana(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.1, 75, 85, 0, 50, 3.4, 3.0, 5.5, 5.5, Some(-3.0), Some(5.5), Some(5.5), 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_HAMMER);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 3.1, 75, 85, 0, 50, 3.4, 3.0, 5.5, 9.0, Some(-3.0), Some(5.5), Some(9.0), 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_HAMMER);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 3.1, 75, 85, 0, 50, 4.4, 3.0, 5.5, 13.0, Some(-3.0), Some(5.5), Some(13.0), 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_HAMMER);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.1, 75, 85, 0, 65, 3.4, 3.0, 5.5, 5.5, Some(-3.0), Some(5.5), Some(5.5), 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_HAMMER);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 3.1, 75, 85, 0, 65, 3.4, 3.0, 5.5, 9.0, Some(-3.0), Some(5.5), Some(9.0), 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_HAMMER);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 3.1, 75, 85, 0, 65, 4.4, 3.0, 5.5, 13.0, Some(-3.0), Some(5.5), Some(13.0), 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_HAMMER);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
@@ -454,6 +475,7 @@ unsafe extern "C" fn popo_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
+        MotionModule::set_rate(fighter.module_accessor, 1.15);
     }
 }
 
@@ -810,7 +832,7 @@ unsafe extern "C" fn popo_dair_smash_script_nana(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 18.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("havel"), 6.6, 361, 130, 0, 40, 5.5, 0.0, 6.5, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_HAMMER);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("havel"), 6.6, 50, 130, 0, 40, 5.5, 0.0, 6.5, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_HAMMER);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 41.0);
     if macros::is_excute(fighter) {
@@ -1196,78 +1218,78 @@ unsafe extern "C" fn popo_downtaunt_smash_script_nana(fighter: &mut L2CAgentBase
 pub fn install() {
     Agent::new("popo")
     .on_line(Main, popo_frame) //opff
-    .game_acmd("game_attack11", popo_jab_smash_script)
-    .game_acmd("game_attack12", popo_jab2_smash_script)
-    .game_acmd("game_attackdash", popo_dashattack_smash_script)
-    .game_acmd("game_attacks3", popo_ftilt_smash_script)
-    .game_acmd("game_attacks3hi", popo_ftilt_smash_script)
-    .game_acmd("game_attacks3lw", popo_ftilt_smash_script)
-    .game_acmd("game_attackhi3", popo_utilt_smash_script)
-    .game_acmd("game_attacklw3", popo_dtilt_smash_script)
-    .game_acmd("game_attacks4", popo_fsmash_smash_script)
-    .game_acmd("game_attackhi4", popo_usmash_smash_script)
-    .game_acmd("game_attacklw4", popo_dsmash_smash_script)
-    .game_acmd("game_attackairn", popo_nair_smash_script)
-    .game_acmd("game_attackairf", popo_fair_smash_script)
-    .game_acmd("game_attackairb", popo_bair_smash_script)
-    .game_acmd("game_attackairhi", popo_uair_smash_script)
-    .game_acmd("game_attackairlw", popo_dair_smash_script)
-    .game_acmd("game_catch", popo_grab_smash_script)
-    .game_acmd("game_catchdash", popo_grabd_smash_script)
-    .game_acmd("game_catchturn", popo_grabp_smash_script)
-    .game_acmd("game_throwf", popo_fthrow_smash_script)
-    .game_acmd("game_throwb", popo_bthrow_smash_script)
-    .game_acmd("game_throwhi", popo_uthrow_smash_script)
-    .game_acmd("game_throwlw", popo_dthrow_smash_script)
-    .game_acmd("game_specialn", popo_neutralb_smash_script)
-    .game_acmd("game_specialairn", popo_neutralb_air_smash_script)
-    .game_acmd("game_specialairhithrow", popo_upb_1_air_smash_script)
-    .game_acmd("game_speciallw", popo_downb_smash_script)
-    .game_acmd("game_specialairlw", popo_downb_smash_script)
+    .game_acmd("game_attack11", popo_jab_smash_script, Low)
+    .game_acmd("game_attack12", popo_jab2_smash_script, Low)
+    .game_acmd("game_attackdash", popo_dashattack_smash_script, Low)
+    .game_acmd("game_attacks3", popo_ftilt_smash_script, Low)
+    .game_acmd("game_attacks3hi", popo_ftilt_smash_script, Low)
+    .game_acmd("game_attacks3lw", popo_ftilt_smash_script, Low)
+    .game_acmd("game_attackhi3", popo_utilt_smash_script, Low)
+    .game_acmd("game_attacklw3", popo_dtilt_smash_script, Low)
+    .game_acmd("game_attacks4", popo_fsmash_smash_script, Low)
+    .game_acmd("game_attackhi4", popo_usmash_smash_script, Low)
+    .game_acmd("game_attacklw4", popo_dsmash_smash_script, Low)
+    .game_acmd("game_attackairn", popo_nair_smash_script, Low)
+    .game_acmd("game_attackairf", popo_fair_smash_script, Low)
+    .game_acmd("game_attackairb", popo_bair_smash_script, Low)
+    .game_acmd("game_attackairhi", popo_uair_smash_script, Low)
+    .game_acmd("game_attackairlw", popo_dair_smash_script, Low)
+    .game_acmd("game_catch", popo_grab_smash_script, Low)
+    .game_acmd("game_catchdash", popo_grabd_smash_script, Low)
+    .game_acmd("game_catchturn", popo_grabp_smash_script, Low)
+    .game_acmd("game_throwf", popo_fthrow_smash_script, Low)
+    .game_acmd("game_throwb", popo_bthrow_smash_script, Low)
+    .game_acmd("game_throwhi", popo_uthrow_smash_script, Low)
+    .game_acmd("game_throwlw", popo_dthrow_smash_script, Low)
+    .game_acmd("game_specialn", popo_neutralb_smash_script, Low)
+    .game_acmd("game_specialairn", popo_neutralb_air_smash_script, Low)
+    .game_acmd("game_specialairhithrow", popo_upb_1_air_smash_script, Low)
+    .game_acmd("game_speciallw", popo_downb_smash_script, Low)
+    .game_acmd("game_specialairlw", popo_downb_smash_script, Low)
     .install();
 
     Agent::new("popo_iceshot")
-    .game_acmd("game_shoot", iceshot_projectile)
+    .game_acmd("game_shoot", iceshot_projectile, Low)
     .install();
 
     Agent::new("popo_blizzard")
-    .game_acmd("game_fly", blizzard_projectile)
+    .game_acmd("game_fly", blizzard_projectile, Low)
     .install();
 
     Agent::new("nana")
     .on_line(Main, nana_frame) //opff
-    .game_acmd("game_attack11_nana", popo_jab_smash_script_nana)
-    .game_acmd("game_attack12_nana", popo_jab2_smash_script_nana)
-    .game_acmd("game_attackdash_nana", popo_dashattack_smash_script_nana)
-    .game_acmd("game_attacks3_nana", popo_ftilt_smash_script_nana)
-    .game_acmd("game_attacks3hi_nana", popo_ftilt_smash_script_nana)
-    .game_acmd("game_attacks3lw_nana", popo_ftilt_smash_script_nana)
-    .game_acmd("game_attackhi3_nana", popo_utilt_smash_script_nana)
-    .game_acmd("game_attacklw3_nana", popo_dtilt_smash_script_nana)
-    .game_acmd("game_attacks4_nana", popo_fsmash_smash_script_nana)
-    .game_acmd("game_attackhi4_nana", popo_usmash_smash_script_nana)
-    .game_acmd("game_attacklw4_nana", popo_dsmash_smash_script_nana)
-    .game_acmd("game_attackairn_nana", popo_nair_smash_script_nana)
-    .game_acmd("game_attackairf_nana", popo_fair_smash_script_nana)
-    .game_acmd("game_attackairb_nana", popo_bair_smash_script_nana)
-    .game_acmd("game_attackairhi_nana", popo_uair_smash_script_nana)
-    .game_acmd("game_attackairlw_nana", popo_dair_smash_script_nana)
-    .game_acmd("game_specialn_nana", popo_neutralb_smash_script_nana)
-    .game_acmd("game_specialairn_nana", popo_neutralb_air_smash_script_nana)
-    .game_acmd("game_specialairhithrow_nana", popo_upb_1_air_smash_script_nana)
-    .game_acmd("game_specialhithrownnana_nana", popo_upb_nanathrow_smash_script)
-    .game_acmd("game_speciallw_nana", popo_downb_smash_script_nana)
-    .game_acmd("game_specialairlw_nana", popo_downb_smash_script_nana)
-    .game_acmd("game_appeallwl_nana", popo_downtaunt_smash_script_nana)
-    .game_acmd("game_appeallwr_nana", popo_downtaunt_smash_script_nana)
+    .game_acmd("game_attack11_nana", popo_jab_smash_script_nana, Low)
+    .game_acmd("game_attack12_nana", popo_jab2_smash_script_nana, Low)
+    .game_acmd("game_attackdash_nana", popo_dashattack_smash_script_nana, Low)
+    .game_acmd("game_attacks3_nana", popo_ftilt_smash_script_nana, Low)
+    .game_acmd("game_attacks3hi_nana", popo_ftilt_smash_script_nana, Low)
+    .game_acmd("game_attacks3lw_nana", popo_ftilt_smash_script_nana, Low)
+    .game_acmd("game_attackhi3_nana", popo_utilt_smash_script_nana, Low)
+    .game_acmd("game_attacklw3_nana", popo_dtilt_smash_script_nana, Low)
+    .game_acmd("game_attacks4_nana", popo_fsmash_smash_script_nana, Low)
+    .game_acmd("game_attackhi4_nana", popo_usmash_smash_script_nana, Low)
+    .game_acmd("game_attacklw4_nana", popo_dsmash_smash_script_nana, Low)
+    .game_acmd("game_attackairn_nana", popo_nair_smash_script_nana, Low)
+    .game_acmd("game_attackairf_nana", popo_fair_smash_script_nana, Low)
+    .game_acmd("game_attackairb_nana", popo_bair_smash_script_nana, Low)
+    .game_acmd("game_attackairhi_nana", popo_uair_smash_script_nana, Low)
+    .game_acmd("game_attackairlw_nana", popo_dair_smash_script_nana, Low)
+    .game_acmd("game_specialn_nana", popo_neutralb_smash_script_nana, Low)
+    .game_acmd("game_specialairn_nana", popo_neutralb_air_smash_script_nana, Low)
+    .game_acmd("game_specialairhithrow_nana", popo_upb_1_air_smash_script_nana, Low)
+    .game_acmd("game_specialhithrownnana_nana", popo_upb_nanathrow_smash_script, Low)
+    .game_acmd("game_speciallw_nana", popo_downb_smash_script_nana, Low)
+    .game_acmd("game_specialairlw_nana", popo_downb_smash_script_nana, Low)
+    .game_acmd("game_appeallwl_nana", popo_downtaunt_smash_script_nana, Low)
+    .game_acmd("game_appeallwr_nana", popo_downtaunt_smash_script_nana, Low)
     .install();
 
     Agent::new("nana_iceshot")
-    .game_acmd("game_shoot", iceshot_projectile_nana)
+    .game_acmd("game_shoot", iceshot_projectile_nana, Low)
     .install();
 
     Agent::new("nana_blizzard")
-    .game_acmd("game_fly", blizzard_projectile_nana)
+    .game_acmd("game_fly", blizzard_projectile_nana, Low)
     .install();
 
 }

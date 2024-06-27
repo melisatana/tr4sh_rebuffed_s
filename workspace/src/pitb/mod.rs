@@ -8,6 +8,7 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
 
 static mut DARKPIT_UPAIR_COUNT : [i32; 8] = [0; 8]; //number of times up air has been used
 static DARKPIT_UPAIR_YVEL : [f32; 4] = [1.5, 1.1, 0.6, 0.3]; //heights for each up air
@@ -233,26 +234,20 @@ unsafe extern "C" fn darkpit_jabfinisher(fighter: &mut L2CAgentBase) {
 }
 
 unsafe extern "C" fn darkpit_dashattack(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 3.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
 	if macros::is_excute(fighter) {
 		MotionModule::set_rate(fighter.module_accessor, 0.5);
 	}
-	sv_animcmd::frame(fighter.lua_state_agent, 6.0);
+	sv_animcmd::frame(fighter.lua_state_agent, 2.0);
 	if macros::is_excute(fighter) {
 		MotionModule::set_rate(fighter.module_accessor, 1.0);
 	}
 	sv_animcmd::frame(fighter.lua_state_agent, 7.0);
 	if macros::is_excute(fighter) {
 		KineticModule::add_speed(fighter.module_accessor, &smash::phx::Vector3f{x: 1.7, y: 0.0, z: 0.0});
-		macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 16.9, 60, 84, 0, 75, 3.5, 0.0, 4.5, 16.0, Some(0.0), Some(7.0), Some(7.0), 1.1, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PALUTENA);
+		macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.4, 77, 64, 0, 75, 3.5, 0.0, 4.5, 16.0, Some(0.0), Some(7.0), Some(7.0), 1.1, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PALUTENA);
 		macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 1.37);
-		MotionModule::set_rate(fighter.module_accessor, 0.125);
-	}
-	sv_animcmd::wait(fighter.lua_state_agent, 1.0);
-	if macros::is_excute(fighter) {
-		macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.7, 100, 54, 0, 80, 2.5, 0.0, 2.5, 14.0, Some(0.0), Some(5.0), Some(7.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PALUTENA);
-		macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 1.37);
-		MotionModule::set_rate(fighter.module_accessor, 0.1);
+		MotionModule::set_rate(fighter.module_accessor, 0.15);
 	}
 	sv_animcmd::wait(fighter.lua_state_agent, 1.0);
 	if macros::is_excute(fighter) {
@@ -967,6 +962,14 @@ unsafe extern "C" fn darkpit_arrow(fighter: &mut L2CAgentBase) {
 	}
 }
 
+unsafe extern "C" fn darkpit_arrow_effect(fighter: &mut L2CAgentBase) {
+    if macros::is_excute(fighter) {
+        macros::EFFECT_FOLLOW(fighter, Hash40::new("pitb_pa_fly_arrow"), Hash40::new("rot"), 0, 0, 0, 0, 0, 0, 1, true);
+		macros::LAST_EFFECT_SET_RATE(fighter, 0.2);
+        macros::EFFECT_FOLLOW(fighter, Hash40::new("pitb_pa_fly_arrow2"), Hash40::new("rot"), 0, 0, 0, 0, 0, 0, 1, true);
+    }
+}
+
 unsafe extern "C" fn darkpit_sidetaunt_left(fighter: &mut L2CAgentBase) {
 	sv_animcmd::frame(fighter.lua_state_agent, 20.0);
 	if macros::is_excute(fighter) {
@@ -992,48 +995,49 @@ unsafe extern "C" fn darkpit_sidetaunt_right(fighter: &mut L2CAgentBase) {
 pub fn install() {
     Agent::new("pitb")
     .on_line(Main, darkpit_frame) //opff
-	.game_acmd("game_jumpaerialf1", darkpit_air_jump_1)
-	.game_acmd("game_jumpaerialf2", darkpit_air_jump_2)
-	.game_acmd("game_jumpaerialf3", darkpit_air_jump_3)
-    .game_acmd("game_attack11", darkpit_jab)
-    .game_acmd("game_attack12", darkpit_jab2)
-	.game_acmd("game_attack13", darkpit_jab3)
-    .game_acmd("game_attack100", darkpit_jab100)
-	.game_acmd("game_attackend", darkpit_jabfinisher)
-    .game_acmd("game_attackdash", darkpit_dashattack)
-    .game_acmd("game_attacks3", darkpit_ftilt)
-    .game_acmd("game_attackhi3", darkpit_utilt)
-    .game_acmd("game_attacklw3", darkpit_dtilt)
-    .game_acmd("game_attacks4", darkpit_fsmash)
-    .game_acmd("game_attackhi4", darkpit_usmash)
-    .game_acmd("game_attacklw4", darkpit_dsmash)
-	.effect_acmd("effect_attacklw4", darkpit_dsmash_effect)
-	.sound_acmd("sound_attacklw4", darkpit_dsmash_sound)
-    .game_acmd("game_attackairn", darkpit_nair)
-    .game_acmd("game_attackairf", darkpit_fair)
-    .game_acmd("game_attackairb", darkpit_bair)
-    .game_acmd("game_attackairhi", darkpit_uair)
-    .game_acmd("game_attackairlw", darkpit_dair)
-    .game_acmd("game_catch", darkpit_grab)
-    .game_acmd("game_catchdash", darkpit_grabd)
-    .game_acmd("game_catchturn", darkpit_grabp)
-	.game_acmd("game_catchattack", darkpit_pummel)
-    .game_acmd("game_throwf", darkpit_fthrow)
-    .game_acmd("game_throwb", darkpit_bthrow)
-	.effect_acmd("effect_throwb", darkpit_bthrow_effect)
-    .game_acmd("game_throwhi", darkpit_uthrow)
-    .game_acmd("game_throwlw", darkpit_dthrow)
-    .game_acmd("game_specialsstart", darkpit_sidespecial_start)
-    .game_acmd("game_specialairsstart", darkpit_sidespecial_air_start)
-    .game_acmd("game_specialsend", darkpit_sidespecial_end)
-    .game_acmd("game_specialairsend", darkpit_sidespecial_air_end)
-    .game_acmd("game_specialhi", darkpit_upspecial)
-    .game_acmd("game_appealsl", darkpit_sidetaunt_left)
-	.game_acmd("game_appealsr", darkpit_sidetaunt_right)
+	.game_acmd("game_jumpaerialf1", darkpit_air_jump_1, Low)
+	.game_acmd("game_jumpaerialf2", darkpit_air_jump_2, Low)
+	.game_acmd("game_jumpaerialf3", darkpit_air_jump_3, Low)
+    .game_acmd("game_attack11", darkpit_jab, Low)
+    .game_acmd("game_attack12", darkpit_jab2, Low)
+	.game_acmd("game_attack13", darkpit_jab3, Low)
+    .game_acmd("game_attack100", darkpit_jab100, Low)
+	.game_acmd("game_attackend", darkpit_jabfinisher, Low)
+    .game_acmd("game_attackdash", darkpit_dashattack, Low)
+    .game_acmd("game_attacks3", darkpit_ftilt, Low)
+    .game_acmd("game_attackhi3", darkpit_utilt, Low)
+    .game_acmd("game_attacklw3", darkpit_dtilt, Low)
+    .game_acmd("game_attacks4", darkpit_fsmash, Low)
+    .game_acmd("game_attackhi4", darkpit_usmash, Low)
+    .game_acmd("game_attacklw4", darkpit_dsmash, Low)
+	.effect_acmd("effect_attacklw4", darkpit_dsmash_effect, Low)
+	.sound_acmd("sound_attacklw4", darkpit_dsmash_sound, Low)
+    .game_acmd("game_attackairn", darkpit_nair, Low)
+    .game_acmd("game_attackairf", darkpit_fair, Low)
+    .game_acmd("game_attackairb", darkpit_bair, Low)
+    .game_acmd("game_attackairhi", darkpit_uair, Low)
+    .game_acmd("game_attackairlw", darkpit_dair, Low)
+    .game_acmd("game_catch", darkpit_grab, Low)
+    .game_acmd("game_catchdash", darkpit_grabd, Low)
+    .game_acmd("game_catchturn", darkpit_grabp, Low)
+	.game_acmd("game_catchattack", darkpit_pummel, Low)
+    .game_acmd("game_throwf", darkpit_fthrow, Low)
+    .game_acmd("game_throwb", darkpit_bthrow, Low)
+	.effect_acmd("effect_throwb", darkpit_bthrow_effect, Low)
+    .game_acmd("game_throwhi", darkpit_uthrow, Low)
+    .game_acmd("game_throwlw", darkpit_dthrow, Low)
+    .game_acmd("game_specialsstart", darkpit_sidespecial_start, Low)
+    .game_acmd("game_specialairsstart", darkpit_sidespecial_air_start, Low)
+    .game_acmd("game_specialsend", darkpit_sidespecial_end, Low)
+    .game_acmd("game_specialairsend", darkpit_sidespecial_air_end, Low)
+    .game_acmd("game_specialhi", darkpit_upspecial, Low)
+    .game_acmd("game_appealsl", darkpit_sidetaunt_left, Low)
+	.game_acmd("game_appealsr", darkpit_sidetaunt_right, Low)
     .install();
 
     Agent::new("pitb_bowarrow")
-    .game_acmd("game_fly", darkpit_arrow)
+    .game_acmd("game_fly", darkpit_arrow, Low)
+	.effect_acmd("effect_fly", darkpit_arrow_effect, Low)
     .install();
 
 

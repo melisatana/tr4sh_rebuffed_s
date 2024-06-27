@@ -8,6 +8,8 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
+
 
 static mut WOLF_STRONG_BLASTER : [bool; 8] = [false; 8];
 
@@ -43,6 +45,7 @@ unsafe extern "C" fn wolf_frame(fighter: &mut L2CFighterCommon) {
             if [*FIGHTER_STATUS_KIND_SPECIAL_N].contains(&status) {
                 if ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_SPECIAL) == false {
                     WOLF_STRONG_BLASTER[entry_id] = false;
+                    //macros::FT_MOTION_RATE(fighter, 1.0);
                     MotionModule::set_rate(fighter.module_accessor, 1.0);
                 }
             }
@@ -783,14 +786,14 @@ unsafe extern "C" fn laser_projectile(fighter: &mut L2CAgentBase) {
 
     if entry_id < 8 && WOLF_STRONG_BLASTER[entry_id] {
         if macros::is_excute(fighter) {
-            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 14.5, 40, 100, 0, 50, 6.5, 0.0, 0.0, 0.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_SPEED, false, -3, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 14.5, 45, 90, 0, 50, 6.5, 0.0, 0.0, 0.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_SPEED, false, -3, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
             ModelModule::set_scale(fighter.module_accessor, 1.5);
             macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 0.77);
         }
     }
     else {
         if macros::is_excute(fighter) {
-            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.7, 42, 60, 0, 30, 3.5, 0.0, 0.0, 0.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_SPEED, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.7, 48, 60, 0, 30, 3.5, 0.0, 0.0, 0.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_SPEED, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_ENERGY);
             ModelModule::set_scale(fighter.module_accessor, 1.0);
         }
     }
@@ -955,52 +958,52 @@ unsafe extern "C" fn wolf_downb_start_smash_script(fighter: &mut L2CAgentBase) {
 pub fn install() {
     Agent::new("wolf")
     .on_line(Main, wolf_frame) //opff
-    .game_acmd("game_passivewalljump", wolf_walljump_smash_script)
-    .game_acmd("game_attack11", wolf_jab_smash_script)
-    .game_acmd("game_attack12", wolf_jab2_smash_script)
-    .game_acmd("game_attack13", wolf_jab3_smash_script)
-    .game_acmd("game_attackdash", wolf_dashattack_smash_script)
-    .game_acmd("game_attacks3", wolf_ftilt_smash_script)
-    .game_acmd("game_attacks3hi", wolf_ftilt2_smash_script)
-    .game_acmd("game_attacks3lw", wolf_ftilt3_smash_script)
-    .game_acmd("game_attackhi3", wolf_utilt_smash_script)
-    .game_acmd("game_attacklw3", wolf_dtilt_smash_script)
-    .game_acmd("game_attacks4", wolf_fsmash_smash_script)
-    .game_acmd("game_attackhi4", wolf_usmash_smash_script)
-    .game_acmd("game_attacklw4", wolf_dsmash_smash_script)
-    .game_acmd("game_attackairn", wolf_nair_smash_script)
-    .game_acmd("game_attackairf", wolf_fair_smash_script)
-    .game_acmd("game_attackairb", wolf_bair_smash_script)
-    .game_acmd("game_attackairhi", wolf_uair_smash_script)
-    .game_acmd("game_attackairlw", wolf_dair_smash_script)
-    .game_acmd("game_catch", wolf_grab_smash_script)
-    .game_acmd("game_catchdash", wolf_grabd_smash_script)
-    .game_acmd("game_catchturn", wolf_grabp_smash_script)
-    .game_acmd("game_throwf", wolf_fthrow_smash_script)
-    .game_acmd("game_throwb", wolf_bthrow_smash_script)
-    .game_acmd("game_throwhi", wolf_uthrow_smash_script)
-    .game_acmd("game_throwlw", wolf_dthrow_smash_script)
-    .game_acmd("game_specialn", wolf_neutralb_smash_script)
-    .game_acmd("game_specialairn", wolf_neutralb_air_smash_script)
-    .game_acmd("game_specials", wolf_sideb_smash_script)
-    .game_acmd("game_specialairs", wolf_sideb_smash_script)
-    .game_acmd("game_specialsend", wolf_sideb_end_smash_script)
-    .game_acmd("game_specialairsend", wolf_sideb_end_air_smash_script)
-    .game_acmd("game_specialhihold", wolf_upb_start_smash_script)
-    .game_acmd("game_specialhiholdair", wolf_upb_start_smash_script)
-    .game_acmd("game_specialhilanding", wolf_upb_end_ground_smash_script)
-    .game_acmd("game_specialairhifall", wolf_upb_end_smash_script)
-    .game_acmd("game_speciallwstart", wolf_downb_start_smash_script)
-    .game_acmd("game_specialairlwstart", wolf_downb_start_smash_script)
+    .game_acmd("game_passivewalljump", wolf_walljump_smash_script, Low)
+    .game_acmd("game_attack11", wolf_jab_smash_script, Low)
+    .game_acmd("game_attack12", wolf_jab2_smash_script, Low)
+    .game_acmd("game_attack13", wolf_jab3_smash_script, Low)
+    .game_acmd("game_attackdash", wolf_dashattack_smash_script, Low)
+    .game_acmd("game_attacks3", wolf_ftilt_smash_script, Low)
+    .game_acmd("game_attacks3hi", wolf_ftilt2_smash_script, Low)
+    .game_acmd("game_attacks3lw", wolf_ftilt3_smash_script, Low)
+    .game_acmd("game_attackhi3", wolf_utilt_smash_script, Low)
+    .game_acmd("game_attacklw3", wolf_dtilt_smash_script, Low)
+    .game_acmd("game_attacks4", wolf_fsmash_smash_script, Low)
+    .game_acmd("game_attackhi4", wolf_usmash_smash_script, Low)
+    .game_acmd("game_attacklw4", wolf_dsmash_smash_script, Low)
+    .game_acmd("game_attackairn", wolf_nair_smash_script, Low)
+    .game_acmd("game_attackairf", wolf_fair_smash_script, Low)
+    .game_acmd("game_attackairb", wolf_bair_smash_script, Low)
+    .game_acmd("game_attackairhi", wolf_uair_smash_script, Low)
+    .game_acmd("game_attackairlw", wolf_dair_smash_script, Low)
+    .game_acmd("game_catch", wolf_grab_smash_script, Low)
+    .game_acmd("game_catchdash", wolf_grabd_smash_script, Low)
+    .game_acmd("game_catchturn", wolf_grabp_smash_script, Low)
+    .game_acmd("game_throwf", wolf_fthrow_smash_script, Low)
+    .game_acmd("game_throwb", wolf_bthrow_smash_script, Low)
+    .game_acmd("game_throwhi", wolf_uthrow_smash_script, Low)
+    .game_acmd("game_throwlw", wolf_dthrow_smash_script, Low)
+    .game_acmd("game_specialn", wolf_neutralb_smash_script, Low)
+    .game_acmd("game_specialairn", wolf_neutralb_air_smash_script, Low)
+    .game_acmd("game_specials", wolf_sideb_smash_script, Low)
+    .game_acmd("game_specialairs", wolf_sideb_smash_script, Low)
+    .game_acmd("game_specialsend", wolf_sideb_end_smash_script, Low)
+    .game_acmd("game_specialairsend", wolf_sideb_end_air_smash_script, Low)
+    .game_acmd("game_specialhihold", wolf_upb_start_smash_script, Low)
+    .game_acmd("game_specialhiholdair", wolf_upb_start_smash_script, Low)
+    .game_acmd("game_specialhilanding", wolf_upb_end_ground_smash_script, Low)
+    .game_acmd("game_specialairhifall", wolf_upb_end_smash_script, Low)
+    .game_acmd("game_speciallwstart", wolf_downb_start_smash_script, Low)
+    .game_acmd("game_specialairlwstart", wolf_downb_start_smash_script, Low)
     .install();
 
     Agent::new("wolf_blaster_bullet")
-    .game_acmd("game_fly", laser_projectile)
+    .game_acmd("game_fly", laser_projectile, Low)
     .install();
 
     Agent::new("wolf_illusion")
-    .game_acmd("game_moveground", wolf_illusion_ground)
-    .game_acmd("game_moveair", wolf_illusion_air)
+    .game_acmd("game_moveground", wolf_illusion_ground, Low)
+    .game_acmd("game_moveair", wolf_illusion_air, Low)
     .install();
 
     Agent::new("kirby")

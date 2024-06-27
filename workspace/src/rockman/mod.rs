@@ -8,6 +8,7 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase, L2CFighterBase};
 use smashline::*;
 use smash_script::*;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
 
 static mut ROCKMAN_GIANT_TORNADO : [bool; 8] = [false; 8];
 static mut ROCKMAN_GIANT_TORNADO_IN_SLOW : [bool; 8] = [false; 8];
@@ -16,6 +17,7 @@ static mut ROCKMAN_GIANT_TORNADO_CAN_CANCEL : [bool; 8] = [false; 8];
 // A Once-Per-Fighter-Frame that only applies to Mega Man
 unsafe extern "C" fn rockman_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
+
         global_fighter_frame(fighter);
         let status = StatusModule::status_kind(fighter.module_accessor);
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
@@ -35,6 +37,10 @@ unsafe extern "C" fn rockman_frame(fighter: &mut L2CFighterCommon) {
             ROCKMAN_GIANT_TORNADO[entry_id] = false;
         }
 
+
+        if status == *FIGHTER_ROCKMAN_STATUS_KIND_SPECIAL_HI_JUMP {
+            crate::custom::fastfall_helper(fighter);
+        }
 
         
     }
@@ -109,8 +115,8 @@ unsafe extern "C" fn rockman_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 1, Hash40::new("armr"), 11.5, 76, 130, 0, 57, 5.5, 0.0, 0.0, 0.0, None, None, None, 1.3, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 1, Hash40::new("armr"), 11.5, 76, 130, 0, 57, 5.5, 4.5, 0.0, 0.0, None, None, None, 1.3, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 1, Hash40::new("armr"), 10.7, 76, 130, 0, 57, 5.5, 0.0, 0.0, 0.0, None, None, None, 1.3, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 1, Hash40::new("armr"), 10.7, 76, 130, 0, 57, 5.5, 4.5, 0.0, 0.0, None, None, None, 1.3, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_PUNCH);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 17.0);
     if macros::is_excute(fighter) {
@@ -134,7 +140,7 @@ unsafe extern "C" fn rockman_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 9.6, 54, 50, 0, 60, 5.0, 0.0, 3.0, 3.7, None, None, None, 1.0, 0.9, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 2, 0.4, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 9.3, 57, 50, 0, 60, 5.4, 0.0, 3.0, 3.7, None, None, None, 1.0, 0.9, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 2, 0.4, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 5.0, false);
         AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
     }
@@ -142,7 +148,12 @@ unsafe extern "C" fn rockman_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.4);
     }
-    sv_animcmd::wait(fighter.lua_state_agent, 7.0);
+    sv_animcmd::wait(fighter.lua_state_agent, 5.0);
+    if macros::is_excute(fighter) {
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 9.3, 64, 50, 0, 60, 5.4, 0.0, 3.0, 3.7, None, None, None, 1.0, 0.9, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 2, 0.4, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 4.0, false);
+    }
+    sv_animcmd::wait(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
         HitModule::set_status_all(fighter.module_accessor, HitStatus(*HIT_STATUS_NORMAL), 0);
     }
@@ -261,8 +272,8 @@ unsafe extern "C" fn rockman_nair_smash_script(fighter: &mut L2CAgentBase) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
         ArticleModule::generate_article_enable(fighter.module_accessor, *FIGHTER_ROCKMAN_GENERATE_ARTICLE_ROCKBUSTER, false, -1);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_ROCKMAN_INSTANCE_WORK_ID_FLAG_ROCKBUSTER_SHOOT);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.7, 72, 110, 0, 65, 3.0, 0.0, 12.6, 5.5, Some(0.0), Some(6.7), Some(5.5), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, -0.5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 4.7, 72, 110, 0, 65, 3.0, 0.0, 9.6, 8.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, -0.5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.7, 72, 110, 0, 65, 3.3, 0.0, 12.6, 5.5, Some(0.0), Some(6.7), Some(5.5), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, -0.5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 4.7, 72, 110, 0, 65, 3.3, 0.0, 9.6, 8.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, -0.5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 2.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 2.0, false);
     }
@@ -436,6 +447,10 @@ unsafe extern "C" fn rockman_dair_smash_script(fighter: &mut L2CAgentBase) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_WORK_ID_FLAG_RESERVE_GRAVITY_STABLE_UNABLE);
     }
+    sv_animcmd::frame(fighter.lua_state_agent, 10.0);
+    if macros::is_excute(fighter) {
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
+    }
     sv_animcmd::frame(fighter.lua_state_agent, 23.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.0);
@@ -546,7 +561,7 @@ unsafe extern "C" fn rockman_grabp_smash_script(fighter: &mut L2CAgentBase) {
 
 unsafe extern "C" fn rockman_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 11.4, 35, 45, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 11.4, 35, 45, 0, 67, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 9.0);
@@ -911,76 +926,76 @@ unsafe extern "C" fn rockman_downtaunt_smash_script(fighter: &mut L2CAgentBase) 
 pub fn install() {
     Agent::new("rockman")
     .on_line(Main, rockman_frame) //opff
-    .game_acmd("game_attack1turn", rockman_megabuster_ground_turn_smash_script)
-    .game_acmd("game_attackdash", rockman_dashattack_smash_script)
-    .game_acmd("game_attackhi3", rockman_utilt_smash_script)
-    .game_acmd("game_attacklw3", rockman_dtilt_smash_script)
-    .game_acmd("game_attacks4", rockman_fsmash_smash_script)
-    .game_acmd("game_attackhi4", rockman_usmash_smash_script)
-    .game_acmd("game_attacklw4", rockman_dsmash_smash_script)
-    .game_acmd("game_attackairn", rockman_nair_smash_script)
-    .game_acmd("game_attackairf", rockman_fair_smash_script)
-    .game_acmd("game_attackairb", rockman_bair_smash_script)
-    .effect_acmd("effect_attackairb", rockman_bair_effect_script)
-    .game_acmd("game_attackairhi", rockman_uair_smash_script)
-    .game_acmd("game_attackairlw", rockman_dair_smash_script)
-    .sound_acmd("sound_attackairlw", rockman_dair_sound_script)
-    .game_acmd("game_catch", rockman_grab_smash_script)
-    .game_acmd("game_catchdash", rockman_grabd_smash_script)
-    .game_acmd("game_catchturn", rockman_grabp_smash_script)
-    .game_acmd("game_throwf", rockman_fthrow_smash_script)
-    .game_acmd("game_throwb", rockman_bthrow_smash_script)
-    .game_acmd("game_throwhi", rockman_uthrow_smash_script)
-    .game_acmd("game_throwlw", rockman_dthrow_smash_script)
-    .game_acmd("game_specialn", rockman_neutralb_smash_script)
-    .game_acmd("game_specialairn", rockman_neutralb_air_smash_script)
-    .game_acmd("game_specialnturn", rockman_neutralb_turn_smash_script)
-    .game_acmd("game_specialairnturn", rockman_neutralb_turn_air_smash_script)
-    .game_acmd("game_specialnempty", rockman_neutralb_empty_smash_script)
-    .game_acmd("game_specialairnempty", rockman_neutralb_empty_air_smash_script)
-    .game_acmd("game_specialnturnempty", rockman_neutralb_empty_turn_smash_script)
-    .game_acmd("game_specialairnturnempty", rockman_neutralb_empty_turn_air_smash_script)
-    .game_acmd("game_specials", rockman_sideb_smash_script)
-    .game_acmd("game_specialairs", rockman_sideb_smash_script)
-    .game_acmd("game_specialhi", rockman_upb_smash_script)
-    .game_acmd("game_specialairhi", rockman_upb_smash_script)
-    .game_acmd("game_speciallw", rockman_downb_start_smash_script)
-    .game_acmd("game_specialairlw", rockman_downb_start_smash_script)
-    .game_acmd("game_speciallwshoot", rockman_downb_shoot_smash_script)
-    .game_acmd("game_specialairlwshoot", rockman_downb_shoot_smash_script)
-    .game_acmd("game_appeallwl", rockman_downtaunt_smash_script)
-    .game_acmd("game_appeallwr", rockman_downtaunt_smash_script)
+    .game_acmd("game_attack1turn", rockman_megabuster_ground_turn_smash_script, Low)
+    .game_acmd("game_attackdash", rockman_dashattack_smash_script, Low)
+    .game_acmd("game_attackhi3", rockman_utilt_smash_script, Low)
+    .game_acmd("game_attacklw3", rockman_dtilt_smash_script, Low)
+    .game_acmd("game_attacks4", rockman_fsmash_smash_script, Low)
+    .game_acmd("game_attackhi4", rockman_usmash_smash_script, Low)
+    .game_acmd("game_attacklw4", rockman_dsmash_smash_script, Low)
+    .game_acmd("game_attackairn", rockman_nair_smash_script, Low)
+    .game_acmd("game_attackairf", rockman_fair_smash_script, Low)
+    .game_acmd("game_attackairb", rockman_bair_smash_script, Low)
+    .effect_acmd("effect_attackairb", rockman_bair_effect_script, Low)
+    .game_acmd("game_attackairhi", rockman_uair_smash_script, Low)
+    .game_acmd("game_attackairlw", rockman_dair_smash_script, Low)
+    .sound_acmd("sound_attackairlw", rockman_dair_sound_script, Low)
+    .game_acmd("game_catch", rockman_grab_smash_script, Low)
+    .game_acmd("game_catchdash", rockman_grabd_smash_script, Low)
+    .game_acmd("game_catchturn", rockman_grabp_smash_script, Low)
+    .game_acmd("game_throwf", rockman_fthrow_smash_script, Low)
+    .game_acmd("game_throwb", rockman_bthrow_smash_script, Low)
+    .game_acmd("game_throwhi", rockman_uthrow_smash_script, Low)
+    .game_acmd("game_throwlw", rockman_dthrow_smash_script, Low)
+    .game_acmd("game_specialn", rockman_neutralb_smash_script, Low)
+    .game_acmd("game_specialairn", rockman_neutralb_air_smash_script, Low)
+    .game_acmd("game_specialnturn", rockman_neutralb_turn_smash_script, Low)
+    .game_acmd("game_specialairnturn", rockman_neutralb_turn_air_smash_script, Low)
+    .game_acmd("game_specialnempty", rockman_neutralb_empty_smash_script, Low)
+    .game_acmd("game_specialairnempty", rockman_neutralb_empty_air_smash_script, Low)
+    .game_acmd("game_specialnturnempty", rockman_neutralb_empty_turn_smash_script, Low)
+    .game_acmd("game_specialairnturnempty", rockman_neutralb_empty_turn_air_smash_script, Low)
+    .game_acmd("game_specials", rockman_sideb_smash_script, Low)
+    .game_acmd("game_specialairs", rockman_sideb_smash_script, Low)
+    .game_acmd("game_specialhi", rockman_upb_smash_script, Low)
+    .game_acmd("game_specialairhi", rockman_upb_smash_script, Low)
+    .game_acmd("game_speciallw", rockman_downb_start_smash_script, Low)
+    .game_acmd("game_specialairlw", rockman_downb_start_smash_script, Low)
+    .game_acmd("game_speciallwshoot", rockman_downb_shoot_smash_script, Low)
+    .game_acmd("game_specialairlwshoot", rockman_downb_shoot_smash_script, Low)
+    .game_acmd("game_appeallwl", rockman_downtaunt_smash_script, Low)
+    .game_acmd("game_appeallwr", rockman_downtaunt_smash_script, Low)
     .install();
 
     Agent::new("rockman_rockbuster")
-    .game_acmd("game_regular", megabuster_projectile)
+    .game_acmd("game_regular", megabuster_projectile, Low)
     .install();
 
     Agent::new("rockman_chargeshot")
-    .game_acmd("game_regular", megabuster_fsmash_projectile)
+    .game_acmd("game_regular", megabuster_fsmash_projectile, Low)
     .install();
 
     Agent::new("rockman_airshooter")
-    .game_acmd("game_regular", airshooter_projectile)
+    .game_acmd("game_regular", airshooter_projectile, Low)
     .install();
 
     Agent::new("rockman_hardknuckle")
     .on_line(Main, rockman_hardknuckle_weapon_frame)
-    .game_acmd("game_regular", hardknuckle_projectile)
+    .game_acmd("game_regular", hardknuckle_projectile, Low)
     .install();
 
     Agent::new("rockman_crashbomb")
-    .game_acmd("game_fly", crashbomb_fly)
-    .game_acmd("game_explode", crashbomb_explode)
+    .game_acmd("game_fly", crashbomb_fly, Low)
+    .game_acmd("game_explode", crashbomb_explode, Low)
     .install();
 
     Agent::new("rockman_leafshield")
-    .game_acmd("game_start", leafshield_start)
-    .game_acmd("game_startreverse", leafshield_start_reverse)
-    .game_acmd("game_shield", leafshield_shield)
-    .game_acmd("game_shieldreverse", leafshield_shield_reverse)
-    .game_acmd("game_fly", leafshield_shoot)
-    .game_acmd("game_flyreverse", leafshield_shoot_reverse)
+    .game_acmd("game_start", leafshield_start, Low)
+    .game_acmd("game_startreverse", leafshield_start_reverse, Low)
+    .game_acmd("game_shield", leafshield_shield, Low)
+    .game_acmd("game_shieldreverse", leafshield_shield_reverse, Low)
+    .game_acmd("game_fly", leafshield_shoot, Low)
+    .game_acmd("game_flyreverse", leafshield_shoot_reverse, Low)
     .install();
 
 }

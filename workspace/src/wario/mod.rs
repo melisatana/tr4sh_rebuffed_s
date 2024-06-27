@@ -10,6 +10,8 @@ use smash_script::*;
 use smash::phx::Vector3f;
 use smash::hash40;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
+
 
 static mut WARIO_SLOW_UP_AIR : [bool; 8] = [false; 8];
 
@@ -87,6 +89,30 @@ unsafe extern "C" fn wario_frame(fighter: &mut L2CFighterCommon) {
             WARIO_DSMASH_SPEEN[entry_id] = false;
         }
 
+        if status == *FIGHTER_WARIO_STATUS_KIND_SPECIAL_N_END {
+            if (stickx >= 0.5 && PostureModule::lr(fighter.module_accessor) <= -0.5) || (stickx <= -0.5 && PostureModule::lr(fighter.module_accessor) >= 0.5) {
+                PostureModule::reverse_lr(fighter.module_accessor);
+                PostureModule::update_rot_y_lr(fighter.module_accessor);
+            }
+        }
+
+
+    }
+}
+
+
+unsafe extern "C" fn kirby_wariohat_frame(fighter: &mut L2CFighterCommon) {
+    unsafe {
+        let status = StatusModule::status_kind(fighter.module_accessor);
+        let stickx = ControlModule::get_stick_x(fighter.module_accessor);
+        
+        if status == *FIGHTER_KIRBY_STATUS_KIND_WARIO_SPECIAL_N_END {
+            if (stickx >= 0.5 && PostureModule::lr(fighter.module_accessor) <= -0.5) || (stickx <= -0.5 && PostureModule::lr(fighter.module_accessor) >= 0.5) {
+                PostureModule::reverse_lr(fighter.module_accessor);
+                PostureModule::update_rot_y_lr(fighter.module_accessor);
+            }
+        }
+
     }
 }
 
@@ -136,24 +162,26 @@ unsafe extern "C" fn wario_dashattack(fighter: &mut L2CAgentBase) {
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("arml"), HitStatus(*HIT_STATUS_XLU), 0);
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("shoulderl"), HitStatus(*HIT_STATUS_XLU), 0);
         KineticModule::add_speed(fighter.module_accessor, &smash::phx::Vector3f{x: 0.6, y: 0.0, z: 0.0});
+        shield!(fighter, *MA_MSC_CMD_REFLECTOR, *COLLISION_KIND_REFLECTOR, 0, Hash40::new("top"), 7.0, 0.0, 7.0, -6.8, 0.0, 7.0, 6.8, 0.0, 0.0, 1, false, 0.0, *FIGHTER_REFLECTOR_GROUP_HOMERUNBAT);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.4, 40, 103, 0, 60, 4.8, 0.0, 4.2, 5.8, Some(0.0), Some(10.4), Some(5.8), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 6, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
+        
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 13.4, 40, 103, 0, 60, 4.8, 0.0, 4.2, 5.8, Some(0.0), Some(10.4), Some(5.8), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 6, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 11.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 9.7, 74, 80, 0, 60, 4.8, 0.0, 8.0, 4.8, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 6, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 9.7, 74, 80, 0, 60, 3.8, 0.0, 6.0, 2.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 6, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 1.0, false);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 9.2, 74, 80, 0, 60, 4.8, 0.0, 8.0, 4.8, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 6, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 9.2, 74, 80, 0, 60, 3.8, 0.0, 6.0, 2.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 6, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 1.0, false);
-    
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 2, 1.0, false);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 24.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
         MotionModule::set_rate(fighter.module_accessor, 1.4);
         HitModule::set_status_all(fighter.module_accessor, HitStatus(*HIT_STATUS_NORMAL), 0);
+        shield!(fighter, *MA_MSC_CMD_SHIELD_OFF, *COLLISION_KIND_REFLECTOR, 0, *FIGHTER_REFLECTOR_GROUP_HOMERUNBAT);
     }
 }
 
@@ -363,8 +391,8 @@ unsafe extern "C" fn wario_utilt(fighter: &mut L2CAgentBase) {
 unsafe extern "C" fn wario_dtilt(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.5, 300, 30, 0, 20, 3.3, 0.0, 2.1, 12.0, Some(0.0), Some(2.1), Some(4.5), 0.25, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 4, 0.2, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 5.5, 300, 30, 0, 20, 3.3, 0.0, 2.1, 18.0, Some(0.0), Some(2.1), Some(4.5), 0.25, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 4, 0.2, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.5, 300, 30, 0, 14, 3.3, 0.0, 2.1, 12.0, Some(0.0), Some(2.1), Some(4.5), 0.25, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 4, 0.2, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 5.5, 300, 30, 0, 14, 3.3, 0.0, 2.1, 18.0, Some(0.0), Some(2.1), Some(4.5), 0.25, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 4, 0.2, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_PUNCH);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 1.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 1.0, false);
         AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
@@ -810,7 +838,7 @@ unsafe extern "C" fn wario_uthrow(fighter: &mut L2CAgentBase) {
 
 unsafe extern "C" fn wario_dthrow(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 4.8, 130, 28, 0, 50, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 4.8, 130, 37, 0, 50, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 22.0);
@@ -1090,54 +1118,58 @@ unsafe extern "C" fn wario_bike_turn_loop(fighter: &mut L2CAgentBase) {
 //#[skyline::main(name = "tr4sh_rebuffed")]
 pub fn install() {
     Agent::new("wario")
-      .on_line(Main, wario_frame) //opff
-      .game_acmd("game_attack11", wario_jab)
-      .game_acmd("game_attack12", wario_jab2)
-      .game_acmd("game_attackdash", wario_dashattack)
-      .sound_acmd("sound_attackdash", wario_dashattack_sound)
-      .game_acmd("game_attacks3", wario_ftilt)
-      .game_acmd("game_attacks3hi", wario_ftilt_up)
-      .game_acmd("game_attacks3lw", wario_ftilt_down)
-      .game_acmd("game_attackhi3", wario_utilt)
-      .game_acmd("game_attacklw3", wario_dtilt)
-      .game_acmd("game_attacks4", wario_fsmash)
-      .game_acmd("game_attackhi4", wario_usmash)
-      .game_acmd("game_attacklw4", wario_dsmash)
-      .game_acmd("game_attackairn", wario_nair)
-      .game_acmd("game_attackairf", wario_fair)
-      .game_acmd("game_attackairb", wario_bair)
-      .game_acmd("game_attackairhi", wario_uair)
-      .game_acmd("game_attackairlw", wario_dair)
-      .game_acmd("game_catch", wario_grab)
-      .game_acmd("game_catchdash", wario_grabd)
-      .game_acmd("game_catchturn", wario_grabp)
-      .game_acmd("game_catchattack", wario_pummel)
-      .game_acmd("game_throwf", wario_fthrow)
-      .game_acmd("game_throwb", wario_bthrow)
-      .game_acmd("game_throwhi", wario_uthrow)
-      .game_acmd("game_throwlw", wario_dthrow)
-      .game_acmd("game_cliffattack", wario_ledgegetupattack)
-      .game_acmd("game_specialnopenwait", wario_neutralspecial_open)
-      .game_acmd("game_specialairnopenwait", wario_neutralspecial_air_open)
-      .game_acmd("game_specialnend", wario_neutralspecial_end)
-      .game_acmd("game_specialairnend", wario_neutralspecial_air_end)
-      .game_acmd("game_specialhijump", wario_upspecial)
-      .game_acmd("game_speciallwsr", wario_downspecial_weak)
-      .game_acmd("game_specialairlwsr", wario_downspecial_weak)
-      .game_acmd("game_speciallwmr", wario_downspecial_mid)
-      .game_acmd("game_specialairlwmr", wario_downspecial_mid)
-      .game_acmd("game_speciallwlr", wario_downspecial_strong)
-      .game_acmd("game_specialairlwlr", wario_downspecial_strong)
-      .game_acmd("game_speciallwflyr", wario_downspecial_fly)
-      .game_acmd("game_specialairlwflyr", wario_downspecial_fly)
-      .install();
+    .on_line(Main, wario_frame) //opff
+    .game_acmd("game_attack11", wario_jab, Low)
+    .game_acmd("game_attack12", wario_jab2, Low)
+    .game_acmd("game_attackdash", wario_dashattack, Low)
+    .sound_acmd("sound_attackdash", wario_dashattack_sound, Low)
+    .game_acmd("game_attacks3", wario_ftilt, Low)
+    .game_acmd("game_attacks3hi", wario_ftilt_up, Low)
+    .game_acmd("game_attacks3lw", wario_ftilt_down, Low)
+    .game_acmd("game_attackhi3", wario_utilt, Low)
+    .game_acmd("game_attacklw3", wario_dtilt, Low)
+    .game_acmd("game_attacks4", wario_fsmash, Low)
+    .game_acmd("game_attackhi4", wario_usmash, Low)
+    .game_acmd("game_attacklw4", wario_dsmash, Low)
+    .game_acmd("game_attackairn", wario_nair, Low)
+    .game_acmd("game_attackairf", wario_fair, Low)
+    .game_acmd("game_attackairb", wario_bair, Low)
+    .game_acmd("game_attackairhi", wario_uair, Low)
+    .game_acmd("game_attackairlw", wario_dair, Low)
+    .game_acmd("game_catch", wario_grab, Low)
+    .game_acmd("game_catchdash", wario_grabd, Low)
+    .game_acmd("game_catchturn", wario_grabp, Low)
+    .game_acmd("game_catchattack", wario_pummel, Low)
+    .game_acmd("game_throwf", wario_fthrow, Low)
+    .game_acmd("game_throwb", wario_bthrow, Low)
+    .game_acmd("game_throwhi", wario_uthrow, Low)
+    .game_acmd("game_throwlw", wario_dthrow, Low)
+    .game_acmd("game_cliffattack", wario_ledgegetupattack, Low)
+    .game_acmd("game_specialnopenwait", wario_neutralspecial_open, Low)
+    .game_acmd("game_specialairnopenwait", wario_neutralspecial_air_open, Low)
+    .game_acmd("game_specialnend", wario_neutralspecial_end, Low)
+    .game_acmd("game_specialairnend", wario_neutralspecial_air_end, Low)
+    .game_acmd("game_specialhijump", wario_upspecial, Low)
+    .game_acmd("game_speciallwsr", wario_downspecial_weak, Low)
+    .game_acmd("game_specialairlwsr", wario_downspecial_weak, Low)
+    .game_acmd("game_speciallwmr", wario_downspecial_mid, Low)
+    .game_acmd("game_specialairlwmr", wario_downspecial_mid, Low)
+    .game_acmd("game_speciallwlr", wario_downspecial_strong, Low)
+    .game_acmd("game_specialairlwlr", wario_downspecial_strong, Low)
+    .game_acmd("game_speciallwflyr", wario_downspecial_fly, Low)
+    .game_acmd("game_specialairlwflyr", wario_downspecial_fly, Low)
+    .install();
+
+    Agent::new("kirby")
+    .on_line(Main, kirby_wariohat_frame)
+    .install();
   
-      Agent::new("wario_wariobike")
-      .game_acmd("game_specialsdrive", wario_bike_drive)
-      .game_acmd("game_specialswheelieend", wario_bike_wheelie_end)
-      .game_acmd("game_specialsturnstart", wario_bike_turn_start)
-      .game_acmd("game_specialsturnloop", wario_bike_turn_loop)
-      .install();
+    Agent::new("wario_wariobike")
+    .game_acmd("game_specialsdrive", wario_bike_drive, Low)
+    .game_acmd("game_specialswheelieend", wario_bike_wheelie_end, Low)
+    .game_acmd("game_specialsturnstart", wario_bike_turn_start, Low)
+    .game_acmd("game_specialsturnloop", wario_bike_turn_loop, Low)
+    .install();
 
     
 }

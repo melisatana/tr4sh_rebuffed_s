@@ -8,6 +8,8 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
+
 
 pub static mut SELF_DAMAGE_METER : [f32; 8] = [0.0; 8]; //total stored self-damage
 static mut SELF_DAMAGE_FRAME : [i32; 8] = [0; 8]; //for effect frames
@@ -108,6 +110,13 @@ unsafe extern "C" fn pichu_frame(fighter: &mut L2CFighterCommon) {
             SELF_DAMAGE_FRAME_CURRENT_STATUS[entry_id] = status;
         }
 
+
+        if status == *FIGHTER_PIKACHU_STATUS_KIND_SPECIAL_S_HOLD {
+            if (ControlModule::get_stick_x(fighter.module_accessor) >= 0.5 && PostureModule::lr(fighter.module_accessor) <= -0.5) || (ControlModule::get_stick_x(fighter.module_accessor) <= -0.5 && PostureModule::lr(fighter.module_accessor) >= 0.5) {
+                PostureModule::reverse_lr(fighter.module_accessor);
+                PostureModule::update_rot_y_lr(fighter.module_accessor);
+            }  
+        }
 
         if status == *FIGHTER_PIKACHU_STATUS_KIND_SPECIAL_HI_WARP || (status == *FIGHTER_PIKACHU_STATUS_KIND_SPECIAL_HI_END && MotionModule::frame(fighter.module_accessor) <= 8.0) {
             if SELF_DAMAGE_METER[entry_id] <= PICHU_CHARGE_LV2 {
@@ -230,8 +239,8 @@ unsafe extern "C" fn pichu_jab(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
         KineticModule::add_speed(fighter.module_accessor, &smash::phx::Vector3f{x: 0.3, y: 0.0, z: 0.0});
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.9, 0, 50, 0, 10, 3.7, 0.0, 3.0, 6.0, None, None, None, 0.4, 1.7, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_HEAD);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 1.9, 0, 50, 0, 20, 3.7, 0.0, 3.0, 10.0, None, None, None, 0.4, 1.7, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_HEAD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.8, 0, 50, 0, 10, 3.7, 0.0, 3.0, 6.0, None, None, None, 0.4, 1.7, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_HEAD);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 1.8, 0, 50, 0, 20, 3.7, 0.0, 3.0, 10.0, None, None, None, 0.4, 1.7, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 3, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_HEAD);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
@@ -603,13 +612,13 @@ unsafe extern "C" fn pichu_dair(fighter: &mut L2CAgentBase) {
         SELF_DAMAGE_METER[entry_id] -= 1.0;
         macros::HIT_NODE(fighter, Hash40::new("mimir1"), *HIT_STATUS_XLU);
         macros::HIT_NODE(fighter, Hash40::new("mimil1"), *HIT_STATUS_XLU);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("neck"), 15.9, 270, 86, 0, 16, 5.5, 4.5, -1.3, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_HEAD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("neck"), 13.8, 270, 86, 0, 16, 5.5, 4.5, -1.3, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_HEAD);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 18.0);
     if macros::is_excute(fighter) {
         HitModule::set_status_all(fighter.module_accessor, HitStatus(*HIT_STATUS_NORMAL), 0);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("neck"), 12.9, 361, 107, 0, 26, 5.4, 4.5, 0.5, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_HEAD);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("hip"), 12.9, 361, 107, 0, 26, 3.5, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_HEAD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("neck"), 10.0, 361, 107, 0, 33, 5.4, 4.5, 0.5, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_HEAD);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("hip"), 10.0, 361, 107, 0, 33, 3.5, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_HEAD);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 27.0);
     if macros::is_excute(fighter) {
@@ -1076,67 +1085,67 @@ unsafe extern "C" fn pichu_uptaunt_smash_script(fighter: &mut L2CAgentBase) {
 pub fn install() {
     Agent::new("pichu")
       .on_line(Main, pichu_frame) //opff
-      .game_acmd("game_guarddamage", pichu_shield)
-      .game_acmd("game_justshieldoff", pichu_perfectshield)
-      .game_acmd("game_attack11", pichu_jab)
-      .game_acmd("game_attackdash", pichu_dashattack)
-      .game_acmd("game_attacks3", pichu_ftilt)
-      .game_acmd("game_attackhi3", pichu_utilt)
-      .game_acmd("game_attacklw3", pichu_dtilt)
-      .game_acmd("game_attacks4", pichu_fsmash)
-      .game_acmd("game_attackhi4", pichu_usmash)
-      .game_acmd("game_attacklw4", pichu_dsmash)
-      .game_acmd("game_attackairn", pichu_nair)
-      .game_acmd("game_attackairf", pichu_fair)
-      .game_acmd("game_attackairb", pichu_bair)
-      .game_acmd("game_attackairhi", pichu_uair)
-      .game_acmd("game_attackairlw", pichu_dair)
-      .game_acmd("game_landingairlw", pichu_dair_landing)
-      .game_acmd("game_catch", pichu_grab)
-      .game_acmd("game_catchdash", pichu_grabd)
-      .game_acmd("game_catchturn", pichu_grabp)
-      .game_acmd("game_catchattack", pichu_pummel)
-      .game_acmd("game_throwf", pichu_fthrow)
-      .game_acmd("game_throwb", pichu_bthrow)
-      .game_acmd("game_throwhi", pichu_uthrow)
-      .game_acmd("game_throwlw", pichu_dthrow)
-      .game_acmd("game_specialn", pichu_neutralspecial)
-      .game_acmd("game_specialairn", pichu_neutralspecial_air)
-      .game_acmd("game_specials", pichu_sidespecial)
-      .game_acmd("game_specialhistart", pichu_upspecial_start)
-      .game_acmd("game_specialairhistart", pichu_upspecial_start)
-      .sound_acmd("sound_specialhistart", pichu_upspecialstart_sound)
-      .sound_acmd("sound_specialairhistart", pichu_upspecialstart_sound)
-      .game_acmd("game_specialhi1", pichu_upspecial_1)
-      .game_acmd("game_specialairhi1", pichu_upspecial_1)
-      .game_acmd("game_specialhi2", pichu_upspecial_2)
-      .game_acmd("game_specialairhi2", pichu_upspecial_2)
-      .game_acmd("game_speciallwhit", pichu_downspecial_hit)
-      .game_acmd("game_specialairlwhit", pichu_downspecial_hit)
-      .game_acmd("game_finalattack", pichu_final_loop)
-      .game_acmd("game_finalattack2", pichu_final_loop_2)
-      .game_acmd("game_finalattackfinish", pichu_final_loop_finish)
-      .game_acmd("game_final2", pichu_final_finish)
-      .game_acmd("game_finalair2", pichu_final_finish)
-      .game_acmd("game_appealhil", pichu_uptaunt_smash_script)
-      .game_acmd("game_appealhir", pichu_uptaunt_smash_script)
+      .game_acmd("game_guarddamage", pichu_shield, Low)
+      .game_acmd("game_justshieldoff", pichu_perfectshield, Low)
+      .game_acmd("game_attack11", pichu_jab, Low)
+      .game_acmd("game_attackdash", pichu_dashattack, Low)
+      .game_acmd("game_attacks3", pichu_ftilt, Low)
+      .game_acmd("game_attackhi3", pichu_utilt, Low)
+      .game_acmd("game_attacklw3", pichu_dtilt, Low)
+      .game_acmd("game_attacks4", pichu_fsmash, Low)
+      .game_acmd("game_attackhi4", pichu_usmash, Low)
+      .game_acmd("game_attacklw4", pichu_dsmash, Low)
+      .game_acmd("game_attackairn", pichu_nair, Low)
+      .game_acmd("game_attackairf", pichu_fair, Low)
+      .game_acmd("game_attackairb", pichu_bair, Low)
+      .game_acmd("game_attackairhi", pichu_uair, Low)
+      .game_acmd("game_attackairlw", pichu_dair, Low)
+      .game_acmd("game_landingairlw", pichu_dair_landing, Low)
+      .game_acmd("game_catch", pichu_grab, Low)
+      .game_acmd("game_catchdash", pichu_grabd, Low)
+      .game_acmd("game_catchturn", pichu_grabp, Low)
+      .game_acmd("game_catchattack", pichu_pummel, Low)
+      .game_acmd("game_throwf", pichu_fthrow, Low)
+      .game_acmd("game_throwb", pichu_bthrow, Low)
+      .game_acmd("game_throwhi", pichu_uthrow, Low)
+      .game_acmd("game_throwlw", pichu_dthrow, Low)
+      .game_acmd("game_specialn", pichu_neutralspecial, Low)
+      .game_acmd("game_specialairn", pichu_neutralspecial_air, Low)
+      .game_acmd("game_specials", pichu_sidespecial, Low)
+      .game_acmd("game_specialhistart", pichu_upspecial_start, Low)
+      .game_acmd("game_specialairhistart", pichu_upspecial_start, Low)
+      .sound_acmd("sound_specialhistart", pichu_upspecialstart_sound, Low)
+      .sound_acmd("sound_specialairhistart", pichu_upspecialstart_sound, Low)
+      .game_acmd("game_specialhi1", pichu_upspecial_1, Low)
+      .game_acmd("game_specialairhi1", pichu_upspecial_1, Low)
+      .game_acmd("game_specialhi2", pichu_upspecial_2, Low)
+      .game_acmd("game_specialairhi2", pichu_upspecial_2, Low)
+      .game_acmd("game_speciallwhit", pichu_downspecial_hit, Low)
+      .game_acmd("game_specialairlwhit", pichu_downspecial_hit, Low)
+      .game_acmd("game_finalattack", pichu_final_loop, Low)
+      .game_acmd("game_finalattack2", pichu_final_loop_2, Low)
+      .game_acmd("game_finalattackfinish", pichu_final_loop_finish, Low)
+      .game_acmd("game_final2", pichu_final_finish, Low)
+      .game_acmd("game_finalair2", pichu_final_finish, Low)
+      .game_acmd("game_appealhil", pichu_uptaunt_smash_script, Low)
+      .game_acmd("game_appealhir", pichu_uptaunt_smash_script, Low)
       .install();
   
       Agent::new("pichu_dengeki")
-      .game_acmd("game_regular", pichu_thunderjolt_ground)
+      .game_acmd("game_regular", pichu_thunderjolt_ground, Low)
       .install();
 
       Agent::new("pichu_dengekidama")
-      .game_acmd("game_regular", pichu_thunderjolt)
+      .game_acmd("game_regular", pichu_thunderjolt, Low)
       .install();
   
       Agent::new("pichu_kaminari")
-      .game_acmd("game_regular", pichu_thunder)
+      .game_acmd("game_regular", pichu_thunder, Low)
       .install();
 
       Agent::new("pichu_cloud")
-      .game_acmd("game_regular", pichu_thundercloud)
-      .effect_acmd("effect_regular", pichu_thundercloud_effect)
+      .game_acmd("game_regular", pichu_thundercloud, Low)
+      .effect_acmd("effect_regular", pichu_thundercloud_effect, Low)
       .install();
 
       Agent::new("kirby")

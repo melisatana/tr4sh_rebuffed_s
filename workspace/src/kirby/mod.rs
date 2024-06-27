@@ -8,6 +8,7 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smash_script::*;
 use smashline::*;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
 
 
 static mut KIRBY_FTHROW_BURY_RECHARGE_TIMER : [i32; 8] = [0; 8];
@@ -121,8 +122,8 @@ unsafe extern "C" fn kirby_run_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
     if crate::sonic::SKIRBY_NEUTRALB_CURRENT_SPEEDUP_LEVEL[entry_id] >= 3 {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 6.1, 70, 70, 0, 50, 5.7, 0.0, 5.0, 0.0, None, None, None, 1.0, 2.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 30, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, -5.0, false);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.3, 70, 70, 0, 50, 5.7, 0.0, 5.0, 0.0, None, None, None, 1.0, 2.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 30, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, -6.0, false);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 0.3);
     
     }
@@ -463,6 +464,10 @@ unsafe extern "C" fn kirby_fsmash3_smash_script(fighter: &mut L2CAgentBase) {
             damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0.0);
         }
     }
+    sv_animcmd::frame(fighter.lua_state_agent, 12.0);
+    if macros::is_excute(fighter) {
+        KineticModule::add_speed(fighter.module_accessor, &smash::phx::Vector3f{x: 0.4, y: 0.0, z: 0.0});
+    }
     sv_animcmd::frame(fighter.lua_state_agent, 13.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("footl"), 22.7, 34, 39, 0, 42, 4.2, 0.0, -7.5, 0.0, Some(0.0), Some(0.0), Some(0.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 13, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_KICK);
@@ -660,11 +665,11 @@ unsafe extern "C" fn kirby_bair_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.4, 361, 107, 0, 20, 4.5, 0.0, 4.5, -13.0, Some(0.0), Some(4.5), Some(-6.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.4, 361, 115, 0, 20, 4.5, 0.0, 4.5, -13.0, Some(0.0), Some(4.5), Some(-6.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 9.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.7, 361, 112, 0, 9, 3.5, 0.0, 4.5, -11.0, Some(0.0), Some(4.5), Some(-6.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.7, 361, 112, 0, 14, 3.5, 0.0, 4.5, -11.0, Some(0.0), Some(4.5), Some(-6.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 17.0);
     if macros::is_excute(fighter) {
@@ -839,6 +844,7 @@ unsafe extern "C" fn kirby_pummel_smash_script(fighter: &mut L2CAgentBase) {
 
 unsafe extern "C" fn kirby_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+    
     if macros::is_excute(fighter) {
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 7.7, 270, 75, 0, 40, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_bury_r"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
@@ -923,7 +929,7 @@ unsafe extern "C" fn kirby_uthrow_smash_script(fighter: &mut L2CAgentBase) {
 
 unsafe extern "C" fn kirby_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 3.2, 63, 110, 0, 48, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 3.2, 63, 115, 0, 48, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 9.0);
@@ -1323,64 +1329,64 @@ unsafe extern "C" fn kirby_downb_falling_smash_script(fighter: &mut L2CAgentBase
 pub fn install() {
     Agent::new("kirby")
     .on_line(Main, kirby_frame) //opff
-    .game_acmd("game_jumpaerialf1", kirby_air_jump_1)
-    .game_acmd("game_jumpaerialf2", kirby_air_jump_2)
-    .game_acmd("game_jumpaerialf3", kirby_air_jump_3)
-    .game_acmd("game_jumpaerialf4", kirby_air_jump_4)
-    .game_acmd("game_jumpaerialf5", kirby_air_jump_5)
-    .game_acmd("game_run", kirby_run_smash_script)
-    .game_acmd("game_justshieldoff", kirby_parry_smash_script)
-    .game_acmd("game_shieldbreakfly", kirby_shieldbreak_smash_script)
-    .game_acmd("game_attack11", kirby_jab_smash_script)
-    .game_acmd("game_attack12", kirby_jab2_smash_script)
-    .game_acmd("game_attack100", kirby_jab100_smash_script)
-    .game_acmd("game_attack100end", kirby_jab_finisher_smash_script)
-    .game_acmd("game_attackdash", kirby_dash_attack_smash_script)
-    .game_acmd("game_attacks3", kirby_ftilt_smash_script)
-    .game_acmd("game_attacks3hi", kirby_ftilt_smash_script)
-    .game_acmd("game_attacks3lw", kirby_ftilt_smash_script)
-    .game_acmd("game_attackhi3", kirby_utilt_smash_script)
-    .game_acmd("game_attacklw3", kirby_dtilt_smash_script)
-    .game_acmd("game_attacks4", kirby_fsmash_smash_script)
-    .game_acmd("game_attacks4hi", kirby_fsmash2_smash_script)
-    .game_acmd("game_attacks4lw", kirby_fsmash3_smash_script)
-    .game_acmd("game_attackhi4", kirby_usmash_smash_script)
-    .game_acmd("game_attacklw4", kirby_dsmash_smash_script)
-    .game_acmd("game_attackairn", kirby_nair_smash_script)
-    .game_acmd("game_attackairf", kirby_fair_smash_script)
-    .game_acmd("game_attackairb", kirby_bair_smash_script)
-    .game_acmd("game_attackairhi", kirby_uair_smash_script)
-    .game_acmd("game_attackairlw", kirby_dair_smash_script)
-    .game_acmd("game_catch", kirby_grab_smash_script)
-    .game_acmd("game_catchdash", kirby_grabd_smash_script)
-    .game_acmd("game_catchturn", kirby_grabp_smash_script)
-    .game_acmd("game_catchattack", kirby_pummel_smash_script)
-    .game_acmd("game_throwf", kirby_fthrow_smash_script)
-    .game_acmd("game_throwb", kirby_bthrow_smash_script)
-    .game_acmd("game_throwhi", kirby_uthrow_smash_script)
-    .game_acmd("game_throwlw", kirby_dthrow_smash_script)
-    .game_acmd("game_specialnloop", kirby_neutralb_suckloop_smash_script)
-    .game_acmd("game_specialairnloop", kirby_neutralb_suckloop_air_smash_script)
-    .game_acmd("game_specialnswallow", kirby_neutralb_swallow_smash_script)
-    .game_acmd("game_specialairnswallow", kirby_neutralb_swallow_smash_script)
-    .game_acmd("game_specialsstart", kirby_sideb_start_smash_script)
-    .game_acmd("game_specialairsstart", kirby_sideb_start_smash_script)
-    .game_acmd("game_specialss", kirby_sideb_smash_script)
-    .game_acmd("game_specials", kirby_sideb_fire_smash_script)
-    .game_acmd("game_specialsmax", kirby_sideb_max_smash_script)
-    .game_acmd("game_specialairss", kirby_sideb_air_smash_script)
-    .game_acmd("game_specialairs", kirby_sideb_airfire_smash_script)
-    .game_acmd("game_specialairsmax", kirby_sideb_airmax_smash_script)
-    .game_acmd("game_specialhi", kirby_upb_start_smash_script)
-    .game_acmd("game_specialairhi", kirby_upb_start_smash_script)
-    .game_acmd("game_specialairhi2", kirby_upb_rise_smash_script)
-    .game_acmd("game_speciallw", kirby_downb_ground_script)
-    .game_acmd("game_speciallwtoground", kirby_downb_landing_script)
-    .game_acmd("game_speciallwtoair", kirby_downb_falling_smash_script)
+    .game_acmd("game_jumpaerialf1", kirby_air_jump_1, Low)
+    .game_acmd("game_jumpaerialf2", kirby_air_jump_2, Low)
+    .game_acmd("game_jumpaerialf3", kirby_air_jump_3, Low)
+    .game_acmd("game_jumpaerialf4", kirby_air_jump_4, Low)
+    .game_acmd("game_jumpaerialf5", kirby_air_jump_5, Low)
+    .game_acmd("game_run", kirby_run_smash_script, Low)
+    .game_acmd("game_justshieldoff", kirby_parry_smash_script, Low)
+    .game_acmd("game_shieldbreakfly", kirby_shieldbreak_smash_script, Low)
+    .game_acmd("game_attack11", kirby_jab_smash_script, Low)
+    .game_acmd("game_attack12", kirby_jab2_smash_script, Low)
+    .game_acmd("game_attack100", kirby_jab100_smash_script, Low)
+    .game_acmd("game_attack100end", kirby_jab_finisher_smash_script, Low)
+    .game_acmd("game_attackdash", kirby_dash_attack_smash_script, Low)
+    .game_acmd("game_attacks3", kirby_ftilt_smash_script, Low)
+    .game_acmd("game_attacks3hi", kirby_ftilt_smash_script, Low)
+    .game_acmd("game_attacks3lw", kirby_ftilt_smash_script, Low)
+    .game_acmd("game_attackhi3", kirby_utilt_smash_script, Low)
+    .game_acmd("game_attacklw3", kirby_dtilt_smash_script, Low)
+    .game_acmd("game_attacks4", kirby_fsmash_smash_script, Low)
+    .game_acmd("game_attacks4hi", kirby_fsmash2_smash_script, Low)
+    .game_acmd("game_attacks4lw", kirby_fsmash3_smash_script, Low)
+    .game_acmd("game_attackhi4", kirby_usmash_smash_script, Low)
+    .game_acmd("game_attacklw4", kirby_dsmash_smash_script, Low)
+    .game_acmd("game_attackairn", kirby_nair_smash_script, Low)
+    .game_acmd("game_attackairf", kirby_fair_smash_script, Low)
+    .game_acmd("game_attackairb", kirby_bair_smash_script, Low)
+    .game_acmd("game_attackairhi", kirby_uair_smash_script, Low)
+    .game_acmd("game_attackairlw", kirby_dair_smash_script, Low)
+    .game_acmd("game_catch", kirby_grab_smash_script, Low)
+    .game_acmd("game_catchdash", kirby_grabd_smash_script, Low)
+    .game_acmd("game_catchturn", kirby_grabp_smash_script, Low)
+    .game_acmd("game_catchattack", kirby_pummel_smash_script, Low)
+    .game_acmd("game_throwf", kirby_fthrow_smash_script, Low)
+    .game_acmd("game_throwb", kirby_bthrow_smash_script, Low)
+    .game_acmd("game_throwhi", kirby_uthrow_smash_script, Low)
+    .game_acmd("game_throwlw", kirby_dthrow_smash_script, Low)
+    .game_acmd("game_specialnloop", kirby_neutralb_suckloop_smash_script, Low)
+    .game_acmd("game_specialairnloop", kirby_neutralb_suckloop_air_smash_script, Low)
+    .game_acmd("game_specialnswallow", kirby_neutralb_swallow_smash_script, Low)
+    .game_acmd("game_specialairnswallow", kirby_neutralb_swallow_smash_script, Low)
+    .game_acmd("game_specialsstart", kirby_sideb_start_smash_script, Low)
+    .game_acmd("game_specialairsstart", kirby_sideb_start_smash_script, Low)
+    .game_acmd("game_specialss", kirby_sideb_smash_script, Low)
+    .game_acmd("game_specials", kirby_sideb_fire_smash_script, Low)
+    .game_acmd("game_specialsmax", kirby_sideb_max_smash_script, Low)
+    .game_acmd("game_specialairss", kirby_sideb_air_smash_script, Low)
+    .game_acmd("game_specialairs", kirby_sideb_airfire_smash_script, Low)
+    .game_acmd("game_specialairsmax", kirby_sideb_airmax_smash_script, Low)
+    .game_acmd("game_specialhi", kirby_upb_start_smash_script, Low)
+    .game_acmd("game_specialairhi", kirby_upb_start_smash_script, Low)
+    .game_acmd("game_specialairhi2", kirby_upb_rise_smash_script, Low)
+    .game_acmd("game_speciallw", kirby_downb_ground_script, Low)
+    .game_acmd("game_speciallwtoground", kirby_downb_landing_script, Low)
+    .game_acmd("game_speciallwtoair", kirby_downb_falling_smash_script, Low)
     .install();
 
     Agent::new("kirby_finalcuttershot")
-    .game_acmd("game_finalcutterregular", kirby_finalcutter_script)
+    .game_acmd("game_finalcutterregular", kirby_finalcutter_script, Low)
     .install();
 
 

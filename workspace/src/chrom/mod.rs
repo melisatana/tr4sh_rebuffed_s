@@ -8,6 +8,7 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
 
 static mut CHROM_DASHATTACK_HITBOX_ACTIVE : [bool; 8] = [false; 8];
 static mut CHROM_DASHATTACK_HITBOX_FINAL : [bool; 8] = [false; 8];
@@ -20,7 +21,6 @@ unsafe fn set_dashattack_hitbox(fighter: &mut L2CAgentBase) {
     let point_offset_x = PostureModule::lr(fighter.module_accessor) * (CHROM_DASHATTACK_HITBOX_X[entry_id] - PostureModule::pos_x(fighter.module_accessor));
     let point_offset_y = CHROM_DASHATTACK_HITBOX_Y[entry_id] - PostureModule::pos_y(fighter.module_accessor);
     
-    
     if CHROM_DASHATTACK_HITBOX_FINAL[entry_id] {
         macros::ATTACK(fighter, 0, 1, Hash40::new("top"), 6.0, 80, 100, 0, 120, 6.0, 0.0, 8.0, 0.0, Some(0.0), Some(point_offset_y), Some(point_offset_x), 1.2, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, f32::NAN, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
     }
@@ -28,7 +28,6 @@ unsafe fn set_dashattack_hitbox(fighter: &mut L2CAgentBase) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.5, 367, 30, 30, 100, 6.0, 0.0, 8.0, 0.0, Some(0.0), Some(point_offset_y), Some(point_offset_x), 0.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, f32::NAN, 0.0, 2, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
         macros::EFFECT(fighter, Hash40::new("sys_hit_sting"), Hash40::new("top"), 0, 8, -20, 0, 0, 0, 0.5, 0, 4, 10, 0, 0, 0, true);
     }
-    //AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 6.0, false);
 }
 
 // A Once-Per-Fighter-Frame that only applies to Chrom
@@ -75,7 +74,7 @@ unsafe extern "C" fn chrom_frame(fighter: &mut L2CFighterCommon) {
                 
         }
 
-        if [*FIGHTER_STATUS_KIND_SPECIAL_HI, *FIGHTER_IKE_STATUS_KIND_SPECIAL_HI_2, *FIGHTER_IKE_STATUS_KIND_SPECIAL_HI_3].contains(&status) {
+        if [*FIGHTER_STATUS_KIND_SPECIAL_HI, *FIGHTER_ROY_STATUS_KIND_SPECIAL_HI_2, *FIGHTER_ROY_STATUS_KIND_SPECIAL_HI_3].contains(&status) {
             if sticky <= -0.5 {
                 GroundModule::set_passable_check(fighter.module_accessor, true);
             }
@@ -245,8 +244,8 @@ unsafe extern "C" fn chrom_utilt_smash_script(fighter: &mut L2CAgentBase) {
 unsafe extern "C" fn chrom_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.4, 76, 58, 0, 50, 5.8, 0.0, 5.6, 14.0, Some(0.0), Some(7.0), Some(10.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CHROM_HIT, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 7.4, 76, 58, 0, 50, 4.7, 0.0, 4.0, 19.0, Some(0.0), Some(7.0), Some(12.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CHROM_HIT, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.4, 76, 66, 0, 50, 5.8, 0.0, 5.6, 14.0, Some(0.0), Some(7.0), Some(10.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CHROM_HIT, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 7.4, 76, 66, 0, 50, 4.7, 0.0, 4.0, 19.0, Some(0.0), Some(7.0), Some(12.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CHROM_HIT, *ATTACK_REGION_SWORD);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 2.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 2.0, false);
         AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
@@ -254,7 +253,7 @@ unsafe extern "C" fn chrom_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
-        MotionModule::set_rate(fighter.module_accessor, 1.15);
+        //MotionModule::set_rate(fighter.module_accessor, 1.15);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 52.0);
     if macros::is_excute(fighter) {
@@ -636,7 +635,7 @@ unsafe extern "C" fn chrom_grabp_smash_script(fighter: &mut L2CAgentBase) {
 
 unsafe extern "C" fn chrom_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 9.7, 45, 120, 0, 40, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 9.0, 45, 120, 0, 40, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_lay"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 14.0);
@@ -670,7 +669,7 @@ unsafe extern "C" fn chrom_bthrow_smash_script(fighter: &mut L2CAgentBase) {
 
 unsafe extern "C" fn chrom_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 11.9, 97, 60, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 8.8, 97, 113, 0, 67, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 12.0);
@@ -702,6 +701,138 @@ unsafe extern "C" fn chrom_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
+
+
+
+unsafe extern "C" fn chrom_neutralb_loop_effect_script(fighter: &mut L2CAgentBase) {
+    //wait_loop_sync_mot();
+    sv_animcmd::wait_loop_sync_mot(fighter.lua_state_agent);
+    if macros::is_excute(fighter) {
+        macros::EFFECT_FOLLOW(fighter, Hash40::new("chrom_volcano_hold_1"), Hash40::new("sword1"), 0, 0, 0, 0, 0, 0, 1, true);
+        macros::EFFECT_FOLLOW(fighter, Hash40::new("chrom_volcano_hold_2"), Hash40::new("sword1"), 0, 0, 0, 0, 0, 0, 1, true);
+    }
+    if WorkModule::get_int(fighter.module_accessor, *FIGHTER_ROY_STATUS_SPECIAL_N_WORK_INT_READY_LEVEL) == 0 {
+        if macros::is_excute(fighter) {
+            macros::EFFECT_FOLLOW(fighter, Hash40::new("chrom_sword_purple"), Hash40::new("sword1"), 0, 0, 0, 0, 0, 0, 1, true);
+        }
+    }
+    for _ in 0..6 {
+        if macros::is_excute(fighter) {
+            macros::FOOT_EFFECT(fighter, Hash40::new("sys_dash_smoke"), Hash40::new("top"), -8, 0, 0, 0, 0, 0, 0.5, 8, 0, 4, 0, 0, 0, false);
+            macros::FLASH(fighter, 0.392, 0, 0.941, 0.1);
+        }
+        sv_animcmd::wait(fighter.lua_state_agent, 4.0);
+        if macros::is_excute(fighter) {
+            macros::COL_NORMAL(fighter);
+        }
+        sv_animcmd::wait(fighter.lua_state_agent, 2.0);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 35.0);
+    for _ in 0..6 {
+        if macros::is_excute(fighter) {
+            macros::FOOT_EFFECT(fighter, Hash40::new("sys_dash_smoke"), Hash40::new("top"), -8, 0, 0, 0, 0, 0, 0.62, 8, 0, 4, 0, 0, 0, false);
+            macros::FLASH(fighter, 0.392, 0, 0.941, 0.2);
+        }
+        sv_animcmd::wait(fighter.lua_state_agent, 4.0);
+        if macros::is_excute(fighter) {
+            macros::COL_NORMAL(fighter);
+        }
+        sv_animcmd::wait(fighter.lua_state_agent, 2.0);
+    }
+    if WorkModule::get_int(fighter.module_accessor, *FIGHTER_ROY_STATUS_SPECIAL_N_WORK_INT_READY_LEVEL) == 1 {
+        if PostureModule::lr(fighter.module_accessor) < 0.0 {
+            if macros::is_excute(fighter) {
+                macros::EFFECT(fighter, Hash40::new("chrom_level_2"), Hash40::new("top"), 0, 0, 0, 0, 180, 0, 0.7, 0, 0, 0, 0, 0, 0, true);
+            }
+            else {
+                if macros::is_excute(fighter) {
+                    macros::EFFECT(fighter, Hash40::new("chrom_level_2"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 0.7, 0, 0, 0, 0, 0, 0, true);
+                }
+            }
+        }
+    }
+    if macros::is_excute(fighter) {
+        macros::EFFECT_FOLLOW(fighter, Hash40::new("chrom_attack_refraction_2"), Hash40::new("sword1"), 0, 0, 1.25, 0, 0, 0, 1, true);
+        macros::LAST_EFFECT_SET_RATE(fighter, 1);
+    }
+    for _ in 0..6 {
+        if macros::is_excute(fighter) {
+            macros::FOOT_EFFECT(fighter, Hash40::new("sys_dash_smoke"), Hash40::new("top"), -10, 0, 0, 0, 0, 0, 0.75, 10, 0, 4, 0, 0, 0, false);
+            macros::FLASH(fighter, 0.392, 0, 0.941, 0.3);
+        }
+        sv_animcmd::wait(fighter.lua_state_agent, 4.0);
+        if macros::is_excute(fighter) {
+            macros::COL_NORMAL(fighter);
+        }
+        sv_animcmd::wait(fighter.lua_state_agent, 2.0);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 35.0);
+    for _ in 0..6 {
+        if macros::is_excute(fighter) {
+            macros::FOOT_EFFECT(fighter, Hash40::new("sys_dash_smoke"), Hash40::new("top"), -10, 0, 0, 0, 0, 0, 0.87, 10, 0, 4, 0, 0, 0, false);
+            macros::FLASH(fighter, 0.392, 0, 0.941, 0.35);
+        }
+        sv_animcmd::wait(fighter.lua_state_agent, 4.0);
+        if macros::is_excute(fighter) {
+            macros::COL_NORMAL(fighter);
+        }
+        sv_animcmd::wait(fighter.lua_state_agent, 2.0);
+    }
+    if WorkModule::get_int(fighter.module_accessor, *FIGHTER_ROY_STATUS_SPECIAL_N_WORK_INT_READY_LEVEL) == 2 {
+        if PostureModule::lr(fighter.module_accessor) < 0.0 {
+            if macros::is_excute(fighter) {
+                macros::EFFECT(fighter, Hash40::new("chrom_level_3"), Hash40::new("top"), 0, 0, 0, 0, 180, 0, 0.8, 0, 0, 0, 0, 0, 0, true);
+            }
+            else {
+                if macros::is_excute(fighter) {
+                    macros::EFFECT(fighter, Hash40::new("chrom_level_3"), Hash40::new("top"), 0, 0, 0, 0, 0, 0, 0.8, 0, 0, 0, 0, 0, 0, true);
+                }
+            }
+        }
+    }
+    if macros::is_excute(fighter) {
+        macros::EFFECT_FOLLOW(fighter, Hash40::new("chrom_attack_refraction_2"), Hash40::new("sword1"), 0, 0, 1.25, 0, 0, 0, 1.5, true);
+        macros::LAST_EFFECT_SET_RATE(fighter, 1);
+    }
+    for _ in 0..6 {
+        if macros::is_excute(fighter) {
+            macros::FOOT_EFFECT(fighter, Hash40::new("sys_dash_smoke"), Hash40::new("top"), -12, 0, 0, 0, 0, 0, 1, 12, 0, 4, 0, 0, 0, false);
+            macros::FLASH(fighter, 0.392, 0, 0.941, 0.4);
+        }
+        sv_animcmd::wait(fighter.lua_state_agent, 4.0);
+        if macros::is_excute(fighter) {
+            macros::COL_NORMAL(fighter);
+        }
+        sv_animcmd::wait(fighter.lua_state_agent, 2.0);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 35.0);
+    for _ in 0..6 {
+        if macros::is_excute(fighter) {
+            macros::FOOT_EFFECT(fighter, Hash40::new("sys_dash_smoke"), Hash40::new("top"), -12, 0, 0, 0, 0, 0, 1.1, 12, 0, 4, 0, 0, 0, false);
+            macros::FLASH(fighter, 0.392, 0, 0.941, 0.45);
+        }
+        sv_animcmd::wait(fighter.lua_state_agent, 4.0);
+        if macros::is_excute(fighter) {
+            macros::COL_NORMAL(fighter);
+        }
+        sv_animcmd::wait(fighter.lua_state_agent, 2.0);
+    }
+    if WorkModule::get_int(fighter.module_accessor, *FIGHTER_ROY_STATUS_SPECIAL_N_WORK_INT_READY_LEVEL) == 3 {
+        if macros::is_excute(fighter) {
+            macros::FLASH(fighter, 0.392, 0, 0.941, 0.5);
+        }
+    }
+    for _ in 0..6 {
+        sv_animcmd::wait(fighter.lua_state_agent, 4.0);
+        if macros::is_excute(fighter) {
+            macros::FOOT_EFFECT(fighter, Hash40::new("sys_dash_smoke"), Hash40::new("top"), -16, 0, 0, 0, 0, 0, 1.25, 12, 0, 4, 0, 0, 0, false);
+            macros::COL_NORMAL(fighter);
+        }
+        sv_animcmd::wait(fighter.lua_state_agent, 2.0);
+    }
+}
+
+
 unsafe extern "C" fn chrom_neutralb_turn_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     macros::FT_MOTION_RATE(fighter, 0.5);
@@ -730,7 +861,7 @@ unsafe extern "C" fn chrom_neutralb_2_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 6.4, 280, 110, 0, 20, 8.7, 0.0, 8.5, 15.7, Some(0.0), Some(13.0), Some(15.7), 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_bury"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_BOMB);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 6.4, 280, 110, 0, 20, 8.7, 0.0, 8.5, 15.7, Some(0.0), Some(14.5), Some(15.7), 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_bury"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_BOMB);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
@@ -744,7 +875,7 @@ unsafe extern "C" fn chrom_neutralb_3_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 6.4, 280, 110, 0, 20, 8.7, 0.0, 8.5, 15.7, Some(0.0), Some(13.0), Some(15.7), 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_bury"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_BOMB);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 6.4, 280, 110, 0, 20, 8.7, 0.0, 8.5, 15.7, Some(0.0), Some(16.0), Some(15.7), 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_bury"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_BOMB);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
@@ -759,7 +890,7 @@ unsafe extern "C" fn chrom_neutralb_max_smash_script(fighter: &mut L2CAgentBase)
     }
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 69.0, 280, 70, 0, 50, 17.0, 0.0, 10.5, 15.7, Some(0.0), Some(17.5), Some(15.7), 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 30, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_bury"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_BOMB);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 42.0, 280, 70, 0, 50, 17.0, 0.0, 10.5, 15.7, Some(0.0), Some(18.5), Some(15.7), 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 30, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_bury"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_HEAVY, *ATTACK_REGION_BOMB);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 17.0);
     if macros::is_excute(fighter) {
@@ -991,7 +1122,7 @@ unsafe extern "C" fn chrom_upb_2_air_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS_BOTH_SIDES);
-        MotionModule::set_rate(fighter.module_accessor, 2.0);
+        MotionModule::set_rate(fighter.module_accessor, 1.5);
     
     }
     sv_animcmd::frame(fighter.lua_state_agent, 22.0);
@@ -1064,54 +1195,56 @@ unsafe extern "C" fn chrom_downb_smash_script(fighter: &mut L2CAgentBase) {
 pub fn install() {
     Agent::new("chrom")
     .on_line(Main, chrom_frame) //opff
-    .game_acmd("game_attack11", chrom_jab_smash_script)
-    .effect_acmd("effect_attack11", chrom_jab_effect_script)
-    .sound_acmd("sound_attack11", chrom_jab_sound_script)
-    .game_acmd("game_attackdash", chrom_dashattack_smash_script)
-    .game_acmd("game_attacks3", chrom_ftilt_smash_script)
-    .game_acmd("game_attackhi3", chrom_utilt_smash_script)
-    .game_acmd("game_attacklw3", chrom_dtilt_smash_script)
-    .effect_acmd("effect_attacklw3", chrom_dtilt_effect_script)
-    .game_acmd("game_attacks4", chrom_fsmash_smash_script)
-    .game_acmd("game_attackhi4", chrom_usmash_smash_script)
-    .game_acmd("game_attacklw4", chrom_dsmash_smash_script)
-    .game_acmd("game_attackairn", chrom_nair_smash_script)
-    .game_acmd("game_attackairf", chrom_fair_smash_script)
-    .game_acmd("game_attackairb", chrom_bair_smash_script)
-    .game_acmd("game_attackairhi", chrom_uair_smash_script)
-    .game_acmd("game_attackairlw", chrom_dair_smash_script)
-    .game_acmd("game_catch", chrom_grab_smash_script)
-    .game_acmd("game_catchdash", chrom_grabd_smash_script)
-    .game_acmd("game_catchturn", chrom_grabp_smash_script)
-    .game_acmd("game_throwf", chrom_fthrow_smash_script)
-    .game_acmd("game_throwb", chrom_bthrow_smash_script)
-    .game_acmd("game_throwhi", chrom_uthrow_smash_script)
-    .game_acmd("game_throwlw", chrom_dthrow_smash_script)
-    .game_acmd("game_specialnturn", chrom_neutralb_turn_smash_script)
-    .game_acmd("game_specialairnturn", chrom_neutralb_turn_smash_script)
-    .game_acmd("game_specialnend", chrom_neutralb_1_smash_script)
-    .game_acmd("game_specialairnend", chrom_neutralb_1_smash_script)
-    .game_acmd("game_specialnend2", chrom_neutralb_2_smash_script)
-    .game_acmd("game_specialairnen2", chrom_neutralb_2_smash_script)
-    .game_acmd("game_specialnend3", chrom_neutralb_3_smash_script)
-    .game_acmd("game_specialairnend3", chrom_neutralb_3_smash_script)
-    .game_acmd("game_specialnendmax", chrom_neutralb_max_smash_script)
-    .game_acmd("game_specialairnendmax", chrom_neutralb_max_smash_script)
-    .game_acmd("game_specials1", chrom_sideb_1_smash_script)
-    .game_acmd("game_specialairs1", chrom_sideb_1_air_smash_script)
-    .game_acmd("game_specials2lw", chrom_sideb_2_smash_script)
-    .game_acmd("game_specialairs2lw", chrom_sideb_2_air_smash_script)
-    .game_acmd("game_specials3s", chrom_sideb_3_smash_script)
-    .game_acmd("game_specialairs3s", chrom_sideb_3_air_smash_script)
-    .game_acmd("game_specials4s", chrom_sideb_4_smash_script)
-    .game_acmd("game_specialairs4s", chrom_sideb_4_air_smash_script)
-    .game_acmd("game_specialhi2", chrom_upb_2_smash_script)
-    .game_acmd("game_specialairhi2", chrom_upb_2_air_smash_script)
-    .game_acmd("game_specialhi4", chrom_upb_4_smash_script)
-    .game_acmd("game_speciallw", chrom_downb_counter_smash_script)
-    .game_acmd("game_specialairlw", chrom_downb_counter_smash_script)
-    .game_acmd("game_speciallwhit", chrom_downb_smash_script)
-    .game_acmd("game_specialairlwhit", chrom_downb_smash_script)
+    .game_acmd("game_attack11", chrom_jab_smash_script, Low)
+    .effect_acmd("effect_attack11", chrom_jab_effect_script, Low)
+    .sound_acmd("sound_attack11", chrom_jab_sound_script, Low)
+    .game_acmd("game_attackdash", chrom_dashattack_smash_script, Low)
+    .game_acmd("game_attacks3", chrom_ftilt_smash_script, Low)
+    .game_acmd("game_attackhi3", chrom_utilt_smash_script, Low)
+    .game_acmd("game_attacklw3", chrom_dtilt_smash_script, Low)
+    .effect_acmd("effect_attacklw3", chrom_dtilt_effect_script, Low)
+    .game_acmd("game_attacks4", chrom_fsmash_smash_script, Low)
+    .game_acmd("game_attackhi4", chrom_usmash_smash_script, Low)
+    .game_acmd("game_attacklw4", chrom_dsmash_smash_script, Low)
+    .game_acmd("game_attackairn", chrom_nair_smash_script, Low)
+    .game_acmd("game_attackairf", chrom_fair_smash_script, Low)
+    .game_acmd("game_attackairb", chrom_bair_smash_script, Low)
+    .game_acmd("game_attackairhi", chrom_uair_smash_script, Low)
+    .game_acmd("game_attackairlw", chrom_dair_smash_script, Low)
+    .game_acmd("game_catch", chrom_grab_smash_script, Low)
+    .game_acmd("game_catchdash", chrom_grabd_smash_script, Low)
+    .game_acmd("game_catchturn", chrom_grabp_smash_script, Low)
+    .game_acmd("game_throwf", chrom_fthrow_smash_script, Low)
+    .game_acmd("game_throwb", chrom_bthrow_smash_script, Low)
+    .game_acmd("game_throwhi", chrom_uthrow_smash_script, Low)
+    .game_acmd("game_throwlw", chrom_dthrow_smash_script, Low)
+    .effect_acmd("effect_specialnloop", chrom_neutralb_loop_effect_script, Low)
+    .effect_acmd("effect_specialairnloop", chrom_neutralb_loop_effect_script, Low)
+    .game_acmd("game_specialnturn", chrom_neutralb_turn_smash_script, Low)
+    .game_acmd("game_specialairnturn", chrom_neutralb_turn_smash_script, Low)
+    .game_acmd("game_specialnend", chrom_neutralb_1_smash_script, Low)
+    .game_acmd("game_specialairnend", chrom_neutralb_1_smash_script, Low)
+    .game_acmd("game_specialnend2", chrom_neutralb_2_smash_script, Low)
+    .game_acmd("game_specialairnen2", chrom_neutralb_2_smash_script, Low)
+    .game_acmd("game_specialnend3", chrom_neutralb_3_smash_script, Low)
+    .game_acmd("game_specialairnend3", chrom_neutralb_3_smash_script, Low)
+    .game_acmd("game_specialnendmax", chrom_neutralb_max_smash_script, Low)
+    .game_acmd("game_specialairnendmax", chrom_neutralb_max_smash_script, Low)
+    .game_acmd("game_specials1", chrom_sideb_1_smash_script, Low)
+    .game_acmd("game_specialairs1", chrom_sideb_1_air_smash_script, Low)
+    .game_acmd("game_specials2lw", chrom_sideb_2_smash_script, Low)
+    .game_acmd("game_specialairs2lw", chrom_sideb_2_air_smash_script, Low)
+    .game_acmd("game_specials3s", chrom_sideb_3_smash_script, Low)
+    .game_acmd("game_specialairs3s", chrom_sideb_3_air_smash_script, Low)
+    .game_acmd("game_specials4s", chrom_sideb_4_smash_script, Low)
+    .game_acmd("game_specialairs4s", chrom_sideb_4_air_smash_script, Low)
+    .game_acmd("game_specialhi2", chrom_upb_2_smash_script, Low)
+    .game_acmd("game_specialairhi2", chrom_upb_2_air_smash_script, Low)
+    .game_acmd("game_specialhi4", chrom_upb_4_smash_script, Low)
+    .game_acmd("game_speciallw", chrom_downb_counter_smash_script, Low)
+    .game_acmd("game_specialairlw", chrom_downb_counter_smash_script, Low)
+    .game_acmd("game_speciallwhit", chrom_downb_smash_script, Low)
+    .game_acmd("game_specialairlwhit", chrom_downb_smash_script, Low)
     .install();
 
 

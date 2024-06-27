@@ -8,7 +8,7 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 use crate::custom::global_fighter_frame;
-
+use smashline::Priority::*;
 
 
 // A Once-Per-Fighter-Frame that only applies to Pit
@@ -234,13 +234,13 @@ unsafe extern "C" fn pit_jabfinisher(fighter: &mut L2CAgentBase) {
 unsafe extern "C" fn pit_dashattack(fighter: &mut L2CAgentBase) {
 	sv_animcmd::frame(fighter.lua_state_agent, 7.0);
 	if macros::is_excute(fighter) {
-		macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.2, 60, 81, 0, 80, 4.0, 0.0, 4.5, 16.0, Some(0.0), Some(7.0), Some(7.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PALUTENA);
-		macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 1.37);
+		macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.2, 47, 114, 0, 40, 4.0, 0.0, 4.5, 16.0, Some(0.0), Some(7.0), Some(7.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PALUTENA);
+		macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 1.15);
 	}
 	sv_animcmd::wait(fighter.lua_state_agent, 3.0);
 	if macros::is_excute(fighter) {
 		AttackModule::clear_all(fighter.module_accessor);
-		MotionModule::set_rate(fighter.module_accessor, 1.3);
+		MotionModule::set_rate(fighter.module_accessor, 1.35);
 	}
 }
 
@@ -870,45 +870,45 @@ unsafe extern "C" fn pit_arrow(fighter: &mut L2CAgentBase) {
 pub fn install() {
     Agent::new("pit")
     .on_line(Main, pit_frame) //
-	.game_acmd("game_jumpaerialf1", pit_air_jump_1)
-	.game_acmd("game_jumpaerialf2", pit_air_jump_2)
-	.game_acmd("game_jumpaerialf3", pit_air_jump_3)
-    .game_acmd("game_attack11", pit_jab)
-    .game_acmd("game_attack12", pit_jab2)
-	.game_acmd("game_attack13", pit_jab3)
-    .game_acmd("game_attack100", pit_jab100)
-	.game_acmd("game_attack100end", pit_jabfinisher)
-    .game_acmd("game_attackdash", pit_dashattack)
-    .game_acmd("game_attacks3", pit_ftilt)
-    .game_acmd("game_attackhi3", pit_utilt)
-    .game_acmd("game_attacklw3", pit_dtilt)
-    .game_acmd("game_attacks4", pit_fsmash)
-    .game_acmd("game_attackhi4", pit_usmash)
-    .game_acmd("game_attacklw4", pit_dsmash)
-    .game_acmd("game_attackairn", pit_nair)
-    .game_acmd("game_attackairf", pit_fair)
-    .game_acmd("game_attackairb", pit_bair)
-    .game_acmd("game_attackairhi", pit_uair)
-    .game_acmd("game_attackairlw", pit_dair)
-    .game_acmd("game_catch", pit_grab)
-    .game_acmd("game_catchdash", pit_grabd)
-    .game_acmd("game_catchturn", pit_grabp)
-    .game_acmd("game_throwf", pit_fthrow)
-    .game_acmd("game_throwb", pit_bthrow)
-    .game_acmd("game_throwhi", pit_uthrow)
-    .game_acmd("game_throwlw", pit_dthrow)
-    .game_acmd("game_specialsstart", pit_sidespecial_start)
-    .game_acmd("game_specialairsstart", pit_sidespecial_air_start)
-    .game_acmd("game_specialsend", pit_sidespecial_end)
-    .game_acmd("game_specialairsend", pit_sidespecial_air_end)
-    .game_acmd("game_speciallwstartl", pit_downspecial_l)
-    .game_acmd("game_speciallwstartr", pit_downspecial_r)
-	.game_acmd("game_specialairlwstartl", pit_downspecial_air_l)
-    .game_acmd("game_specialairlwstartr", pit_downspecial_air_r)
+	.game_acmd("game_jumpaerialf1", pit_air_jump_1, Low)
+	.game_acmd("game_jumpaerialf2", pit_air_jump_2, Low)
+	.game_acmd("game_jumpaerialf3", pit_air_jump_3, Low)
+    .game_acmd("game_attack11", pit_jab, Low)
+    .game_acmd("game_attack12", pit_jab2, Low)
+	.game_acmd("game_attack13", pit_jab3, Low)
+    .game_acmd("game_attack100", pit_jab100, Low)
+	.game_acmd("game_attack100end", pit_jabfinisher, Low)
+    .game_acmd("game_attackdash", pit_dashattack, Low)
+    .game_acmd("game_attacks3", pit_ftilt, Low)
+    .game_acmd("game_attackhi3", pit_utilt, Low)
+    .game_acmd("game_attacklw3", pit_dtilt, Low)
+    .game_acmd("game_attacks4", pit_fsmash, Low)
+    .game_acmd("game_attackhi4", pit_usmash, Low)
+    .game_acmd("game_attacklw4", pit_dsmash, Low)
+    .game_acmd("game_attackairn", pit_nair, Low)
+    .game_acmd("game_attackairf", pit_fair, Low)
+    .game_acmd("game_attackairb", pit_bair, Low)
+    .game_acmd("game_attackairhi", pit_uair, Low)
+    .game_acmd("game_attackairlw", pit_dair, Low)
+    .game_acmd("game_catch", pit_grab, Low)
+    .game_acmd("game_catchdash", pit_grabd, Low)
+    .game_acmd("game_catchturn", pit_grabp, Low)
+    .game_acmd("game_throwf", pit_fthrow, Low)
+    .game_acmd("game_throwb", pit_bthrow, Low)
+    .game_acmd("game_throwhi", pit_uthrow, Low)
+    .game_acmd("game_throwlw", pit_dthrow, Low)
+    .game_acmd("game_specialsstart", pit_sidespecial_start, Low)
+    .game_acmd("game_specialairsstart", pit_sidespecial_air_start, Low)
+    .game_acmd("game_specialsend", pit_sidespecial_end, Low)
+    .game_acmd("game_specialairsend", pit_sidespecial_air_end, Low)
+    .game_acmd("game_speciallwstartl", pit_downspecial_l, Low)
+    .game_acmd("game_speciallwstartr", pit_downspecial_r, Low)
+	.game_acmd("game_specialairlwstartl", pit_downspecial_air_l, Low)
+    .game_acmd("game_specialairlwstartr", pit_downspecial_air_r, Low)
     .install();
 
     Agent::new("pit_bowarrow")
-    .game_acmd("game_fly", pit_arrow)
+    .game_acmd("game_fly", pit_arrow, Low)
     .install();
 
 

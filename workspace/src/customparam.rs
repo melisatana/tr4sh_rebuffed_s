@@ -180,11 +180,35 @@ pub unsafe fn get_param_float_replace(module_accessor: u64, param_type: u64, par
 					return 1.2;
 				}
 			}
+			if param_type == hash40("param_shadowball") {
+				if param_hash == hash40("angle") {
+					if crate::mewtwo::MEWTWO_NEUTRALB_DOWN_ANGLE[entry_id] {
+						return -40.0;
+					}
+					if crate::mewtwo::MEWTWO_NEUTRALB_UP_ANGLE[entry_id] {
+						return 40.0;
+					}
+				}
+			}
+			if param_type == hash40("param_special_n") {
+				if param_hash == hash40("special_n_fail_rot") {
+					if crate::sonic::SONIC_NEUTRALB_BOUNCE[entry_id] {
+						return -90.0;
+					}
+				}
+			}
 		}
 		if fighter_kind == *FIGHTER_KIND_LUIGI {
 			if param_type == hash40("dive_speed_y") {
 				if crate::luigi::LUIGI_UPB_SUPERFAST_FALL[entry_id] {
 					return 4.5;
+				}
+			}
+		}
+		if fighter_kind == *FIGHTER_KIND_GAMEWATCH {
+			if param_type == hash40("landing_attack_air_frame_lw") {
+				if crate::gamewatch::GAMEWATCH_SLOW_FAIR[entry_id] {
+					return 17.0;
 				}
 			}
 		}
@@ -290,6 +314,13 @@ pub unsafe fn get_param_float_replace(module_accessor: u64, param_type: u64, par
 				}
 				if crate::sonic::SONIC_NEUTRALB_CURRENT_SPEEDUP_LEVEL[entry_id] == 4 {
 					return 1.31;
+				}
+			}
+			if param_type == hash40("param_special_n") {
+				if param_hash == hash40("special_n_fail_rot") {
+					if crate::sonic::SONIC_NEUTRALB_BOUNCE[entry_id] {
+						return -90.0;
+					}
 				}
 			}
 		}
@@ -427,7 +458,7 @@ pub unsafe fn get_param_float_replace(module_accessor: u64, param_type: u64, par
 		if fighter_kind == *FIGHTER_KIND_TRAIL {
 			if param_type == hash40("landing_attack_air_frame_lw") {
 				if crate::trail::SORA_SLOW_DOWN_AIR[entry_id] {
-					return 29.0;
+					return 30.0;
 				}
 			}
 		}
@@ -469,6 +500,18 @@ pub unsafe fn get_param_float_replace(module_accessor: u64, param_type: u64, par
 				if param_hash == hash40("speed") {
 					if crate::mariod::DR_SLOW_PILL[entry_id] {
 					return 1.0;
+					}
+				}
+			}
+		}
+		if fighter_kind == *WEAPON_KIND_MEWTWO_SHADOWBALL {
+			if param_type == hash40("param_shadowball") {
+				if param_hash == hash40("angle") {
+					if crate::mewtwo::MEWTWO_NEUTRALB_DOWN_ANGLE[entry_id] {
+						return -40.0;
+					}
+					if crate::mewtwo::MEWTWO_NEUTRALB_UP_ANGLE[entry_id] {
+						return 40.0;
 					}
 				}
 			}

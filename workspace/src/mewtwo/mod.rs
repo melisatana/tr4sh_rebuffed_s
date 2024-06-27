@@ -8,6 +8,7 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
 
 static mut MEWTWO_HAS_FUTURESIGHT : [bool; 8] = [false; 8];
 static mut MEWTWO_FUTURESIGHT_X : [f32; 8] = [0.0; 8];
@@ -19,6 +20,9 @@ static MEWTWO_FUTURESIGHT_FUSE_TIME : i32 = 600;
 static MEWTWO_FUTURESIGHT_EXPLOSION_TIME : i32 = 40;
 static MEWTWO_FUTURESIGHT_HIT_COOLDOWN_TIME : i32 = 3;
 
+pub static mut MEWTWO_NEUTRALB_UP_ANGLE : [bool; 8] = [false; 8];
+pub static mut MEWTWO_NEUTRALB_DOWN_ANGLE : [bool; 8] = [false; 8];
+
 // A Once-Per-Fighter-Frame that only applies to Mewtwo
 unsafe extern "C" fn mewtwo_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
@@ -28,6 +32,7 @@ unsafe extern "C" fn mewtwo_frame(fighter: &mut L2CFighterCommon) {
         let point_offset_x = PostureModule::lr(fighter.module_accessor) * (MEWTWO_FUTURESIGHT_X[entry_id] - PostureModule::pos_x(fighter.module_accessor));
         let point_offset_y = MEWTWO_FUTURESIGHT_Y[entry_id] - PostureModule::pos_y(fighter.module_accessor);
         let stickx = ControlModule::get_stick_x(fighter.module_accessor);
+        let sticky = ControlModule::get_stick_y(fighter.module_accessor);
         let lr = PostureModule::lr(fighter.module_accessor);
         let stickx_directional = stickx * lr;
 
@@ -52,8 +57,31 @@ unsafe extern "C" fn mewtwo_frame(fighter: &mut L2CFighterCommon) {
         }
 
 
+        if [*FIGHTER_MEWTWO_STATUS_KIND_SPECIAL_N_SHOOT].contains(&status) {
+            if sticky >= 0.5 {
+                MEWTWO_NEUTRALB_UP_ANGLE[entry_id] = true;
+                MEWTWO_NEUTRALB_DOWN_ANGLE[entry_id] = false;
+            }
+            if sticky <= -0.5 {
+                MEWTWO_NEUTRALB_DOWN_ANGLE[entry_id] = true;
+                MEWTWO_NEUTRALB_UP_ANGLE[entry_id] = false;
+            }
+            if stickx >= 0.5 || stickx <= -0.5 || MotionModule::frame(fighter.module_accessor) >= (7.0) {
+                MEWTWO_NEUTRALB_UP_ANGLE[entry_id] = false;
+                MEWTWO_NEUTRALB_DOWN_ANGLE[entry_id] = false;
+            }
+        }
+
+        if status != *FIGHTER_MEWTWO_STATUS_KIND_SPECIAL_N_SHOOT {
+            MEWTWO_NEUTRALB_UP_ANGLE[entry_id] = false;
+            MEWTWO_NEUTRALB_DOWN_ANGLE[entry_id] = false;
+        }
+
         if sv_information::is_ready_go() == false || [*FIGHTER_STATUS_KIND_WIN, *FIGHTER_STATUS_KIND_LOSE, *FIGHTER_STATUS_KIND_DEAD].contains(&status) {
 			MEWTWO_HAS_FUTURESIGHT[entry_id] = false;
+            MEWTWO_NEUTRALB_UP_ANGLE[entry_id] = false;
+            MEWTWO_NEUTRALB_DOWN_ANGLE[entry_id] = false;
+        
 		};
 
         if MEWTWO_HAS_FUTURESIGHT[entry_id] {
@@ -97,7 +125,45 @@ unsafe extern "C" fn mewtwo_frame(fighter: &mut L2CFighterCommon) {
                 AttackModule::clear(fighter.module_accessor, 7, false);
             }
         }
+
+
         
+    }
+}
+
+unsafe extern "C" fn kirby_mewtwohat_frame(fighter: &mut L2CFighterCommon) {
+    unsafe {
+        let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+        let status = StatusModule::status_kind(fighter.module_accessor);
+        let stickx = ControlModule::get_stick_x(fighter.module_accessor);
+        let sticky = ControlModule::get_stick_y(fighter.module_accessor);
+
+        if [*FIGHTER_KIRBY_STATUS_KIND_MEWTWO_SPECIAL_N_SHOOT].contains(&status) {
+            if sticky >= 0.5 {
+                MEWTWO_NEUTRALB_UP_ANGLE[entry_id] = true;
+                MEWTWO_NEUTRALB_DOWN_ANGLE[entry_id] = false;
+            }
+            if sticky <= -0.5 {
+                MEWTWO_NEUTRALB_DOWN_ANGLE[entry_id] = true;
+                MEWTWO_NEUTRALB_UP_ANGLE[entry_id] = false;
+            }
+            if stickx >= 0.5 || stickx <= -0.5 || MotionModule::frame(fighter.module_accessor) >= (7.0) {
+                MEWTWO_NEUTRALB_UP_ANGLE[entry_id] = false;
+                MEWTWO_NEUTRALB_DOWN_ANGLE[entry_id] = false;
+            }
+        }
+
+        if status != *FIGHTER_KIRBY_STATUS_KIND_MEWTWO_SPECIAL_N_SHOOT {
+            MEWTWO_NEUTRALB_UP_ANGLE[entry_id] = false;
+            MEWTWO_NEUTRALB_DOWN_ANGLE[entry_id] = false;
+        }
+
+        if sv_information::is_ready_go() == false || [*FIGHTER_STATUS_KIND_WIN, *FIGHTER_STATUS_KIND_LOSE, *FIGHTER_STATUS_KIND_DEAD].contains(&status) {
+			MEWTWO_NEUTRALB_UP_ANGLE[entry_id] = false;
+            MEWTWO_NEUTRALB_DOWN_ANGLE[entry_id] = false;
+		};
+
+
     }
 }
 
@@ -224,9 +290,9 @@ unsafe extern "C" fn mewtwo_jab100end_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.5, 361, 100, 0, 82, 5.5, 0.0, 10.5, 11.0, None, None, None, 2.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 4.5, 361, 100, 0, 82, 5.5, 0.0, 10.5, 15.0, None, None, None, 2.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 4.5, 361, 100, 0, 82, 5.5, 0.0, 10.5, 18.5, None, None, None, 2.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.5, 361, 100, 0, 82, 5.5, 0.0, 10.5, 11.0, None, None, None, 1.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 4.5, 361, 100, 0, 82, 5.5, 0.0, 10.5, 15.0, None, None, None, 1.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 4.5, 361, 100, 0, 82, 5.5, 0.0, 10.5, 18.5, None, None, None, 1.7, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PUNCH);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
@@ -297,8 +363,8 @@ unsafe extern "C" fn mewtwo_utilt_smash_script(fighter: &mut L2CAgentBase) {
 unsafe extern "C" fn mewtwo_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.3, 80, 92, 0, 30, 5.3, 0.0, 3.0, 5.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_TAIL);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 7.3, 80, 92, 0, 30, 4.8, 0.0, 1.5, 13.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_TAIL);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.6, 80, 92, 0, 30, 5.3, 0.0, 3.0, 5.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_TAIL);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 7.6, 80, 92, 0, 30, 4.8, 0.0, 1.5, 13.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_TAIL);
         macros::ATTACK(fighter, 2, 0, Hash40::new("s_tail7"), 5.6, 100, 70, 0, 50, 4.2, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_TAIL);
         AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
     }
@@ -324,8 +390,8 @@ unsafe extern "C" fn mewtwo_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 18.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 15.7, 361, 106, 0, 30, 3.5, 0.0, 9.5, 10.2, Some(0.0), Some(9.5), Some(11.5), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 19.4, 361, 106, 0, 30, 6.3, 0.0, 9.5, 19.2, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 15.7, 361, 106, 0, 36, 3.5, 0.0, 9.5, 10.2, Some(0.0), Some(9.5), Some(11.5), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 19.4, 361, 106, 0, 36, 6.3, 0.0, 9.5, 19.2, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PUNCH);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 22.0);
     if macros::is_excute(fighter) {
@@ -350,8 +416,8 @@ unsafe extern "C" fn mewtwo_fsmash2_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 18.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 15.7, 361, 106, 0, 30, 3.5, 0.0, 11.2, 9.6, Some(0.0), Some(11.7), Some(10.8), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 19.4, 361, 106, 0, 30, 6.3, 0.0, 15.5, 17.3, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 15.7, 361, 106, 0, 36, 3.5, 0.0, 11.2, 9.6, Some(0.0), Some(11.7), Some(10.8), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 19.4, 361, 106, 0, 36, 6.3, 0.0, 15.5, 17.3, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PUNCH);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 22.0);
     if macros::is_excute(fighter) {
@@ -376,8 +442,8 @@ unsafe extern "C" fn mewtwo_fsmash3_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 18.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 15.7, 361, 106, 0, 30, 3.5, 0.0, 9.0, 10.0, Some(0.0), Some(8.2), Some(11.5), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 19.4, 361, 106, 0, 30, 6.3, 0.0, 6.4, 18.8, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 15.7, 361, 106, 0, 36, 3.5, 0.0, 9.0, 10.0, Some(0.0), Some(8.2), Some(11.5), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 19.4, 361, 106, 0, 36, 6.3, 0.0, 6.4, 18.8, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_PUNCH);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 22.0);
     if macros::is_excute(fighter) {
@@ -400,10 +466,10 @@ unsafe extern "C" fn mewtwo_usmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     for _ in 0..5 {
         if macros::is_excute(fighter) {
-            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.1, 170, 100, 18, 0, 5.1, 0.0, 22.0, -5.8, None, None, None, 0.6, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_NONE);
-            macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 1.1, 170, 100, 18, 0, 5.1, 0.0, 22.0, 5.8, None, None, None, 0.6, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_NONE);
-            macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 1.1, 95, 100, 40, 0, 4.0, 0.0, 14.0, 0.0, None, None, None, 0.6, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_A, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_NONE);
-            macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 1.1, 270, 100, 5, 0, 4.5, 0.0, 23.6, 0.0, None, None, None, 0.6, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_NONE);
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.2, 170, 100, 18, 0, 5.1, 0.0, 22.0, -5.8, None, None, None, 0.6, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_NONE);
+            macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 1.2, 170, 100, 18, 0, 5.1, 0.0, 22.0, 5.8, None, None, None, 0.6, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_NONE);
+            macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 1.2, 95, 100, 40, 0, 4.0, 0.0, 14.0, 0.0, None, None, None, 0.6, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_A, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_NONE);
+            macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 1.2, 270, 100, 5, 0, 4.5, 0.0, 23.6, 0.0, None, None, None, 0.6, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_NONE);
         }
         sv_animcmd::wait(fighter.lua_state_agent, 2.0);
         if macros::is_excute(fighter) {
@@ -690,7 +756,7 @@ unsafe extern "C" fn mewtwo_uthrow_smash_script(fighter: &mut L2CAgentBase) {
 
 unsafe extern "C" fn mewtwo_dthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.0, 64, 50, 0, 55, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.0, 64, 73, 0, 55, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
@@ -822,48 +888,52 @@ unsafe extern "C" fn confusion_projectile(fighter: &mut L2CAgentBase) {
 pub fn install() {
     Agent::new("mewtwo")
     .on_line(Main, mewtwo_frame) //opff
-    .game_acmd("game_attack11", mewtwo_jab_smash_script)
-    .game_acmd("game_attack100", mewtwo_jab100_smash_script)
-	.game_acmd("game_attack100end", mewtwo_jab100end_smash_script)
-    .game_acmd("game_attackdash", mewtwo_dashattack_smash_script)
-    .game_acmd("game_attacks3", mewtwo_ftilt_smash_script)
-    .game_acmd("game_attacks3hi", mewtwo_ftilt_smash_script)
-    .game_acmd("game_attacks3lw", mewtwo_ftilt_smash_script)
-    .game_acmd("game_attackhi3", mewtwo_utilt_smash_script)
-    .game_acmd("game_attacklw3", mewtwo_dtilt_smash_script)
-    .game_acmd("game_attacks4", mewtwo_fsmash_smash_script)
-    .game_acmd("game_attacks4hi", mewtwo_fsmash2_smash_script)
-    .game_acmd("game_attacks4lw", mewtwo_fsmash3_smash_script)
-    .game_acmd("game_attackhi4", mewtwo_usmash_smash_script)
-    .game_acmd("game_attacklw4", mewtwo_dsmash_smash_script)
-    .game_acmd("game_attackairn", mewtwo_nair_smash_script)
-    .game_acmd("game_attackairf", mewtwo_fair_smash_script)
-    .game_acmd("game_attackairb", mewtwo_bair_smash_script)
-    .game_acmd("game_attackairhi", mewtwo_uair_smash_script)
-    .game_acmd("game_attackairlw", mewtwo_dair_smash_script)
-    .game_acmd("game_catch", mewtwo_grab_smash_script)
-    .game_acmd("game_catchdash", mewtwo_grabd_smash_script)
-    .game_acmd("game_catchturn", mewtwo_grabp_smash_script)
-    .game_acmd("game_throwf", mewtwo_fthrow_smash_script)
-    .game_acmd("game_throwb", mewtwo_bthrow_smash_script)
-    .game_acmd("game_throwhi", mewtwo_uthrow_smash_script)
-    .game_acmd("game_throwlw", mewtwo_dthrow_smash_script)
-    .game_acmd("game_specialnshoot", mewtwo_neutralb_shoot_smash_script)
-    .game_acmd("game_specialairnshoot", mewtwo_neutralb_shoot_air_smash_script)
-    .game_acmd("game_specials", mewtwo_sideb_smash_script)
-    .game_acmd("game_speciallw", mewtwo_downb_smash_script)
-    .game_acmd("game_specialairlw", mewtwo_downb_smash_script)
+    .game_acmd("game_attack11", mewtwo_jab_smash_script, Low)
+    .game_acmd("game_attack100", mewtwo_jab100_smash_script, Low)
+	.game_acmd("game_attack100end", mewtwo_jab100end_smash_script, Low)
+    .game_acmd("game_attackdash", mewtwo_dashattack_smash_script, Low)
+    .game_acmd("game_attacks3", mewtwo_ftilt_smash_script, Low)
+    .game_acmd("game_attacks3hi", mewtwo_ftilt_smash_script, Low)
+    .game_acmd("game_attacks3lw", mewtwo_ftilt_smash_script, Low)
+    .game_acmd("game_attackhi3", mewtwo_utilt_smash_script, Low)
+    .game_acmd("game_attacklw3", mewtwo_dtilt_smash_script, Low)
+    .game_acmd("game_attacks4", mewtwo_fsmash_smash_script, Low)
+    .game_acmd("game_attacks4hi", mewtwo_fsmash2_smash_script, Low)
+    .game_acmd("game_attacks4lw", mewtwo_fsmash3_smash_script, Low)
+    .game_acmd("game_attackhi4", mewtwo_usmash_smash_script, Low)
+    .game_acmd("game_attacklw4", mewtwo_dsmash_smash_script, Low)
+    .game_acmd("game_attackairn", mewtwo_nair_smash_script, Low)
+    .game_acmd("game_attackairf", mewtwo_fair_smash_script, Low)
+    .game_acmd("game_attackairb", mewtwo_bair_smash_script, Low)
+    .game_acmd("game_attackairhi", mewtwo_uair_smash_script, Low)
+    .game_acmd("game_attackairlw", mewtwo_dair_smash_script, Low)
+    .game_acmd("game_catch", mewtwo_grab_smash_script, Low)
+    .game_acmd("game_catchdash", mewtwo_grabd_smash_script, Low)
+    .game_acmd("game_catchturn", mewtwo_grabp_smash_script, Low)
+    .game_acmd("game_throwf", mewtwo_fthrow_smash_script, Low)
+    .game_acmd("game_throwb", mewtwo_bthrow_smash_script, Low)
+    .game_acmd("game_throwhi", mewtwo_uthrow_smash_script, Low)
+    .game_acmd("game_throwlw", mewtwo_dthrow_smash_script, Low)
+    .game_acmd("game_specialnshoot", mewtwo_neutralb_shoot_smash_script, Low)
+    .game_acmd("game_specialairnshoot", mewtwo_neutralb_shoot_air_smash_script, Low)
+    .game_acmd("game_specials", mewtwo_sideb_smash_script, Low)
+    .game_acmd("game_speciallw", mewtwo_downb_smash_script, Low)
+    .game_acmd("game_specialairlw", mewtwo_downb_smash_script, Low)
+    .install();
+
+    Agent::new("kirby")
+    .on_line(Main, kirby_mewtwohat_frame)
     .install();
 
     Agent::new("mewtwo_shadowball")
-    .game_acmd("game_shootthrowf", shadowball_fthrow)
-    .game_acmd("game_charge", shadowball_charge)
-    .game_acmd("game_chargemax", shadowball_charge_max)
-    .game_acmd("game_shoot", shadowball_b)
+    .game_acmd("game_shootthrowf", shadowball_fthrow, Low)
+    .game_acmd("game_charge", shadowball_charge, Low)
+    .game_acmd("game_chargemax", shadowball_charge_max, Low)
+    .game_acmd("game_shoot", shadowball_b, Low)
     .install();
 
     Agent::new("mewtwo_bindball")
-    .game_acmd("game_shoot", confusion_projectile)
+    .game_acmd("game_shoot", confusion_projectile, Low)
     .install();
 
 }

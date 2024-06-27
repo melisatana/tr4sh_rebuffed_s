@@ -8,6 +8,7 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smash_script::*;
 use smashline::*;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
 
 static mut LINK_GLOWSTICK_FRAME : [i32; 8] = [0; 8];
 static mut LINK_GLOWSTICK_STATUS_CURRENT : [i32; 8] = [0; 8];
@@ -102,9 +103,9 @@ unsafe extern "C" fn link_jab2_smash_script(fighter: &mut L2CAgentBase) {
 unsafe extern "C" fn link_jab3_smash_script(fighter: &mut L2CAgentBase) {  
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.7, 30, 94, 0, 70, 4.5, 0.0, 8.0, 10.0, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 5.7, 30, 94, 0, 70, 4.5, 0.0, 8.0, 15.0, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("sword1"), 5.7, 30, 94, 0, 70, 3.95, 11.0, 0.0, -1.5, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.7, 30, 94, 0, 70, 4.5, 0.0, 8.0, 10.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 5.7, 30, 94, 0, 70, 4.5, 0.0, 8.0, 15.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("sword1"), 5.7, 30, 94, 0, 70, 3.95, 11.0, 0.0, -1.5, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
@@ -247,8 +248,10 @@ unsafe extern "C" fn link_fsmash_charge_smash_script(fighter: &mut L2CAgentBase)
 
     sv_animcmd::frame(fighter.lua_state_agent, 50.0);
     if macros::is_excute(fighter) {
-        LINK_FSMASH_CHARGE[entry_id] = true;
-        macros::PLAY_SE(fighter, Hash40::new("se_common_spirits_critical_l_tail"));
+        if DamageModule::damage(fighter.module_accessor, 0) < 100.0 {
+            LINK_FSMASH_CHARGE[entry_id] = true;
+            macros::PLAY_SE(fighter, Hash40::new("se_common_spirits_critical_l_tail"));
+        }
     }
 }
 
@@ -378,10 +381,10 @@ unsafe extern "C" fn link_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 9.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("sword2"), 14.8, 70, 121, 0, 46, 3.8, 1.5, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false,false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("sword2"), 14.8, 70, 121, 0, 46, 3.9, 8.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false,false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("armr"), 14.8, 70, 121, 0, 46, 3.6, 1.0, 1.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false,false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 3, 0, Hash40::new("colonells"), 14.8, 70, 121, 0, 46, 3.3, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false,false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("sword2"), 14.8, 70, 121, 0, 51, 3.8, 1.5, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false,false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("sword2"), 14.8, 70, 121, 0, 51, 3.9, 8.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false,false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("armr"), 14.8, 70, 121, 0, 51, 3.6, 1.0, 1.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false,false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 3, 0, Hash40::new("colonells"), 14.8, 70, 121, 0, 51, 3.3, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false,false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
         AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
@@ -601,11 +604,11 @@ unsafe extern "C" fn link_dair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 14.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_LINK_INSTANCE_WORK_ID_FLAG_ATTACK_AIR_LW_SET_ATTACK);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 18.0, 270, 80, 0, 30, 4.4, 1.0, 1.5, 0.0, Some(1.0), Some(6.2), Some(0.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 18.0, 270, 80, 0, 30, 4.4, 1.0, 0.8, 0.0, Some(1.0), Some(6.2), Some(0.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 21.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 15.0, 50, 110, 0, 30, 4.7, 1.0, 1.5, 0.0, Some(1.0), Some(5.5), Some(0.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 15.0, 50, 110, 0, 30, 4.7, 1.0, 0.8, 0.0, Some(1.0), Some(5.5), Some(0.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
         MotionModule::set_rate(fighter.module_accessor, 1.7);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 65.0);
@@ -854,15 +857,15 @@ unsafe extern "C" fn link_upb_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("sword2"), 15.5, 40, 92, 0, 60, 4.4, -2.0, 0.0, 0.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("sword2"), 15.5, 40, 92, 0, 60, 3.9, 2.5, 0.0, 1.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("sword2"), 15.5, 40, 92, 0, 60, 3.2, 8.0, 0.0, 1.5, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("sword2"), 15.5, 40, 92, 0, 60, 4.4, -2.0, 0.0, 0.0, None, None, None, 1.3, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("sword2"), 15.5, 40, 92, 0, 60, 3.9, 2.5, 0.0, 1.0, None, None, None, 1.3, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("sword2"), 15.5, 40, 92, 0, 60, 3.2, 8.0, 0.0, 1.5, None, None, None, 1.3, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 9.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("sword2"), 11.5, 41, 92, 0, 60, 4.4, -2.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("sword2"), 11.5, 41, 92, 0, 60, 3.9, 2.5, 0.0, 1.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("sword2"), 11.5, 41, 92, 0, 60, 3.2, 8.0, 0.0, 1.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("sword2"), 10.5, 20, 100, 0, 55, 4.4, -2.0, 0.0, 0.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("sword2"), 10.5, 20, 100, 0, 55, 3.9, 2.5, 0.0, 1.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("sword2"), 10.5, 20, 100, 0, 55, 3.2, 8.0, 0.0, 1.5, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 20.0);
     if macros::is_excute(fighter) {
@@ -1020,64 +1023,64 @@ unsafe extern "C" fn link_swordbeam(fighter: &mut L2CAgentBase) {
 pub fn install() {
     Agent::new("link")
     .on_line(Main, link_frame) //opff
-    .game_acmd("game_attack11", link_jab_smash_script)
-    .game_acmd("game_attack12", link_jab2_smash_script)
-    .game_acmd("game_attack13", link_jab3_smash_script)
-    .game_acmd("game_attackdash", link_dash_attack_smash_script)
-    .game_acmd("game_attacks3", link_ftilt_smash_script)
-    .game_acmd("game_attacks3hi", link_ftilt_smash_script)
-    .game_acmd("game_attacks3lw", link_ftilt_smash_script)
-    .effect_acmd("effect_attacks3", link_ftilt_effect_script)
-    .effect_acmd("effect_attacks3hi", link_ftilt_effect_script)
-    .effect_acmd("effect_attacks3lw", link_ftilt_effect_script)
-    .sound_acmd("sound_attacks3", link_ftilt_sound_script)
-    .sound_acmd("sound_attacks3hi", link_ftilt_sound_script)
-    .sound_acmd("sound_attacks3lw", link_ftilt_sound_script)
-    .expression_acmd("expression_attacks3", link_ftilt_expression_script)
-    .expression_acmd("expression_attacks3hi", link_ftilt_expression_script)
-    .expression_acmd("expression_attacks3lw", link_ftilt_expression_script)
-    .game_acmd("game_attackhi3", link_utilt_smash_script)
-    .game_acmd("game_attacklw3", link_dtilt_smash_script)
-    .game_acmd("game_attacks4charge", link_fsmash_charge_smash_script)
-    .game_acmd("game_attacks4", link_fsmash_smash_script)
-    .game_acmd("game_attacks4s2", link_fsmash2_smash_script)
-    .game_acmd("game_attackhi4", link_usmash_smash_script)
-    .game_acmd("game_attacklw4", link_dsmash_smash_script)
-    .game_acmd("game_attackairn", link_nair_smash_script)
-    .game_acmd("game_attackairf", link_fair_smash_script)
-    .game_acmd("game_attackairb", link_bair_smash_script)
-    .game_acmd("game_attackairhi", link_uair_smash_script)
-    .effect_acmd("effect_attackairhi", link_uair_effect_script)
-    .sound_acmd("sound_attackairhi", link_uair_sound_script)
-    .expression_acmd("expression_attackairhi", link_uair_expression_script)
-    .expression_acmd("expression_landingairhi", link_uair_landing_expression_script)
-    .game_acmd("game_attackairlw", link_dair_smash_script)
-    .game_acmd("game_catch", link_grab_smash_script)
-    .game_acmd("game_catchdash", link_grabd_smash_script)
-    .game_acmd("game_catchturn", link_grabp_smash_script)
-    .game_acmd("game_throwf", link_fthrow_smash_script)
-    .game_acmd("game_throwb", link_bthrow_smash_script)
-    .game_acmd("game_throwhi", link_uthrow_smash_script)
-    .game_acmd("game_throwlw", link_dthrow_smash_script)
-    .game_acmd("game_specialnend", link_neutralb_end_smash_script)
-    .game_acmd("game_specials1", link_sideb_throw_smash_script)
-    .game_acmd("game_specialairs1", link_sideb_airthrow_smash_script)
-    .game_acmd("game_specials2", link_sideb_catch_smash_script)
-    .game_acmd("game_specialairs2", link_sideb_aircatch_smash_script)
-    .game_acmd("game_specialhi", link_upb_smash_script)
-    .game_acmd("game_specialairhi", link_upb_air_smash_script)
+    .game_acmd("game_attack11", link_jab_smash_script, Low)
+    .game_acmd("game_attack12", link_jab2_smash_script, Low)
+    .game_acmd("game_attack13", link_jab3_smash_script, Low)
+    .game_acmd("game_attackdash", link_dash_attack_smash_script, Low)
+    .game_acmd("game_attacks3", link_ftilt_smash_script, Low)
+    .game_acmd("game_attacks3hi", link_ftilt_smash_script, Low)
+    .game_acmd("game_attacks3lw", link_ftilt_smash_script, Low)
+    .effect_acmd("effect_attacks3", link_ftilt_effect_script, Low)
+    .effect_acmd("effect_attacks3hi", link_ftilt_effect_script, Low)
+    .effect_acmd("effect_attacks3lw", link_ftilt_effect_script, Low)
+    .sound_acmd("sound_attacks3", link_ftilt_sound_script, Low)
+    .sound_acmd("sound_attacks3hi", link_ftilt_sound_script, Low)
+    .sound_acmd("sound_attacks3lw", link_ftilt_sound_script, Low)
+    .expression_acmd("expression_attacks3", link_ftilt_expression_script, Low)
+    .expression_acmd("expression_attacks3hi", link_ftilt_expression_script, Low)
+    .expression_acmd("expression_attacks3lw", link_ftilt_expression_script, Low)
+    .game_acmd("game_attackhi3", link_utilt_smash_script, Low)
+    .game_acmd("game_attacklw3", link_dtilt_smash_script, Low)
+    .game_acmd("game_attacks4charge", link_fsmash_charge_smash_script, Low)
+    .game_acmd("game_attacks4", link_fsmash_smash_script, Low)
+    .game_acmd("game_attacks4s2", link_fsmash2_smash_script, Low)
+    .game_acmd("game_attackhi4", link_usmash_smash_script, Low)
+    .game_acmd("game_attacklw4", link_dsmash_smash_script, Low)
+    .game_acmd("game_attackairn", link_nair_smash_script, Low)
+    .game_acmd("game_attackairf", link_fair_smash_script, Low)
+    .game_acmd("game_attackairb", link_bair_smash_script, Low)
+    .game_acmd("game_attackairhi", link_uair_smash_script, Low)
+    .effect_acmd("effect_attackairhi", link_uair_effect_script, Low)
+    .sound_acmd("sound_attackairhi", link_uair_sound_script, Low)
+    .expression_acmd("expression_attackairhi", link_uair_expression_script, Low)
+    .expression_acmd("expression_landingairhi", link_uair_landing_expression_script, Low)
+    .game_acmd("game_attackairlw", link_dair_smash_script, Low)
+    .game_acmd("game_catch", link_grab_smash_script, Low)
+    .game_acmd("game_catchdash", link_grabd_smash_script, Low)
+    .game_acmd("game_catchturn", link_grabp_smash_script, Low)
+    .game_acmd("game_throwf", link_fthrow_smash_script, Low)
+    .game_acmd("game_throwb", link_bthrow_smash_script, Low)
+    .game_acmd("game_throwhi", link_uthrow_smash_script, Low)
+    .game_acmd("game_throwlw", link_dthrow_smash_script, Low)
+    .game_acmd("game_specialnend", link_neutralb_end_smash_script, Low)
+    .game_acmd("game_specials1", link_sideb_throw_smash_script, Low)
+    .game_acmd("game_specialairs1", link_sideb_airthrow_smash_script, Low)
+    .game_acmd("game_specials2", link_sideb_catch_smash_script, Low)
+    .game_acmd("game_specialairs2", link_sideb_aircatch_smash_script, Low)
+    .game_acmd("game_specialhi", link_upb_smash_script, Low)
+    .game_acmd("game_specialairhi", link_upb_air_smash_script, Low)
     .install();
 
     Agent::new("link_bowarrow")
-    .game_acmd("game_fly", link_arrow)
+    .game_acmd("game_fly", link_arrow, Low)
     .install();
 
     Agent::new("link_boomerang")
-    .game_acmd("game_fly", link_boomerang_throw)
-    .game_acmd("game_turn", link_boomerang_return)
+    .game_acmd("game_fly", link_boomerang_throw, Low)
+    .game_acmd("game_turn", link_boomerang_return, Low)
     .install();
 
     Agent::new("link_swordbeam")
-    .game_acmd("game_fly", link_swordbeam)
+    .game_acmd("game_fly", link_swordbeam, Low)
     .install();
 }

@@ -9,6 +9,7 @@ use smashline::*;
 use smash_script::*;
 use smash::hash40;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
 
 static mut GANON_SLOW_DOWN_AIR : [bool; 8] = [false; 8];
 static mut GANON_SLOW_DOWN_AIR_IN_SLOW : [bool; 8] = [false; 8];
@@ -109,7 +110,7 @@ unsafe extern "C" fn kirby_ganonhat_frame(fighter: &mut L2CFighterCommon) {
         }
         let frame = MotionModule::frame(fighter.module_accessor);
         if status == *FIGHTER_KIRBY_STATUS_KIND_GANON_SPECIAL_N_TURN && 22.0 < frame && frame < 41.0 && stickx_directional <= -0.5 {
-            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_GANON_STATUS_KIND_SPECIAL_N_TURN, true);
+            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_KIRBY_STATUS_KIND_GANON_SPECIAL_N_TURN, true);
         }
 
     }
@@ -656,7 +657,7 @@ unsafe extern "C" fn ganon_grabp_smash_script(fighter: &mut L2CAgentBase) {
 
 unsafe extern "C" fn ganon_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.0, 58, 70, 0, 40, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.0, 58, 70, 0, 51, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 11.0);
@@ -1227,50 +1228,49 @@ unsafe extern "C" fn ganon_downb_air_falling_script(fighter: &mut L2CAgentBase) 
 pub fn install() {
     Agent::new("ganon")
       .on_line(Main, ganon_frame) //opff
-      .game_acmd("game_attack11", ganon_jab_smash_script)
-      .game_acmd("game_attackdash", ganon_dashattack_smash_script)
-      .game_acmd("game_attacks3", ganon_ftilt_smash_script)
-      .game_acmd("game_attackhi3", ganon_utilt_smash_script)
-      .sound_acmd("sound_attackhi3", ganon_utilt_se_smash_script)
-      .effect_acmd("effect_attackhi3", ganon_utilt_gfx_smash_script)
-      .game_acmd("game_attacklw3", ganon_dtilt_smash_script)
-      .game_acmd("game_attacks4charge", ganon_fsmash_charge_smash_script)
-      .game_acmd("game_attacks4", ganon_fsmash_smash_script)
-      .game_acmd("game_attackhi4", ganon_usmash_smash_script)
-      .game_acmd("game_attacklw4", ganon_dsmash_smash_script)
-      .game_acmd("game_attackairn", ganon_nair_smash_script)
-      .game_acmd("game_attackairf", ganon_fair_smash_script)
-      .game_acmd("game_attackairb", ganon_bair_smash_script)
-      .effect_acmd("effect_attackairb", ganon_bair_effect_script)
-      .game_acmd("game_attackairhi", ganon_uair_smash_script)
-      .game_acmd("game_attackairlw", ganon_dair_smash_script)
-      .game_acmd("game_catch", ganon_grab_smash_script)
-      .game_acmd("game_catchdash", ganon_grabd_smash_script)
-      .game_acmd("game_catchturn", ganon_grabp_smash_script)
-      .game_acmd("game_throwf", ganon_fthrow_smash_script)
-      .game_acmd("game_throwb", ganon_bthrow_smash_script)
-      .game_acmd("game_throwhi", ganon_uthrow_smash_script)
-      .game_acmd("game_throwlw", ganon_dthrow_smash_script)
-      .game_acmd("game_cliffattack", ganon_ledge_attack_smash_script)
-      .game_acmd("game_specialn", ganon_neutralb_smash_script)
-      .game_acmd("game_specialairn", ganon_neutralb_air_smash_script)
-      .game_acmd("game_specialnturn", ganon_neutralb_turn_smash_script)
-      .game_acmd("game_specialairnturn", ganon_neutralb_air_turn_smash_script)
-      .game_acmd("game_specialsstart", ganon_sideb_dash_smash_script)
-      .game_acmd("game_specialairsstart", ganon_sideb_dash_air_smash_script)
-      .game_acmd("game_specials", ganon_sideb_smash_script)
-      .game_acmd("game_specialairs", ganon_sideb_air_smash_script)
-      .game_acmd("game_specialairsfall", ganon_sideb_air_fall_smash_script)
-      .game_acmd("game_specialhi", ganon_upb_ascent_smash_script)
-      .game_acmd("game_specialairhi", ganon_upb_ascent_smash_script)
-      .game_acmd("game_specialhithrow", ganon_upb_throw_smash_script)
-      .game_acmd("game_speciallw", ganon_downb_smash_script)
-      .game_acmd("game_specialairlw", ganon_downb_air_smash_script)
-      .game_acmd("game_speciallwend", ganon_downb_end_smash_script)
-      .game_acmd("game_speciallwendair", ganon_downb_groundtoair_end_smash_script)
-      .game_acmd("game_specialairlwendair", ganon_downb_air_falling_script)
-      .game_acmd("game_specialairlwend", ganon_downb_air_landing_smash_script)
-
+      .game_acmd("game_attack11", ganon_jab_smash_script, Low)
+      .game_acmd("game_attackdash", ganon_dashattack_smash_script, Low)
+      .game_acmd("game_attacks3", ganon_ftilt_smash_script, Low)
+      .game_acmd("game_attackhi3", ganon_utilt_smash_script, Low)
+      .sound_acmd("sound_attackhi3", ganon_utilt_se_smash_script, Low)
+      .effect_acmd("effect_attackhi3", ganon_utilt_gfx_smash_script, Low)
+      .game_acmd("game_attacklw3", ganon_dtilt_smash_script, Low)
+      .game_acmd("game_attacks4charge", ganon_fsmash_charge_smash_script, Low)
+      .game_acmd("game_attacks4", ganon_fsmash_smash_script, Low)
+      .game_acmd("game_attackhi4", ganon_usmash_smash_script, Low)
+      .game_acmd("game_attacklw4", ganon_dsmash_smash_script, Low)
+      .game_acmd("game_attackairn", ganon_nair_smash_script, Low)
+      .game_acmd("game_attackairf", ganon_fair_smash_script, Low)
+      .game_acmd("game_attackairb", ganon_bair_smash_script, Low)
+      .effect_acmd("effect_attackairb", ganon_bair_effect_script, Low)
+      .game_acmd("game_attackairhi", ganon_uair_smash_script, Low)
+      .game_acmd("game_attackairlw", ganon_dair_smash_script, Low)
+      .game_acmd("game_catch", ganon_grab_smash_script, Low)
+      .game_acmd("game_catchdash", ganon_grabd_smash_script, Low)
+      .game_acmd("game_catchturn", ganon_grabp_smash_script, Low)
+      .game_acmd("game_throwf", ganon_fthrow_smash_script, Low)
+      .game_acmd("game_throwb", ganon_bthrow_smash_script, Low)
+      .game_acmd("game_throwhi", ganon_uthrow_smash_script, Low)
+      .game_acmd("game_throwlw", ganon_dthrow_smash_script, Low)
+      .game_acmd("game_cliffattack", ganon_ledge_attack_smash_script, Low)
+      .game_acmd("game_specialn", ganon_neutralb_smash_script, Low)
+      .game_acmd("game_specialairn", ganon_neutralb_air_smash_script, Low)
+      .game_acmd("game_specialnturn", ganon_neutralb_turn_smash_script, Low)
+      .game_acmd("game_specialairnturn", ganon_neutralb_air_turn_smash_script, Low)
+      .game_acmd("game_specialsstart", ganon_sideb_dash_smash_script, Low)
+      .game_acmd("game_specialairsstart", ganon_sideb_dash_air_smash_script, Low)
+      .game_acmd("game_specials", ganon_sideb_smash_script, Low)
+      .game_acmd("game_specialairs", ganon_sideb_air_smash_script, Low)
+      .game_acmd("game_specialairsfall", ganon_sideb_air_fall_smash_script, Low)
+      .game_acmd("game_specialhi", ganon_upb_ascent_smash_script, Low)
+      .game_acmd("game_specialairhi", ganon_upb_ascent_smash_script, Low)
+      .game_acmd("game_specialhithrow", ganon_upb_throw_smash_script, Low)
+      .game_acmd("game_speciallw", ganon_downb_smash_script, Low)
+      .game_acmd("game_specialairlw", ganon_downb_air_smash_script, Low)
+      .game_acmd("game_speciallwend", ganon_downb_end_smash_script, Low)
+      .game_acmd("game_speciallwendair", ganon_downb_groundtoair_end_smash_script, Low)
+      .game_acmd("game_specialairlwendair", ganon_downb_air_falling_script, Low)
+      .game_acmd("game_specialairlwend", ganon_downb_air_landing_smash_script, Low)
       .install();
   
       

@@ -8,6 +8,7 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
 
 static mut MIIFIGHTER_FTILT_WAS_CRUMPLE : [bool; 8] = [false; 8];
 static mut MIIFIGHTER_FTILT_CRUMPLE_RECHARGE_TIMER : [i32; 8] = [0; 8];
@@ -984,6 +985,10 @@ unsafe extern "C" fn miifighter_sideb_onslaught_start_air_script(fighter: &mut L
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 4.0, 3.0);
     }
+    sv_animcmd::frame(fighter.lua_state_agent, 74.0);
+    if macros::is_excute(fighter) {
+        StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_FALL, false);
+    }
 }
 
 unsafe extern "C" fn miifighter_sideb_onslaught_end_script(fighter: &mut L2CAgentBase) {
@@ -1035,7 +1040,7 @@ unsafe extern "C" fn miifighter_sideb_onslaught_end_script(fighter: &mut L2CAgen
     }
     sv_animcmd::frame(fighter.lua_state_agent, 27.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("toer"), 13.6, 30, 70, 0, 60, 7.0, 0.0, 0.0, 0.0, Some(-6.0), Some(-2.0), Some(1.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("toer"), 12.7, 30, 85, 0, 60, 7.0, 0.0, 0.0, 0.0, Some(-6.0), Some(-2.0), Some(1.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 29.0);
     if macros::is_excute(fighter) {
@@ -1104,7 +1109,7 @@ unsafe extern "C" fn miifighter_sideb_onslaught_air_end_script(fighter: &mut L2C
     sv_animcmd::frame(fighter.lua_state_agent, 27.0);
     if macros::is_excute(fighter) {
         KineticModule::add_speed(fighter.module_accessor, &smash::phx::Vector3f{x: 0.85, y: 3.0, z: 0.0});
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.6, 30, 70, 0, 60, 7.0, 0.0, 16.0, 9.5, Some(0.0), Some(10.0), Some(8.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 3, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.7, 30, 85, 0, 60, 7.0, 0.0, 16.0, 9.5, Some(0.0), Some(10.0), Some(8.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 3, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 30.0);
     if macros::is_excute(fighter) {
@@ -1219,7 +1224,7 @@ unsafe extern "C" fn miifighter_sideb_suplex_air_dash_script(fighter: &mut L2CAg
 unsafe extern "C" fn miifighter_sideb_suplex_throwlanding_dash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_DAMAGE_POWER, 15.99);
-        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.0, 73, 225, 0, 45, 0.0, 1.0, *ATTACK_LR_CHECK_B, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 5.0, 73, 210, 0, 45, 0.0, 1.0, *ATTACK_LR_CHECK_B, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
@@ -1722,69 +1727,69 @@ unsafe extern "C" fn miifighter_downb_counterthrow_air_script(fighter: &mut L2CA
 pub fn install() {
     Agent::new("miifighter")
     .on_line(Main, miifighter_frame) //opff
-    .game_acmd("game_attack11", miifighter_jab_smash_script)
-    .game_acmd("game_attack12", miifighter_jab2_smash_script)
-    .game_acmd("game_attack100", miifighter_jab100_smash_script)
-    .game_acmd("game_attack100end", miifighter_jab100end_smash_script)
-    .game_acmd("game_attackdash", miifighter_dashattack_smash_script)
-    .game_acmd("game_attacks3", miifighter_ftilt_smash_script)
-    .game_acmd("game_attacks3hi", miifighter_ftilt_smash_script)
-    .game_acmd("game_attacks3lw", miifighter_ftilt_smash_script)
-    .game_acmd("game_attackhi3", miifighter_utilt_smash_script)
-    .game_acmd("game_attacklw3", miifighter_dtilt_smash_script)
-    .game_acmd("game_attacks4", miifighter_fsmash_smash_script)
-    .game_acmd("game_attacks4hi", miifighter_fsmash_smash_script)
-    .game_acmd("game_attacks4lw", miifighter_fsmash_smash_script)
-    .game_acmd("game_attackhi4", miifighter_usmash_smash_script)
-    .game_acmd("game_attacklw4", miifighter_dsmash_smash_script)
-    .game_acmd("game_attackairn", miifighter_nair_smash_script)
-    .game_acmd("game_attackairf", miifighter_fair_smash_script)
-    .game_acmd("game_attackairb", miifighter_bair_smash_script)
-    .game_acmd("game_attackairhi", miifighter_uair_smash_script)
-    .game_acmd("game_attackairlw", miifighter_dair_smash_script)
-    .game_acmd("game_catch", miifighter_grab_smash_script)
-    .game_acmd("game_catchdash", miifighter_grabd_smash_script)
-    .game_acmd("game_catchturn", miifighter_grabp_smash_script)
-    .game_acmd("game_throwf", miifighter_fthrow_smash_script)
-    .game_acmd("game_throwb", miifighter_bthrow_smash_script)
-    .game_acmd("game_throwhi", miifighter_uthrow_smash_script)
-    .game_acmd("game_throwlw", miifighter_dthrow_smash_script)
-    .game_acmd("game_specialn1", miifighter_neutralb_shotput_smash_script)
-    .game_acmd("game_specialairn1", miifighter_neutralb_shotput_smash_script)
-    .game_acmd("game_specialn2finish", miifighter_neutralb_machpunch_finish_smash_script)
-    .game_acmd("game_specialairn2finish", miifighter_neutralb_machpunch_finish_air_smash_script)
-    .game_acmd("game_specialn3", miifighter_neutralb_firekick_smash_script)
-    .game_acmd("game_specialairn3", miifighter_neutralb_firekick_air_smash_script)
-    .game_acmd("game_specialn3turn", miifighter_neutralb_firekick_turn_smash_script)
-    .game_acmd("game_specialairn3turn", miifighter_neutralb_firekick_air_turn_smash_script)
-    .game_acmd("game_specials1start", miifighter_sideb_onslaught_start_script)
-    .game_acmd("game_specialairs1start", miifighter_sideb_onslaught_start_air_script)
-    .game_acmd("game_specials1end", miifighter_sideb_onslaught_end_script)
-    .game_acmd("game_specialairs1end", miifighter_sideb_onslaught_air_end_script)
-    .game_acmd("game_specials2", miifighter_sideb_dropkick_script)
-    .game_acmd("game_specials3dash", miifighter_sideb_suplex_dash_script)
-    .game_acmd("game_specialairs3dash", miifighter_sideb_suplex_air_dash_script)
-    .game_acmd("game_specialairs3landing", miifighter_sideb_suplex_throwlanding_dash_script)
-    .game_acmd("game_specialhi12", miifighter_upb_axekick_rising_script)
-    .game_acmd("game_specialairhi12", miifighter_upb_axekick_rising_script)
-    .game_acmd("game_specialhi13", miifighter_upb_axekick_falling_script)
-    .game_acmd("game_specialairhi13", miifighter_upb_axekick_falling_air_script)
-    .game_acmd("game_specialhi14", miifighter_upb_axekick_landing_script)
-    .game_acmd("game_specialairhi14", miifighter_upb_axekick_air_landing_script)
-    .game_acmd("game_specialhi2", miifighter_upb_helicopter_script)
-    .game_acmd("game_specialairhi2", miifighter_upb_helicopter_air_script)
-    .game_acmd("game_specialhi3", miifighter_upb_uppercut_script)
-    .game_acmd("game_specialairhi3", miifighter_upb_uppercut_script)
-    .game_acmd("game_speciallw1landing", miifighter_downb_headon_landing_script)
-    .game_acmd("game_speciallw2landing", miifighter_downb_feintjump_landing_script)
-    .game_acmd("game_specialairlw2kick", miifighter_downb_feintjump_kick_script)
-    .game_acmd("game_speciallw2kicklanding", miifighter_downb_feintjump_kicklanding_script)
-    .game_acmd("game_speciallw3throw", miifighter_downb_counterthrow_script)
-    .game_acmd("game_specialairlw3throw", miifighter_downb_counterthrow_air_script)
+    .game_acmd("game_attack11", miifighter_jab_smash_script, Low)
+    .game_acmd("game_attack12", miifighter_jab2_smash_script, Low)
+    .game_acmd("game_attack100", miifighter_jab100_smash_script, Low)
+    .game_acmd("game_attack100end", miifighter_jab100end_smash_script, Low)
+    .game_acmd("game_attackdash", miifighter_dashattack_smash_script, Low)
+    .game_acmd("game_attacks3", miifighter_ftilt_smash_script, Low)
+    .game_acmd("game_attacks3hi", miifighter_ftilt_smash_script, Low)
+    .game_acmd("game_attacks3lw", miifighter_ftilt_smash_script, Low)
+    .game_acmd("game_attackhi3", miifighter_utilt_smash_script, Low)
+    .game_acmd("game_attacklw3", miifighter_dtilt_smash_script, Low)
+    .game_acmd("game_attacks4", miifighter_fsmash_smash_script, Low)
+    .game_acmd("game_attacks4hi", miifighter_fsmash_smash_script, Low)
+    .game_acmd("game_attacks4lw", miifighter_fsmash_smash_script, Low)
+    .game_acmd("game_attackhi4", miifighter_usmash_smash_script, Low)
+    .game_acmd("game_attacklw4", miifighter_dsmash_smash_script, Low)
+    .game_acmd("game_attackairn", miifighter_nair_smash_script, Low)
+    .game_acmd("game_attackairf", miifighter_fair_smash_script, Low)
+    .game_acmd("game_attackairb", miifighter_bair_smash_script, Low)
+    .game_acmd("game_attackairhi", miifighter_uair_smash_script, Low)
+    .game_acmd("game_attackairlw", miifighter_dair_smash_script, Low)
+    .game_acmd("game_catch", miifighter_grab_smash_script, Low)
+    .game_acmd("game_catchdash", miifighter_grabd_smash_script, Low)
+    .game_acmd("game_catchturn", miifighter_grabp_smash_script, Low)
+    .game_acmd("game_throwf", miifighter_fthrow_smash_script, Low)
+    .game_acmd("game_throwb", miifighter_bthrow_smash_script, Low)
+    .game_acmd("game_throwhi", miifighter_uthrow_smash_script, Low)
+    .game_acmd("game_throwlw", miifighter_dthrow_smash_script, Low)
+    .game_acmd("game_specialn1", miifighter_neutralb_shotput_smash_script, Low)
+    .game_acmd("game_specialairn1", miifighter_neutralb_shotput_smash_script, Low)
+    .game_acmd("game_specialn2finish", miifighter_neutralb_machpunch_finish_smash_script, Low)
+    .game_acmd("game_specialairn2finish", miifighter_neutralb_machpunch_finish_air_smash_script, Low)
+    .game_acmd("game_specialn3", miifighter_neutralb_firekick_smash_script, Low)
+    .game_acmd("game_specialairn3", miifighter_neutralb_firekick_air_smash_script, Low)
+    .game_acmd("game_specialn3turn", miifighter_neutralb_firekick_turn_smash_script, Low)
+    .game_acmd("game_specialairn3turn", miifighter_neutralb_firekick_air_turn_smash_script, Low)
+    .game_acmd("game_specials1start", miifighter_sideb_onslaught_start_script, Low)
+    .game_acmd("game_specialairs1start", miifighter_sideb_onslaught_start_air_script, Low)
+    .game_acmd("game_specials1end", miifighter_sideb_onslaught_end_script, Low)
+    .game_acmd("game_specialairs1end", miifighter_sideb_onslaught_air_end_script, Low)
+    .game_acmd("game_specials2", miifighter_sideb_dropkick_script, Low)
+    .game_acmd("game_specials3dash", miifighter_sideb_suplex_dash_script, Low)
+    .game_acmd("game_specialairs3dash", miifighter_sideb_suplex_air_dash_script, Low)
+    .game_acmd("game_specialairs3landing", miifighter_sideb_suplex_throwlanding_dash_script, Low)
+    .game_acmd("game_specialhi12", miifighter_upb_axekick_rising_script, Low)
+    .game_acmd("game_specialairhi12", miifighter_upb_axekick_rising_script, Low)
+    .game_acmd("game_specialhi13", miifighter_upb_axekick_falling_script, Low)
+    .game_acmd("game_specialairhi13", miifighter_upb_axekick_falling_air_script, Low)
+    .game_acmd("game_specialhi14", miifighter_upb_axekick_landing_script, Low)
+    .game_acmd("game_specialairhi14", miifighter_upb_axekick_air_landing_script, Low)
+    .game_acmd("game_specialhi2", miifighter_upb_helicopter_script, Low)
+    .game_acmd("game_specialairhi2", miifighter_upb_helicopter_air_script, Low)
+    .game_acmd("game_specialhi3", miifighter_upb_uppercut_script, Low)
+    .game_acmd("game_specialairhi3", miifighter_upb_uppercut_script, Low)
+    .game_acmd("game_speciallw1landing", miifighter_downb_headon_landing_script, Low)
+    .game_acmd("game_speciallw2landing", miifighter_downb_feintjump_landing_script, Low)
+    .game_acmd("game_specialairlw2kick", miifighter_downb_feintjump_kick_script, Low)
+    .game_acmd("game_speciallw2kicklanding", miifighter_downb_feintjump_kicklanding_script, Low)
+    .game_acmd("game_speciallw3throw", miifighter_downb_counterthrow_script, Low)
+    .game_acmd("game_specialairlw3throw", miifighter_downb_counterthrow_air_script, Low)
     .install();
 
     Agent::new("miifighter_ironball")
-    .game_acmd("game_fly", shotput_ball_script)
+    .game_acmd("game_fly", shotput_ball_script, Low)
     .install();
 
 

@@ -8,6 +8,7 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
 
 static mut MIISWORDSMAN_FSMASH_FULLCHARGE : [bool; 8] = [false; 8];
 static mut MIISWORDSMAN_FSMASH_HITBOX_ACTIVE : [bool; 8] = [false; 8];
@@ -1512,90 +1513,90 @@ unsafe extern "C" fn miiswordsman_downb_thrust_air_ending_smash_script(fighter: 
 pub fn install() {
     Agent::new("miiswordsman")
     .on_line(Main, miiswordsman_frame) //opff
-    .game_acmd("game_attack11", miiswordsman_jab_smash_script)
-    .game_acmd("game_attack12", miiswordsman_jab2_smash_script)
-    .game_acmd("game_attack13", miiswordsman_jab3_smash_script)
-    .game_acmd("game_attackdash", miiswordsman_dashattack_smash_script)
-    .game_acmd("game_attacks3", miiswordsman_ftilt_smash_script)
-    .game_acmd("game_attackhi3", miiswordsman_utilt_smash_script)
-    .game_acmd("game_attacklw3", miiswordsman_dtilt_smash_script)
-    .game_acmd("game_attacks4charge", miiswordsman_fsmash_charge_smash_script)
-    .game_acmd("game_attacks4", miiswordsman_fsmash_smash_script)
-    .game_acmd("game_attackhi4", miiswordsman_usmash_smash_script)
-    .game_acmd("game_attacklw4", miiswordsman_dsmash_smash_script)
-    .game_acmd("game_attackairn", miiswordsman_nair_smash_script)
-    .game_acmd("game_attackairf", miiswordsman_fair_smash_script)
-    .game_acmd("game_attackairb", miiswordsman_bair_smash_script)
-    .game_acmd("game_attackairhi", miiswordsman_uair_smash_script)
-    .game_acmd("game_attackairlw", miiswordsman_dair_smash_script)
-    .game_acmd("game_landingairlw", miiswordsman_dair_landing_smash_script)
-    .game_acmd("game_catch", miiswordsman_grab_smash_script)
-    .game_acmd("game_catchdash", miiswordsman_grabd_smash_script)
-    .game_acmd("game_catchturn", miiswordsman_grabp_smash_script)
-    .game_acmd("game_throwf", miiswordsman_fthrow_smash_script)
-    .game_acmd("game_throwb", miiswordsman_bthrow_smash_script)
-    .game_acmd("game_throwhi", miiswordsman_uthrow_smash_script)
-    .game_acmd("game_throwlw", miiswordsman_dthrow_smash_script)
+    .game_acmd("game_attack11", miiswordsman_jab_smash_script, Low)
+    .game_acmd("game_attack12", miiswordsman_jab2_smash_script, Low)
+    .game_acmd("game_attack13", miiswordsman_jab3_smash_script, Low)
+    .game_acmd("game_attackdash", miiswordsman_dashattack_smash_script, Low)
+    .game_acmd("game_attacks3", miiswordsman_ftilt_smash_script, Low)
+    .game_acmd("game_attackhi3", miiswordsman_utilt_smash_script, Low)
+    .game_acmd("game_attacklw3", miiswordsman_dtilt_smash_script, Low)
+    .game_acmd("game_attacks4charge", miiswordsman_fsmash_charge_smash_script, Low)
+    .game_acmd("game_attacks4", miiswordsman_fsmash_smash_script, Low)
+    .game_acmd("game_attackhi4", miiswordsman_usmash_smash_script, Low)
+    .game_acmd("game_attacklw4", miiswordsman_dsmash_smash_script, Low)
+    .game_acmd("game_attackairn", miiswordsman_nair_smash_script, Low)
+    .game_acmd("game_attackairf", miiswordsman_fair_smash_script, Low)
+    .game_acmd("game_attackairb", miiswordsman_bair_smash_script, Low)
+    .game_acmd("game_attackairhi", miiswordsman_uair_smash_script, Low)
+    .game_acmd("game_attackairlw", miiswordsman_dair_smash_script, Low)
+    .game_acmd("game_landingairlw", miiswordsman_dair_landing_smash_script, Low)
+    .game_acmd("game_catch", miiswordsman_grab_smash_script, Low)
+    .game_acmd("game_catchdash", miiswordsman_grabd_smash_script, Low)
+    .game_acmd("game_catchturn", miiswordsman_grabp_smash_script, Low)
+    .game_acmd("game_throwf", miiswordsman_fthrow_smash_script, Low)
+    .game_acmd("game_throwb", miiswordsman_bthrow_smash_script, Low)
+    .game_acmd("game_throwhi", miiswordsman_uthrow_smash_script, Low)
+    .game_acmd("game_throwlw", miiswordsman_dthrow_smash_script, Low)
 
-    .game_acmd("game_specialn1", miiswordsman_neutralb_galestrike_smash_script)
-    .game_acmd("game_specialairn1", miiswordsman_neutralb_galestrike_air_smash_script)
+    .game_acmd("game_specialn1", miiswordsman_neutralb_galestrike_smash_script, Low)
+    .game_acmd("game_specialairn1", miiswordsman_neutralb_galestrike_air_smash_script, Low)
 
-    .game_acmd("game_specialn3end", miiswordsman_neutralb_blurblade_end_smash_script)
-    .game_acmd("game_specialairn3end", miiswordsman_neutralb_blurblade_airend_smash_script)
-    .game_acmd("game_specialn3endturn", miiswordsman_neutralb_blurblade_turnend_smash_script)
-    .game_acmd("game_specialairn3endturn", miiswordsman_neutralb_blurblade_airendturn_smash_script)
+    .game_acmd("game_specialn3end", miiswordsman_neutralb_blurblade_end_smash_script, Low)
+    .game_acmd("game_specialairn3end", miiswordsman_neutralb_blurblade_airend_smash_script, Low)
+    .game_acmd("game_specialn3endturn", miiswordsman_neutralb_blurblade_turnend_smash_script, Low)
+    .game_acmd("game_specialairn3endturn", miiswordsman_neutralb_blurblade_airendturn_smash_script, Low)
 
-    .game_acmd("game_specialn3endmax", miiswordsman_neutralb_blurblade_maxend_smash_script)
-    .game_acmd("game_specialairn3endmax", miiswordsman_neutralb_blurblade_airendmax_smash_script)
-    .game_acmd("game_specialn3endmaxturn", miiswordsman_neutralb_blurblade_turnendmax_smash_script)
-    .game_acmd("game_specialairn3endmaxturn", miiswordsman_neutralb_blurblade_airendturnmax_smash_script)
-
-
-    .game_acmd("game_specials1hit", miiswordsman_sideb_assault_hit_smash_script)
-
-    .game_acmd("game_specials2dash", miiswordsman_sideb_galestab_dash_smash_script)
-    .game_acmd("game_specialairs2dash", miiswordsman_sideb_galestab_dash_smash_script)
-
-    .game_acmd("game_specials2attack", miiswordsman_sideb_galestab_attack_smash_script)
-    .game_acmd("game_specialairs2attack", miiswordsman_sideb_galestab_attack_air_smash_script)
+    .game_acmd("game_specialn3endmax", miiswordsman_neutralb_blurblade_maxend_smash_script, Low)
+    .game_acmd("game_specialairn3endmax", miiswordsman_neutralb_blurblade_airendmax_smash_script, Low)
+    .game_acmd("game_specialn3endmaxturn", miiswordsman_neutralb_blurblade_turnendmax_smash_script, Low)
+    .game_acmd("game_specialairn3endmaxturn", miiswordsman_neutralb_blurblade_airendturnmax_smash_script, Low)
 
 
-    .game_acmd("game_specialhi1", miiswordsman_upb_stonescabbard_rise_smash_script)
-    .game_acmd("game_specialairhi1", miiswordsman_upb_stonescabbard_rise_air_smash_script)
-    .game_acmd("game_specialhi1end", miiswordsman_upb_stonescabbard_landing_smash_script)
-    .game_acmd("game_specialairhi1end", miiswordsman_upb_stonescabbard_landing_air_smash_script)
+    .game_acmd("game_specials1hit", miiswordsman_sideb_assault_hit_smash_script, Low)
 
-    .game_acmd("game_specialhi2hold", miiswordsman_upb_skywardslash_start_smash_script)
-    .game_acmd("game_specialairhi2hold", miiswordsman_upb_skywardslash_start_smash_script)
+    .game_acmd("game_specials2dash", miiswordsman_sideb_galestab_dash_smash_script, Low)
+    .game_acmd("game_specialairs2dash", miiswordsman_sideb_galestab_dash_smash_script, Low)
 
-    .game_acmd("game_specialhi3", miiswordsman_upb_speen_smash_script)
-    .game_acmd("game_specialairhi3", miiswordsman_upb_speen_air_smash_script)
+    .game_acmd("game_specials2attack", miiswordsman_sideb_galestab_attack_smash_script, Low)
+    .game_acmd("game_specialairs2attack", miiswordsman_sideb_galestab_attack_air_smash_script, Low)
 
-    .game_acmd("game_speciallw1", miiswordsman_downb_counter_smash_script)
-    .game_acmd("game_specialairlw1", miiswordsman_downb_counter_smash_script)
-    .game_acmd("game_speciallw1hit", miiswordsman_downb_counterhit_smash_script)
-    .game_acmd("game_specialairlw1hit", miiswordsman_downb_counterhit_smash_script)
 
-    .game_acmd("game_speciallw2", miiswordsman_downb_cape_smash_script)
-    .game_acmd("game_specialairlw2", miiswordsman_downb_cape_smash_script)
+    .game_acmd("game_specialhi1", miiswordsman_upb_stonescabbard_rise_smash_script, Low)
+    .game_acmd("game_specialairhi1", miiswordsman_upb_stonescabbard_rise_air_smash_script, Low)
+    .game_acmd("game_specialhi1end", miiswordsman_upb_stonescabbard_landing_smash_script, Low)
+    .game_acmd("game_specialairhi1end", miiswordsman_upb_stonescabbard_landing_air_smash_script, Low)
 
-    .game_acmd("game_speciallw3", miiswordsman_downb_thrust_smash_script)
-    .game_acmd("game_specialairlw3", miiswordsman_downb_thrust_air_smash_script)
-    .game_acmd("game_specialairlw3endair", miiswordsman_downb_thrust_air_ending_smash_script)
+    .game_acmd("game_specialhi2hold", miiswordsman_upb_skywardslash_start_smash_script, Low)
+    .game_acmd("game_specialairhi2hold", miiswordsman_upb_skywardslash_start_smash_script, Low)
+
+    .game_acmd("game_specialhi3", miiswordsman_upb_speen_smash_script, Low)
+    .game_acmd("game_specialairhi3", miiswordsman_upb_speen_air_smash_script, Low)
+
+    .game_acmd("game_speciallw1", miiswordsman_downb_counter_smash_script, Low)
+    .game_acmd("game_specialairlw1", miiswordsman_downb_counter_smash_script, Low)
+    .game_acmd("game_speciallw1hit", miiswordsman_downb_counterhit_smash_script, Low)
+    .game_acmd("game_specialairlw1hit", miiswordsman_downb_counterhit_smash_script, Low)
+
+    .game_acmd("game_speciallw2", miiswordsman_downb_cape_smash_script, Low)
+    .game_acmd("game_specialairlw2", miiswordsman_downb_cape_smash_script, Low)
+
+    .game_acmd("game_speciallw3", miiswordsman_downb_thrust_smash_script, Low)
+    .game_acmd("game_specialairlw3", miiswordsman_downb_thrust_air_smash_script, Low)
+    .game_acmd("game_specialairlw3endair", miiswordsman_downb_thrust_air_ending_smash_script, Low)
     .install();
 
     Agent::new("miiswordsman_tornadoshot")
-    .game_acmd("game_fly", galestrike_projectile)
+    .game_acmd("game_fly", galestrike_projectile, Low)
     .install();
 
     Agent::new("miiswordsman_lightshuriken")
-    .game_acmd("game_fly", shuriken_projectile)
+    .game_acmd("game_fly", shuriken_projectile, Low)
     .install();
 
     Agent::new("miiswordsman_chakram")
-    .game_acmd("game_flyflicksub", chakram_fast_projectile)
-    .game_acmd("game_flynormalsub", chakram_slow_projectile)
-    .game_acmd("game_fly", chakram_projectile)
+    .game_acmd("game_flyflicksub", chakram_fast_projectile, Low)
+    .game_acmd("game_flynormalsub", chakram_slow_projectile, Low)
+    .game_acmd("game_fly", chakram_projectile, Low)
     .install();
 
 }

@@ -8,6 +8,7 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
 
 static mut BAYONETTA_SMASHATTACK_CAN_MOVE_LIMB : [bool; 8] = [false; 8];
 static mut BAYONETTA_SMASHATTACK_LIMB_X : [f32; 8] = [0.0; 8];
@@ -208,10 +209,12 @@ unsafe extern "C" fn bayonetta_jab3_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 11.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.2, 361, 8, 0, 40, 6.5, 0.0, 7.0, 10.0, Some(0.0), Some(10.5), Some(10.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.2, 361, 8, 20, 40, 4.0, 0.0, 5.5, 7.0, Some(0.0), Some(12.5), Some(7.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 2.2, 180, 8, 20, 40, 4.0, 0.0, 5.5, 11.0, Some(0.0), Some(12.5), Some(11.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 10.0, false);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 10.0, false);
     }
-    sv_animcmd::wait(fighter.lua_state_agent, 2.0);
+    sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
         MotionModule::set_rate(fighter.module_accessor, 0.9);
@@ -370,10 +373,10 @@ unsafe extern "C" fn bayonetta_ftilt3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 22.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.0);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.1, 81, 66, 0, 63, 7.5, 0.0, 16.0, 5.3, Some(0.0), Some(8.0), Some(4.5), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 4, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 7.1, 81, 66, 0, 63, 7.5, 0.0, 26.0, 6.0, Some(0.0), Some(8.0), Some(4.5), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 4, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 7.0, false);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 7.0, false);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.4, 81, 74, 0, 63, 7.5, 0.0, 16.0, 5.3, Some(0.0), Some(8.0), Some(4.5), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 4, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 5.4, 81, 74, 0, 63, 7.5, 0.0, 26.0, 6.0, Some(0.0), Some(8.0), Some(4.5), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 4, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 6.0, false);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 6.0, false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
@@ -1540,29 +1543,29 @@ unsafe extern "C" fn bayonetta_sideb_afterburner_up_smash_script(fighter: &mut L
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.0);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_BAYONETTA_STATUS_WORK_ID_SPECIAL_AIR_S_FLAG_WALL_CHECK);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("kneer"), 6.5, 45, 50, 0, 68, 5.0, 6.0, 0.0, 3.0, Some(2.0), Some(0.0), Some(3.0), 0.5, 1.3, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("kneer"), 6.5, 41, 50, 0, 68, 5.0, 6.0, 0.0, -3.0, Some(2.0), Some(0.0), Some(-3.0), 0.5, 1.3, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("kneer"), 6.5, 52, 43, 0, 74, 5.0, 6.0, 0.0, 3.0, Some(-1.0), Some(0.0), Some(3.0), 0.5, 1.3, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("kneer"), 6.5, 48, 43, 0, 74, 5.0, 6.0, 0.0, -3.0, Some(-1.0), Some(0.0), Some(-3.0), 0.5, 1.3, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 5.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 5.0, false);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 15.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("kneer"), 7.5, 65, 35, 0, 60, 5.0, 6.0, 0.0, 3.0, Some(2.0), Some(0.0), Some(3.0), 0.5, 1.3, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("kneer"), 7.5, 60, 35, 0, 60, 5.0, 6.0, 0.0, -3.0, Some(2.0), Some(0.0), Some(-3.0), 0.5, 1.3, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("kneer"), 7.5, 65, 35, 0, 60, 5.0, 6.0, 0.0, 3.0, Some(-1.0), Some(0.0), Some(3.0), 0.5, 1.3, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("kneer"), 7.5, 60, 35, 0, 60, 5.0, 6.0, 0.0, -3.0, Some(-1.0), Some(0.0), Some(-3.0), 0.5, 1.3, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 5.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 5.0, false);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 18.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("kneer"), 7.5, 83, 33, 0, 55, 5.0, 6.0, 0.0, 3.0, Some(2.0), Some(0.0), Some(3.0), 0.5, 1.3, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("kneer"), 7.5, 78, 33, 0, 55, 5.0, 6.0, 0.0, -3.0, Some(2.0), Some(0.0), Some(-3.0), 0.5, 1.3, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("kneer"), 7.5, 83, 33, 0, 55, 5.0, 6.0, 0.0, 3.0, Some(-1.0), Some(0.0), Some(3.0), 0.5, 1.3, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("kneer"), 7.5, 78, 33, 0, 55, 5.0, 6.0, 0.0, -3.0, Some(-1.0), Some(0.0), Some(-3.0), 0.5, 1.3, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 5.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 5.0, false);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 20.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("kneer"), 6.5, 100, 112, 60, 0, 5.0, 6.0, 0.0, 3.0, Some(2.0), Some(0.0), Some(3.0), 0.5, 1.3, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("kneer"), 6.5, 95, 112, 50, 0, 5.0, 6.0, 0.0, -3.0, Some(2.0), Some(0.0), Some(-3.0), 0.5, 1.3, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("kneer"), 6.5, 100, 112, 60, 0, 5.0, 6.0, 0.0, 3.0, Some(-1.0), Some(0.0), Some(3.0), 0.5, 1.3, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("kneer"), 6.5, 95, 112, 50, 0, 5.0, 6.0, 0.0, -3.0, Some(-1.0), Some(0.0), Some(-3.0), 0.5, 1.3, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 5.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 5.0, false);
     }
@@ -1883,66 +1886,66 @@ unsafe extern "C" fn bayonetta_final_end_smash_script(fighter: &mut L2CAgentBase
 pub fn install() {
     Agent::new("bayonetta")
     .on_line(Main, bayonetta_frame) //opff
-    .game_acmd("game_attack11", bayonetta_jab_smash_script)
-    .game_acmd("game_attack12", bayonetta_jab2_smash_script)
-    .game_acmd("game_attack13", bayonetta_jab3_smash_script)
-    .game_acmd("game_attack100end", bayonetta_jab100end_smash_script)
-    .game_acmd("game_attackdash", bayonetta_dashattack_smash_script)
-    .game_acmd("game_attacks3", bayonetta_ftilt_smash_script)
-    .game_acmd("game_attacks32", bayonetta_ftilt2_smash_script)
-    .game_acmd("game_attacks33", bayonetta_ftilt3_smash_script)
-    .game_acmd("game_attackhi3", bayonetta_utilt_smash_script)
-    .game_acmd("game_attacklw3", bayonetta_dtilt_smash_script)
-    .game_acmd("game_attacks4", bayonetta_fsmash_smash_script)
-    .game_acmd("game_attacks4hi", bayonetta_fsmash2_smash_script)
-    .game_acmd("game_attacks4lw", bayonetta_fsmash3_smash_script)
-    .game_acmd("game_attackhi4", bayonetta_usmash_smash_script)
-    .game_acmd("game_attacklw4", bayonetta_dsmash_smash_script)
-    .game_acmd("game_attackairn", bayonetta_nair_smash_script)
-    .game_acmd("game_attackairnhold", bayonetta_nair_hold_smash_script)
-    .game_acmd("game_attackairf", bayonetta_fair_smash_script)
-    .game_acmd("game_attackairf2", bayonetta_fair2_smash_script)
-    .game_acmd("game_attackairf3", bayonetta_fair3_smash_script)
-    .game_acmd("game_attackairb", bayonetta_bair_smash_script)
-    .game_acmd("game_attackairhi", bayonetta_uair_smash_script)
-    .game_acmd("game_attackairhihold", bayonetta_uair_hold_smash_script)
-    .game_acmd("game_attackairlw", bayonetta_dair_smash_script)
-    .game_acmd("game_landingairlw", bayonetta_dair_landing_smash_script)
-    .game_acmd("game_cliffattack", bayonetta_ledge_attack_smash_script)
-    .game_acmd("game_catch", bayonetta_grab_smash_script)
-    .game_acmd("game_catchdash", bayonetta_grabd_smash_script)
-    .game_acmd("game_catchturn", bayonetta_grabp_smash_script)
-    .game_acmd("game_throwf", bayonetta_fthrow_smash_script)
-    .game_acmd("game_throwb", bayonetta_bthrow_smash_script)
-    .game_acmd("game_throwhi", bayonetta_uthrow_smash_script)
-    .game_acmd("game_throwlw", bayonetta_dthrow_smash_script)
-    .game_acmd("game_specials", bayonetta_sideb_heelslide_smash_script)
-    .game_acmd("game_specialsholdend", bayonetta_sideb_heelslide_hold_smash_script)
-    .game_acmd("game_specialairsu", bayonetta_sideb_afterburner_up_smash_script)
-    .game_acmd("game_specialairsd", bayonetta_sideb_afterburner_down_smash_script)
-    .game_acmd("game_specialhi", bayonetta_upb_smash_script)
-    .game_acmd("game_specialairhi", bayonetta_upb_air_smash_script)
-    .game_acmd("game_speciallw", bayonetta_downb_smash_script)
-    .game_acmd("game_specialairlw", bayonetta_downb_smash_script)
-    .game_acmd("game_finalvisualscene01", bayonetta_final_visualscene01_script)
-    .game_acmd("game_finalend", bayonetta_final_end_smash_script)
-    .game_acmd("game_finalairend", bayonetta_final_end_smash_script)
+    .game_acmd("game_attack11", bayonetta_jab_smash_script, Low)
+    .game_acmd("game_attack12", bayonetta_jab2_smash_script, Low)
+    .game_acmd("game_attack13", bayonetta_jab3_smash_script, Low)
+    .game_acmd("game_attack100end", bayonetta_jab100end_smash_script, Low)
+    .game_acmd("game_attackdash", bayonetta_dashattack_smash_script, Low)
+    .game_acmd("game_attacks3", bayonetta_ftilt_smash_script, Low)
+    .game_acmd("game_attacks32", bayonetta_ftilt2_smash_script, Low)
+    .game_acmd("game_attacks33", bayonetta_ftilt3_smash_script, Low)
+    .game_acmd("game_attackhi3", bayonetta_utilt_smash_script, Low)
+    .game_acmd("game_attacklw3", bayonetta_dtilt_smash_script, Low)
+    .game_acmd("game_attacks4", bayonetta_fsmash_smash_script, Low)
+    .game_acmd("game_attacks4hi", bayonetta_fsmash2_smash_script, Low)
+    .game_acmd("game_attacks4lw", bayonetta_fsmash3_smash_script, Low)
+    .game_acmd("game_attackhi4", bayonetta_usmash_smash_script, Low)
+    .game_acmd("game_attacklw4", bayonetta_dsmash_smash_script, Low)
+    .game_acmd("game_attackairn", bayonetta_nair_smash_script, Low)
+    .game_acmd("game_attackairnhold", bayonetta_nair_hold_smash_script, Low)
+    .game_acmd("game_attackairf", bayonetta_fair_smash_script, Low)
+    .game_acmd("game_attackairf2", bayonetta_fair2_smash_script, Low)
+    .game_acmd("game_attackairf3", bayonetta_fair3_smash_script, Low)
+    .game_acmd("game_attackairb", bayonetta_bair_smash_script, Low)
+    .game_acmd("game_attackairhi", bayonetta_uair_smash_script, Low)
+    .game_acmd("game_attackairhihold", bayonetta_uair_hold_smash_script, Low)
+    .game_acmd("game_attackairlw", bayonetta_dair_smash_script, Low)
+    .game_acmd("game_landingairlw", bayonetta_dair_landing_smash_script, Low)
+    .game_acmd("game_cliffattack", bayonetta_ledge_attack_smash_script, Low)
+    .game_acmd("game_catch", bayonetta_grab_smash_script, Low)
+    .game_acmd("game_catchdash", bayonetta_grabd_smash_script, Low)
+    .game_acmd("game_catchturn", bayonetta_grabp_smash_script, Low)
+    .game_acmd("game_throwf", bayonetta_fthrow_smash_script, Low)
+    .game_acmd("game_throwb", bayonetta_bthrow_smash_script, Low)
+    .game_acmd("game_throwhi", bayonetta_uthrow_smash_script, Low)
+    .game_acmd("game_throwlw", bayonetta_dthrow_smash_script, Low)
+    .game_acmd("game_specials", bayonetta_sideb_heelslide_smash_script, Low)
+    .game_acmd("game_specialsholdend", bayonetta_sideb_heelslide_hold_smash_script, Low)
+    .game_acmd("game_specialairsu", bayonetta_sideb_afterburner_up_smash_script, Low)
+    .game_acmd("game_specialairsd", bayonetta_sideb_afterburner_down_smash_script, Low)
+    .game_acmd("game_specialhi", bayonetta_upb_smash_script, Low)
+    .game_acmd("game_specialairhi", bayonetta_upb_air_smash_script, Low)
+    .game_acmd("game_speciallw", bayonetta_downb_smash_script, Low)
+    .game_acmd("game_specialairlw", bayonetta_downb_smash_script, Low)
+    .game_acmd("game_finalvisualscene01", bayonetta_final_visualscene01_script, Low)
+    .game_acmd("game_finalend", bayonetta_final_end_smash_script, Low)
+    .game_acmd("game_finalairend", bayonetta_final_end_smash_script, Low)
     .install();
 
     Agent::new("bayonetta_wickedweavearm")
-    .game_acmd("game_attacks4", weavearm_fsmash)
-    .game_acmd("game_attacks4hi", weavearm_fsmashhi)
-    .game_acmd("game_attacks4lw", weavearm_fsmashlw)
-    .game_acmd("game_attackhi4", weavearm_usmash)
+    .game_acmd("game_attacks4", weavearm_fsmash, Low)
+    .game_acmd("game_attacks4hi", weavearm_fsmashhi, Low)
+    .game_acmd("game_attacks4lw", weavearm_fsmashlw, Low)
+    .game_acmd("game_attackhi4", weavearm_usmash, Low)
     .install();
 
     Agent::new("bayonetta_wickedweaveleg")
-    .game_acmd("game_attacklw4", weaveleg_dsmash)
+    .game_acmd("game_attacklw4", weaveleg_dsmash, Low)
     .install();
 
     Agent::new("bayonetta_specialn_bullet")
-    .game_acmd("game_move", bullet_climax_uncharged)
-    .game_acmd("game_movechargebullet", bullet_climax_charged)
+    .game_acmd("game_move", bullet_climax_uncharged, Low)
+    .game_acmd("game_movechargebullet", bullet_climax_charged, Low)
     .install();
 
 

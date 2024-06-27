@@ -9,6 +9,7 @@ use smashline::*;
 use smash_script::*;
 use smash::hash40;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
 
 static mut EDGE_FLARE_IS_HITSTUN : [bool; 8] = [false; 8];
 
@@ -42,6 +43,20 @@ unsafe extern "C" fn edge_frame(fighter: &mut L2CFighterCommon) {
     }
 
 }
+
+
+//Neutral B Status Script stuff here
+
+
+
+
+
+
+
+
+
+
+
 
 //#[weapon_frame( agent = WEAPON_KIND_EDGE_FIRE )]
 pub unsafe extern "C" fn edge_gigaflare_weapon_frame(weapon : &mut L2CFighterBase) {
@@ -1146,63 +1161,63 @@ unsafe extern "C" fn edge_downtaunt_smash_script(fighter: &mut L2CAgentBase) {
 pub fn install() {
     Agent::new("edge")
     .on_line(Main, edge_frame) //opff
-    .game_acmd("game_attack11", edge_jab_smash_script)
-    .game_acmd("game_attack12", edge_jab2_smash_script)
-    .game_acmd("game_attack13", edge_jab3_smash_script)
-    .game_acmd("game_attackdash", edge_dashattack_smash_script)
-    .game_acmd("game_attacks3", edge_ftilt_smash_script)
-    .game_acmd("game_attacks3hi", edge_ftilt2_smash_script)
-    .game_acmd("game_attacks3lw", edge_ftilt3_smash_script)
-    .game_acmd("game_attackhi3", edge_utilt_smash_script)
-    .game_acmd("game_attacklw3", edge_dtilt_smash_script)
-    .game_acmd("game_attacks4", edge_fsmash_smash_script)
-    .game_acmd("game_attackhi4", edge_usmash_smash_script)
-    .game_acmd("game_attacklw4", edge_dsmash_smash_script)
-    .game_acmd("game_attackairn", edge_nair_smash_script)
-    .game_acmd("game_attackairf", edge_fair_smash_script)
-    .game_acmd("game_attackairfwall", edge_fair_wallstab_smash_script)
-    .game_acmd("game_attackairb", edge_bair_smash_script)
-    .game_acmd("game_attackairhi", edge_uair_smash_script)
-    .game_acmd("game_attackairlw", edge_dair_smash_script)
-    .game_acmd("game_landingairlw", edge_dair_landing_smash_script)
-    .game_acmd("game_catch", edge_grab_smash_script)
-    .game_acmd("game_catchdash", edge_grabd_smash_script)
-    .game_acmd("game_catchturn", edge_grabp_smash_script)
-    .game_acmd("game_throwf", edge_fthrow_smash_script)
-    .game_acmd("game_throwb", edge_bthrow_smash_script)
-    .game_acmd("game_throwhi", edge_uthrow_smash_script)
-    .game_acmd("game_throwlw", edge_dthrow_smash_script)
-    .game_acmd("game_specialnstart", edge_neutralb_charge_smash_script)
-    .game_acmd("game_specialairnstart", edge_neutralb_charge_smash_script)
-    .game_acmd("game_specialn1", edge_neutralb_1_smash_script)
-    .game_acmd("game_specialairn1", edge_neutralb_1_smash_script)
-    .game_acmd("game_specialn2", edge_neutralb_2_smash_script)
-    .game_acmd("game_specialairn2", edge_neutralb_2_smash_script)
-    .game_acmd("game_specialhistart", edge_upb_start_smash_script)
-    .game_acmd("game_specialairhistart", edge_upb_start_smash_script)
-    .game_acmd("game_specialhi1", edge_upb_slash_smash_script)
-    .game_acmd("game_specialhi2end", edge_upb_octaslash_end_smash_script)
-    .game_acmd("game_specialairhi2end", edge_upb_octaslash_end_air_smash_script)
-    .game_acmd("game_speciallw", edge_downb_smash_script)
-    .game_acmd("game_specialairlw", edge_downb_smash_script)
-    .game_acmd("game_appeallwl", edge_downtaunt_smash_script)
-    .game_acmd("game_appeallwr", edge_downtaunt_smash_script)
+    .game_acmd("game_attack11", edge_jab_smash_script, Low)
+    .game_acmd("game_attack12", edge_jab2_smash_script, Low)
+    .game_acmd("game_attack13", edge_jab3_smash_script, Low)
+    .game_acmd("game_attackdash", edge_dashattack_smash_script, Low)
+    .game_acmd("game_attacks3", edge_ftilt_smash_script, Low)
+    .game_acmd("game_attacks3hi", edge_ftilt2_smash_script, Low)
+    .game_acmd("game_attacks3lw", edge_ftilt3_smash_script, Low)
+    .game_acmd("game_attackhi3", edge_utilt_smash_script, Low)
+    .game_acmd("game_attacklw3", edge_dtilt_smash_script, Low)
+    .game_acmd("game_attacks4", edge_fsmash_smash_script, Low)
+    .game_acmd("game_attackhi4", edge_usmash_smash_script, Low)
+    .game_acmd("game_attacklw4", edge_dsmash_smash_script, Low)
+    .game_acmd("game_attackairn", edge_nair_smash_script, Low)
+    .game_acmd("game_attackairf", edge_fair_smash_script, Low)
+    .game_acmd("game_attackairfwall", edge_fair_wallstab_smash_script, Low)
+    .game_acmd("game_attackairb", edge_bair_smash_script, Low)
+    .game_acmd("game_attackairhi", edge_uair_smash_script, Low)
+    .game_acmd("game_attackairlw", edge_dair_smash_script, Low)
+    .game_acmd("game_landingairlw", edge_dair_landing_smash_script, Low)
+    .game_acmd("game_catch", edge_grab_smash_script, Low)
+    .game_acmd("game_catchdash", edge_grabd_smash_script, Low)
+    .game_acmd("game_catchturn", edge_grabp_smash_script, Low)
+    .game_acmd("game_throwf", edge_fthrow_smash_script, Low)
+    .game_acmd("game_throwb", edge_bthrow_smash_script, Low)
+    .game_acmd("game_throwhi", edge_uthrow_smash_script, Low)
+    .game_acmd("game_throwlw", edge_dthrow_smash_script, Low)
+    .game_acmd("game_specialnstart", edge_neutralb_charge_smash_script, Low)
+    .game_acmd("game_specialairnstart", edge_neutralb_charge_smash_script, Low)
+    .game_acmd("game_specialn1", edge_neutralb_1_smash_script, Low)
+    .game_acmd("game_specialairn1", edge_neutralb_1_smash_script, Low)
+    .game_acmd("game_specialn2", edge_neutralb_2_smash_script, Low)
+    .game_acmd("game_specialairn2", edge_neutralb_2_smash_script, Low)
+    .game_acmd("game_specialhistart", edge_upb_start_smash_script, Low)
+    .game_acmd("game_specialairhistart", edge_upb_start_smash_script, Low)
+    .game_acmd("game_specialhi1", edge_upb_slash_smash_script, Low)
+    .game_acmd("game_specialhi2end", edge_upb_octaslash_end_smash_script, Low)
+    .game_acmd("game_specialairhi2end", edge_upb_octaslash_end_air_smash_script, Low)
+    .game_acmd("game_speciallw", edge_downb_smash_script, Low)
+    .game_acmd("game_specialairlw", edge_downb_smash_script, Low)
+    .game_acmd("game_appeallwl", edge_downtaunt_smash_script, Low)
+    .game_acmd("game_appeallwr", edge_downtaunt_smash_script, Low)
     .install();
 
     Agent::new("edge_fire")
     .on_line(Main, edge_gigaflare_weapon_frame)
-    .game_acmd("game_bursts", flare_explode)
-    .game_acmd("game_burstm", megaflare_explode)
-    .game_acmd("game_burstl", gigaflare_explode)
+    .game_acmd("game_bursts", flare_explode, Low)
+    .game_acmd("game_burstm", megaflare_explode, Low)
+    .game_acmd("game_burstl", gigaflare_explode, Low)
     .install();
 
 
     Agent::new("edge_flare1")
-    .game_acmd("game_fly", shadowflare_fly)
+    .game_acmd("game_fly", shadowflare_fly, Low)
     .install();
 
     Agent::new("edge_flash")
-    .game_acmd("game_attack", scintilla_projectile)
+    .game_acmd("game_attack", scintilla_projectile, Low)
     .install();
 
 }

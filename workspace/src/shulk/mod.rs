@@ -8,6 +8,7 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
 
 
 static mut SHULK_FUNNY : [bool; 8] = [false; 8];
@@ -183,10 +184,10 @@ unsafe extern "C" fn shulk_shieldbreak_script(fighter: &mut L2CAgentBase) {
 unsafe extern "C" fn shulk_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.8, 361, 10, 15, 25, 4.5, 0.0, 9.0, 2.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 2.8, 361, 10, 15, 25, 4.5, 0.0, 9.0, 4.5, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 2.8, 180, 10, 10, 15, 4.1, 0.0, 9.0, 7.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 2.8, 361, 10, 10, 15, 4.1, 0.0, 9.0, 7.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.4, 361, 10, 15, 25, 4.5, 0.0, 9.0, 2.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 2.4, 361, 10, 15, 25, 4.5, 0.0, 9.0, 4.5, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 2.4, 180, 10, 10, 15, 4.1, 0.0, 9.0, 7.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 2.4, 361, 10, 10, 15, 4.1, 0.0, 9.0, 7.0, None, None, None, 1.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 4.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 4.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 2, 4.0, false);
@@ -228,11 +229,21 @@ unsafe extern "C" fn shulk_jab2_smash_script(fighter: &mut L2CAgentBase) {
 unsafe extern "C" fn shulk_jab3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.6, 50, 100, 0, 60, 7.0, 0.0, 10.0, 14.0, Some(0.0), Some(10.0), Some(10.0), 2.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        if WorkModule::get_int64(fighter.module_accessor, *FIGHTER_SHULK_INSTANCE_WORK_ID_INT_SPECIAL_N_TYPE) == *FIGHTER_SHULK_MONAD_TYPE_SPEED as u64 {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.6, 70, 90, 0, 65, 7.0, 0.0, 10.0, 14.0, Some(0.0), Some(10.0), Some(10.0), 2.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        }
+        else {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.6, 70, 115, 0, 65, 7.0, 0.0, 10.0, 14.0, Some(0.0), Some(10.0), Some(10.0), 2.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        }
     }
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.6, 70, 100, 0, 70, 7.0, 0.0, 18.5, 14.0, Some(0.0), Some(12.0), Some(14.0), 2.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        if WorkModule::get_int64(fighter.module_accessor, *FIGHTER_SHULK_INSTANCE_WORK_ID_INT_SPECIAL_N_TYPE) == *FIGHTER_SHULK_MONAD_TYPE_SPEED as u64 {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.6, 70, 90, 0, 65, 7.0, 0.0, 18.5, 14.0, Some(0.0), Some(12.0), Some(14.0), 2.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        }
+        else {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.6, 70, 115, 0, 65, 7.0, 0.0, 18.5, 14.0, Some(0.0), Some(12.0), Some(14.0), 2.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        }
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
@@ -241,7 +252,7 @@ unsafe extern "C" fn shulk_jab3_smash_script(fighter: &mut L2CAgentBase) {
             MotionModule::set_rate(fighter.module_accessor, 1.9);
         }
         else {
-            MotionModule::set_rate(fighter.module_accessor, 1.1);
+            MotionModule::set_rate(fighter.module_accessor, 1.15);
         }
     }
 }
@@ -612,9 +623,9 @@ unsafe extern "C" fn shulk_nair_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 13.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("swordr"), 10.4, 56, 69, 0, 40, 5.0, 2.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("swordr"), 10.4, 56, 69, 0, 40, 5.0, 6.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("swordr"), 10.4, 56, 69, 0, 40, 5.0, 12.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("swordr"), 10.2, 61, 69, 0, 50, 5.0, 2.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("swordr"), 10.2, 61, 69, 0, 50, 5.0, 6.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("swordr"), 10.2, 61, 69, 0, 50, 5.0, 12.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 2.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 2.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 2, 2.0, false);
@@ -710,7 +721,7 @@ unsafe extern "C" fn shulk_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
-        MotionModule::set_rate(fighter.module_accessor, 1.5);
+        MotionModule::set_rate(fighter.module_accessor, 2.0);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 12.0);
     if macros::is_excute(fighter) {
@@ -732,8 +743,8 @@ unsafe extern "C" fn shulk_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 24.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.4, 88, 100, 0, 55, 6.5, 0.0, 20.0, 0.0, Some(0.0), Some(15.0), Some(0.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 11.4, 88, 100, 0, 55, 4.0, 0.0, 39.0, 0.0, Some(0.0), Some(15.0), Some(0.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 10.4, 88, 109, 0, 55, 6.5, 0.0, 20.0, 0.0, Some(0.0), Some(15.0), Some(0.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 10.4, 88, 109, 0, 55, 4.0, 0.0, 39.0, 0.0, Some(0.0), Some(15.0), Some(0.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_sting"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
@@ -826,7 +837,7 @@ unsafe extern "C" fn shulk_grabd_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
-        macros::CATCH(fighter, 0, Hash40::new("top"), 3.7, 0.0, 8.0, 4.0, Some(0.0), Some(8.0), Some(12.2), *FIGHTER_STATUS_KIND_CAPTURE_PULLED, *COLLISION_SITUATION_MASK_GA);
+        macros::CATCH(fighter, 0, Hash40::new("top"), 3.8, 0.0, 8.0, 4.0, Some(0.0), Some(8.0), Some(12.2), *FIGHTER_STATUS_KIND_CAPTURE_PULLED, *COLLISION_SITUATION_MASK_GA);
     }
     macros::game_CaptureCutCommon(fighter);
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
@@ -997,14 +1008,14 @@ unsafe extern "C" fn shulk_sideb_start_smash_script(fighter: &mut L2CAgentBase) 
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.66666667);
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 10.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_SHULK_INSTANCE_WORK_ID_FLAG_SPECIAL_N_ACTIVE) && WorkModule::get_int64(fighter.module_accessor, *FIGHTER_SHULK_INSTANCE_WORK_ID_INT_SPECIAL_N_TYPE) == *FIGHTER_SHULK_MONAD_TYPE_JUMP as u64 {
             damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0.0);
         }
-        /*if WorkModule::get_int64(fighter.module_accessor, *FIGHTER_SHULK_INSTANCE_WORK_ID_INT_SPECIAL_N_TYPE) == *FIGHTER_SHULK_MONAD_TYPE_BUSTER as u64 {
-            damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0.0);
-        }*/
+        if WorkModule::get_int64(fighter.module_accessor, *FIGHTER_SHULK_INSTANCE_WORK_ID_INT_SPECIAL_N_TYPE) == *FIGHTER_SHULK_MONAD_TYPE_SPEED as u64 {
+            KineticModule::add_speed(fighter.module_accessor, &smash::phx::Vector3f{x: 1.5, y: 0.0, z: 0.0});
+        }
     }
     sv_animcmd::frame(fighter.lua_state_agent, 31.0);
     if macros::is_excute(fighter) {
@@ -1023,10 +1034,13 @@ unsafe extern "C" fn shulk_sideb_start_air_smash_script(fighter: &mut L2CAgentBa
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.66666667);
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 10.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_SHULK_INSTANCE_WORK_ID_FLAG_SPECIAL_N_ACTIVE) && WorkModule::get_int64(fighter.module_accessor, *FIGHTER_SHULK_INSTANCE_WORK_ID_INT_SPECIAL_N_TYPE) == *FIGHTER_SHULK_MONAD_TYPE_JUMP as u64 {
             damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0.0);
+        }
+        if WorkModule::get_int64(fighter.module_accessor, *FIGHTER_SHULK_INSTANCE_WORK_ID_INT_SPECIAL_N_TYPE) == *FIGHTER_SHULK_MONAD_TYPE_SPEED as u64 {
+            KineticModule::add_speed(fighter.module_accessor, &smash::phx::Vector3f{x: 1.5, y: 0.0, z: 0.0});
         }
     }
     sv_animcmd::frame(fighter.lua_state_agent, 31.0);
@@ -1055,13 +1069,13 @@ unsafe extern "C" fn shulk_sideb_falling_smash_script(fighter: &mut L2CAgentBase
         AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_HIGH), false);
         AttackModule::set_lr_check_front(fighter.module_accessor, 0);
         AttackModule::set_lr_check_back(fighter.module_accessor, 1);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 2.0);
-    if macros::is_excute(fighter) {
-        notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS_BOTH_SIDES);
         if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_SHULK_INSTANCE_WORK_ID_FLAG_SPECIAL_N_ACTIVE) && WorkModule::get_int64(fighter.module_accessor, *FIGHTER_SHULK_INSTANCE_WORK_ID_INT_SPECIAL_N_TYPE) == *FIGHTER_SHULK_MONAD_TYPE_JUMP as u64 {
             damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_ALWAYS, 0.0);
         }
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 2.0);
+    if macros::is_excute(fighter) {
+        notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS_BOTH_SIDES);   
     }
 }
 
@@ -1866,100 +1880,100 @@ unsafe extern "C" fn shulk_sidebstart_sound(fighter: &mut L2CAgentBase) {
 pub fn install() {
     Agent::new("shulk")
     .on_line(Main, shulk_frame) //opff
-    .game_acmd("game_escapen", shulk_spotdodge_script)
-    .expression_acmd("expression_escapen", shulk_spotdodge_expression_script)
-    .game_acmd("game_justshieldoff", shulk_parry_script)
-    .game_acmd("game_shieldbreakfly", shulk_shieldbreak_script)
-    .game_acmd("game_attack11", shulk_jab_smash_script)
-    .game_acmd("game_attack12", shulk_jab2_smash_script)
-    .game_acmd("game_attack13", shulk_jab3_smash_script)
-    .game_acmd("game_attackdash", shulk_dashattack_smash_script)
-    .game_acmd("game_attacks3", shulk_ftilt_smash_script)
-    .game_acmd("game_attacks3hi", shulk_ftilt_smash_script)
-    .game_acmd("game_attacks3lw", shulk_ftilt_smash_script)
-    .effect_acmd("effect_attacks3", shulk_ftilt_effect_script)
-    .effect_acmd("effect_attacks3hi", shulk_ftilt_effect_script)
-    .effect_acmd("effect_attacks3lw", shulk_ftilt_effect_script)
-    .sound_acmd("sound_attacks3", shulk_ftilt_sound_script)
-    .sound_acmd("sound_attacks3hi", shulk_ftilt_sound_script)
-    .sound_acmd("sound_attacks3lw", shulk_ftilt_sound_script)
-    .expression_acmd("expression_attacks3", shulk_ftilt_expression_script)
-    .expression_acmd("expression_attacks3hi", shulk_ftilt_expression_script)
-    .expression_acmd("expression_attacks3lw", shulk_ftilt_expression_script)
-    .game_acmd("game_attackhi3", shulk_utilt_smash_script)
-    .game_acmd("game_attacklw3", shulk_dtilt_smash_script)
-    .game_acmd("game_attacks4", shulk_fsmash_smash_script)
-    .game_acmd("game_attacks4hi", shulk_fsmash_smash_script)
-    .game_acmd("game_attacks4lw", shulk_fsmash_smash_script)
-    .game_acmd("game_attackhi4", shulk_usmash_smash_script)
-    .game_acmd("game_attacklw4", shulk_dsmash_smash_script)
-    .game_acmd("game_attackairn", shulk_nair_smash_script)
-    .game_acmd("game_attackairf", shulk_fair_smash_script)
-    .game_acmd("game_attackairb", shulk_bair_smash_script)
-    .game_acmd("game_attackairhi", shulk_uair_smash_script)
-    .game_acmd("game_attackairlw", shulk_dair_smash_script)
-    .game_acmd("game_catch", shulk_grab_smash_script)
-    .game_acmd("game_catchdash", shulk_grabd_smash_script)
-    .game_acmd("game_catchturn", shulk_grabp_smash_script)
-    .game_acmd("game_catchattack", shulk_pummel_smash_script)
-    .game_acmd("game_throwf", shulk_fthrow_smash_script)
-    .game_acmd("game_throwb", shulk_bthrow_smash_script)
-    .game_acmd("game_throwhi", shulk_uthrow_smash_script)
-    .game_acmd("game_throwlw", shulk_dthrow_smash_script)
-    .game_acmd("game_specialnspeed", shulk_neutralb_speed_smash_script)
-    .game_acmd("game_specialairnspeed", shulk_neutralb_speed_smash_script)
-    .game_acmd("game_specials", shulk_sideb_start_smash_script)
-    .game_acmd("game_specialairs", shulk_sideb_start_air_smash_script)
-    .game_acmd("game_specialairsfall", shulk_sideb_falling_smash_script)
-    .game_acmd("game_specialairslanding", shulk_sideb_landing_smash_script)
-    .game_acmd("game_specialhi", shulk_upb_smash_script)
-    .game_acmd("game_specialairhi", shulk_upb_smash_script)
-    .game_acmd("game_specialhiadd", shulk_upb2_smash_script)
-    .game_acmd("game_speciallw", shulk_downb_start_smash_script)
-    .game_acmd("game_specialairlw", shulk_downb_start_smash_script)
-    .game_acmd("game_speciallwattack", shulk_downb_attack_smash_script)
-    .game_acmd("game_specialairlwattack", shulk_downb_attack_air_smash_script)
-    .game_acmd("game_speciallwf", shulk_downb_attack_f_smash_script)
-    .game_acmd("game_appealhil", shulk_uptaunt)
-    .game_acmd("game_appealhir", shulk_uptaunt)
-    .sound_acmd("sound_appealhil", shulk_uptaunt_sound)
-    .sound_acmd("sound_appealhir", shulk_uptaunt_sound)
-    .game_acmd("game_appealsl", shulk_sidetaunt)
-    .game_acmd("game_appealsr", shulk_sidetaunt)
-    .sound_acmd("sound_appealsl", shulk_sidetaunt_sound)
-    .sound_acmd("sound_appealsr", shulk_sidetaunt_sound)
-    .game_acmd("game_appeallwl", shulk_downtaunt)
-    .game_acmd("game_appeallwr", shulk_downtaunt)
+    .game_acmd("game_escapen", shulk_spotdodge_script, Low)
+    .expression_acmd("expression_escapen", shulk_spotdodge_expression_script, Low)
+    .game_acmd("game_justshieldoff", shulk_parry_script, Low)
+    .game_acmd("game_shieldbreakfly", shulk_shieldbreak_script, Low)
+    .game_acmd("game_attack11", shulk_jab_smash_script, Low)
+    .game_acmd("game_attack12", shulk_jab2_smash_script, Low)
+    .game_acmd("game_attack13", shulk_jab3_smash_script, Low)
+    .game_acmd("game_attackdash", shulk_dashattack_smash_script, Low)
+    .game_acmd("game_attacks3", shulk_ftilt_smash_script, Low)
+    .game_acmd("game_attacks3hi", shulk_ftilt_smash_script, Low)
+    .game_acmd("game_attacks3lw", shulk_ftilt_smash_script, Low)
+    .effect_acmd("effect_attacks3", shulk_ftilt_effect_script, Low)
+    .effect_acmd("effect_attacks3hi", shulk_ftilt_effect_script, Low)
+    .effect_acmd("effect_attacks3lw", shulk_ftilt_effect_script, Low)
+    .sound_acmd("sound_attacks3", shulk_ftilt_sound_script, Low)
+    .sound_acmd("sound_attacks3hi", shulk_ftilt_sound_script, Low)
+    .sound_acmd("sound_attacks3lw", shulk_ftilt_sound_script, Low)
+    .expression_acmd("expression_attacks3", shulk_ftilt_expression_script, Low)
+    .expression_acmd("expression_attacks3hi", shulk_ftilt_expression_script, Low)
+    .expression_acmd("expression_attacks3lw", shulk_ftilt_expression_script, Low)
+    .game_acmd("game_attackhi3", shulk_utilt_smash_script, Low)
+    .game_acmd("game_attacklw3", shulk_dtilt_smash_script, Low)
+    .game_acmd("game_attacks4", shulk_fsmash_smash_script, Low)
+    .game_acmd("game_attacks4hi", shulk_fsmash_smash_script, Low)
+    .game_acmd("game_attacks4lw", shulk_fsmash_smash_script, Low)
+    .game_acmd("game_attackhi4", shulk_usmash_smash_script, Low)
+    .game_acmd("game_attacklw4", shulk_dsmash_smash_script, Low)
+    .game_acmd("game_attackairn", shulk_nair_smash_script, Low)
+    .game_acmd("game_attackairf", shulk_fair_smash_script, Low)
+    .game_acmd("game_attackairb", shulk_bair_smash_script, Low)
+    .game_acmd("game_attackairhi", shulk_uair_smash_script, Low)
+    .game_acmd("game_attackairlw", shulk_dair_smash_script, Low)
+    .game_acmd("game_catch", shulk_grab_smash_script, Low)
+    .game_acmd("game_catchdash", shulk_grabd_smash_script, Low)
+    .game_acmd("game_catchturn", shulk_grabp_smash_script, Low)
+    .game_acmd("game_catchattack", shulk_pummel_smash_script, Low)
+    .game_acmd("game_throwf", shulk_fthrow_smash_script, Low)
+    .game_acmd("game_throwb", shulk_bthrow_smash_script, Low)
+    .game_acmd("game_throwhi", shulk_uthrow_smash_script, Low)
+    .game_acmd("game_throwlw", shulk_dthrow_smash_script, Low)
+    .game_acmd("game_specialnspeed", shulk_neutralb_speed_smash_script, Low)
+    .game_acmd("game_specialairnspeed", shulk_neutralb_speed_smash_script, Low)
+    .game_acmd("game_specials", shulk_sideb_start_smash_script, Low)
+    .game_acmd("game_specialairs", shulk_sideb_start_air_smash_script, Low)
+    .game_acmd("game_specialairsfall", shulk_sideb_falling_smash_script, Low)
+    .game_acmd("game_specialairslanding", shulk_sideb_landing_smash_script, Low)
+    .game_acmd("game_specialhi", shulk_upb_smash_script, Low)
+    .game_acmd("game_specialairhi", shulk_upb_smash_script, Low)
+    .game_acmd("game_specialhiadd", shulk_upb2_smash_script, Low)
+    .game_acmd("game_speciallw", shulk_downb_start_smash_script, Low)
+    .game_acmd("game_specialairlw", shulk_downb_start_smash_script, Low)
+    .game_acmd("game_speciallwattack", shulk_downb_attack_smash_script, Low)
+    .game_acmd("game_specialairlwattack", shulk_downb_attack_air_smash_script, Low)
+    .game_acmd("game_speciallwf", shulk_downb_attack_f_smash_script, Low)
+    .game_acmd("game_appealhil", shulk_uptaunt, Low)
+    .game_acmd("game_appealhir", shulk_uptaunt, Low)
+    .sound_acmd("sound_appealhil", shulk_uptaunt_sound, Low)
+    .sound_acmd("sound_appealhir", shulk_uptaunt_sound, Low)
+    .game_acmd("game_appealsl", shulk_sidetaunt, Low)
+    .game_acmd("game_appealsr", shulk_sidetaunt, Low)
+    .sound_acmd("sound_appealsl", shulk_sidetaunt_sound, Low)
+    .sound_acmd("sound_appealsr", shulk_sidetaunt_sound, Low)
+    .game_acmd("game_appeallwl", shulk_downtaunt, Low)
+    .game_acmd("game_appeallwr", shulk_downtaunt, Low)
 
-    .sound_acmd("sound_dash", shulk_dash_sound)
-    .sound_acmd("sound_turndash", shulk_turndash_sound)
-    .sound_acmd("sound_jumpfront", shulk_jumpfront_sound)
-    .sound_acmd("sound_jumpfrontmini", shulk_jumpfrontmini_sound)
-    .sound_acmd("sound_jumpback", shulk_jumpback_sound)
-    .sound_acmd("sound_jumpbackmini", shulk_jumpbackmini_sound)
-    .sound_acmd("sound_jumpaerialfront", shulk_jumpaerialfront_sound)
-    .sound_acmd("sound_jumpaerialback", shulk_jumpaerialback_sound)
-    .sound_acmd("sound_guardon", shulk_shield_sound)
-    .sound_acmd("sound_justshieldoff", shulk_parry_sound)
-    .sound_acmd("sound_attackdash", shulk_dashattack_sound)
-    .sound_acmd("sound_attack11", shulk_jab1_sound)
-    .sound_acmd("sound_attack12", shulk_jab2_sound)
-    .sound_acmd("sound_attack13", shulk_jab3_sound)
-    .sound_acmd("sound_attackhi3", shulk_utilt_sound)
-    .sound_acmd("sound_attacklw3", shulk_dtilt_sound)
-    .sound_acmd("sound_attacks4", shulk_fsmash_sound)
-    .sound_acmd("sound_attacks4hi", shulk_fsmash_sound)
-    .sound_acmd("sound_attacks4lw", shulk_fsmash_sound)
-    .sound_acmd("sound_attackhi4", shulk_usmash_sound)
-    .sound_acmd("sound_attacklw4", shulk_dsmash_sound)
-    .sound_acmd("sound_attackairn", shulk_nair_sound)
-    .sound_acmd("sound_attackairf", shulk_fair_sound)
-    .sound_acmd("sound_attackairb", shulk_bair_sound)
-    .sound_acmd("sound_attackairhi", shulk_uair_sound)
-    .sound_acmd("sound_attackairlw", shulk_dair_sound)
-    .sound_acmd("sound_catchattack", shulk_pummel_sound)
-    .sound_acmd("sound_specials", shulk_sidebstart_sound)
-    .sound_acmd("sound_specialairs", shulk_sidebstart_sound)
+    .sound_acmd("sound_dash", shulk_dash_sound, Low)
+    .sound_acmd("sound_turndash", shulk_turndash_sound, Low)
+    .sound_acmd("sound_jumpfront", shulk_jumpfront_sound, Low)
+    .sound_acmd("sound_jumpfrontmini", shulk_jumpfrontmini_sound, Low)
+    .sound_acmd("sound_jumpback", shulk_jumpback_sound, Low)
+    .sound_acmd("sound_jumpbackmini", shulk_jumpbackmini_sound, Low)
+    .sound_acmd("sound_jumpaerialfront", shulk_jumpaerialfront_sound, Low)
+    .sound_acmd("sound_jumpaerialback", shulk_jumpaerialback_sound, Low)
+    .sound_acmd("sound_guardon", shulk_shield_sound, Low)
+    .sound_acmd("sound_justshieldoff", shulk_parry_sound, Low)
+    .sound_acmd("sound_attackdash", shulk_dashattack_sound, Low)
+    .sound_acmd("sound_attack11", shulk_jab1_sound, Low)
+    .sound_acmd("sound_attack12", shulk_jab2_sound, Low)
+    .sound_acmd("sound_attack13", shulk_jab3_sound, Low)
+    .sound_acmd("sound_attackhi3", shulk_utilt_sound, Low)
+    .sound_acmd("sound_attacklw3", shulk_dtilt_sound, Low)
+    .sound_acmd("sound_attacks4", shulk_fsmash_sound, Low)
+    .sound_acmd("sound_attacks4hi", shulk_fsmash_sound, Low)
+    .sound_acmd("sound_attacks4lw", shulk_fsmash_sound, Low)
+    .sound_acmd("sound_attackhi4", shulk_usmash_sound, Low)
+    .sound_acmd("sound_attacklw4", shulk_dsmash_sound, Low)
+    .sound_acmd("sound_attackairn", shulk_nair_sound, Low)
+    .sound_acmd("sound_attackairf", shulk_fair_sound, Low)
+    .sound_acmd("sound_attackairb", shulk_bair_sound, Low)
+    .sound_acmd("sound_attackairhi", shulk_uair_sound, Low)
+    .sound_acmd("sound_attackairlw", shulk_dair_sound, Low)
+    .sound_acmd("sound_catchattack", shulk_pummel_sound, Low)
+    .sound_acmd("sound_specials", shulk_sidebstart_sound, Low)
+    .sound_acmd("sound_specialairs", shulk_sidebstart_sound, Low)
     .install();
 
     Agent::new("kirby")

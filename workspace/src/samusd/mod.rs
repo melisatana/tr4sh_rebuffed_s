@@ -8,6 +8,8 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smash_script::*;
 use smashline::*;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
+
 
 static mut DARKSAMUS_ELECPOINTS_ACTIVE : [[bool; 5]; 8] = [[false; 5]; 8]; //whether the point exists
 static mut DARKSAMUS_ELECPOINTS_X : [[f32; 5]; 8] = [[0.0; 5]; 8]; //the x co-ordinate of the point
@@ -267,8 +269,8 @@ unsafe fn set_downtaunt_hitboxes(fighter: &mut L2CAgentBase) {
             let point_offset_x = PostureModule::lr(fighter.module_accessor) * (DARKSAMUS_ELECPOINTS_X[entry_id][j as usize] - PostureModule::pos_x(fighter.module_accessor));
             let point_offset_y = DARKSAMUS_ELECPOINTS_Y[entry_id][j as usize] - PostureModule::pos_y(fighter.module_accessor);
             
-            macros::ATTACK(fighter, j, 0, Hash40::new("top"), 9.5, 361, 38, 0, 80, 13.0, 0.0, point_offset_y, point_offset_x, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_curse_poison"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_BOMB, *ATTACK_REGION_BOMB);
-            AttackModule::set_poison_param(fighter.module_accessor, j as i32, 600, 30, 0.6, false);
+            macros::ATTACK(fighter, j, 0, Hash40::new("top"), 9.5, 361, 38, 0, 80, 14.0, 0.0, point_offset_y, point_offset_x, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_curse_poison"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_BOMB, *ATTACK_REGION_BOMB);
+            AttackModule::set_poison_param(fighter.module_accessor, j as i32, 600, 30, 0.7, false);
         }
     }
 }
@@ -441,11 +443,11 @@ unsafe extern "C" fn dark_samus_dashattack(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.0);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.2, 64, 70, 0, 60, 6.1, 0.0, 10.0, 6.0, Some(0.0), Some(7.5), Some(3.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_BODY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.2, 67, 70, 0, 60, 6.1, 0.0, 10.0, 6.0, Some(0.0), Some(7.5), Some(3.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_BODY);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 6.3, 64, 70, 0, 60, 5.1, 0.0, 10.0, 6.0, Some(0.0), Some(7.5), Some(3.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_BODY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 6.3, 67, 70, 0, 60, 5.1, 0.0, 10.0, 6.0, Some(0.0), Some(7.5), Some(3.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_BODY);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
@@ -896,7 +898,7 @@ unsafe extern "C" fn dark_samus_zair(fighter: &mut L2CAgentBase) {
 
 unsafe extern "C" fn dark_samus_fthrow(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 13.5, 42, 30, 0, 90, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_elec_whip"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 12.5, 42, 30, 0, 90, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_elec_whip"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 15.0);
@@ -1149,7 +1151,7 @@ unsafe extern "C" fn dark_samus_upspecial(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         //WorkModule::off_flag(fighter.module_accessor, *FIGHTER_SAMUS_STATUS_SPECIAL_HI_FLAG_DISABLE_LR);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_SAMUS_STATUS_SPECIAL_HI_FLAG_ACC_X);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.7, 85, 93, 0, 56, 8.0, 0.0, 6.5, 0.0, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_BODY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.7, 85, 93, 0, 56, 8.0, 0.0, 6.5, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_BODY);
         GroundModule::set_passable_check(fighter.module_accessor, true);
         /* 
         if ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_SPECIAL) && DARKSAMUS_HAS_ELECPOINT[entry_id] {
@@ -1208,7 +1210,7 @@ unsafe extern "C" fn dark_samus_upspecial_air(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.7, 85, 93, 0, 56, 8.0, 0.0, 6.5, 0.0, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_BODY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.7, 85, 93, 0, 56, 8.0, 0.0, 6.5, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_BODY);
         GroundModule::set_passable_check(fighter.module_accessor, true);
         if ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_SPECIAL) && is_any_elecpoint_active(fighter) {
             let target_id = find_closest_elecpoint(fighter);
@@ -1403,49 +1405,49 @@ unsafe extern "C" fn dark_samus_chargeshot(fighter: &mut L2CAgentBase) {
 pub fn install() {
     Agent::new("samusd")
       .on_line(Main, dark_samus_frame) //opff
-      .game_acmd("game_attack11", dark_samus_jab)
-      .game_acmd("game_attack12", dark_samus_jab2)
-      .game_acmd("game_attackdash", dark_samus_dashattack)
-      .game_acmd("game_attacks3", dark_samus_ftilt)
-      .game_acmd("game_attacks3hi", dark_samus_ftilt)
-      .game_acmd("game_attacks3lw", dark_samus_ftilt)
-      .game_acmd("game_attackhi3", dark_samus_utilt)
-      .game_acmd("game_attacklw3", dark_samus_dtilt)
-      .game_acmd("game_attacks4charge", dark_samus_fsmash_charge)
-      .game_acmd("game_attacks4", dark_samus_fsmash)
-      .game_acmd("game_attacks4hi", dark_samus_fsmash)
-      .game_acmd("game_attacks4lw", dark_samus_fsmash)
-      .game_acmd("game_attackhi4", dark_samus_usmash)
-      .game_acmd("game_attacklw4", dark_samus_dsmash)
-      .game_acmd("game_attackairn", dark_samus_nair)
-      .game_acmd("game_attackairf", dark_samus_fair)
-      .game_acmd("game_attackairb", dark_samus_bair)
-      .game_acmd("game_attackairhi", dark_samus_uair)
-      .game_acmd("game_attackairlw", dark_samus_dair)
-      .effect_acmd("effect_attackairlw", dark_samus_dair_effect)
-      .sound_acmd("sound_attackairlw", dark_samus_dair_sound)
-      .game_acmd("game_catch", dark_samus_grab)
-      .game_acmd("game_catchdash", dark_samus_grabd)
-      .game_acmd("game_catchturn", dark_samus_grabp)
-      .game_acmd("game_aircatch", dark_samus_zair)
-      .game_acmd("game_throwf", dark_samus_fthrow)
-      .game_acmd("game_throwb", dark_samus_bthrow)
-      .game_acmd("game_throwhi", dark_samus_uthrow)
-      .game_acmd("game_throwlw", dark_samus_dthrow)
-      .game_acmd("game_special", dark_samus_sidespecial)
-      .game_acmd("game_specialair", dark_samus_sidespecial_air)
-      .game_acmd("game_specials", dark_samus_sidespecial_super)
-      .game_acmd("game_specialairs", dark_samus_sidespecial_air_super)
-      .game_acmd("game_specialhi", dark_samus_upspecial)
-      .game_acmd("game_specialairhi", dark_samus_upspecial_air)
-      .game_acmd("game_speciallw", dark_samus_downspecial)
-      .game_acmd("game_specialairlw", dark_samus_downspecial_air)
-      .game_acmd("game_appeallwl", dark_samus_downtaunt)
-      .game_acmd("game_appeallwr", dark_samus_downtaunt)
+      .game_acmd("game_attack11", dark_samus_jab, Low)
+      .game_acmd("game_attack12", dark_samus_jab2, Low)
+      .game_acmd("game_attackdash", dark_samus_dashattack, Low)
+      .game_acmd("game_attacks3", dark_samus_ftilt, Low)
+      .game_acmd("game_attacks3hi", dark_samus_ftilt, Low)
+      .game_acmd("game_attacks3lw", dark_samus_ftilt, Low)
+      .game_acmd("game_attackhi3", dark_samus_utilt, Low)
+      .game_acmd("game_attacklw3", dark_samus_dtilt, Low)
+      .game_acmd("game_attacks4charge", dark_samus_fsmash_charge, Low)
+      .game_acmd("game_attacks4", dark_samus_fsmash, Low)
+      .game_acmd("game_attacks4hi", dark_samus_fsmash, Low)
+      .game_acmd("game_attacks4lw", dark_samus_fsmash, Low)
+      .game_acmd("game_attackhi4", dark_samus_usmash, Low)
+      .game_acmd("game_attacklw4", dark_samus_dsmash, Low)
+      .game_acmd("game_attackairn", dark_samus_nair, Low)
+      .game_acmd("game_attackairf", dark_samus_fair, Low)
+      .game_acmd("game_attackairb", dark_samus_bair, Low)
+      .game_acmd("game_attackairhi", dark_samus_uair, Low)
+      .game_acmd("game_attackairlw", dark_samus_dair, Low)
+      .effect_acmd("effect_attackairlw", dark_samus_dair_effect, Low)
+      .sound_acmd("sound_attackairlw", dark_samus_dair_sound, Low)
+      .game_acmd("game_catch", dark_samus_grab, Low)
+      .game_acmd("game_catchdash", dark_samus_grabd, Low)
+      .game_acmd("game_catchturn", dark_samus_grabp, Low)
+      .game_acmd("game_aircatch", dark_samus_zair, Low)
+      .game_acmd("game_throwf", dark_samus_fthrow, Low)
+      .game_acmd("game_throwb", dark_samus_bthrow, Low)
+      .game_acmd("game_throwhi", dark_samus_uthrow, Low)
+      .game_acmd("game_throwlw", dark_samus_dthrow, Low)
+      .game_acmd("game_special", dark_samus_sidespecial, Low)
+      .game_acmd("game_specialair", dark_samus_sidespecial_air, Low)
+      .game_acmd("game_specials", dark_samus_sidespecial_super, Low)
+      .game_acmd("game_specialairs", dark_samus_sidespecial_air_super, Low)
+      .game_acmd("game_specialhi", dark_samus_upspecial, Low)
+      .game_acmd("game_specialairhi", dark_samus_upspecial_air, Low)
+      .game_acmd("game_speciallw", dark_samus_downspecial, Low)
+      .game_acmd("game_specialairlw", dark_samus_downspecial_air, Low)
+      .game_acmd("game_appeallwl", dark_samus_downtaunt, Low)
+      .game_acmd("game_appeallwr", dark_samus_downtaunt, Low)
       .install();
   
       Agent::new("samusd_cshot")
-      .game_acmd("game_shoot", dark_samus_chargeshot)
+      .game_acmd("game_shoot", dark_samus_chargeshot, Low)
       .install();
       
       

@@ -8,6 +8,8 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
+
 
 static mut PACMAN_CURRENT_HYDRANT_TYPE : [i32; 8] = [0; 8]; //0 = Water, 1 = Fire, 2 = Ice
 static mut PACMAN_NEXT_HYDRANT_TYPE : [i32; 8] = [0; 8];
@@ -30,7 +32,7 @@ unsafe extern "C" fn pacman_frame(fighter: &mut L2CFighterCommon) {
         if MotionModule::frame(fighter.module_accessor) >= (8.0) && [*FIGHTER_STATUS_KIND_SPECIAL_HI, *FIGHTER_PACMAN_STATUS_KIND_SPECIAL_HI_LOOP, *FIGHTER_PACMAN_STATUS_KIND_SPECIAL_HI_END].contains(&status) {
           crate::custom::fastfall_whenever_helper(fighter);
         }
-
+            
         
     }
 }
@@ -849,56 +851,56 @@ unsafe extern "C" fn pacman_uptaunt_script(fighter: &mut L2CAgentBase) {
 pub fn install() {
     Agent::new("pacman")
     .on_line(Main, pacman_frame) //opff
-    .game_acmd("game_attack11", pacman_jab_smash_script)
-    .game_acmd("game_attack12", pacman_jab2_smash_script)
-    .game_acmd("game_attack13", pacman_jab3_smash_script)
-    .game_acmd("game_attackdash", pacman_dashattack_smash_script)
-    .game_acmd("game_attacks3", pacman_ftilt_smash_script)
-    .game_acmd("game_attacks3hi", pacman_ftilt_smash_script)
-    .game_acmd("game_attacks3lw", pacman_ftilt_smash_script)
-    .game_acmd("game_attackhi3", pacman_utilt_smash_script)
-    .effect_acmd("effect_attackhi3", pacman_utilt_effect_script)
-    .game_acmd("game_attacklw3", pacman_dtilt_smash_script)
-    .game_acmd("game_attacks4", pacman_fsmash_smash_script)
-    .game_acmd("game_attackhi4", pacman_usmash_smash_script)
-    .game_acmd("game_attacklw4", pacman_dsmash_smash_script)
-    .game_acmd("game_attackairn", pacman_nair_smash_script)
-    .game_acmd("game_attackairf", pacman_fair_smash_script)
-    .game_acmd("game_attackairb", pacman_bair_smash_script)
-    .game_acmd("game_attackairhi", pacman_uair_smash_script)
-    .game_acmd("game_attackairlw", pacman_dair_smash_script)
-    .game_acmd("game_catch", pacman_grab_smash_script)
-    .effect_acmd("effect_catch", pacman_grab_effect_script)
-    .sound_acmd("sound_catch", pacman_grab_sound_script)
-    .expression_acmd("expression_catch", pacman_grab_expression_script)
-    .game_acmd("game_catchdash", pacman_grabd_smash_script)
-    .game_acmd("game_catchturn", pacman_grabp_smash_script)
-    .game_acmd("game_throwf", pacman_fthrow_smash_script)
-    .game_acmd("game_throwb", pacman_bthrow_smash_script)
-    .game_acmd("game_throwhi", pacman_uthrow_smash_script)
-    .game_acmd("game_throwlw", pacman_dthrow_smash_script)
-    .game_acmd("game_specialsdash", pacman_sideb_dash_smash_script)
-    .game_acmd("game_specialairhiloop", pacman_upb_jump_smash_script)
-    .game_acmd("game_speciallw", pacman_downspecial)
-    .game_acmd("game_specialairlw", pacman_downspecial_air)
-    .game_acmd("game_appealhil", pacman_uptaunt_script)
-    .game_acmd("game_appealhir", pacman_uptaunt_script)
+    .game_acmd("game_attack11", pacman_jab_smash_script, Low)
+    .game_acmd("game_attack12", pacman_jab2_smash_script, Low)
+    .game_acmd("game_attack13", pacman_jab3_smash_script, Low)
+    .game_acmd("game_attackdash", pacman_dashattack_smash_script, Low)
+    .game_acmd("game_attacks3", pacman_ftilt_smash_script, Low)
+    .game_acmd("game_attacks3hi", pacman_ftilt_smash_script, Low)
+    .game_acmd("game_attacks3lw", pacman_ftilt_smash_script, Low)
+    .game_acmd("game_attackhi3", pacman_utilt_smash_script, Low)
+    .effect_acmd("effect_attackhi3", pacman_utilt_effect_script, Low)
+    .game_acmd("game_attacklw3", pacman_dtilt_smash_script, Low)
+    .game_acmd("game_attacks4", pacman_fsmash_smash_script, Low)
+    .game_acmd("game_attackhi4", pacman_usmash_smash_script, Low)
+    .game_acmd("game_attacklw4", pacman_dsmash_smash_script, Low)
+    .game_acmd("game_attackairn", pacman_nair_smash_script, Low)
+    .game_acmd("game_attackairf", pacman_fair_smash_script, Low)
+    .game_acmd("game_attackairb", pacman_bair_smash_script, Low)
+    .game_acmd("game_attackairhi", pacman_uair_smash_script, Low)
+    .game_acmd("game_attackairlw", pacman_dair_smash_script, Low)
+    .game_acmd("game_catch", pacman_grab_smash_script, Low)
+    .effect_acmd("effect_catch", pacman_grab_effect_script, Low)
+    .sound_acmd("sound_catch", pacman_grab_sound_script, Low)
+    .expression_acmd("expression_catch", pacman_grab_expression_script, Low)
+    .game_acmd("game_catchdash", pacman_grabd_smash_script, Low)
+    .game_acmd("game_catchturn", pacman_grabp_smash_script, Low)
+    .game_acmd("game_throwf", pacman_fthrow_smash_script, Low)
+    .game_acmd("game_throwb", pacman_bthrow_smash_script, Low)
+    .game_acmd("game_throwhi", pacman_uthrow_smash_script, Low)
+    .game_acmd("game_throwlw", pacman_dthrow_smash_script, Low)
+    .game_acmd("game_specialsdash", pacman_sideb_dash_smash_script, Low)
+    .game_acmd("game_specialairhiloop", pacman_upb_jump_smash_script, Low)
+    .game_acmd("game_speciallw", pacman_downspecial, Low)
+    .game_acmd("game_specialairlw", pacman_downspecial_air, Low)
+    .game_acmd("game_appealhil", pacman_uptaunt_script, Low)
+    .game_acmd("game_appealhir", pacman_uptaunt_script, Low)
     .install();
 
     Agent::new("pacman_trampoline")
-    .game_acmd("game_break", trampoline_break)
+    .game_acmd("game_break", trampoline_break, Low)
     .install();
 
     Agent::new("pacman_firehydrant")
-    .game_acmd("game_fall", hydrant_falling)
-    .game_acmd("game_fly", hydrant_hit)
+    .game_acmd("game_fall", hydrant_falling, Low)
+    .game_acmd("game_fly", hydrant_hit, Low)
     .install();
 
     Agent::new("pacman_firehydrantwater")
-    .game_acmd("game_shoot", hydrantwater_shoot)
-    .effect_acmd("effect_shoot", hydrantwater_shoot_effect)
-    .game_acmd("game_shootup", hydrantwater_shoot_up)
-    .effect_acmd("effect_shootup", hydrantwater_shoot_up_effect)
+    .game_acmd("game_shoot", hydrantwater_shoot, Low)
+    .effect_acmd("effect_shoot", hydrantwater_shoot_effect, Low)
+    .game_acmd("game_shootup", hydrantwater_shoot_up, Low)
+    .effect_acmd("effect_shootup", hydrantwater_shoot_up_effect, Low)
     .install();
 
 }

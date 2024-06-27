@@ -1,5 +1,6 @@
 #![allow(unused_macros)]
 
+use smash::hash40;
 use smash::phx::Hash40;
 use smash::lib::lua_const::*;
 use smash::app::*;
@@ -8,6 +9,7 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
 
 
 static mut LITTLEMAC_DOWNB_PRESSED : [bool; 8] = [false; 8];
@@ -24,6 +26,25 @@ unsafe extern "C" fn littlemac_frame(fighter: &mut L2CFighterCommon) {
         let status = StatusModule::status_kind(fighter.module_accessor);
         
         //println!("It'sa me, Little Mac, it's time to Punch-Out!!");
+
+
+        if MotionModule::motion_kind(fighter.module_accessor) == hash40("attack_11") 
+        || MotionModule::motion_kind(fighter.module_accessor) == hash40("attack_12") 
+        || MotionModule::motion_kind(fighter.module_accessor) == hash40("attack_13") 
+        || MotionModule::motion_kind(fighter.module_accessor) == hash40("attack_s3_s") 
+        || MotionModule::motion_kind(fighter.module_accessor) == hash40("attack_hi3") 
+        || MotionModule::motion_kind(fighter.module_accessor) == hash40("attack_lw3") {
+            let hitlag_frame = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_HIT_STOP_ATTACK_SUSPEND_FRAME);
+            if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) 
+            && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false 
+            && hitlag_frame <= 0 {
+                WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ESCAPE);
+                WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ESCAPE_F);
+                WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_ESCAPE_B);
+                
+                fighter.sub_transition_group_check_ground_escape();
+            }
+        }
 
         if WorkModule::get_float(fighter.module_accessor, *FIGHTER_LITTLEMAC_INSTANCE_WORK_ID_FLOAT_KO_GAGE) < 0.0 {
             WorkModule::set_float(fighter.module_accessor, 0.0, *FIGHTER_LITTLEMAC_INSTANCE_WORK_ID_FLOAT_KO_GAGE);
@@ -54,6 +75,9 @@ unsafe extern "C" fn littlemac_frame(fighter: &mut L2CFighterCommon) {
             LITTLEMAC_NEUTRALB_CHARGEUP[entry_id] = 0.0;
 
 		}
+
+
+        
         
 
     }
@@ -348,7 +372,7 @@ unsafe extern "C" fn littlemac_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 15.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("armr"), 12.1, 96, 80, 0, 36, 5.1, 3.0, 0.0, 0.0, None, None, None, 2.5, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_BAT, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("armr"), 13.1, 96, 70, 0, 36, 5.1, 3.0, 0.0, 0.0, None, None, None, 2.5, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_BAT, *ATTACK_REGION_PUNCH);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
@@ -438,8 +462,8 @@ unsafe extern "C" fn littlemac_fsmash2_smash_script(fighter: &mut L2CAgentBase) 
     if macros::is_excute(fighter) {
         damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_NORMAL, 0.0);
         MotionModule::set_rate(fighter.module_accessor, 1.0);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("armr"), 10.1, 76, 75, 0, 45, 4.0, 3.0, 0.0, 0.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("armr"), 10.1, 76, 75, 0, 45, 3.0, -1.5, 0.0, 0.0, Some(-2.0), Some(0.0), Some(0.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("armr"), 10.4, 76, 70, 0, 55, 4.0, 3.0, 0.0, 0.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("armr"), 10.4, 76, 70, 0, 55, 3.0, -1.5, 0.0, 0.0, Some(-2.0), Some(0.0), Some(0.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
@@ -498,7 +522,7 @@ unsafe extern "C" fn littlemac_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("armr"), 21.0, 86, 86, 0, 40, 3.5, 3.0, 0.0, 0.0, None, None, None, 1.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("armr"), 21.5, 86, 81, 0, 40, 3.5, 3.0, 0.0, 0.0, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_PUNCH);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
@@ -535,9 +559,9 @@ unsafe extern "C" fn littlemac_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("armr"), 14.6, 30, 93, 0, 25, 4.5, 3.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("armr"), 14.6, 30, 93, 0, 25, 3.0, -1.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("hip"), 14.6, 30, 93, 0, 25, 2.5, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("armr"), 14.3, 30, 93, 0, 25, 4.5, 3.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("armr"), 14.3, 30, 93, 0, 25, 3.0, -1.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("hip"), 14.3, 30, 93, 0, 25, 2.5, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
         AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
@@ -554,9 +578,9 @@ unsafe extern "C" fn littlemac_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 17.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("armr"), 14.6, 30, 93, 0, 25, 4.5, 3.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("armr"), 14.6, 30, 93, 0, 25, 3.0, -1.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("hip"), 14.6, 30, 93, 0, 25, 2.5, 1.0, 0.0, -1.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("armr"), 14.3, 30, 93, 0, 25, 4.5, 3.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("armr"), 14.3, 30, 93, 0, 25, 3.0, -1.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("hip"), 14.3, 30, 93, 0, 25, 2.5, 1.0, 0.0, -1.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
         AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
@@ -600,14 +624,14 @@ unsafe extern "C" fn littlemac_fair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 9.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("armr"), 5.5, 32, 80, 0, 25, 4.4, 3.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("armr"), 5.5, 32, 80, 0, 25, 2.9, -1.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("shoulderr"), 5.5, 32, 80, 0, 25, 2.9, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("armr"), 5.8, 34, 80, 0, 25, 4.4, 3.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("armr"), 5.8, 34, 80, 0, 25, 3.3, -1.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("shoulderr"), 5.8, 34, 80, 0, 25, 3.3, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
-        MotionModule::set_rate(fighter.module_accessor, 1.2);
+        MotionModule::set_rate(fighter.module_accessor, 1.35);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 30.0);
     if macros::is_excute(fighter) {
@@ -628,8 +652,8 @@ unsafe extern "C" fn littlemac_bair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
         macros::ATTACK(fighter, 0, 0, Hash40::new("armr"), 8.6, 20, 84, 0, 55, 4.3, 3.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("armr"), 8.6, 20, 84, 0, 55, 2.3, -1.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("shoulderr"), 8.6, 20, 84, 0, 55, 2.3, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("armr"), 8.6, 20, 84, 0, 55, 2.8, -1.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("shoulderr"), 8.6, 20, 84, 0, 55, 2.8, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
@@ -668,9 +692,9 @@ unsafe extern "C" fn littlemac_dair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("armr"), 6.9, 270, 106, 0, 10, 3.4, -1.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("armr"), 6.9, 270, 106, 0, 10, 3.9, 3.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("shoulderr"), 6.9, 270, 106, 10, 0, 2.5, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("armr"), 7.9, 270, 106, 0, 10, 3.4, -1.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("armr"), 7.9, 270, 106, 0, 10, 3.9, 3.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("shoulderr"), 7.9, 270, 106, 10, 0, 2.5, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
@@ -1220,6 +1244,8 @@ unsafe extern "C" fn littlemac_downb_attack_air_smash_script(fighter: &mut L2CAg
 }
 
 unsafe extern "C" fn littlemac_downtaunt_smash_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
     sv_animcmd::frame(fighter.lua_state_agent, 20.0);
     if macros::is_excute(fighter) {
         if ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_LW) {
@@ -1229,58 +1255,71 @@ unsafe extern "C" fn littlemac_downtaunt_smash_script(fighter: &mut L2CAgentBase
 }
 
 
+//update Mac's UI?
+/*pub unsafe extern "C" fn update_littlemac_ui(entry_id: i32, total_gauge: f32) {
+    let manager = singletons::FighterManager() as *mut u64;
+    let offset = (*manager + (entry_id as u64 * 8) + 0x20) as *mut u64;
+    update_littlemac_ui_internal((*offset + 0x41e4) as *mut u32, total_gauge as i32);
+}
+
+#[skyline::from_offset(0x68cda0)]
+fn update_littlemac_ui_internal(manager_offset: *mut u32, total_gauge: i32);
+*/
+
+
+
 pub fn install() {
     Agent::new("littlemac")
     .on_line(Main, littlemac_frame) //opff
-    .game_acmd("game_attack11", littlemac_jab_smash_script)
-    .game_acmd("game_attack12", littlemac_jab2_smash_script)
-    .game_acmd("game_attack13", littlemac_jab3_smash_script)
-    .game_acmd("game_attack100", littlemac_jab100_smash_script)
-    .game_acmd("game_attack100end", littlemac_jab100end_smash_script)
-    .game_acmd("game_attackdash", littlemac_dashattack_smash_script)
-    .game_acmd("game_attacks3", littlemac_ftilt_smash_script)
-    .game_acmd("game_attackhi3", littlemac_utilt_smash_script)
-    .game_acmd("game_attacklw3", littlemac_dtilt_smash_script)
-    .game_acmd("game_attacks4charge", littlemac_fsmash_charge_smash_script)
-    .game_acmd("game_attacks4", littlemac_fsmash_smash_script)
-    .game_acmd("game_attacks4hi", littlemac_fsmash2_smash_script)
-    .game_acmd("game_attacks4lw", littlemac_fsmash3_smash_script)
-    .game_acmd("game_attackhi4charge", littlemac_usmash_charge_smash_script)
-    .game_acmd("game_attackhi4", littlemac_usmash_smash_script)
-    .game_acmd("game_attacklw4charge", littlemac_dsmash_charge_smash_script)
-    .game_acmd("game_attacklw4", littlemac_dsmash_smash_script)
-    .game_acmd("game_attackairn", littlemac_nair_smash_script)
-    .game_acmd("game_attackairf", littlemac_fair_smash_script)
-    .game_acmd("game_attackairb", littlemac_bair_smash_script)
-    .game_acmd("game_attackairhi", littlemac_uair_smash_script)
-    .game_acmd("game_attackairlw", littlemac_dair_smash_script)
-    .game_acmd("game_catch", littlemac_grab_smash_script)
-    .game_acmd("game_catchdash", littlemac_grabd_smash_script)
-    .game_acmd("game_catchturn", littlemac_grabp_smash_script)
-    .game_acmd("game_throwf", littlemac_fthrow_smash_script)
-    .game_acmd("game_throwb", littlemac_bthrow_smash_script)
-    .game_acmd("game_throwhi", littlemac_uthrow_smash_script)
-    .game_acmd("game_throwlw", littlemac_dthrow_smash_script)
-    .game_acmd("game_specialnstart", littlemac_neutralb_start_smash_script)
-    .game_acmd("game_specialairnstart", littlemac_neutralb_start_smash_script)
-    .game_acmd("game_specialndash", littlemac_neutralb_dash_smash_script)
-    .game_acmd("game_specialairndash", littlemac_neutralb_dash_max_turn_smash_script)
-    .game_acmd("game_specialndashturn", littlemac_neutralb_dash_turn_smash_script)
-    .game_acmd("game_specialairndashturn", littlemac_neutralb_dash_turn_smash_script)
-    .game_acmd("game_specialnmaxdash", littlemac_neutralb_dash_max_smash_script)
-    .game_acmd("game_specialairnmaxdash", littlemac_neutralb_dash_max_smash_script)
-    .game_acmd("game_specialnmaxdashturn", littlemac_neutralb_dash_max_turn_smash_script)
-    .game_acmd("game_specialairnmaxdashturn", littlemac_neutralb_dash_max_turn_smash_script)
-    .game_acmd("game_specialnmaxdashend", littlemac_neutralb_dash_max_end_smash_script)
-    .game_acmd("game_specialairnmaxdashend", littlemac_neutralb_dash_max_end_smash_script)
-    .game_acmd("game_specialn2", littlemac_neutralb_ko_smash_script)
-    .game_acmd("game_specialairn2", littlemac_neutralb_ko_air_smash_script)
-    .game_acmd("game_specialairsblow", littlemac_sideb_attack_smash_script)
-    .game_acmd("game_specialhi", littlemac_upb_smash_script)
-    .game_acmd("game_speciallwhit", littlemac_downb_attack_smash_script)
-    .game_acmd("game_specialairlwhit", littlemac_downb_attack_air_smash_script)
-    .game_acmd("game_appeallwl", littlemac_downtaunt_smash_script)
-    .game_acmd("game_appeallwr", littlemac_downtaunt_smash_script)
+    .game_acmd("game_attack11", littlemac_jab_smash_script, Low)
+    .game_acmd("game_attack12", littlemac_jab2_smash_script, Low)
+    .game_acmd("game_attack13", littlemac_jab3_smash_script, Low)
+    .game_acmd("game_attack100", littlemac_jab100_smash_script, Low)
+    .game_acmd("game_attack100end", littlemac_jab100end_smash_script, Low)
+    .game_acmd("game_attackdash", littlemac_dashattack_smash_script, Low)
+    .game_acmd("game_attacks3", littlemac_ftilt_smash_script, Low)
+    .game_acmd("game_attackhi3", littlemac_utilt_smash_script, Low)
+    .game_acmd("game_attacklw3", littlemac_dtilt_smash_script, Low)
+    .game_acmd("game_attacks4charge", littlemac_fsmash_charge_smash_script, Low)
+    .game_acmd("game_attacks4", littlemac_fsmash_smash_script, Low)
+    .game_acmd("game_attacks4hi", littlemac_fsmash2_smash_script, Low)
+    .game_acmd("game_attacks4lw", littlemac_fsmash3_smash_script, Low)
+    .game_acmd("game_attackhi4charge", littlemac_usmash_charge_smash_script, Low)
+    .game_acmd("game_attackhi4", littlemac_usmash_smash_script, Low)
+    .game_acmd("game_attacklw4charge", littlemac_dsmash_charge_smash_script, Low)
+    .game_acmd("game_attacklw4", littlemac_dsmash_smash_script, Low)
+    .game_acmd("game_attackairn", littlemac_nair_smash_script, Low)
+    .game_acmd("game_attackairf", littlemac_fair_smash_script, Low)
+    .game_acmd("game_attackairb", littlemac_bair_smash_script, Low)
+    .game_acmd("game_attackairhi", littlemac_uair_smash_script, Low)
+    .game_acmd("game_attackairlw", littlemac_dair_smash_script, Low)
+    .game_acmd("game_catch", littlemac_grab_smash_script, Low)
+    .game_acmd("game_catchdash", littlemac_grabd_smash_script, Low)
+    .game_acmd("game_catchturn", littlemac_grabp_smash_script, Low)
+    .game_acmd("game_throwf", littlemac_fthrow_smash_script, Low)
+    .game_acmd("game_throwb", littlemac_bthrow_smash_script, Low)
+    .game_acmd("game_throwhi", littlemac_uthrow_smash_script, Low)
+    .game_acmd("game_throwlw", littlemac_dthrow_smash_script, Low)
+    .game_acmd("game_specialnstart", littlemac_neutralb_start_smash_script, Low)
+    .game_acmd("game_specialairnstart", littlemac_neutralb_start_smash_script, Low)
+    .game_acmd("game_specialndash", littlemac_neutralb_dash_smash_script, Low)
+    .game_acmd("game_specialairndash", littlemac_neutralb_dash_smash_script, Low)
+    .game_acmd("game_specialndashturn", littlemac_neutralb_dash_turn_smash_script, Low)
+    .game_acmd("game_specialairndashturn", littlemac_neutralb_dash_turn_smash_script, Low)
+    .game_acmd("game_specialnmaxdash", littlemac_neutralb_dash_max_smash_script, Low)
+    .game_acmd("game_specialairnmaxdash", littlemac_neutralb_dash_max_smash_script, Low)
+    .game_acmd("game_specialnmaxdashturn", littlemac_neutralb_dash_max_turn_smash_script, Low)
+    .game_acmd("game_specialairnmaxdashturn", littlemac_neutralb_dash_max_turn_smash_script, Low)
+    .game_acmd("game_specialnmaxdashend", littlemac_neutralb_dash_max_end_smash_script, Low)
+    .game_acmd("game_specialairnmaxdashend", littlemac_neutralb_dash_max_end_smash_script, Low)
+    .game_acmd("game_specialn2", littlemac_neutralb_ko_smash_script, Low)
+    .game_acmd("game_specialairn2", littlemac_neutralb_ko_air_smash_script, Low)
+    .game_acmd("game_specialairsblow", littlemac_sideb_attack_smash_script, Low)
+    .game_acmd("game_specialhi", littlemac_upb_smash_script, Low)
+    .game_acmd("game_speciallwhit", littlemac_downb_attack_smash_script, Low)
+    .game_acmd("game_specialairlwhit", littlemac_downb_attack_air_smash_script, Low)
+    .game_acmd("game_appeallwl", littlemac_downtaunt_smash_script, Low)
+    .game_acmd("game_appeallwr", littlemac_downtaunt_smash_script, Low)
     .install();
 
     Agent::new("kirby")

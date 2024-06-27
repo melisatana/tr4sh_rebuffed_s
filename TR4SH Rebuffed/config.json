@@ -32,6 +32,38 @@
 			"fighter/link/motion/body/c07/c01attacks3hi.nuanmb",
 			"fighter/link/motion/body/c07/c01attacks3lw.nuanmb"
 		],
+		"fighter/samus/c00": [
+			"fighter/samus/motion/body/c00/a05squatf.nuanmb",
+			"fighter/samus/motion/body/c00/a05squatb.nuanmb"
+		],
+		"fighter/samus/c01": [
+			"fighter/samus/motion/body/c01/a05squatf.nuanmb",
+			"fighter/samus/motion/body/c01/a05squatb.nuanmb"
+		],
+		"fighter/samus/c02": [
+			"fighter/samus/motion/body/c02/a05squatf.nuanmb",
+			"fighter/samus/motion/body/c02/a05squatb.nuanmb"
+		],
+		"fighter/samus/c03": [
+			"fighter/samus/motion/body/c03/a05squatf.nuanmb",
+			"fighter/samus/motion/body/c03/a05squatb.nuanmb"
+		],
+		"fighter/samus/c04": [
+			"fighter/samus/motion/body/c04/a05squatf.nuanmb",
+			"fighter/samus/motion/body/c04/a05squatb.nuanmb"
+		],
+		"fighter/samus/c05": [
+			"fighter/samus/motion/body/c05/a05squatf.nuanmb",
+			"fighter/samus/motion/body/c05/a05squatb.nuanmb"
+		],
+		"fighter/samus/c06": [
+			"fighter/samus/motion/body/c06/a05squatf.nuanmb",
+			"fighter/samus/motion/body/c06/a05squatb.nuanmb"
+		],
+		"fighter/samus/c07": [
+			"fighter/samus/motion/body/c07/a05squatf.nuanmb",
+			"fighter/samus/motion/body/c07/a05squatb.nuanmb"
+		],
 		"fighter/zelda/c00": [
 			"fighter/zelda/motion/body/c00/c03attacks4hi.nuanmb",
 			"fighter/zelda/motion/body/c00/c03attacks4lw.nuanmb"
@@ -120,6 +152,38 @@
 		"fighter/lucina/c07": [
 			"fighter/lucina/motion/body/c07/c00attack13.nuanmb"
 		],
+		"fighter/lucas/c00": [
+			"fighter/lucas/motion/body/c00/c03attacks4hi.nuanmb",
+			"fighter/lucas/motion/body/c00/c03attacks4lw.nuanmb"
+		],
+		"fighter/lucas/c01": [
+			"fighter/lucas/motion/body/c01/c03attacks4hi.nuanmb",
+			"fighter/lucas/motion/body/c01/c03attacks4lw.nuanmb"
+		],
+		"fighter/lucas/c02": [
+			"fighter/lucas/motion/body/c02/c03attacks4hi.nuanmb",
+			"fighter/lucas/motion/body/c02/c03attacks4lw.nuanmb"
+		],
+		"fighter/lucas/c03": [
+			"fighter/lucas/motion/body/c03/c03attacks4hi.nuanmb",
+			"fighter/lucas/motion/body/c03/c03attacks4lw.nuanmb"
+		],
+		"fighter/lucas/c04": [
+			"fighter/lucas/motion/body/c04/c03attacks4hi.nuanmb",
+			"fighter/lucas/motion/body/c04/c03attacks4lw.nuanmb"
+		],
+		"fighter/lucas/c05": [
+			"fighter/lucas/motion/body/c05/c03attacks4hi.nuanmb",
+			"fighter/lucas/motion/body/c05/c03attacks4lw.nuanmb"
+		],
+		"fighter/lucas/c06": [
+			"fighter/lucas/motion/body/c06/c03attacks4hi.nuanmb",
+			"fighter/lucas/motion/body/c06/c03attacks4lw.nuanmb"
+		],
+		"fighter/lucas/c07": [
+			"fighter/lucas/motion/body/c07/c03attacks4hi.nuanmb",
+			"fighter/lucas/motion/body/c07/c03attacks4lw.nuanmb"
+		],
 		"fighter/lucario/c00": [
 			"fighter/lucario/motion/body/c00/c03attacks4hi.nuanmb",
 			"fighter/lucario/motion/body/c00/c03attacks4lw.nuanmb"
@@ -151,6 +215,38 @@
 		"fighter/lucario/c07": [
 			"fighter/lucario/motion/body/c07/c03attacks4hi.nuanmb",
 			"fighter/lucario/motion/body/c07/c03attacks4lw.nuanmb"
+		],
+		"fighter/pikmin/c00": [
+			"fighter/pikmin/motion/body/c00/c01attacks3hi.nuanmb",
+			"fighter/pikmin/motion/body/c00/c01attacks3lw.nuanmb"
+		],
+		"fighter/pikmin/c01": [
+			"fighter/pikmin/motion/body/c01/c01attacks3hi.nuanmb",
+			"fighter/pikmin/motion/body/c01/c01attacks3lw.nuanmb"
+		],
+		"fighter/pikmin/c02": [
+			"fighter/pikmin/motion/body/c02/c01attacks3hi.nuanmb",
+			"fighter/pikmin/motion/body/c02/c01attacks3lw.nuanmb"
+		],
+		"fighter/pikmin/c03": [
+			"fighter/pikmin/motion/body/c03/c01attacks3hi.nuanmb",
+			"fighter/pikmin/motion/body/c03/c01attacks3lw.nuanmb"
+		],
+		"fighter/pikmin/c04": [
+			"fighter/pikmin/motion/body/c04/c01attacks3hi.nuanmb",
+			"fighter/pikmin/motion/body/c04/c01attacks3lw.nuanmb"
+		],
+		"fighter/pikmin/c05": [
+			"fighter/pikmin/motion/body/c05/c01attacks3hi.nuanmb",
+			"fighter/pikmin/motion/body/c05/c01attacks3lw.nuanmb"
+		],
+		"fighter/pikmin/c06": [
+			"fighter/pikmin/motion/body/c06/c01attacks3hi.nuanmb",
+			"fighter/pikmin/motion/body/c06/c01attacks3lw.nuanmb"
+		],
+		"fighter/pikmin/c07": [
+			"fighter/pikmin/motion/body/c07/c01attacks3hi.nuanmb",
+			"fighter/pikmin/motion/body/c07/c01attacks3lw.nuanmb"
 		],
 		"fighter/shulk/c00": [
 			"fighter/shulk/motion/body/c00/c01attacks3hi.nuanmb",
@@ -191,8 +287,38 @@
 			"fighter/shulk/motion/body/c07/c01attacks3hi.nuanmb",
 			"fighter/shulk/motion/body/c07/c01attacks3lw.nuanmb",
 			"fighter/shulk/motion/body/c07/b02escapen_dab.nuanmb"
+		],
+		"fighter/dolly/c00": [
+			"fighter/dolly/motion/body/c00/a05squatb.nuanmb",
+			"fighter/dolly/motion/body/c00/a05squatf.nuanmb"
+		],
+		"fighter/dolly/c01": [
+			"fighter/dolly/motion/body/c01/a05squatb.nuanmb",
+			"fighter/dolly/motion/body/c01/a05squatf.nuanmb"
+		],
+		"fighter/dolly/c02": [
+			"fighter/dolly/motion/body/c02/a05squatb.nuanmb",
+			"fighter/dolly/motion/body/c02/a05squatf.nuanmb"
+		],
+		"fighter/dolly/c03": [
+			"fighter/dolly/motion/body/c03/a05squatb.nuanmb",
+			"fighter/dolly/motion/body/c03/a05squatf.nuanmb"
+		],
+		"fighter/dolly/c04": [
+			"fighter/dolly/motion/body/c04/a05squatb.nuanmb",
+			"fighter/dolly/motion/body/c04/a05squatf.nuanmb"
+		],
+		"fighter/dolly/c05": [
+			"fighter/dolly/motion/body/c05/a05squatb.nuanmb",
+			"fighter/dolly/motion/body/c05/a05squatf.nuanmb"
+		],
+		"fighter/dolly/c06": [
+			"fighter/dolly/motion/body/c06/a05squatb.nuanmb",
+			"fighter/dolly/motion/body/c06/a05squatf.nuanmb"
+		],
+		"fighter/dolly/c07": [
+			"fighter/dolly/motion/body/c07/a05squatb.nuanmb",
+			"fighter/dolly/motion/body/c07/a05squatf.nuanmb"
 		]
-
-		
 	}
 }

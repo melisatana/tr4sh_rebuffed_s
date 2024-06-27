@@ -9,6 +9,7 @@ use smashline::*;
 use smash_script::*;
 use smash::hash40;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
 
 // A Once-Per-Fighter-Frame that only applies to Joker
 unsafe extern "C" fn jack_frame(fighter: &mut L2CFighterCommon) {
@@ -26,6 +27,13 @@ unsafe extern "C" fn jack_frame(fighter: &mut L2CFighterCommon) {
             }
             else {
                 GroundModule::set_passable_check(fighter.module_accessor, false);
+            }
+        }
+
+
+        if status == *FIGHTER_JACK_STATUS_KIND_SPECIAL_LW_ENDURE {
+            if ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_JUMP) {
+                StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_JACK_STATUS_KIND_SPECIAL_N_JUMP, false);
             }
         }
 
@@ -2346,10 +2354,29 @@ unsafe extern "C" fn jack_downb_guard_end_script(fighter: &mut L2CAgentBase) {
     }
 }
 
+unsafe extern "C" fn jack_downb_guard_attack_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        macros::WHOLE_HIT(fighter, *HIT_STATUS_XLU);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 8.0);
+    if macros::is_excute(fighter) {
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 6.4, 100, 100, 82, 0, 12.0, 0.0, 10.0, -3.0, Some(0.0), Some(10.0), Some(3.0), 0.8, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_NONE);
+    }
+    sv_animcmd::wait(fighter.lua_state_agent, 2.0);
+    if macros::is_excute(fighter) {
+        AttackModule::clear_all(fighter.module_accessor);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 15.0);
+    if macros::is_excute(fighter) {
+        macros::WHOLE_HIT(fighter, *HIT_STATUS_NORMAL);
+    }
+}
+
 unsafe extern "C" fn jack_downb_counter_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 12.0, 361, 51, 0, 80, 17.0, 0.0, 10.5, -5.0, Some(0.0), Some(10.5), Some(10.0), 0.75, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 12.0, 361, 51, 0, 80, 14.5, 0.0, 10.5, -6.0, Some(0.0), Some(10.5), Some(12.0), 0.75, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);
         AttackModule::set_force_reaction(fighter.module_accessor, 0, true, false);
         AttackModule::set_force_reaction(fighter.module_accessor, 1, true, false);
     }
@@ -2363,61 +2390,63 @@ unsafe extern "C" fn jack_downb_counter_smash_script(fighter: &mut L2CAgentBase)
 pub fn install() {
     Agent::new("jack")
     .on_line(Main, jack_frame) //opff
-    .game_acmd("game_wait4", jack_summon_script)
-    .game_acmd("game_wait5", jack_dispatch_script)
-    .game_acmd("game_attack11", jack_jab_smash_script)
-    .game_acmd("game_attack12", jack_jab2_smash_script)
-    .game_acmd("game_attack13", jack_jab3_smash_script)
-    .game_acmd("game_attackdash", jack_dashattack_smash_script)
-    .game_acmd("game_attacks3", jack_ftilt_smash_script)
-    .game_acmd("game_attacks3hi", jack_ftilt_smash_script)
-    .game_acmd("game_attacks3lw", jack_ftilt_smash_script)
-    .game_acmd("game_attackhi3", jack_utilt_smash_script)
-    .game_acmd("game_attacklw3", jack_dtilt_smash_script)
-    .game_acmd("game_attacks4", jack_fsmash_smash_script)
-    .game_acmd("game_attackhi4", jack_usmash_smash_script)
-    .game_acmd("game_attacklw4", jack_dsmash_smash_script)
-    .game_acmd("game_attackairn", jack_nair_smash_script)
-    .game_acmd("game_attackairf", jack_fair_smash_script)
-    .game_acmd("game_attackairb", jack_bair_smash_script)
-    .game_acmd("game_attackairhi", jack_uair_smash_script)
-    .game_acmd("game_attackairlw", jack_dair_smash_script)
-    .game_acmd("game_catch", jack_grab_smash_script)
-    .game_acmd("game_catchdash", jack_grabd_smash_script)
-    .game_acmd("game_catchturn", jack_grabp_smash_script)
-    .game_acmd("game_throwf", jack_fthrow_smash_script)
-    .game_acmd("game_throwb", jack_bthrow_smash_script)
-    .game_acmd("game_throwhi", jack_uthrow_smash_script)
-    .game_acmd("game_throwlw", jack_dthrow_smash_script)
-    .game_acmd("game_specialn1", jack_neutralb_1_smash_script)
-    .game_acmd("game_specialn2", jack_neutralb_2_smash_script)
-    .game_acmd("game_specialn3", jack_neutralb_3_smash_script)
-    .game_acmd("game_specialn1_ex", jack_neutralb_1_ex_smash_script)
-    .game_acmd("game_specialn2_ex", jack_neutralb_2_ex_smash_script)
-    .game_acmd("game_specialn3_ex", jack_neutralb_3_ex_smash_script)
-    .game_acmd("game_specialairn1", jack_neutralb_1_air_smash_script)
-    .game_acmd("game_specialairn2", jack_neutralb_2_air_smash_script)
-    .game_acmd("game_specialairn3", jack_neutralb_3_air_smash_script)
-    .game_acmd("game_specialairn1_ex", jack_neutralb_1_ex_air_smash_script)
-    .game_acmd("game_specialairn2_ex", jack_neutralb_2_ex_air_smash_script)
-    .game_acmd("game_specialairn3_ex", jack_neutralb_3_ex_air_smash_script)
-    .game_acmd("game_specialnjump", jack_neutralb_jump_script) // the gump jump
-    .game_acmd("game_specialairndown", jack_neutralb_air_down_loop_smash_script)
-    .game_acmd("game_specialairndownend", jack_neutralb_air_down_end_smash_script)
-    .game_acmd("game_specialairnshoot", jack_neutralb_air_speen_smash_script)
-    .game_acmd("game_specials1", jack_sideb_eiha_smash_script)
-    .game_acmd("game_specialairs1", jack_sideb_eiha_smash_script)
-    .game_acmd("game_specials2", jack_sideb_eigaon_smash_script)
-    .game_acmd("game_specialairs2", jack_sideb_eigaon_smash_script)
-    .game_acmd("game_specialhi", jack_upb_wire_smash_script)
-    .game_acmd("game_specialairhi", jack_upb_wire_air_smash_script)   
-    .game_acmd("game_specialairhif", jack_upb_fly_smash_script)
-    .game_acmd("game_specialairhib", jack_upb_fly_smash_script)
-    .game_acmd("game_specialhithrow", jack_upb_wire_throw_smash_script) 
-    .game_acmd("game_speciallwend", jack_downb_guard_end_script)
-    .game_acmd("game_specialairlwend", jack_downb_guard_end_script)
-    .game_acmd("game_speciallwcounter", jack_downb_counter_smash_script)
-    .game_acmd("game_specialairlwcounter", jack_downb_counter_smash_script)
+    .game_acmd("game_wait4", jack_summon_script, Low)
+    .game_acmd("game_wait5", jack_dispatch_script, Low)
+    .game_acmd("game_attack11", jack_jab_smash_script, Low)
+    .game_acmd("game_attack12", jack_jab2_smash_script, Low)
+    .game_acmd("game_attack13", jack_jab3_smash_script, Low)
+    .game_acmd("game_attackdash", jack_dashattack_smash_script, Low)
+    .game_acmd("game_attacks3", jack_ftilt_smash_script, Low)
+    .game_acmd("game_attacks3hi", jack_ftilt_smash_script, Low)
+    .game_acmd("game_attacks3lw", jack_ftilt_smash_script, Low)
+    .game_acmd("game_attackhi3", jack_utilt_smash_script, Low)
+    .game_acmd("game_attacklw3", jack_dtilt_smash_script, Low)
+    .game_acmd("game_attacks4", jack_fsmash_smash_script, Low)
+    .game_acmd("game_attackhi4", jack_usmash_smash_script, Low)
+    .game_acmd("game_attacklw4", jack_dsmash_smash_script, Low)
+    .game_acmd("game_attackairn", jack_nair_smash_script, Low)
+    .game_acmd("game_attackairf", jack_fair_smash_script, Low)
+    .game_acmd("game_attackairb", jack_bair_smash_script, Low)
+    .game_acmd("game_attackairhi", jack_uair_smash_script, Low)
+    .game_acmd("game_attackairlw", jack_dair_smash_script, Low)
+    .game_acmd("game_catch", jack_grab_smash_script, Low)
+    .game_acmd("game_catchdash", jack_grabd_smash_script, Low)
+    .game_acmd("game_catchturn", jack_grabp_smash_script, Low)
+    .game_acmd("game_throwf", jack_fthrow_smash_script, Low)
+    .game_acmd("game_throwb", jack_bthrow_smash_script, Low)
+    .game_acmd("game_throwhi", jack_uthrow_smash_script, Low)
+    .game_acmd("game_throwlw", jack_dthrow_smash_script, Low)
+    .game_acmd("game_specialn1", jack_neutralb_1_smash_script, Low)
+    .game_acmd("game_specialn2", jack_neutralb_2_smash_script, Low)
+    .game_acmd("game_specialn3", jack_neutralb_3_smash_script, Low)
+    .game_acmd("game_specialn1_ex", jack_neutralb_1_ex_smash_script, Low)
+    .game_acmd("game_specialn2_ex", jack_neutralb_2_ex_smash_script, Low)
+    .game_acmd("game_specialn3_ex", jack_neutralb_3_ex_smash_script, Low)
+    .game_acmd("game_specialairn1", jack_neutralb_1_air_smash_script, Low)
+    .game_acmd("game_specialairn2", jack_neutralb_2_air_smash_script, Low)
+    .game_acmd("game_specialairn3", jack_neutralb_3_air_smash_script, Low)
+    .game_acmd("game_specialairn1_ex", jack_neutralb_1_ex_air_smash_script, Low)
+    .game_acmd("game_specialairn2_ex", jack_neutralb_2_ex_air_smash_script, Low)
+    .game_acmd("game_specialairn3_ex", jack_neutralb_3_ex_air_smash_script, Low)
+    .game_acmd("game_specialnjump", jack_neutralb_jump_script, Low) // the gump jump
+    .game_acmd("game_specialairndown", jack_neutralb_air_down_loop_smash_script, Low)
+    .game_acmd("game_specialairndownend", jack_neutralb_air_down_end_smash_script, Low)
+    .game_acmd("game_specialairnshoot", jack_neutralb_air_speen_smash_script, Low)
+    .game_acmd("game_specials1", jack_sideb_eiha_smash_script, Low)
+    .game_acmd("game_specialairs1", jack_sideb_eiha_smash_script, Low)
+    .game_acmd("game_specials2", jack_sideb_eigaon_smash_script, Low)
+    .game_acmd("game_specialairs2", jack_sideb_eigaon_smash_script, Low)
+    .game_acmd("game_specialhi", jack_upb_wire_smash_script, Low)
+    .game_acmd("game_specialairhi", jack_upb_wire_air_smash_script, Low)   
+    .game_acmd("game_specialairhif", jack_upb_fly_smash_script, Low)
+    .game_acmd("game_specialairhib", jack_upb_fly_smash_script, Low)
+    .game_acmd("game_specialhithrow", jack_upb_wire_throw_smash_script, Low) 
+    .game_acmd("game_speciallwend", jack_downb_guard_end_script, Low)
+    .game_acmd("game_specialairlwend", jack_downb_guard_end_script, Low)
+    .game_acmd("game_speciallwattack", jack_downb_guard_attack_script, Low)
+    .game_acmd("game_specialairlwattack", jack_downb_guard_attack_script, Low)
+    .game_acmd("game_speciallwcounter", jack_downb_counter_smash_script, Low)
+    .game_acmd("game_specialairlwcounter", jack_downb_counter_smash_script, Low)
     .install();
 
     Agent::new("kirby")
@@ -2425,13 +2454,13 @@ pub fn install() {
     .install();
 
     Agent::new("jack_fire")
-    .game_acmd("game_fly", eiha_projectile)
-    .game_acmd("game_hit", eiha_projectile_hit)
+    .game_acmd("game_fly", eiha_projectile, Low)
+    .game_acmd("game_hit", eiha_projectile_hit, Low)
     .install();
 
     Agent::new("jack_fire2")
-    .game_acmd("game_fly", eigaon_projectile)
-    .game_acmd("game_hit", eigaon_projectile_hit)
+    .game_acmd("game_fly", eigaon_projectile, Low)
+    .game_acmd("game_hit", eigaon_projectile_hit, Low)
     .install();
 
 

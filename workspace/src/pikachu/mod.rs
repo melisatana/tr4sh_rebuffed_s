@@ -8,6 +8,7 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smash_script::*;
 use smashline::*;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
 
 pub static mut PIKACHU_DOWNB_STATIC_IS_HIT : [bool; 8] = [false; 8];
 static mut PIKACHU_DOWNB_STATIC_TIMER : [i32; 8] = [0; 8];
@@ -40,12 +41,15 @@ unsafe extern "C" fn pikachu_frame(fighter: &mut L2CFighterCommon) {
             PIKACHU_DOWNB_STATIC_TIMER[entry_id] = 0;
             PIKACHU_NEUTRALB_CHANGE_ANGLE[entry_id] = false;
         }
+        
 
-        //
-        ///////////////
-        ///////////////
-        ///////////////
-        //fix neutral b for Kirby!!!!!!!!!!
+        if status == *FIGHTER_PIKACHU_STATUS_KIND_SPECIAL_S_HOLD {
+            if (ControlModule::get_stick_x(fighter.module_accessor) >= 0.5 && PostureModule::lr(fighter.module_accessor) <= -0.5) || (ControlModule::get_stick_x(fighter.module_accessor) <= -0.5 && PostureModule::lr(fighter.module_accessor) >= 0.5) {
+                PostureModule::reverse_lr(fighter.module_accessor);
+                PostureModule::update_rot_y_lr(fighter.module_accessor);
+            }  
+        }
+
 
     }
 }
@@ -990,47 +994,47 @@ unsafe extern "C" fn pikachu_thunderbolt(fighter: &mut L2CAgentBase) {
 pub fn install() {
     Agent::new("pikachu")
       .on_line(Main, pikachu_frame) //opff
-      .game_acmd("game_justshieldoff", pikachu_perfectshield_smash_script)
-      .game_acmd("game_attack11", pikachu_jab_smash_script)
-      .game_acmd("game_attackdash", pikachu_dashattack_smash_script)
-      .game_acmd("game_attacks3", pikachu_ftilt_smash_script)
-      .game_acmd("game_attacks3hi", pikachu_ftilt2_smash_script)
-      .game_acmd("game_attacks3lw", pikachu_ftilt3_smash_script)
-      .game_acmd("game_attackhi3", pikachu_utilt_smash_script)
-      .game_acmd("game_attacklw3", pikachu_dtilt_smash_script)
-      .game_acmd("game_attacks4", pikachu_fsmash_smash_script)
-      .effect_acmd("effect_attacks4", pikachu_fsmash_effect_script)
-      .game_acmd("game_attackhi4", pikachu_usmash_smash_script)
-      .effect_acmd("effect_attackhi4", pikachu_usmash_effect_script)
-      .game_acmd("game_attacklw4", pikachu_dsmash_smash_script)
-      .effect_acmd("effect_attacklw4", pikachu_dsmash_effect_script)
-      .game_acmd("game_attackairn", pikachu_nair_smash_script)
-      .effect_acmd("effect_attackairn", pikachu_nair_effect_script)
-      .game_acmd("game_attackairf", pikachu_fair_smash_script)
-      .game_acmd("game_attackairb", pikachu_bair_smash_script)
-      .game_acmd("game_landingairb", pikachu_bair_landing_smash_script)
-      .game_acmd("game_attackairhi", pikachu_uair_smash_script)
-      .game_acmd("game_attackairlw", pikachu_dair_smash_script)
-      .game_acmd("game_catch", pikachu_grab_smash_script)
-      .game_acmd("game_catchdash", pikachu_grabd_smash_script)
-      .game_acmd("game_catchturn", pikachu_grabp_smash_script)
-      .game_acmd("game_throwf", pikachu_fthrow_smash_script)
-      .game_acmd("game_throwb", pikachu_bthrow_smash_script)
-      .game_acmd("game_throwhi", pikachu_uthrow_smash_script)
-      .game_acmd("game_throwlw", pikachu_dthrow_smash_script)
-      .game_acmd("game_specialn", pikachu_neutralb_smash_script)
-      .game_acmd("game_specialairn", pikachu_neutralb_smash_script)
-      .game_acmd("game_specials", pikachu_sideb_smash_script)
+      .game_acmd("game_justshieldoff", pikachu_perfectshield_smash_script, Low)
+      .game_acmd("game_attack11", pikachu_jab_smash_script, Low)
+      .game_acmd("game_attackdash", pikachu_dashattack_smash_script, Low)
+      .game_acmd("game_attacks3", pikachu_ftilt_smash_script, Low)
+      .game_acmd("game_attacks3hi", pikachu_ftilt2_smash_script, Low)
+      .game_acmd("game_attacks3lw", pikachu_ftilt3_smash_script, Low)
+      .game_acmd("game_attackhi3", pikachu_utilt_smash_script, Low)
+      .game_acmd("game_attacklw3", pikachu_dtilt_smash_script, Low)
+      .game_acmd("game_attacks4", pikachu_fsmash_smash_script, Low)
+      .effect_acmd("effect_attacks4", pikachu_fsmash_effect_script, Low)
+      .game_acmd("game_attackhi4", pikachu_usmash_smash_script, Low)
+      .effect_acmd("effect_attackhi4", pikachu_usmash_effect_script, Low)
+      .game_acmd("game_attacklw4", pikachu_dsmash_smash_script, Low)
+      .effect_acmd("effect_attacklw4", pikachu_dsmash_effect_script, Low)
+      .game_acmd("game_attackairn", pikachu_nair_smash_script, Low)
+      .effect_acmd("effect_attackairn", pikachu_nair_effect_script, Low)
+      .game_acmd("game_attackairf", pikachu_fair_smash_script, Low)
+      .game_acmd("game_attackairb", pikachu_bair_smash_script, Low)
+      .game_acmd("game_landingairb", pikachu_bair_landing_smash_script, Low)
+      .game_acmd("game_attackairhi", pikachu_uair_smash_script, Low)
+      .game_acmd("game_attackairlw", pikachu_dair_smash_script, Low)
+      .game_acmd("game_catch", pikachu_grab_smash_script, Low)
+      .game_acmd("game_catchdash", pikachu_grabd_smash_script, Low)
+      .game_acmd("game_catchturn", pikachu_grabp_smash_script, Low)
+      .game_acmd("game_throwf", pikachu_fthrow_smash_script, Low)
+      .game_acmd("game_throwb", pikachu_bthrow_smash_script, Low)
+      .game_acmd("game_throwhi", pikachu_uthrow_smash_script, Low)
+      .game_acmd("game_throwlw", pikachu_dthrow_smash_script, Low)
+      .game_acmd("game_specialn", pikachu_neutralb_smash_script, Low)
+      .game_acmd("game_specialairn", pikachu_neutralb_smash_script, Low)
+      .game_acmd("game_specials", pikachu_sideb_smash_script, Low)
 
-      .game_acmd("game_specialhi1", pikachu_upb1_smash_script)
-      .game_acmd("game_specialairhi1", pikachu_upb1_smash_script)
-      .game_acmd("game_specialhi2", pikachu_upb2_smash_script)
-      .game_acmd("game_specialairhi2", pikachu_upb2_smash_script)
+      .game_acmd("game_specialhi1", pikachu_upb1_smash_script, Low)
+      .game_acmd("game_specialairhi1", pikachu_upb1_smash_script, Low)
+      .game_acmd("game_specialhi2", pikachu_upb2_smash_script, Low)
+      .game_acmd("game_specialairhi2", pikachu_upb2_smash_script, Low)
 
-      .game_acmd("game_speciallw", pikachu_downb_smash_script)
-      .game_acmd("game_specialairlw", pikachu_downb_air_smash_script)
-      .game_acmd("game_speciallwhit", pikachu_downb_blast_smash_script)
-      .game_acmd("game_specialairlwhit", pikachu_downb_blast_smash_script)
+      .game_acmd("game_speciallw", pikachu_downb_smash_script, Low)
+      .game_acmd("game_specialairlw", pikachu_downb_air_smash_script, Low)
+      .game_acmd("game_speciallwhit", pikachu_downb_blast_smash_script, Low)
+      .game_acmd("game_specialairlwhit", pikachu_downb_blast_smash_script, Low)
       .install();
 
       Agent::new("kirby")
@@ -1038,15 +1042,15 @@ pub fn install() {
       .install();
   
       Agent::new("pikachu_dengeki")
-      .game_acmd("game_regular", pikachu_thunderjolt_floor)
+      .game_acmd("game_regular", pikachu_thunderjolt_floor, Low)
       .install();
 
       Agent::new("pikachu_dengekidama")
-      .game_acmd("game_regular", pikachu_thunderjolt_air)
+      .game_acmd("game_regular", pikachu_thunderjolt_air, Low)
       .install();
   
       Agent::new("pikachu_kaminari")
-      .game_acmd("game_regular", pikachu_thunderbolt)
+      .game_acmd("game_regular", pikachu_thunderbolt, Low)
       .install();
     
 }

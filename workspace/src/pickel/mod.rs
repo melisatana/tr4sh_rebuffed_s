@@ -8,6 +8,8 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
+
 
 static mut STEVE_SLOW_DOWN_AIR : [bool; 8] = [false; 8];
 static mut STEVE_SLOW_DOWN_AIR_IN_SLOW : [bool; 8] = [false; 8];
@@ -1710,44 +1712,44 @@ unsafe extern "C" fn steve_sidetaunt(fighter: &mut L2CAgentBase) {
 pub fn install() {
     Agent::new("pickel")
     .on_line(Main, steve_frame) //opff
-    .game_acmd("game_attackdash", steve_dashattack)
-    .game_acmd("game_attacks3", steve_ftilt)
-    .game_acmd("game_attackhi3", steve_utilt)
-    .game_acmd("game_attacklw3", steve_dtilt)
-    .game_acmd("game_attacks4", steve_fsmash)
-    .game_acmd("game_attackhi4", steve_usmash)
-    .game_acmd("game_attackairn", steve_nair)
-    .game_acmd("game_attackairf", steve_fair)
-    .effect_acmd("effect_attackairf", steve_fair_effect)
-    .game_acmd("game_attackairb", steve_bair)
-    .effect_acmd("effect_attackairb", steve_bair_effect)
-    .game_acmd("game_attackairhi", steve_uair)
-    .game_acmd("game_attackairlw", steve_dair)
-    .game_acmd("game_catch", steve_grab)
-    .game_acmd("game_catchdash", steve_dashgrab)
-    .game_acmd("game_catchturn", steve_pivotgrab)
-    .game_acmd("game_throwf", steve_fthrow)
-    .game_acmd("game_throwb", steve_bthrow)
-    .game_acmd("game_throwhi", steve_uthrow)
-    .game_acmd("game_throwlw", steve_dthrow)
-    .game_acmd("game_specialairhi", steve_upb_fly)
-    .game_acmd("game_appealsl", steve_sidetaunt)
-    .game_acmd("game_appealsr", steve_sidetaunt)
+    .game_acmd("game_attackdash", steve_dashattack, Low)
+    .game_acmd("game_attacks3", steve_ftilt, Low)
+    .game_acmd("game_attackhi3", steve_utilt, Low)
+    .game_acmd("game_attacklw3", steve_dtilt, Low)
+    .game_acmd("game_attacks4", steve_fsmash, Low)
+    .game_acmd("game_attackhi4", steve_usmash, Low)
+    .game_acmd("game_attackairn", steve_nair, Low)
+    .game_acmd("game_attackairf", steve_fair, Low)
+    .effect_acmd("effect_attackairf", steve_fair_effect, Low)
+    .game_acmd("game_attackairb", steve_bair, Low)
+    .effect_acmd("effect_attackairb", steve_bair_effect, Low)
+    .game_acmd("game_attackairhi", steve_uair, Low)
+    .game_acmd("game_attackairlw", steve_dair, Low)
+    .game_acmd("game_catch", steve_grab, Low)
+    .game_acmd("game_catchdash", steve_dashgrab, Low)
+    .game_acmd("game_catchturn", steve_pivotgrab, Low)
+    .game_acmd("game_throwf", steve_fthrow, Low)
+    .game_acmd("game_throwb", steve_bthrow, Low)
+    .game_acmd("game_throwhi", steve_uthrow, Low)
+    .game_acmd("game_throwlw", steve_dthrow, Low)
+    .game_acmd("game_specialairhi", steve_upb_fly, Low)
+    .game_acmd("game_appealsl", steve_sidetaunt, Low)
+    .game_acmd("game_appealsr", steve_sidetaunt, Low)
     .install();
 
     Agent::new("pickel_fire")
-    .game_acmd("game_attacklw3", steve_dtilt_fire)
-    .effect_acmd("effect_attacklw3", steve_dtilt_fire_effect)
+    .game_acmd("game_attacklw3", steve_dtilt_fire, Low)
+    .effect_acmd("effect_attacklw3", steve_dtilt_fire_effect, Low)
     .install();
 
     Agent::new("pickel_melt")
-    .game_acmd("game_attacklw4", steve_dsmash_lava)
+    .game_acmd("game_attacklw4", steve_dsmash_lava, Low)
     .install();
 
     Agent::new("pickel_forge")
-    .game_acmd("game_fallattack", steve_dair_anvil)
-    .game_acmd("game_fallattackride", steve_dair_anvil_ride)
-    .game_acmd("game_wait", steve_dair_anvil_land)
+    .game_acmd("game_fallattack", steve_dair_anvil, Low)
+    .game_acmd("game_fallattackride", steve_dair_anvil_ride, Low)
+    .game_acmd("game_wait", steve_dair_anvil_land, Low)
     .install();
 
 }

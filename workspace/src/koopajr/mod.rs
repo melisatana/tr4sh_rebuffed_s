@@ -8,12 +8,18 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
+
+
+static mut KOOPAJR_DOWNB_PICKUP : [bool; 8] = [false; 8];
 
 // A Once-Per-Fighter-Frame that only applies to Bowser Jr.
 unsafe extern "C" fn koopajr_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
         global_fighter_frame(fighter);
         let status = StatusModule::status_kind(fighter.module_accessor);
+        let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+        
 
         if status == *FIGHTER_STATUS_KIND_ATTACK_LW3 {
             if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false {
@@ -23,6 +29,15 @@ unsafe extern "C" fn koopajr_frame(fighter: &mut L2CFighterCommon) {
 
         if [*FIGHTER_STATUS_KIND_SPECIAL_N, *FIGHTER_KOOPAJR_STATUS_KIND_SPECIAL_N_HOLD, *FIGHTER_KOOPAJR_STATUS_KIND_SPECIAL_N_SHOOT, *FIGHTER_KOOPAJR_STATUS_KIND_SPECIAL_HI_ATTACK].contains(&status) {
             crate::custom::fastfall_helper(fighter);
+        }
+
+        if status == *FIGHTER_STATUS_KIND_SPECIAL_LW && (MotionModule::frame(fighter.module_accessor) >= 11.0 && MotionModule::frame(fighter.module_accessor) <= 14.0) {
+            if ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_SPECIAL) {
+                ItemModule::pickup_item(fighter.module_accessor, ItemSize{ _address: *ITEM_SIZE_LIGHT as u8 }, *FIGHTER_HAVE_ITEM_WORK_TEMPORARY, *ITEM_TRAIT_FLAG_QUICK, QuickItemTreatType{ _address: 0 }, ItemPickupSearchMode{ _address: 0 });
+                ItemModule::use_item(fighter.module_accessor, *FIGHTER_HAVE_ITEM_WORK_TEMPORARY, false);
+                ItemModule::pickup_item(fighter.module_accessor, ItemSize{ _address: *ITEM_SIZE_LIGHT as u8 }, 0, -1, QuickItemTreatType{ _address: 0 }, ItemPickupSearchMode{ _address: 0 });
+                KOOPAJR_DOWNB_PICKUP[entry_id] = true;
+            }
         }
 
     }
@@ -341,8 +356,8 @@ unsafe extern "C" fn koopajr_ftilt_expression_script(fighter: &mut L2CAgentBase)
 unsafe extern "C" fn koopajr_utilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("clownarml1"), 8.3, 97, 90, 0, 45, 4.5, 8.5, 0.0, 0.0, Some(10.0), Some(0.0), Some(0.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_OBJECT);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("clownarml1"), 8.3, 97, 90, 0, 45, 3.0, 0.0, 0.0, 0.0, Some(3.5), Some(0.0), Some(0.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("clownarml1"), 8.3, 97, 90, 0, 45, 4.8, 8.5, 0.0, 0.0, Some(10.0), Some(0.0), Some(0.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("clownarml1"), 8.3, 97, 90, 0, 45, 3.5, 0.0, 0.0, 0.0, Some(3.5), Some(0.0), Some(0.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_OBJECT);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 9.0);
     if macros::is_excute(fighter) {
@@ -539,8 +554,10 @@ unsafe extern "C" fn koopajr_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.0, 367, 90, 20, 20, 5.2, 0.0, 3.5, 12.5, Some(0.0), Some(8.5), Some(12.5), 0.8, 0.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 5.0, 367, 90, 20, 20, 5.2, 0.0, 3.5, -12.0, Some(0.0), Some(8.5), Some(-12.0), 0.8, 0.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.0, 170, 90, 15, 15, 5.2, 0.0, 3.5, 12.5, Some(0.0), Some(8.5), Some(12.5), 0.8, 0.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 5.0, 170, 90, 15, 15, 5.2, 0.0, 3.5, -12.0, Some(0.0), Some(8.5), Some(-12.0), 0.8, 0.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 5.0, 367, 90, 20, 20, 5.2, 0.0, 3.5, 12.5, Some(0.0), Some(8.5), Some(12.5), 0.8, 0.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_A, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 5.0, 367, 90, 20, 20, 5.2, 0.0, 3.5, -12.0, Some(0.0), Some(8.5), Some(-12.0), 0.8, 0.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_POS, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_A, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
@@ -672,7 +689,7 @@ unsafe extern "C" fn koopajr_bair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
         macros::ATTACK(fighter, 0, 0, Hash40::new("clownarmr1"), 13.3, 361, 110, 0, 30, 6.0, 7.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("clownarmr1"), 9.0, 70, 92, 0, 37, 2.7, 0.0, 0.0, 0.0, Some(-6.0), Some(0.0), Some(0.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("clownarmr1"), 9.0, 70, 92, 0, 37, 3.2, 0.0, 0.0, 0.0, Some(-7.5), Some(0.0), Some(0.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
@@ -682,6 +699,15 @@ unsafe extern "C" fn koopajr_bair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 30.0);
     if macros::is_excute(fighter) {
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
+    }
+}
+
+
+unsafe extern "C" fn koopajr_bair_effect_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 12.0);
+    if macros::is_excute(fighter) {
+        macros::EFFECT_ALPHA(fighter, Hash40::new("sys_attack_impact"), Hash40::new("top"), -24, 3.7, 0, 0, 0, 0, 1.8, 0, 0, 0, 0, 0, 360, false, 0.9);
+        macros::LAST_EFFECT_SET_RATE(fighter, 1.5);
     }
 }
 
@@ -858,7 +884,7 @@ unsafe extern "C" fn koopajr_fthrow_smash_script(fighter: &mut L2CAgentBase) {
 
 unsafe extern "C" fn koopajr_bthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 9.3, 41, 115, 0, 50, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 8.9, 41, 122, 0, 50, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 23.0);
@@ -877,7 +903,7 @@ unsafe extern "C" fn koopajr_bthrow_smash_script(fighter: &mut L2CAgentBase) {
 
 unsafe extern "C" fn koopajr_uthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 7.5, 75, 60, 0, 55, 0.0, 1.0, *ATTACK_LR_CHECK_B, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 10.9, 80, 44, 0, 77, 0.0, 1.0, *ATTACK_LR_CHECK_B, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 17.0);
@@ -891,10 +917,6 @@ unsafe extern "C" fn koopajr_uthrow_smash_script(fighter: &mut L2CAgentBase) {
         macros::ATK_HIT_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, Hash40::new("throw"), WorkModule::get_int64(fighter.module_accessor,*FIGHTER_STATUS_THROW_WORK_INT_TARGET_OBJECT), WorkModule::get_int64(fighter.module_accessor,*FIGHTER_STATUS_THROW_WORK_INT_TARGET_HIT_GROUP), WorkModule::get_int64(fighter.module_accessor,*FIGHTER_STATUS_THROW_WORK_INT_TARGET_HIT_NO));
         MotionModule::set_rate(fighter.module_accessor, 1.4);
         ArticleModule::set_rate(fighter.module_accessor, *FIGHTER_KOOPAJR_GENERATE_ARTICLE_MAGICHAND, 1.4);
-    }
-    sv_animcmd::frame(fighter.lua_state_agent, 28.0);
-    if macros::is_excute(fighter) {
-        CancelModule::enable_cancel(fighter.module_accessor);
     }
 }
 
@@ -1130,13 +1152,22 @@ unsafe extern "C" fn clowncar_explode(fighter: &mut L2CAgentBase) {
 }
 
 unsafe extern "C" fn koopajr_downb_smash_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+        
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         macros::FT_MOTION_RATE(fighter, 0.8333333333);
+        KOOPAJR_DOWNB_PICKUP[entry_id] = false;
     }
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
         ArticleModule::generate_article_enable(fighter.module_accessor, *FIGHTER_KOOPAJR_GENERATE_ARTICLE_MECHAKOOPA, false, -1);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 14.0);
+    if macros::is_excute(fighter) {
+       if KOOPAJR_DOWNB_PICKUP[entry_id] {
+            macros::FT_MOTION_RATE(fighter, 0.66666667); //1.5x
+        }
     }
 }
 
@@ -1144,53 +1175,54 @@ unsafe extern "C" fn koopajr_downb_smash_script(fighter: &mut L2CAgentBase) {
 pub fn install() {
     Agent::new("koopajr")
     .on_line(Main, koopajr_frame) //opff
-    .game_acmd("game_attack11", koopajr_jab_smash_script)
-    .game_acmd("game_attack12", koopajr_jab2_smash_script)
-    .game_acmd("game_attack100", koopajr_jab100_smash_script)
-    .game_acmd("game_attack100end", koopajr_jab100end_smash_script)
-    .game_acmd("game_attackdash", koopajr_dashattack_smash_script)
-    .game_acmd("game_attacks3", koopajr_ftilt_smash_script)
-    .game_acmd("game_attacks3hi", koopajr_ftilt2_smash_script)
-    .game_acmd("game_attacks3lw", koopajr_ftilt3_smash_script)
-    .expression_acmd("expression_attacks3", koopajr_ftilt_expression_script)
-    .expression_acmd("expression_attacks3hi", koopajr_ftilt_expression_script)
-    .expression_acmd("expression_attacks3lw", koopajr_ftilt_expression_script)
-    .game_acmd("game_attackhi3", koopajr_utilt_smash_script)
-    .game_acmd("game_attacklw3", koopajr_dtilt_smash_script)
-    .game_acmd("game_attacks4", koopajr_fsmash_smash_script)
-    .game_acmd("game_attacks4hi", koopajr_fsmash2_smash_script)
-    .game_acmd("game_attacks4lw", koopajr_fsmash3_smash_script)
-    .game_acmd("game_attackhi4", koopajr_usmash_smash_script)
-    .game_acmd("game_attacklw4", koopajr_dsmash_smash_script)
-    .game_acmd("game_attackairn", koopajr_nair_smash_script)
-    .expression_acmd("expression_attackairn", koopajr_nair_expression_script)
-    .game_acmd("game_attackairf", koopajr_fair_smash_script)
-    .game_acmd("game_attackairb", koopajr_bair_smash_script)
-    .game_acmd("game_attackairhi", koopajr_uair_smash_script)
-    .game_acmd("game_attackairlw", koopajr_dair_smash_script)
-    .game_acmd("game_landingairlw", koopajr_dair_landing_smash_script)
-    .game_acmd("game_catch", koopajr_grab_smash_script)
-    .game_acmd("game_catchdash", koopajr_grabd_smash_script)
-    .game_acmd("game_catchturn", koopajr_grabp_smash_script)
-    .game_acmd("game_throwf", koopajr_fthrow_smash_script)
-    .game_acmd("game_throwb", koopajr_bthrow_smash_script)
-    .game_acmd("game_throwhi", koopajr_uthrow_smash_script)
-    .game_acmd("game_throwlw", koopajr_dthrow_smash_script)
-    .game_acmd("game_specialnstart", koopajr_neutralb_start_smash_script)
-    .game_acmd("game_specialairnstart", koopajr_neutralb_start_smash_script)
-    .game_acmd("game_specialnshoot", koopajr_neutralb_shoot_smash_script)
-    .game_acmd("game_specialairnshoot", koopajr_neutralb_shoot_air_smash_script)
-    .game_acmd("game_specialsstart", koopajr_sideb_start_smash_script)
-    .game_acmd("game_specialairsstart", koopajr_sideb_start_smash_script)
-    .game_acmd("game_specials", koopajr_sideb_dash_smash_script)
-    .game_acmd("game_specialairs", koopajr_sideb_dash_smash_script)
-    .game_acmd("game_specialsspin", koopajr_sideb_speen_smash_script)
-    .game_acmd("game_specialairsspin", koopajr_sideb_speen_air_smash_script)
-    .game_acmd("game_specialhistart", koopajr_upb_start_smash_script)
-    .game_acmd("game_specialairhistart", koopajr_upb_start_air_smash_script)
-    .game_acmd("game_specialhijrattack", koopajr_upb_attack_smash_script)
-    .game_acmd("game_speciallw", koopajr_downb_smash_script)
-    .game_acmd("game_specialairlw", koopajr_downb_smash_script)
+    .game_acmd("game_attack11", koopajr_jab_smash_script, Low)
+    .game_acmd("game_attack12", koopajr_jab2_smash_script, Low)
+    .game_acmd("game_attack100", koopajr_jab100_smash_script, Low)
+    .game_acmd("game_attack100end", koopajr_jab100end_smash_script, Low)
+    .game_acmd("game_attackdash", koopajr_dashattack_smash_script, Low)
+    .game_acmd("game_attacks3", koopajr_ftilt_smash_script, Low)
+    .game_acmd("game_attacks3hi", koopajr_ftilt2_smash_script, Low)
+    .game_acmd("game_attacks3lw", koopajr_ftilt3_smash_script, Low)
+    .expression_acmd("expression_attacks3", koopajr_ftilt_expression_script, Low)
+    .expression_acmd("expression_attacks3hi", koopajr_ftilt_expression_script, Low)
+    .expression_acmd("expression_attacks3lw", koopajr_ftilt_expression_script, Low)
+    .game_acmd("game_attackhi3", koopajr_utilt_smash_script, Low)
+    .game_acmd("game_attacklw3", koopajr_dtilt_smash_script, Low)
+    .game_acmd("game_attacks4", koopajr_fsmash_smash_script, Low)
+    .game_acmd("game_attacks4hi", koopajr_fsmash2_smash_script, Low)
+    .game_acmd("game_attacks4lw", koopajr_fsmash3_smash_script, Low)
+    .game_acmd("game_attackhi4", koopajr_usmash_smash_script, Low)
+    .game_acmd("game_attacklw4", koopajr_dsmash_smash_script, Low)
+    .game_acmd("game_attackairn", koopajr_nair_smash_script, Low)
+    .expression_acmd("expression_attackairn", koopajr_nair_expression_script, Low)
+    .game_acmd("game_attackairf", koopajr_fair_smash_script, Low)
+    .game_acmd("game_attackairb", koopajr_bair_smash_script, Low)
+    .effect_acmd("effect_attackairb", koopajr_bair_effect_script, Low)
+    .game_acmd("game_attackairhi", koopajr_uair_smash_script, Low)
+    .game_acmd("game_attackairlw", koopajr_dair_smash_script, Low)
+    .game_acmd("game_landingairlw", koopajr_dair_landing_smash_script, Low)
+    .game_acmd("game_catch", koopajr_grab_smash_script, Low)
+    .game_acmd("game_catchdash", koopajr_grabd_smash_script, Low)
+    .game_acmd("game_catchturn", koopajr_grabp_smash_script, Low)
+    .game_acmd("game_throwf", koopajr_fthrow_smash_script, Low)
+    .game_acmd("game_throwb", koopajr_bthrow_smash_script, Low)
+    .game_acmd("game_throwhi", koopajr_uthrow_smash_script, Low)
+    .game_acmd("game_throwlw", koopajr_dthrow_smash_script, Low)
+    .game_acmd("game_specialnstart", koopajr_neutralb_start_smash_script, Low)
+    .game_acmd("game_specialairnstart", koopajr_neutralb_start_smash_script, Low)
+    .game_acmd("game_specialnshoot", koopajr_neutralb_shoot_smash_script, Low)
+    .game_acmd("game_specialairnshoot", koopajr_neutralb_shoot_air_smash_script, Low)
+    .game_acmd("game_specialsstart", koopajr_sideb_start_smash_script, Low)
+    .game_acmd("game_specialairsstart", koopajr_sideb_start_smash_script, Low)
+    .game_acmd("game_specials", koopajr_sideb_dash_smash_script, Low)
+    .game_acmd("game_specialairs", koopajr_sideb_dash_smash_script, Low)
+    .game_acmd("game_specialsspin", koopajr_sideb_speen_smash_script, Low)
+    .game_acmd("game_specialairsspin", koopajr_sideb_speen_air_smash_script, Low)
+    .game_acmd("game_specialhistart", koopajr_upb_start_smash_script, Low)
+    .game_acmd("game_specialairhistart", koopajr_upb_start_air_smash_script, Low)
+    .game_acmd("game_specialhijrattack", koopajr_upb_attack_smash_script, Low)
+    .game_acmd("game_speciallw", koopajr_downb_smash_script, Low)
+    .game_acmd("game_specialairlw", koopajr_downb_smash_script, Low)
     .install();
 
     Agent::new("kirby")
@@ -1198,12 +1230,12 @@ pub fn install() {
     .install();
 
     Agent::new("koopajr_cannonball")
-    .game_acmd("game_shoot", cannonball_projectile)
-    .game_acmd("game_hop", cannonball_projectile_hop)
+    .game_acmd("game_shoot", cannonball_projectile, Low)
+    .game_acmd("game_hop", cannonball_projectile_hop, Low)
     .install();
 
     Agent::new("koopajr_remainclown")
-    .game_acmd("game_specialhiburst", clowncar_explode)
+    .game_acmd("game_specialhiburst", clowncar_explode, Low)
     .install();
 
 }

@@ -8,6 +8,7 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
 
 static mut DAISY_DOWNSPECIAL_SATURN_RECHARGE_TIMER : [i32; 8] = [0; 8];
 static DAISY_DOWNSPECIAL_SATURN_COOLDOWN : i32 = 420; 
@@ -440,6 +441,9 @@ unsafe extern "C" fn daisy_fair_effect_script(fighter: &mut L2CAgentBase) {
         macros::EFFECT_FOLLOW_FLIP(fighter, Hash40::new("sys_attack_line"), Hash40::new("sys_attack_line"), Hash40::new("top"), -6.6, 9.0, -5.0, 0.0, 0.0, 0.0, 1.1, true, *EF_FLIP_YZ);
         macros::LAST_EFFECT_SET_COLOR(fighter, /*R*/ 1.9, /*G*/ 0.5, /*B*/ 0.04);
         macros::LAST_EFFECT_SET_RATE(fighter, 0.9);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 6.0);
+    if macros::is_excute(fighter) {
         macros::EFFECT(fighter, Hash40::new("sys_smash_flash"), Hash40::new("toel"), 0.0, 0, 0, 0, 0, 0, 0.8, 0, 0, 0, 0, 0, 0, true);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 14.0);
@@ -477,7 +481,7 @@ unsafe extern "C" fn daisy_bair_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.1, 70, 78, 0, 40, 6.0, 0.0, 8.0, -5.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_HIP);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.1, 62, 78, 0, 40, 6.0, 0.0, 8.0, -5.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_HIP);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 12.0);
     if macros::is_excute(fighter) {
@@ -928,41 +932,41 @@ unsafe extern "C" fn daisy_downb_item_script(fighter: &mut L2CAgentBase) {
 pub fn install() {
     Agent::new("daisy")
     .on_line(Main, daisy_frame) //opff
-    .game_acmd("game_attack11", daisy_jab_smash_script)
-    .game_acmd("game_attack12", daisy_jab2_smash_script)
-	.game_acmd("game_attackdash", daisy_dashattack_script)
-    .game_acmd("game_attacks3", daisy_ftilt_script)
-    .game_acmd("game_attackhi3", daisy_utilt_script)
-    .effect_acmd("effect_attackhi3", daisy_utilt_effect_script)
-    .sound_acmd("sound_attackhi3", daisy_utilt_sound_script)
-    .game_acmd("game_attacklw3", daisy_dtilt_script)
-    .game_acmd("game_attacks4", daisy_fsmash_golf_script)
-    .game_acmd("game_attacks4hi", daisy_fsmash_pan_script)
-    .game_acmd("game_attacks4lw", daisy_fsmash_tennis_script)
-    .game_acmd("game_attackhi4", daisy_usmash_script)
-    .game_acmd("game_attacklw4", daisy_dsmash_script)
-    .game_acmd("game_attackairn", daisy_nair_script)
-    .game_acmd("game_attackairf", daisy_fair_script)
-    .effect_acmd("effect_attackairf", daisy_fair_effect_script)
-    .sound_acmd("sound_attackairf", daisy_fair_sound_script)
-    .expression_acmd("expression_attackairf", daisy_fair_expression_script)
-    .game_acmd("game_attackairb", daisy_bair_script)
-    .game_acmd("game_attackairhi", daisy_uair_script)
-    .game_acmd("game_attackairlw", daisy_dair_script)
-    .game_acmd("game_catch", daisy_grab_script)
-    .game_acmd("game_catchdash", daisy_grabd_script)
-    .game_acmd("game_catchturn", daisy_grabp_script)
-    .game_acmd("game_throwf", daisy_fthrow_script)
-    .game_acmd("game_throwb", daisy_bthrow_script)
-    .game_acmd("game_throwhi", daisy_uthrow_script)
-    .game_acmd("game_throwlw", daisy_dthrow_script)
-    .game_acmd("game_specialairsend", daisy_sideb_air_end_script)
-    .game_acmd("game_specialshitend", daisy_sideb_landing_script)
-    .game_acmd("game_specialhistart", daisy_upb_rise_script)
-    .game_acmd("game_specialairhistart", daisy_upb_rise_air_script)
-    .game_acmd("game_specialhiopen", daisy_upb_parasolopen_script)
-    .game_acmd("game_speciallw", daisy_downb_script)
-    .game_acmd("game_speciallwutility", daisy_downb_item_script)
+    .game_acmd("game_attack11", daisy_jab_smash_script, Low)
+    .game_acmd("game_attack12", daisy_jab2_smash_script, Low)
+	.game_acmd("game_attackdash", daisy_dashattack_script, Low)
+    .game_acmd("game_attacks3", daisy_ftilt_script, Low)
+    .game_acmd("game_attackhi3", daisy_utilt_script, Low)
+    .effect_acmd("effect_attackhi3", daisy_utilt_effect_script, Low)
+    .sound_acmd("sound_attackhi3", daisy_utilt_sound_script, Low)
+    .game_acmd("game_attacklw3", daisy_dtilt_script, Low)
+    .game_acmd("game_attacks4", daisy_fsmash_golf_script, Low)
+    .game_acmd("game_attacks4hi", daisy_fsmash_pan_script, Low)
+    .game_acmd("game_attacks4lw", daisy_fsmash_tennis_script, Low)
+    .game_acmd("game_attackhi4", daisy_usmash_script, Low)
+    .game_acmd("game_attacklw4", daisy_dsmash_script, Low)
+    .game_acmd("game_attackairn", daisy_nair_script, Low)
+    .game_acmd("game_attackairf", daisy_fair_script, Low)
+    .effect_acmd("effect_attackairf", daisy_fair_effect_script, Low)
+    .sound_acmd("sound_attackairf", daisy_fair_sound_script, Low)
+    .expression_acmd("expression_attackairf", daisy_fair_expression_script, Low)
+    .game_acmd("game_attackairb", daisy_bair_script, Low)
+    .game_acmd("game_attackairhi", daisy_uair_script, Low)
+    .game_acmd("game_attackairlw", daisy_dair_script, Low)
+    .game_acmd("game_catch", daisy_grab_script, Low)
+    .game_acmd("game_catchdash", daisy_grabd_script, Low)
+    .game_acmd("game_catchturn", daisy_grabp_script, Low)
+    .game_acmd("game_throwf", daisy_fthrow_script, Low)
+    .game_acmd("game_throwb", daisy_bthrow_script, Low)
+    .game_acmd("game_throwhi", daisy_uthrow_script, Low)
+    .game_acmd("game_throwlw", daisy_dthrow_script, Low)
+    .game_acmd("game_specialairsend", daisy_sideb_air_end_script, Low)
+    .game_acmd("game_specialshitend", daisy_sideb_landing_script, Low)
+    .game_acmd("game_specialhistart", daisy_upb_rise_script, Low)
+    .game_acmd("game_specialairhistart", daisy_upb_rise_air_script, Low)
+    .game_acmd("game_specialhiopen", daisy_upb_parasolopen_script, Low)
+    .game_acmd("game_speciallw", daisy_downb_script, Low)
+    .game_acmd("game_speciallwutility", daisy_downb_item_script, Low)
     .install();
 
     Agent::new("kirby")
@@ -970,7 +974,7 @@ pub fn install() {
     .install();
 
     Agent::new("daisy_kinopiospore")
-    .game_acmd("game_shot", neutralb_toad_spores)
+    .game_acmd("game_shot", neutralb_toad_spores, Low)
     .install();
 
 }

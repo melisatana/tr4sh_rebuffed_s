@@ -8,6 +8,8 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
+
 
 static mut SHEIK_SIDETAUNT_INVISIBLE : [bool; 8] = [false; 8];
 
@@ -437,7 +439,7 @@ unsafe extern "C" fn sheik_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
-        MotionModule::set_rate(fighter.module_accessor, 1.);
+        MotionModule::set_rate(fighter.module_accessor, 1.2);
     }
 }
 
@@ -447,19 +449,24 @@ unsafe extern "C" fn sheik_nair_smash_script(fighter: &mut L2CAgentBase) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
         macros::ATTACK(fighter, 0, 0, Hash40::new("kneel"), 10.1, 361, 110, 0, 30, 4.8, 5.1, -0.1, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
         macros::ATTACK(fighter, 1, 0, Hash40::new("kneel"), 10.1, 361, 110, 0, 30, 4.6, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("hip"), 10.1, 361, 110, 0, 30, 3.8, -1.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("kneer"), 10.1, 361, 110, 0, 30, 4.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("kneel"), 6.0, 55, 100, 0, 30, 4.6, 4.9, -0.1, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("kneel"), 6.0, 55, 100, 0, 30, 4.2, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("hip"), 6.0, 55, 100, 0, 30, 3.3, -1.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("kneel"), 6.0, 55, 100, 0, 30, 4.4, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("kneer"), 6.0, 55, 100, 0, 30, 3.8, 1.7, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 25.0);
     if macros::is_excute(fighter) {
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
         AttackModule::clear_all(fighter.module_accessor);
-        MotionModule::set_rate(fighter.module_accessor, 1.65);
+        //MotionModule::set_rate(fighter.module_accessor, 1.65);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 40.0);
+    if macros::is_excute(fighter) {
+        CancelModule::enable_cancel(fighter.module_accessor);
+        notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS_BOTH_SIDES);
     }
 }
 
@@ -613,7 +620,11 @@ unsafe extern "C" fn sheik_grab_smash_script(fighter: &mut L2CAgentBase) {
 unsafe extern "C" fn sheik_grabd_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
-        MotionModule::set_rate(fighter.module_accessor, 1.2);
+        MotionModule::set_rate(fighter.module_accessor, 1.6);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 8.0);
+    if macros::is_excute(fighter) {
+        MotionModule::set_rate(fighter.module_accessor, 1.0);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
@@ -626,6 +637,7 @@ unsafe extern "C" fn sheik_grabd_smash_script(fighter: &mut L2CAgentBase) {
     macros::game_CaptureCutCommon(fighter);
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
+        MotionModule::set_rate(fighter.module_accessor, 1.2);
         GrabModule::clear_all(fighter.module_accessor);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_CATCH_FLAG_CATCH_WAIT);
         GrabModule::set_rebound(fighter.module_accessor, false);
@@ -635,7 +647,11 @@ unsafe extern "C" fn sheik_grabd_smash_script(fighter: &mut L2CAgentBase) {
 unsafe extern "C" fn sheik_grabp_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
-        MotionModule::set_rate(fighter.module_accessor, 1.2);
+        MotionModule::set_rate(fighter.module_accessor, 1.6);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 8.0);
+    if macros::is_excute(fighter) {
+        MotionModule::set_rate(fighter.module_accessor, 1.0);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 11.0);
     if macros::is_excute(fighter) {
@@ -648,6 +664,7 @@ unsafe extern "C" fn sheik_grabp_smash_script(fighter: &mut L2CAgentBase) {
     macros::game_CaptureCutCommon(fighter);
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
+        MotionModule::set_rate(fighter.module_accessor, 1.2);
         GrabModule::clear_all(fighter.module_accessor);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_CATCH_FLAG_CATCH_WAIT);
         GrabModule::set_rebound(fighter.module_accessor, false);
@@ -857,46 +874,46 @@ unsafe extern "C" fn sheik_sidetaunt_script(fighter: &mut L2CAgentBase) {
 pub fn install() {
     Agent::new("sheik")
     .on_line(Main, sheik_frame) //opff
-    .game_acmd("game_attack11", sheik_jab_smash_script)
-    .game_acmd("game_attack12", sheik_jab2_smash_script)
-    .game_acmd("game_attack100", sheik_jab100_smash_script)
-    .game_acmd("game_attack100end", sheik_jab100end_smash_script)
-    .game_acmd("game_attackdash", sheik_dashattack_smash_script)
-    .game_acmd("game_attacks3", sheik_ftilt_smash_script)
-    .game_acmd("game_attackhi3", sheik_utilt_smash_script)
-    .game_acmd("game_attacklw3", sheik_dtilt_smash_script)
-    .game_acmd("game_attacks4", sheik_fsmash_smash_script)
-    .game_acmd("game_attackhi4", sheik_usmash_smash_script)
-    .game_acmd("game_attacklw4", sheik_dsmash_smash_script)
-    .game_acmd("game_attackairn", sheik_nair_smash_script)
-    .game_acmd("game_attackairf", sheik_fair_smash_script)
-    .game_acmd("game_attackairb", sheik_bair_smash_script)
-    .game_acmd("game_attackairhi", sheik_uair_smash_script)
-    .game_acmd("game_attackairlw", sheik_dair_smash_script)
-    .game_acmd("game_landingairlw", sheik_dair_landing_smash_script)
-    .game_acmd("game_catch", sheik_grab_smash_script)
-    .game_acmd("game_catchdash", sheik_grabd_smash_script)
-    .game_acmd("game_catchturn", sheik_grabp_smash_script)
-    .game_acmd("game_throwf", sheik_fthrow_smash_script)
-    .game_acmd("game_throwb", sheik_bthrow_smash_script)
-    .game_acmd("game_throwhi", sheik_uthrow_smash_script)
-    .game_acmd("game_throwlw", sheik_dthrow_smash_script)
-    .game_acmd("game_specials", sheik_sideb_throw_smash_script)
-    .game_acmd("game_specialairs", sheik_sideb_throw_smash_script)
-    .game_acmd("game_specialhistart", sheik_upb_start_smash_script)
-    .game_acmd("game_specialairhistart", sheik_upb_start_smash_script)
-    .game_acmd("game_speciallwattack", sheik_downb_attack_smash_script)
-    .game_acmd("game_speciallwattackreturn", sheik_downb_attack_subsequent_smash_script)
-    .game_acmd("game_appealsl", sheik_sidetaunt_script)
-    .game_acmd("game_appealsr", sheik_sidetaunt_script)
+    .game_acmd("game_attack11", sheik_jab_smash_script, Low)
+    .game_acmd("game_attack12", sheik_jab2_smash_script, Low)
+    .game_acmd("game_attack100", sheik_jab100_smash_script, Low)
+    .game_acmd("game_attack100end", sheik_jab100end_smash_script, Low)
+    .game_acmd("game_attackdash", sheik_dashattack_smash_script, Low)
+    .game_acmd("game_attacks3", sheik_ftilt_smash_script, Low)
+    .game_acmd("game_attackhi3", sheik_utilt_smash_script, Low)
+    .game_acmd("game_attacklw3", sheik_dtilt_smash_script, Low)
+    .game_acmd("game_attacks4", sheik_fsmash_smash_script, Low)
+    .game_acmd("game_attackhi4", sheik_usmash_smash_script, Low)
+    .game_acmd("game_attacklw4", sheik_dsmash_smash_script, Low)
+    .game_acmd("game_attackairn", sheik_nair_smash_script, Low)
+    .game_acmd("game_attackairf", sheik_fair_smash_script, Low)
+    .game_acmd("game_attackairb", sheik_bair_smash_script, Low)
+    .game_acmd("game_attackairhi", sheik_uair_smash_script, Low)
+    .game_acmd("game_attackairlw", sheik_dair_smash_script, Low)
+    .game_acmd("game_landingairlw", sheik_dair_landing_smash_script, Low)
+    .game_acmd("game_catch", sheik_grab_smash_script, Low)
+    .game_acmd("game_catchdash", sheik_grabd_smash_script, Low)
+    .game_acmd("game_catchturn", sheik_grabp_smash_script, Low)
+    .game_acmd("game_throwf", sheik_fthrow_smash_script, Low)
+    .game_acmd("game_throwb", sheik_bthrow_smash_script, Low)
+    .game_acmd("game_throwhi", sheik_uthrow_smash_script, Low)
+    .game_acmd("game_throwlw", sheik_dthrow_smash_script, Low)
+    .game_acmd("game_specials", sheik_sideb_throw_smash_script, Low)
+    .game_acmd("game_specialairs", sheik_sideb_throw_smash_script, Low)
+    .game_acmd("game_specialhistart", sheik_upb_start_smash_script, Low)
+    .game_acmd("game_specialairhistart", sheik_upb_start_smash_script, Low)
+    .game_acmd("game_speciallwattack", sheik_downb_attack_smash_script, Low)
+    .game_acmd("game_speciallwattackreturn", sheik_downb_attack_subsequent_smash_script, Low)
+    .game_acmd("game_appealsl", sheik_sidetaunt_script, Low)
+    .game_acmd("game_appealsr", sheik_sidetaunt_script, Low)
     .install();
 
     Agent::new("sheik_needle")
-    .game_acmd("game_move", needle_projectile)
+    .game_acmd("game_move", needle_projectile, Low)
     .install();
 
     Agent::new("sheik_fusin")
-    .game_acmd("game_explosion", upb_projectile)
+    .game_acmd("game_explosion", upb_projectile, Low)
     .install();
 
 

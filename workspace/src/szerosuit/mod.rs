@@ -8,6 +8,8 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
+
 
 static mut SZEROSUIT_PASSIVE_TIMER : [i32; 8] = [0; 8];
 pub static mut SZEROSUIT_PASSIVE_TIMER_READY : [bool; 8] = [false; 8];
@@ -96,7 +98,7 @@ unsafe extern "C" fn kirby_zsshat_frame(fighter: &mut L2CFighterCommon) {
             crate::custom::fastfall_helper(fighter);
         }
 
-        if [*FIGHTER_STATUS_KIND_GUARD_ON, *FIGHTER_STATUS_KIND_GUARD].contains(&status) {
+        if [*FIGHTER_STATUS_KIND_GUARD_ON, *FIGHTER_STATUS_KIND_GUARD].contains(&status) && WorkModule::get_int(fighter.module_accessor, *FIGHTER_KIRBY_INSTANCE_WORK_ID_INT_COPY_CHARA) == *FIGHTER_KIND_SZEROSUIT {
             if ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_SPECIAL) {
                 SZEROSUIT_LASER_TOGGLE_TYPE[entry_id] += 1;
                 if SZEROSUIT_LASER_TOGGLE_TYPE[entry_id] == 1 { //fire
@@ -182,8 +184,10 @@ unsafe extern "C" fn szerosuit_jab2_smash_script(fighter: &mut L2CAgentBase) {
 unsafe extern "C" fn szerosuit_jab3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.7, 61, 90, 0, 50, 4.2, 0.0, 9.5, 8.0, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 1, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_ELBOW);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 3.7, 61, 90, 0, 50, 3.7, 0.0, 9.0, 2.0, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 1, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_ELBOW);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.7, 61, 83, 0, 60, 4.2, 0.0, 9.5, 8.0, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 1, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_ELBOW);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 3.7, 61, 83, 0, 60, 3.7, 0.0, 9.0, 2.0, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 1, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_ELBOW);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 1.0, false);
+        AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 1.0, false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
@@ -234,7 +238,7 @@ unsafe extern "C" fn szerosuit_dashattack_smash_script(fighter: &mut L2CAgentBas
 unsafe extern "C" fn szerosuit_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 2, 0, Hash40::new("kneer"), 8.1, 115, 70, 0, 50, 4.7, 7.5, 0.0, 1.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 2, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("kneer"), 8.8, 115, 70, 0, 50, 4.7, 7.5, 0.0, 1.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 2, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_KICK);
         macros::ATTACK(fighter, 1, 0, Hash40::new("kneer"), 8.1, 361, 110, 0, 30, 4.4, 1.0, 0.0, 1.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 2, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
         macros::ATTACK(fighter, 0, 0, Hash40::new("kneer"), 8.1, 361, 110, 0, 30, 4.0, -5.0, 0.0, 1.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 2, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
     }
@@ -263,8 +267,8 @@ unsafe extern "C" fn szerosuit_utilt_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 9.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.7, 88, 81, 0, 65, 7.0, 0.0, 20.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 7.7, 88, 81, 0, 65, 6.0, 0.0, 14.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 7.7, 88, 81, 0, 60, 7.0, 0.0, 20.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 7.7, 88, 81, 0, 60, 6.0, 0.0, 14.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_KICK);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
@@ -1722,53 +1726,53 @@ unsafe extern "C" fn szerosuit_downb_kick_landing_smash_script(fighter: &mut L2C
 pub fn install() {
     Agent::new("szerosuit")
     .on_line(Main, szerosuit_frame) //opff
-    .game_acmd("game_attack11", szerosuit_jab_smash_script)
-    .game_acmd("game_attack12", szerosuit_jab2_smash_script)
-    .game_acmd("game_attack13", szerosuit_jab3_smash_script)
-    .game_acmd("game_attackdash", szerosuit_dashattack_smash_script)
-    .game_acmd("game_attacks3", szerosuit_ftilt_smash_script)
-    .game_acmd("game_attacks3hi", szerosuit_ftilt_smash_script)
-    .game_acmd("game_attacks3lw", szerosuit_ftilt_smash_script)
-    .game_acmd("game_attackhi3", szerosuit_utilt_smash_script)
-    .game_acmd("game_attacklw3", szerosuit_dtilt_smash_script)
-    .game_acmd("game_attacks4", szerosuit_fsmash_smash_script)
-    .game_acmd("game_attacks4hi", szerosuit_fsmash2_smash_script)
-    .game_acmd("game_attacks4lw", szerosuit_fsmash3_smash_script)
-    .game_acmd("game_attackhi4", szerosuit_usmash_smash_script)
-    .effect_acmd("effect_attacklw4charge", szerosuit_dsmash_charge_effect_script)
-    .game_acmd("game_attacklw4", szerosuit_dsmash_smash_script)
-    .effect_acmd("effect_attacklw4", szerosuit_dsmash_effect_script)
-    .game_acmd("game_attackairn", szerosuit_nair_smash_script)
-    .game_acmd("game_attackairf", szerosuit_fair_smash_script)
-    .game_acmd("game_attackairb", szerosuit_bair_smash_script)
-    .game_acmd("game_attackairhi", szerosuit_uair_smash_script)
-    .game_acmd("game_attackairlw", szerosuit_dair_smash_script)
-    .game_acmd("game_landingairlw", szerosuit_dair_landing_smash_script)
-    .game_acmd("game_catch", szerosuit_grab_smash_script)
-    .game_acmd("game_catchdash", szerosuit_grabd_smash_script)
-    .game_acmd("game_catchturn", szerosuit_grabp_smash_script)
-    .game_acmd("game_aircatch", szerosuit_zair_smash_script)
-    .game_acmd("game_throwf", szerosuit_fthrow_smash_script)
-    .game_acmd("game_throwb", szerosuit_bthrow_smash_script)
-    .game_acmd("game_throwhi", szerosuit_uthrow_smash_script)
-    .game_acmd("game_throwlw", szerosuit_dthrow_smash_script)
-    .game_acmd("game_specialnstart", szerosuit_neutralb_start_smash_script)
-    .game_acmd("game_specialairnstart", szerosuit_neutralb_start_smash_script)
-    .game_acmd("game_specialnshoot", szerosuit_neutralb_shoot_smash_script)
-    .game_acmd("game_specialairnshoot", szerosuit_neutralb_shoot_smash_script)
-    .effect_acmd("effect_specialnshoot", szerosuit_neutralb_shoot_effect_script)
-    .effect_acmd("effect_specialairnshoot", szerosuit_neutralb_shoot_effect_script)
-    .effect_acmd("effect_specialnshooth", szerosuit_neutralb_shoot_hold_effect_script)
-    .effect_acmd("effect_specialairnshooth", szerosuit_neutralb_shoot_hold_effect_script)
-    .game_acmd("game_specials", szerosuit_sideb_smash_script)
-    .game_acmd("game_specialairs", szerosuit_sideb_air_smash_script)
-    .game_acmd("game_specials2", szerosuit_sideb_2_smash_script)
-    .game_acmd("game_specialairs2", szerosuit_sideb_2_air_smash_script)
-    .game_acmd("game_specialhi", szerosuit_upb_smash_script)
-    .game_acmd("game_specialairhi", szerosuit_upb_smash_script)
-    .game_acmd("game_specialairlwflip", szerosuit_downb_flip_smash_script)
-    .game_acmd("game_specialairlwkick", szerosuit_downb_kick_smash_script)
-    .game_acmd("game_speciallwkicklanding", szerosuit_downb_kick_landing_smash_script)
+    .game_acmd("game_attack11", szerosuit_jab_smash_script, Low)
+    .game_acmd("game_attack12", szerosuit_jab2_smash_script, Low)
+    .game_acmd("game_attack13", szerosuit_jab3_smash_script, Low)
+    .game_acmd("game_attackdash", szerosuit_dashattack_smash_script, Low)
+    .game_acmd("game_attacks3", szerosuit_ftilt_smash_script, Low)
+    .game_acmd("game_attacks3hi", szerosuit_ftilt_smash_script, Low)
+    .game_acmd("game_attacks3lw", szerosuit_ftilt_smash_script, Low)
+    .game_acmd("game_attackhi3", szerosuit_utilt_smash_script, Low)
+    .game_acmd("game_attacklw3", szerosuit_dtilt_smash_script, Low)
+    .game_acmd("game_attacks4", szerosuit_fsmash_smash_script, Low)
+    .game_acmd("game_attacks4hi", szerosuit_fsmash2_smash_script, Low)
+    .game_acmd("game_attacks4lw", szerosuit_fsmash3_smash_script, Low)
+    .game_acmd("game_attackhi4", szerosuit_usmash_smash_script, Low)
+    .effect_acmd("effect_attacklw4charge", szerosuit_dsmash_charge_effect_script, Low)
+    .game_acmd("game_attacklw4", szerosuit_dsmash_smash_script, Low)
+    .effect_acmd("effect_attacklw4", szerosuit_dsmash_effect_script, Low)
+    .game_acmd("game_attackairn", szerosuit_nair_smash_script, Low)
+    .game_acmd("game_attackairf", szerosuit_fair_smash_script, Low)
+    .game_acmd("game_attackairb", szerosuit_bair_smash_script, Low)
+    .game_acmd("game_attackairhi", szerosuit_uair_smash_script, Low)
+    .game_acmd("game_attackairlw", szerosuit_dair_smash_script, Low)
+    .game_acmd("game_landingairlw", szerosuit_dair_landing_smash_script, Low)
+    .game_acmd("game_catch", szerosuit_grab_smash_script, Low)
+    .game_acmd("game_catchdash", szerosuit_grabd_smash_script, Low)
+    .game_acmd("game_catchturn", szerosuit_grabp_smash_script, Low)
+    .game_acmd("game_aircatch", szerosuit_zair_smash_script, Low)
+    .game_acmd("game_throwf", szerosuit_fthrow_smash_script, Low)
+    .game_acmd("game_throwb", szerosuit_bthrow_smash_script, Low)
+    .game_acmd("game_throwhi", szerosuit_uthrow_smash_script, Low)
+    .game_acmd("game_throwlw", szerosuit_dthrow_smash_script, Low)
+    .game_acmd("game_specialnstart", szerosuit_neutralb_start_smash_script, Low)
+    .game_acmd("game_specialairnstart", szerosuit_neutralb_start_smash_script, Low)
+    .game_acmd("game_specialnshoot", szerosuit_neutralb_shoot_smash_script, Low)
+    .game_acmd("game_specialairnshoot", szerosuit_neutralb_shoot_smash_script, Low)
+    .effect_acmd("effect_specialnshoot", szerosuit_neutralb_shoot_effect_script, Low)
+    .effect_acmd("effect_specialairnshoot", szerosuit_neutralb_shoot_effect_script, Low)
+    .effect_acmd("effect_specialnshooth", szerosuit_neutralb_shoot_hold_effect_script, Low)
+    .effect_acmd("effect_specialairnshooth", szerosuit_neutralb_shoot_hold_effect_script, Low)
+    .game_acmd("game_specials", szerosuit_sideb_smash_script, Low)
+    .game_acmd("game_specialairs", szerosuit_sideb_air_smash_script, Low)
+    .game_acmd("game_specials2", szerosuit_sideb_2_smash_script, Low)
+    .game_acmd("game_specialairs2", szerosuit_sideb_2_air_smash_script, Low)
+    .game_acmd("game_specialhi", szerosuit_upb_smash_script, Low)
+    .game_acmd("game_specialairhi", szerosuit_upb_smash_script, Low)
+    .game_acmd("game_specialairlwflip", szerosuit_downb_flip_smash_script, Low)
+    .game_acmd("game_specialairlwkick", szerosuit_downb_kick_smash_script, Low)
+    .game_acmd("game_speciallwkicklanding", szerosuit_downb_kick_landing_smash_script, Low)
     .install();
 
     Agent::new("kirby")
@@ -1776,17 +1780,17 @@ pub fn install() {
     .install();
 
     Agent::new("szerosuit_paralyzer_bullet")
-    .game_acmd("game_shoot", paralyzer_projectile)
-    .game_acmd("game_shoottame", paralyzer_projectile_big)
-    .effect_acmd("effect_shoot", paralyzer_projectile_effect)
-    .effect_acmd("effect_shoottame", paralyzer_projectile_big_effect)
+    .game_acmd("game_shoot", paralyzer_projectile, Low)
+    .game_acmd("game_shoottame", paralyzer_projectile_big, Low)
+    .effect_acmd("effect_shoot", paralyzer_projectile_effect, Low)
+    .effect_acmd("effect_shoottame", paralyzer_projectile_big_effect, Low)
     .install();
 
     Agent::new("szerosuit_whip")
-    .game_acmd("game_specials", whip_sideb1)
-    .game_acmd("game_specialairs", whip_sideb1_air)
-    .game_acmd("game_specials2", whip_sideb2)
-    .game_acmd("game_specialairs2", whip_sideb2_air)
+    .game_acmd("game_specials", whip_sideb1, Low)
+    .game_acmd("game_specialairs", whip_sideb1_air, Low)
+    .game_acmd("game_specials2", whip_sideb2, Low)
+    .game_acmd("game_specialairs2", whip_sideb2_air, Low)
     .install();
 
 

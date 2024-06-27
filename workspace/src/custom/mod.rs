@@ -279,6 +279,7 @@ unsafe fn set_fighter_status_data_hook(boma: &mut BattleObjectModuleAccessor, ar
         || boma.kind() == *FIGHTER_KIND_WARIO && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
 
         || boma.kind() == *FIGHTER_KIND_MURABITO && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
+        || boma.kind() == *FIGHTER_KIND_PACMAN && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_N])
         || boma.kind() == *FIGHTER_KIND_LITTLEMAC && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_N, *FIGHTER_LITTLEMAC_STATUS_KIND_SPECIAL_N2, *FIGHTER_LITTLEMAC_STATUS_KIND_SPECIAL_N_START, *FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_MIIFIGHTER && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_N, *FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_MIISWORDSMAN && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
@@ -756,17 +757,6 @@ pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
                 }
             }
         }
-
-        /*if [*FIGHTER_STATUS_KIND_ESCAPE_AIR, *FIGHTER_STATUS_KIND_ESCAPE_AIR_SLIDE].contains(&status)  {
-            let touch_right = GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_RIGHT_SIDE as u32);
-            let touch_left = GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_LEFT_SIDE as u32);
-            let touch_side = GroundModule::is_wall_touch_line(fighter.module_accessor, *GROUND_TOUCH_FLAG_SIDE as u32);
-            if touch_left || touch_right || touch_side {
-                if stickx_directional <= -0.5 { 
-                    StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_WALL_JUMP, false);
-                }
-            }
-        }*/
 
         
 

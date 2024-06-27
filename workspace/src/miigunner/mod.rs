@@ -8,6 +8,7 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase, L2CFighterBase};
 use smashline::*;
 use smash_script::*;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
 
 static mut MIIGUNNER_STEALTHBOMB_IS_HITSTUN : [bool; 8] = [false; 8];
 
@@ -1010,75 +1011,75 @@ unsafe extern "C" fn miigunner_downb_vortex_end_air_smash_script(fighter: &mut L
 pub fn install() {
     Agent::new("miigunner")
     .on_line(Main, miigunner_frame) //opff
-    .game_acmd("game_attack11", miigunner_jab_smash_script)
-    .game_acmd("game_attack12", miigunner_jab2_smash_script)
-    .game_acmd("game_attack13", miigunner_jab3_smash_script)
-    .game_acmd("game_attackdash", miigunner_dashattack_smash_script)
-    .game_acmd("game_attacks3", miigunner_ftilt_smash_script)
-    .game_acmd("game_attackhi3", miigunner_utilt_smash_script)
-    .game_acmd("game_attacklw3", miigunner_dtilt_smash_script)
-    .game_acmd("game_attacks4", miigunner_fsmash_smash_script)
-    .game_acmd("game_attackhi4", miigunner_usmash_smash_script)
-    .game_acmd("game_attacklw4", miigunner_dsmash_smash_script)
-    .game_acmd("game_attackairn", miigunner_nair_smash_script)
-    .game_acmd("game_attackairf", miigunner_fair_smash_script)
-    .game_acmd("game_attackairb", miigunner_bair_smash_script)
-    .game_acmd("game_attackairhi", miigunner_uair_smash_script)
-    .game_acmd("game_attackairlw", miigunner_dair_smash_script)
-    .game_acmd("game_catch", miigunner_grab_smash_script)
-    .game_acmd("game_catchdash", miigunner_grabd_smash_script)
-    .game_acmd("game_catchturn", miigunner_grabp_smash_script)
-    .game_acmd("game_throwf", miigunner_fthrow_smash_script)
-    .game_acmd("game_throwb", miigunner_bthrow_smash_script)
-    .game_acmd("game_throwhi", miigunner_uthrow_smash_script)
-    .game_acmd("game_throwlw", miigunner_dthrow_smash_script)
-    .game_acmd("game_specialn2loop", miigunner_neutralb_laserblazeloop_smash_script)
-    .game_acmd("game_specialairn2loop", miigunner_neutralb_laserblazeloop_air_smash_script)
-    .game_acmd("game_specialn2end", miigunner_neutralb_laserblaze_end_smash_script)
-    .game_acmd("game_specialn3start", miigunner_neutralb_grenade_start_smash_script)
-    .game_acmd("game_specialairn3start", miigunner_neutralb_grenade_start_smash_script)
-    .game_acmd("game_specialn3end", miigunner_neutralb_grenade_end_smash_script)
-    .game_acmd("game_specialairn3end", miigunner_neutralb_grenade_end_smash_script)
-    .game_acmd("game_specials1", miigunner_sideb_flamepillar_smash_script)
-    .game_acmd("game_specialairs1", miigunner_sideb_flamepillar_air_smash_script)
-    .game_acmd("game_specialhi2squat", miigunner_upb_cannonkicksquat_smash_script)
-    .game_acmd("game_specialairhi2squat", miigunner_upb_cannonkicksquat_air_smash_script)
-    .game_acmd("game_specialhi2", miigunner_upb_cannonkick_smash_script)
-    .game_acmd("game_speciallw1start", miigunner_downb_reflector_start_smash_script)
-    .game_acmd("game_specialairlw1start", miigunner_downb_reflector_start_air_smash_script)
-    .game_acmd("game_speciallw2", miigunner_downb_bombdrop_smash_script)
-    .game_acmd("game_specialairlw2", miigunner_downb_bombdrop_air_smash_script)
-    .game_acmd("game_speciallw3hold", miigunner_downb_vortex_hold_smash_script)
-    .game_acmd("game_specialairlw3hold", miigunner_downb_vortex_hold_air_smash_script)
-    .game_acmd("game_speciallw3end", miigunner_downb_vortex_end_smash_script)
-    .game_acmd("game_specialairlw3end", miigunner_downb_vortex_end_air_smash_script)
+    .game_acmd("game_attack11", miigunner_jab_smash_script, Low)
+    .game_acmd("game_attack12", miigunner_jab2_smash_script, Low)
+    .game_acmd("game_attack13", miigunner_jab3_smash_script, Low)
+    .game_acmd("game_attackdash", miigunner_dashattack_smash_script, Low)
+    .game_acmd("game_attacks3", miigunner_ftilt_smash_script, Low)
+    .game_acmd("game_attackhi3", miigunner_utilt_smash_script, Low)
+    .game_acmd("game_attacklw3", miigunner_dtilt_smash_script, Low)
+    .game_acmd("game_attacks4", miigunner_fsmash_smash_script, Low)
+    .game_acmd("game_attackhi4", miigunner_usmash_smash_script, Low)
+    .game_acmd("game_attacklw4", miigunner_dsmash_smash_script, Low)
+    .game_acmd("game_attackairn", miigunner_nair_smash_script, Low)
+    .game_acmd("game_attackairf", miigunner_fair_smash_script, Low)
+    .game_acmd("game_attackairb", miigunner_bair_smash_script, Low)
+    .game_acmd("game_attackairhi", miigunner_uair_smash_script, Low)
+    .game_acmd("game_attackairlw", miigunner_dair_smash_script, Low)
+    .game_acmd("game_catch", miigunner_grab_smash_script, Low)
+    .game_acmd("game_catchdash", miigunner_grabd_smash_script, Low)
+    .game_acmd("game_catchturn", miigunner_grabp_smash_script, Low)
+    .game_acmd("game_throwf", miigunner_fthrow_smash_script, Low)
+    .game_acmd("game_throwb", miigunner_bthrow_smash_script, Low)
+    .game_acmd("game_throwhi", miigunner_uthrow_smash_script, Low)
+    .game_acmd("game_throwlw", miigunner_dthrow_smash_script, Low)
+    .game_acmd("game_specialn2loop", miigunner_neutralb_laserblazeloop_smash_script, Low)
+    .game_acmd("game_specialairn2loop", miigunner_neutralb_laserblazeloop_air_smash_script, Low)
+    .game_acmd("game_specialn2end", miigunner_neutralb_laserblaze_end_smash_script, Low)
+    .game_acmd("game_specialn3start", miigunner_neutralb_grenade_start_smash_script, Low)
+    .game_acmd("game_specialairn3start", miigunner_neutralb_grenade_start_smash_script, Low)
+    .game_acmd("game_specialn3end", miigunner_neutralb_grenade_end_smash_script, Low)
+    .game_acmd("game_specialairn3end", miigunner_neutralb_grenade_end_smash_script, Low)
+    .game_acmd("game_specials1", miigunner_sideb_flamepillar_smash_script, Low)
+    .game_acmd("game_specialairs1", miigunner_sideb_flamepillar_air_smash_script, Low)
+    .game_acmd("game_specialhi2squat", miigunner_upb_cannonkicksquat_smash_script, Low)
+    .game_acmd("game_specialairhi2squat", miigunner_upb_cannonkicksquat_air_smash_script, Low)
+    .game_acmd("game_specialhi2", miigunner_upb_cannonkick_smash_script, Low)
+    .game_acmd("game_speciallw1start", miigunner_downb_reflector_start_smash_script, Low)
+    .game_acmd("game_specialairlw1start", miigunner_downb_reflector_start_air_smash_script, Low)
+    .game_acmd("game_speciallw2", miigunner_downb_bombdrop_smash_script, Low)
+    .game_acmd("game_specialairlw2", miigunner_downb_bombdrop_air_smash_script, Low)
+    .game_acmd("game_speciallw3hold", miigunner_downb_vortex_hold_smash_script, Low)
+    .game_acmd("game_specialairlw3hold", miigunner_downb_vortex_hold_air_smash_script, Low)
+    .game_acmd("game_speciallw3end", miigunner_downb_vortex_end_smash_script, Low)
+    .game_acmd("game_specialairlw3end", miigunner_downb_vortex_end_air_smash_script, Low)
     .install();
 
     Agent::new("miigunner_gunnercharge")
-    .game_acmd("game_shoot", chargeblast_projectile)
+    .game_acmd("game_shoot", chargeblast_projectile, Low)
     .install();
 
     Agent::new("miigunner_rapidshot_bullet")
-    .game_acmd("game_flythrowb", bthrow_bullet)
-    .game_acmd("game_flythrowhi", uthrow_bullet_1)
-    .game_acmd("game_fly", laserblaze_projectile)
+    .game_acmd("game_flythrowb", bthrow_bullet, Low)
+    .game_acmd("game_flythrowhi", uthrow_bullet_1, Low)
+    .game_acmd("game_fly", laserblaze_projectile, Low)
     .install();
 
 
     Agent::new("miigunner_grenadelauncher")
-    .game_acmd("game_fly", grenade_moving)
-    .game_acmd("game_explode", grenade_exploding)
-    .effect_acmd("effect_explode", grenade_exploding_effect)
+    .game_acmd("game_fly", grenade_moving, Low)
+    .game_acmd("game_explode", grenade_exploding, Low)
+    .effect_acmd("effect_explode", grenade_exploding_effect, Low)
     .install();
 
     Agent::new("miigunner_attackairf_bullet")
-    .game_acmd("game_fly", fair_laser_projectile)
-    .effect_acmd("effect_fly", fair_laser_projectile_effect)
+    .game_acmd("game_fly", fair_laser_projectile, Low)
+    .effect_acmd("effect_fly", fair_laser_projectile_effect, Low)
     .install();
 
     Agent::new("miigunner_flamepillar")
-    .game_acmd("game_shoot", flamepillar_projectile)
-    .game_acmd("game_pillar", flamepillar_pillar)
+    .game_acmd("game_shoot", flamepillar_projectile, Low)
+    .game_acmd("game_pillar", flamepillar_pillar, Low)
     .install();
 
     Agent::new("miigunner_stealthbomb")
@@ -1086,26 +1087,26 @@ pub fn install() {
     .install();
 
     Agent::new("miigunner_stealthbomb_s")
-    .game_acmd("game_move", stealthbomb_projectile)
+    .game_acmd("game_move", stealthbomb_projectile, Low)
     .install();
 
     Agent::new("miigunner_groundbomb")
     .on_line(Main, miigunner_groundbomb_weapon_frame)
-    .game_acmd("game_fly", bombdrop_contact)
-    .game_acmd("game_burstattack", bombdrop_explode)
+    .game_acmd("game_fly", bombdrop_contact, Low)
+    .game_acmd("game_burstattack", bombdrop_explode, Low)
     .install();
 
     Agent::new("miigunner_miimissile")
-    .game_acmd("game_homing", miimissile_homing_projectile)
+    .game_acmd("game_homing", miimissile_homing_projectile, Low)
     .install();
 
     Agent::new("miigunner_supermissile")
-    .game_acmd("game_straight", miimissile_super_projectile)
-    .effect_acmd("effect_sburst", miimissile_super_effect)
+    .game_acmd("game_straight", miimissile_super_projectile, Low)
+    .effect_acmd("effect_sburst", miimissile_super_effect, Low)
     .install();
 
     Agent::new("miigunner_bottomshoot")
-    .game_acmd("game_shoot", lunarlaunch_projectile)
+    .game_acmd("game_shoot", lunarlaunch_projectile, Low)
     .install();
    
 

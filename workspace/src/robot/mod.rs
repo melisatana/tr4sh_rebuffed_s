@@ -8,6 +8,7 @@ use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smashline::*;
 use smash_script::*;
 use crate::custom::global_fighter_frame;
+use smashline::Priority::*;
 
 static mut ROBOT_SLOW_BACK_AIR : [bool; 8] = [false; 8];
 static mut ROBOT_SLOW_BACK_AIR_IN_SLOW : [bool; 8] = [false; 8];
@@ -824,42 +825,42 @@ unsafe extern "C" fn robot_sideb_end_smash_script(fighter: &mut L2CAgentBase) {
 pub fn install() {
     Agent::new("robot")
     .on_line(Main, robot_frame) //opff
-    .game_acmd("game_attack11", robot_jab_smash_script)
-    .game_acmd("game_attack12", robot_jab2_smash_script)
-    .game_acmd("game_attackdash", robot_dashattack_smash_script)
-    .game_acmd("game_attacks3", robot_ftilt_smash_script)
-    .game_acmd("game_attacks3hi", robot_ftilt2_smash_script)
-    .game_acmd("game_attacks3lw", robot_ftilt3_smash_script)
-    .game_acmd("game_attackhi3", robot_utilt_smash_script)
-    .game_acmd("game_attacklw3", robot_dtilt_smash_script)
-    .game_acmd("game_attacks4", robot_fsmash_smash_script)
-    .game_acmd("game_attacks4hi", robot_fsmash2_smash_script)
-    .game_acmd("game_attacks4lw", robot_fsmash3_smash_script)
-    .game_acmd("game_attackhi4", robot_usmash_smash_script)
-    .game_acmd("game_attacklw4", robot_dsmash_smash_script)
-    .game_acmd("game_attackairn", robot_nair_smash_script)
-    .game_acmd("game_attackairf", robot_fair_smash_script)
-    .game_acmd("game_attackairb", robot_bair_smash_script)
-    .game_acmd("game_attackairhi", robot_uair_smash_script)
-    .game_acmd("game_attackairlw", robot_dair_smash_script)
-    .game_acmd("game_catch", robot_grab_smash_script)
-    .game_acmd("game_catchdash", robot_grabd_smash_script)
-    .game_acmd("game_catchturn", robot_grabp_smash_script)
-    .game_acmd("game_throwf", robot_fthrow_smash_script)
-    .game_acmd("game_throwb", robot_bthrow_smash_script)
-    .game_acmd("game_throwhi", robot_uthrow_smash_script)
-    .game_acmd("game_throwlw", robot_dthrow_smash_script)
-    .game_acmd("game_specialn", robot_neutralb_smash_script)
-    .game_acmd("game_specialairn", robot_neutralb_smash_script)
-    .game_acmd("game_specials", robot_sideb_speen_smash_script)
-    .game_acmd("game_specialairs", robot_sideb_speen_smash_script)
-    .game_acmd("game_specialsend", robot_sideb_end_smash_script)
-    .game_acmd("game_specialairsend", robot_sideb_end_smash_script)    
+    .game_acmd("game_attack11", robot_jab_smash_script, Low)
+    .game_acmd("game_attack12", robot_jab2_smash_script, Low)
+    .game_acmd("game_attackdash", robot_dashattack_smash_script, Low)
+    .game_acmd("game_attacks3", robot_ftilt_smash_script, Low)
+    .game_acmd("game_attacks3hi", robot_ftilt2_smash_script, Low)
+    .game_acmd("game_attacks3lw", robot_ftilt3_smash_script, Low)
+    .game_acmd("game_attackhi3", robot_utilt_smash_script, Low)
+    .game_acmd("game_attacklw3", robot_dtilt_smash_script, Low)
+    .game_acmd("game_attacks4", robot_fsmash_smash_script, Low)
+    .game_acmd("game_attacks4hi", robot_fsmash2_smash_script, Low)
+    .game_acmd("game_attacks4lw", robot_fsmash3_smash_script, Low)
+    .game_acmd("game_attackhi4", robot_usmash_smash_script, Low)
+    .game_acmd("game_attacklw4", robot_dsmash_smash_script, Low)
+    .game_acmd("game_attackairn", robot_nair_smash_script, Low)
+    .game_acmd("game_attackairf", robot_fair_smash_script, Low)
+    .game_acmd("game_attackairb", robot_bair_smash_script, Low)
+    .game_acmd("game_attackairhi", robot_uair_smash_script, Low)
+    .game_acmd("game_attackairlw", robot_dair_smash_script, Low)
+    .game_acmd("game_catch", robot_grab_smash_script, Low)
+    .game_acmd("game_catchdash", robot_grabd_smash_script, Low)
+    .game_acmd("game_catchturn", robot_grabp_smash_script, Low)
+    .game_acmd("game_throwf", robot_fthrow_smash_script, Low)
+    .game_acmd("game_throwb", robot_bthrow_smash_script, Low)
+    .game_acmd("game_throwhi", robot_uthrow_smash_script, Low)
+    .game_acmd("game_throwlw", robot_dthrow_smash_script, Low)
+    .game_acmd("game_specialn", robot_neutralb_smash_script, Low)
+    .game_acmd("game_specialairn", robot_neutralb_smash_script, Low)
+    .game_acmd("game_specials", robot_sideb_speen_smash_script, Low)
+    .game_acmd("game_specialairs", robot_sideb_speen_smash_script, Low)
+    .game_acmd("game_specialsend", robot_sideb_end_smash_script, Low)
+    .game_acmd("game_specialairsend", robot_sideb_end_smash_script, Low)    
     .install();
 
     Agent::new("robot_beam")
-    .game_acmd("game_fly", robo_beam_projectile)
-    .game_acmd("game_flymax", robo_beam_max_projectile)
+    .game_acmd("game_fly", robo_beam_projectile, Low)
+    .game_acmd("game_flymax", robo_beam_max_projectile, Low)
     .install();
 
 }
