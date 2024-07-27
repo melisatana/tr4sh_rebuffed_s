@@ -21,10 +21,29 @@ unsafe extern "C" fn rockman_frame(fighter: &mut L2CFighterCommon) {
         global_fighter_frame(fighter);
         let status = StatusModule::status_kind(fighter.module_accessor);
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+        let sticky = ControlModule::get_stick_y(fighter.module_accessor);
+        
+
+        if 
+        [*FIGHTER_ROCKMAN_STATUS_KIND_ROCKBUSTER_SHOOT_WALK, 
+        *FIGHTER_ROCKMAN_STATUS_KIND_ROCKBUSTER_SHOOT_WALK_BRAKE, 
+        *FIGHTER_ROCKMAN_STATUS_KIND_ROCKBUSTER_SHOOT_WAIT, 
+        *FIGHTER_ROCKMAN_STATUS_KIND_ROCKBUSTER_SHOOT_TURN,
+        *FIGHTER_ROCKMAN_STATUS_KIND_ROCKBUSTER_SHOOT_LANDING].contains(&status ) {
+            if sticky <= -0.5 {
+                GroundModule::set_passable_check(fighter.module_accessor, true);
+                GroundModule::pass_floor(fighter.module_accessor);
+            }
+            else {
+                GroundModule::set_passable_check(fighter.module_accessor, false);
+            }
+        }
+
 
         if status == *FIGHTER_STATUS_KIND_SPECIAL_S {
             crate::custom::fastfall_helper(fighter);
         }
+
 
         if ROCKMAN_GIANT_TORNADO[entry_id] && status == *FIGHTER_STATUS_KIND_ATTACK_AIR && ROCKMAN_GIANT_TORNADO_CAN_CANCEL[entry_id] && ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_ATTACK) == false {
             ROCKMAN_GIANT_TORNADO[entry_id] = false;
@@ -61,15 +80,43 @@ unsafe extern "C" fn rockman_megabuster_ground_turn_smash_script(fighter: &mut L
 
 unsafe extern "C" fn megabuster_projectile(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.3, 361, 30, 0, 22, 3.3, 0.0, 0.0, 0.0, None, None, None, 1.0, 0.5, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_SPEED, false, 1, 0.0, 0, false, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.6, 361, 30, 0, 22, 3.3, 0.0, 0.0, 0.0, None, None, None, 1.0, 0.5, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_SPEED, false, 1, 0.0, 0, false, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_ENERGY);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.3, 361, 10, 0, 12, 2.2, 0.0, 0.0, 0.0, None, None, None, 0.7, 0.5, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_SPEED, false, 1, 0.0, 0, false, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.6, 361, 10, 0, 12, 2.2, 0.0, 0.0, 0.0, None, None, None, 0.7, 0.5, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_SPEED, false, 1, 0.0, 0, false, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_ENERGY);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.3, 361, 10, 0, 8, 2.2, 0.0, 0.0, 0.0, None, None, None, 0.7, 0.5, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_SPEED, false, 1, 0.0, 0, false, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 3.6, 361, 10, 0, 8, 2.2, 0.0, 0.0, 0.0, None, None, None, 0.7, 0.5, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_SPEED, false, 1, 0.0, 0, false, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_ENERGY);
+    }
+}
+
+
+unsafe extern "C" fn rockman_jab_smash_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 2.0);
+    if macros::is_excute(fighter) {
+        ArticleModule::generate_article_enable(fighter.module_accessor, *FIGHTER_ROCKMAN_GENERATE_ARTICLE_ROCKBUSTER, false, -1);
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_ROCKMAN_INSTANCE_WORK_ID_FLAG_ROCKBUSTER_SHOOT);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("arml"), 4.7, 72, 100, 0, 65, 3.5, 3.5, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
+    }
+    sv_animcmd::wait(fighter.lua_state_agent, 2.0);
+    if macros::is_excute(fighter) {
+        AttackModule::clear_all(fighter.module_accessor);
+    }
+}
+
+
+unsafe extern "C" fn rockman_ftilt_smash_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 2.0);
+    if macros::is_excute(fighter) {
+        ArticleModule::generate_article_enable(fighter.module_accessor, *FIGHTER_ROCKMAN_GENERATE_ARTICLE_ROCKBUSTER, false, -1);
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_ROCKMAN_INSTANCE_WORK_ID_FLAG_ROCKBUSTER_SHOOT);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("arml"), 4.7, 72, 100, 0, 65, 3.5, 3.5, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
+    }
+    sv_animcmd::wait(fighter.lua_state_agent, 2.0);
+    if macros::is_excute(fighter) {
+        AttackModule::clear_all(fighter.module_accessor);
     }
 }
 
@@ -137,6 +184,7 @@ unsafe extern "C" fn rockman_dtilt_smash_script(fighter: &mut L2CAgentBase) {
         JostleModule::set_status(fighter.module_accessor, false);
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("kneer"), HitStatus(*HIT_STATUS_XLU), 0);
         HitModule::set_status_joint(fighter.module_accessor, Hash40::new("kneel"), HitStatus(*HIT_STATUS_XLU), 0);
+        HitModule::set_status_joint(fighter.module_accessor, Hash40::new("head"), HitStatus(*HIT_STATUS_XLU), 0);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
@@ -825,11 +873,11 @@ unsafe extern "C" fn crashbomb_explode(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         VisibilityModule::set_whole(fighter.module_accessor, false);
         macros::AREA_WIND_2ND_RAD_arg9(fighter, 0, 2, 0.02, 300, 1, 0, 0, 20, 80);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.5, 361, 15, 0, 16, 7.0, 0.0, 0.0, 0.0, None, None, None, 0.3, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_LR, false, 1.5, 0.0, 5, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, true, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_BOMB);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.5, 361, 15, 0, 16, 7.8, 0.0, 0.0, 0.0, None, None, None, 0.3, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_LR, false, 1.5, 0.0, 5, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, true, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_BOMB);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 19.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.0, 80, 109, 0, 70, 10.0, 0.0, 0.0, 0.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_LR, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, true, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_BOMB);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.0, 80, 109, 0, 70, 10.8, 0.0, 0.0, 0.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_LR, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, true, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_BOMB);
         AttackModule::clear(fighter.module_accessor, 1, false);
     }
 }
@@ -927,7 +975,9 @@ pub fn install() {
     Agent::new("rockman")
     .on_line(Main, rockman_frame) //opff
     .game_acmd("game_attack1turn", rockman_megabuster_ground_turn_smash_script, Low)
+    .game_acmd("game_attack11", rockman_jab_smash_script, Low)
     .game_acmd("game_attackdash", rockman_dashattack_smash_script, Low)
+    .game_acmd("game_attacks3", rockman_ftilt_smash_script, Low)
     .game_acmd("game_attackhi3", rockman_utilt_smash_script, Low)
     .game_acmd("game_attacklw3", rockman_dtilt_smash_script, Low)
     .game_acmd("game_attacks4", rockman_fsmash_smash_script, Low)

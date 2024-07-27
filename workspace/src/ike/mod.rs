@@ -22,6 +22,7 @@ unsafe extern "C" fn ike_frame(fighter: &mut L2CFighterCommon) {
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
         let sticky = ControlModule::get_stick_y(fighter.module_accessor);
+        let stickx = ControlModule::get_stick_x(fighter.module_accessor);
 
         //println!("It'sa me, Ike, I fight for my friendz!");
 
@@ -34,6 +35,15 @@ unsafe extern "C" fn ike_frame(fighter: &mut L2CFighterCommon) {
         
         if IKE_SLOW_FAIR[entry_id] && status != *FIGHTER_STATUS_KIND_ATTACK_AIR {
             IKE_SLOW_FAIR[entry_id] = false;
+        }
+
+        if [*FIGHTER_IKE_STATUS_KIND_SPECIAL_N_END, *FIGHTER_IKE_STATUS_KIND_SPECIAL_N_END_MDL, *FIGHTER_IKE_STATUS_KIND_SPECIAL_N_END_MAX].contains(&status) 
+        && (MotionModule::frame(fighter.module_accessor) >= (1.0) 
+        && MotionModule::frame(fighter.module_accessor) <= (3.0)) {
+            if (stickx >= 0.5 && PostureModule::lr(fighter.module_accessor) <= -0.5) || (stickx <= -0.5 && PostureModule::lr(fighter.module_accessor) >= 0.5) {
+                PostureModule::reverse_lr(fighter.module_accessor);
+                PostureModule::update_rot_y_lr(fighter.module_accessor);
+            }
         }
 
         if [*FIGHTER_IKE_STATUS_KIND_SPECIAL_S_DASH, *FIGHTER_IKE_STATUS_KIND_SPECIAL_S_HOLD].contains(&status) {
@@ -52,6 +62,24 @@ unsafe extern "C" fn ike_frame(fighter: &mut L2CFighterCommon) {
             }
             else {
                 GroundModule::set_passable_check(fighter.module_accessor, false);
+            }
+        }
+    }
+}
+
+
+unsafe extern "C" fn kirby_ikehat_frame(fighter: &mut L2CFighterCommon) {
+    unsafe {
+        let stickx = ControlModule::get_stick_x(fighter.module_accessor);
+        let status = StatusModule::status_kind(fighter.module_accessor);
+        
+
+        if [*FIGHTER_KIRBY_STATUS_KIND_IKE_SPECIAL_N_END, *FIGHTER_KIRBY_STATUS_KIND_IKE_SPECIAL_N_END_MDL, *FIGHTER_KIRBY_STATUS_KIND_IKE_SPECIAL_N_END_MAX].contains(&status) 
+        && (MotionModule::frame(fighter.module_accessor) >= (1.0) 
+        && MotionModule::frame(fighter.module_accessor) <= (3.0)) {
+            if (stickx >= 0.5 && PostureModule::lr(fighter.module_accessor) <= -0.5) || (stickx <= -0.5 && PostureModule::lr(fighter.module_accessor) >= 0.5) {
+                PostureModule::reverse_lr(fighter.module_accessor);
+                PostureModule::update_rot_y_lr(fighter.module_accessor);
             }
         }
     }
@@ -424,7 +452,7 @@ unsafe extern "C" fn ike_fair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
         if IKE_SLOW_FAIR[entry_id] {
-            MotionModule::set_rate(fighter.module_accessor, 0.071111);
+            MotionModule::set_rate(fighter.module_accessor, 0.0666);
             IKE_SLOW_FAIR_IN_SLOW[entry_id] = true;
         }
     }
@@ -735,6 +763,18 @@ unsafe extern "C" fn ike_neutralb_loop_smash_script(fighter: &mut L2CAgentBase) 
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 2, 3.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 3, 3.0, false);
     }
+    if WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_KIND) == *FIGHTER_KIND_KIRBY {
+        if macros::is_excute(fighter) {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.1, 88, 100, 0, 40, 4.7, 0.0, 9.0, 1.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 10, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_SWORD);
+            macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 1.1, 88, 100, 0, 40, 4.7, 0.0, 7.0, 4.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 10, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_SWORD);
+            macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 1.1, 88, 100, 0, 40, 4.7, 0.0, 5.0, 7.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 10, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_SWORD);    
+            macros::ATTACK(fighter, 3, 0, Hash40::new("sword"), 1.1, 88, 100, 0, 40, 4.0, 0.0, 4.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 10, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_SWORD);
+            AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 3.0, false);
+            AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 3.0, false);
+            AttackModule::set_add_reaction_frame(fighter.module_accessor, 2, 3.0, false);
+            AttackModule::set_add_reaction_frame(fighter.module_accessor, 3, 3.0, false);    
+        }
+    }
 }
 
 unsafe extern "C" fn ike_neutralb_loop_air_smash_script(fighter: &mut L2CAgentBase) {
@@ -747,6 +787,18 @@ unsafe extern "C" fn ike_neutralb_loop_air_smash_script(fighter: &mut L2CAgentBa
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 3.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 2, 3.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 3, 3.0, false);
+    }
+    if WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_KIND) == *FIGHTER_KIND_KIRBY {
+        if macros::is_excute(fighter) {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 1.1, 88, 100, 0, 40, 4.7, 0.0, 9.0, 1.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 10, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_SWORD);
+            macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 1.1, 88, 100, 0, 40, 4.7, 0.0, 7.0, 4.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 10, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_SWORD);
+            macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 1.1, 88, 100, 0, 40, 4.7, 0.0, 5.0, 7.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 10, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_SWORD);    
+            macros::ATTACK(fighter, 3, 0, Hash40::new("sword"), 1.1, 88, 100, 0, 40, 4.0, 0.0, 4.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 10, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_SWORD);
+            AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 3.0, false);
+            AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 3.0, false);
+            AttackModule::set_add_reaction_frame(fighter.module_accessor, 2, 3.0, false);
+            AttackModule::set_add_reaction_frame(fighter.module_accessor, 3, 3.0, false);    
+        }
     }
 }
 
@@ -1195,6 +1247,10 @@ pub fn install() {
     .game_acmd("game_specialairlwhit", ike_downb_counter_hit_smash_script, Low)
     .game_acmd("game_appeallwl", ike_downtaunt_smash_script, Low)
     .game_acmd("game_appeallwr", ike_downtaunt_smash_script, Low)
+    .install();
+
+    Agent::new("kirby")
+    .on_line(Main, kirby_ikehat_frame)
     .install();
 
     Agent::new("ike_sword")

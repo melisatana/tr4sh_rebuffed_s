@@ -474,9 +474,9 @@ unsafe extern "C" fn luma_utilt_smash_script(fighter: &mut L2CAgentBase) {
 unsafe extern "C" fn rosetta_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("footl"), 6.7, 77, 90, 0, 35, 5.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("kneel"), 6.7, 77, 90, 0, 35, 4.2, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("legl"), 6.7, 77, 90, 0, 35, 3.5, 1.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("footl"), 6.7, 77, 85, 0, 39, 5.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("kneel"), 6.7, 77, 85, 0, 39, 4.2, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("legl"), 6.7, 77, 85, 0, 39, 3.5, 1.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
         AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 2.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 2.0, false);
@@ -499,7 +499,7 @@ unsafe extern "C" fn luma_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.5, 30, 120, 0, 35, 4.5, 0.0, 3.0, 4.0, Some(0.0), Some(3.0), Some(8.5), 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_HEAD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.5, 40, 120, 0, 42, 4.5, 0.0, 3.0, 4.0, Some(0.0), Some(3.0), Some(8.5), 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_HEAD);
         AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
@@ -525,7 +525,7 @@ unsafe extern "C" fn rosetta_fsmash_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.8, 361, 114, 0, 30, 6.5, 0.0, 11.0, 10.0, Some(0.0), Some(11.0), Some(15.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_MAGIC);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("hip"), 11.0, 30, 100, 0, 70, 5.0, -3.0, 0.0, 0.0, None, None, None, 2.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_SLAP, *ATTACK_REGION_MAGIC);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("hip"), 11.0, 30, 100, 0, 70, 5.8, -3.0, 0.0, 0.0, None, None, None, 2.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_SLAP, *ATTACK_REGION_MAGIC);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 1.3);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
@@ -547,7 +547,7 @@ unsafe extern "C" fn rosetta_fsmash2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.8, 361, 114, 0, 30, 6.5, 0.0, 17.0, 10.0, Some(0.0), Some(20.0), Some(14.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_MAGIC);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("hip"), 11.0, 30, 100, 0, 70, 5.0, -3.0, 0.0, 0.0, None, None, None, 2.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_SLAP, *ATTACK_REGION_MAGIC);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("hip"), 11.0, 30, 100, 0, 70, 5.8, -3.0, 0.0, 0.0, None, None, None, 2.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_SLAP, *ATTACK_REGION_MAGIC);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 1.3);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
@@ -569,7 +569,7 @@ unsafe extern "C" fn rosetta_fsmash3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.8, 361, 114, 0, 30, 6.5, 0.0, 7.0, 10.0, Some(0.0), Some(6.0), Some(14.0), 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_MAGIC);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("hip"), 11.0, 30, 100, 0, 70, 5.0, -3.0, 0.0, 0.0, None, None, None, 2.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_SLAP, *ATTACK_REGION_MAGIC);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("hip"), 11.0, 30, 100, 0, 70, 5.8, -3.0, 0.0, 0.0, None, None, None, 2.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_SLAP, *ATTACK_REGION_MAGIC);
         macros::ATK_SET_SHIELD_SETOFF_MUL(fighter, 0, 1.3);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
@@ -649,7 +649,7 @@ unsafe extern "C" fn rosetta_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.2, 32, 122, 0, 40, 3.9, 0.0, 3.5, 19.0, Some(0.0), Some(3.5), Some(9.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 5, 0.3, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 11.2, 32, 122, 0, 40, 4.9, 0.0, 3.5, 19.0, Some(0.0), Some(3.5), Some(8.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 5, 0.3, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_KICK);
         AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
@@ -658,7 +658,7 @@ unsafe extern "C" fn rosetta_dsmash_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 17.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.4, 32, 122, 0, 36, 3.9, 0.0, 3.5, -19.0, Some(0.0), Some(3.5), Some(-9.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 5, 0.3, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.4, 32, 122, 0, 36, 4.9, 0.0, 3.5, -19.0, Some(0.0), Some(3.5), Some(-8.0), 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 5, 0.3, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_KICK);
         AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
@@ -703,9 +703,9 @@ unsafe extern "C" fn rosetta_nair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.0);
         macros::EFFECT_FOLLOW(fighter, Hash40::new("rosetta_wand_stardust"), Hash40::new("havel"), 0, 13.0, 0, 0, 0, 0, 0.8, true);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("havel"), 7.6, 70, 71, 0, 47, 5.1, 0.0, 7.0, 5.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 10, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_MAGIC);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("havel"), 7.6, 70, 71, 0, 47, 5.1, 0.0, 13.0, 5.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 10, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_MAGIC);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("handl"), 7.6, 70, 71, 0, 47, 3.8, 0.0, 2.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 10, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_MAGIC);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("havel"), 7.4, 70, 79, 0, 47, 4.7, 0.0, 7.0, 5.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 10, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_MAGIC);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("havel"), 7.4, 70, 79, 0, 47, 4.7, 0.0, 13.0, 5.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 10, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_MAGIC);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("handl"), 7.4, 70, 79, 0, 47, 3.8, 0.0, 2.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 10, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_MAGIC, *ATTACK_REGION_MAGIC);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 35.0);
     if macros::is_excute(fighter) {
@@ -850,7 +850,7 @@ unsafe extern "C" fn rosetta_bair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.15);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 6.5, 68, 60, 0, 50, 4.5, 0.0, 10.0, -9.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 4, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 6.5, 68, 60, 0, 50, 4.5, 0.0, 10.0, -17.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 4, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_KICK);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 6.5, 68, 60, 0, 50, 4.5, 0.0, 10.0, -9.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 4, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_KICK);
         macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 6.5, 68, 60, 0, 50, 4.0, 0.0, 10.0, -3.4, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 4, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_magic"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_KICK);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 2.0, false);
@@ -903,7 +903,7 @@ unsafe extern "C" fn rosetta_uair_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 15.0);
     if macros::is_excute(fighter) {
-        MotionModule::set_rate(fighter.module_accessor, 1.3);
+        MotionModule::set_rate(fighter.module_accessor, 1.4);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 20.0);
     if macros::is_excute(fighter) {
@@ -928,7 +928,7 @@ unsafe extern "C" fn luma_uair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::wait(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
-        MotionModule::set_rate(fighter.module_accessor, 1.3);
+        MotionModule::set_rate(fighter.module_accessor, 1.4);
     }
 }
 
@@ -1169,10 +1169,23 @@ unsafe extern "C" fn rosetta_upb_start_smash_script(fighter: &mut L2CAgentBase) 
     }
 }
 
+
+unsafe extern "C" fn rosetta_upb_start_air_smash_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    macros::FT_MOTION_RATE(fighter, 1.5);
+    if macros::is_excute(fighter) {
+        macros::SET_SPEED_EX(fighter, 0.0, 0.5, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 3.0);
+    if macros::is_excute(fighter) {
+        WorkModule::on_flag(fighter.module_accessor, *FIGHTER_ROSETTA_STATUS_SPECIAL_HI_START_FLAG_REVERSE_LR);
+    }
+}
+
 unsafe extern "C" fn rosetta_upb_fly_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         JostleModule::set_status(fighter.module_accessor, false);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("neck"), 11.1, 260, 90, 0, 19, 8.5, -2.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 6, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_HEAD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("neck"), 12.6, 260, 80, 0, 19, 8.5, -2.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 12, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_HEAD);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 12.0);
     if macros::is_excute(fighter) {
@@ -1188,6 +1201,10 @@ unsafe extern "C" fn rosetta_upb_ending_smash_script(fighter: &mut L2CAgentBase)
 }
 
 unsafe extern "C" fn rosetta_downb_smash_script(fighter: &mut L2CAgentBase) {
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_DAMAGE_POWER, 9.0);
+    }
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     for _ in 0..27 {
         if macros::is_excute(fighter) {
@@ -1214,6 +1231,9 @@ unsafe extern "C" fn rosetta_downb_smash_script(fighter: &mut L2CAgentBase) {
         ItemModule::pickup_item(fighter.module_accessor, ItemSize{ _address: *ITEM_SIZE_LIGHT as u8 }, 0, -1, QuickItemTreatType{ _address: 0 }, ItemPickupSearchMode{ _address: 0 });
     }
     sv_animcmd::wait(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_NORMAL, 0.0);
+    }
 }
 
 unsafe extern "C" fn rosetta_downb_effect_script(fighter: &mut L2CAgentBase) {
@@ -1289,7 +1309,7 @@ pub fn install() {
     .game_acmd("game_specials", rosetta_sideb_smash_script, Low)
     .game_acmd("game_specialairs", rosetta_sideb_smash_script, Low)
     .game_acmd("game_specialhistart", rosetta_upb_start_smash_script, Low)
-    .game_acmd("game_specialairhistart", rosetta_upb_start_smash_script, Low)
+    .game_acmd("game_specialairhistart", rosetta_upb_start_air_smash_script, Low)
     .game_acmd("game_specialhi", rosetta_upb_fly_smash_script, Low)
     .game_acmd("game_specialhiend", rosetta_upb_ending_smash_script, Low)
     .game_acmd("game_speciallw", rosetta_downb_smash_script, Low)
@@ -1311,7 +1331,6 @@ pub fn install() {
     .game_acmd("game_attacks3", luma_ftilt_smash_script, Low)
     .game_acmd("game_attackhi3", luma_utilt_smash_script, Low)
     .game_acmd("game_attacklw3", luma_dtilt_smash_script, Low)
-    .game_acmd("game_attacks4", luma_fsmash_smash_script, Low)
     .game_acmd("game_attacks4", luma_fsmash_smash_script, Low)
     .game_acmd("game_attacks4hi", luma_fsmash_smash_script, Low)
     .game_acmd("game_attacks4lw", luma_fsmash_smash_script, Low)

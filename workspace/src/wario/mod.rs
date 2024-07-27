@@ -55,19 +55,21 @@ unsafe extern "C" fn wario_frame(fighter: &mut L2CFighterCommon) {
             ModelModule::set_joint_scale(fighter.module_accessor, Hash40::new("arml"), &Vector3f{x:2.0, y:2.0, z:2.0});
         }
 
-        if WARIO_DSMASH_SPEEN[entry_id] {
-            //GroundModule::correct(fighter.module_accessor, GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
-            JostleModule::set_status(fighter.module_accessor, false);
-            if stickx_directional >= 0.5 {
-                KineticModule::add_speed(fighter.module_accessor, &smash::phx::Vector3f{x: 0.3, y: 0.0, z: 0.0});
-                if KineticModule::get_sum_speed_x(fighter.module_accessor, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN) * lr > 1.0 {
-                    macros::SET_SPEED_EX(fighter, 1.0, 0.0, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
+        if status == *FIGHTER_STATUS_KIND_ATTACK_LW4 {
+            if WARIO_DSMASH_SPEEN[entry_id] {
+                //GroundModule::correct(fighter.module_accessor, GroundCorrectKind(*GROUND_CORRECT_KIND_GROUND));
+                JostleModule::set_status(fighter.module_accessor, false);
+                if stickx_directional >= 0.5 {
+                    KineticModule::add_speed(fighter.module_accessor, &smash::phx::Vector3f{x: 0.3, y: 0.0, z: 0.0});
+                    if KineticModule::get_sum_speed_x(fighter.module_accessor, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN) * lr > 1.0 {
+                        macros::SET_SPEED_EX(fighter, 1.0, 0.0, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
+                    }
                 }
-            }
-            else if stickx_directional <= -0.5 {
-                KineticModule::add_speed(fighter.module_accessor, &smash::phx::Vector3f{x: -0.3, y: 0.0, z: 0.0});
-                if KineticModule::get_sum_speed_x(fighter.module_accessor, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN) * lr < -1.0 {
-                    macros::SET_SPEED_EX(fighter, -1.0, 0.0, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
+                else if stickx_directional <= -0.5 {
+                    KineticModule::add_speed(fighter.module_accessor, &smash::phx::Vector3f{x: -0.3, y: 0.0, z: 0.0});
+                    if KineticModule::get_sum_speed_x(fighter.module_accessor, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN) * lr < -1.0 {
+                        macros::SET_SPEED_EX(fighter, -1.0, 0.0, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
+                    }
                 }
             }
         }
@@ -84,7 +86,8 @@ unsafe extern "C" fn wario_frame(fighter: &mut L2CFighterCommon) {
             *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_JUMP_BOARD,
             *FIGHTER_STATUS_KIND_WIN, 
             *FIGHTER_STATUS_KIND_LOSE, 
-            *FIGHTER_STATUS_KIND_DEAD
+            *FIGHTER_STATUS_KIND_DEAD,
+            *FIGHTER_STATUS_KIND_SLEEP
             ].contains(&status) || StatusModule::situation_kind(fighter.module_accessor) == *SITUATION_KIND_AIR || sv_information::is_ready_go() == false {
             WARIO_DSMASH_SPEEN[entry_id] = false;
         }
@@ -113,6 +116,20 @@ unsafe extern "C" fn kirby_wariohat_frame(fighter: &mut L2CFighterCommon) {
             }
         }
 
+    }
+}
+
+unsafe extern "C" fn wario_squatf(fighter: &mut L2CAgentBase) {
+    if macros::is_excute(fighter) {
+        //MotionModule::set_rate(fighter.module_accessor, 2.0);
+        macros::FT_MOTION_RATE(fighter, 0.5);
+    }
+}
+
+unsafe extern "C" fn wario_squatb(fighter: &mut L2CAgentBase) {
+    if macros::is_excute(fighter) {
+        //MotionModule::set_rate(fighter.module_accessor, 2.0);
+        macros::FT_MOTION_RATE(fighter, 0.5);
     }
 }
 
@@ -439,12 +456,12 @@ unsafe extern "C" fn wario_usmash(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 11.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("head"), 16.7, 95, 94, 0, 45, 7.8, 4.5, 2.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_HEAD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("head"), 15.3, 95, 98, 0, 45, 7.8, 4.5, 2.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_HEAD);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
-        MotionModule::set_rate(fighter.module_accessor, 1.35);
+        MotionModule::set_rate(fighter.module_accessor, 1.5);
         HitModule::set_status_all(fighter.module_accessor, HitStatus(*HIT_STATUS_NORMAL), 0);
     }
 }
@@ -1119,6 +1136,8 @@ unsafe extern "C" fn wario_bike_turn_loop(fighter: &mut L2CAgentBase) {
 pub fn install() {
     Agent::new("wario")
     .on_line(Main, wario_frame) //opff
+    .game_acmd("game_squatf", wario_squatf, Low)
+    .game_acmd("game_squatb", wario_squatb, Low)
     .game_acmd("game_attack11", wario_jab, Low)
     .game_acmd("game_attack12", wario_jab2, Low)
     .game_acmd("game_attackdash", wario_dashattack, Low)

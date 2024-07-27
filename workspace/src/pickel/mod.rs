@@ -23,6 +23,8 @@ unsafe extern "C" fn steve_frame(fighter: &mut L2CFighterCommon) {
         let status = StatusModule::status_kind(fighter.module_accessor);
         let stickx = ControlModule::get_stick_x(fighter.module_accessor);
         let lr = PostureModule::lr(fighter.module_accessor);
+        let sticky = ControlModule::get_stick_y(fighter.module_accessor);
+
 
 
         //println!("*vibe check*");
@@ -43,6 +45,19 @@ unsafe extern "C" fn steve_frame(fighter: &mut L2CFighterCommon) {
             }
             else {
                 macros::COL_NORMAL(fighter);
+            }
+        }
+
+        if 
+        [*FIGHTER_PICKEL_STATUS_KIND_ATTACK_WAIT, 
+        *FIGHTER_PICKEL_STATUS_KIND_ATTACK_WALK,
+        *FIGHTER_PICKEL_STATUS_KIND_ATTACK_WALK_BACK].contains(&status) {
+            if sticky <= -0.5 {
+                GroundModule::set_passable_check(fighter.module_accessor, true);
+                GroundModule::pass_floor(fighter.module_accessor);
+            }
+            else {
+                GroundModule::set_passable_check(fighter.module_accessor, false);
             }
         }
 
@@ -77,6 +92,7 @@ unsafe extern "C" fn steve_frame(fighter: &mut L2CFighterCommon) {
             STEVE_SLOW_DOWN_AIR_CAN_CANCEL[entry_id] = false;
             STEVE_SLOW_DOWN_AIR_IN_SLOW[entry_id] = false;
         }
+        
         
     }
 }

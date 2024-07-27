@@ -9,6 +9,7 @@ use smashline::*;
 use smash_script::*;
 use crate::custom::global_fighter_frame;
 use smashline::Priority::*;
+use smash::hash40;
 
 
 static mut SNAKE_FSMASH_CHARGE: [bool; 8] = [false; 8];
@@ -26,9 +27,22 @@ unsafe extern "C" fn snake_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
         let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
         let status = StatusModule::status_kind(fighter.module_accessor);
+        let hitlag_frame = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_HIT_STOP_ATTACK_SUSPEND_FRAME);
+    
         
         global_fighter_frame(fighter);
         //println!("It'sa me, Snake, tasty!!");
+
+        if MotionModule::motion_kind(fighter.module_accessor) == hash40("attack_11") {
+            if hitlag_frame <= 0 
+            && (AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) 
+            && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false) {
+                WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_CATCH);
+                fighter.sub_transition_group_check_ground_catch();
+                    
+            }
+        }
+
 
         if SNAKE_CLOAK_RECHARGE_TIMER[entry_id] <= 0 {
             if SNAKE_CLOAK_TIMER[entry_id] > 0 {
@@ -77,6 +91,21 @@ unsafe extern "C" fn snake_frame(fighter: &mut L2CFighterCommon) {
         }
 
 
+    }
+}
+
+
+unsafe extern "C" fn snake_squatf_smash_script(fighter: &mut L2CAgentBase) {
+    if macros::is_excute(fighter) {
+        //MotionModule::set_rate(fighter.module_accessor, 2.0);
+        macros::FT_MOTION_RATE(fighter, 0.5);
+    }
+}
+
+unsafe extern "C" fn snake_squatb_smash_script(fighter: &mut L2CAgentBase) {
+    if macros::is_excute(fighter) {
+        //MotionModule::set_rate(fighter.module_accessor, 2.0);
+        macros::FT_MOTION_RATE(fighter, 0.5);
     }
 }
 
@@ -435,7 +464,7 @@ unsafe extern "C" fn mortar_explode(fighter: &mut L2CAgentBase) {
         KineticModule::unable_energy(fighter.module_accessor, *WEAPON_SNAKE_TRENCHMORTAR_BULLET_KINETIC_ENERGY_ID_GRAVITY);
         VisibilityModule::set_int64(fighter.module_accessor, Hash40::new("main").hash as i64, Hash40::new("impact").hash as i64);
         AttackModule::clear_all(fighter.module_accessor);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 15.3, 65, 98, 0, 50, 12.0, 0.0, 0.0, 2.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, true, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_BOMB, *ATTACK_REGION_BOMB);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 15.3, 70, 98, 0, 50, 12.0, 0.0, 0.0, 2.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, true, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_BOMB, *ATTACK_REGION_BOMB);
         macros::QUAKE(fighter, *CAMERA_QUAKE_KIND_S);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
@@ -509,7 +538,7 @@ unsafe extern "C" fn snake_nair_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 36.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.8, 361, 129, 0, 25, 7.5, 0.0, 11.0, 7.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 8.8, 57, 109, 0, 25, 7.5, 0.0, 11.0, 7.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
@@ -599,9 +628,9 @@ unsafe extern "C" fn snake_uair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 1.25);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.4, 80, 97, 0, 45, 4.8, 0.0, 12.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 13.4, 80, 97, 0, 45, 4.8, 0.0, 16.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 13.4, 80, 97, 0, 45, 4.8, 0.0, 21.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.5, 80, 97, 0, 45, 4.8, 0.0, 12.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 12.5, 80, 97, 0, 45, 4.8, 0.0, 16.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 12.5, 80, 97, 0, 45, 4.8, 0.0, 21.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 14.0);
     if macros::is_excute(fighter) {
@@ -1038,6 +1067,7 @@ unsafe extern "C" fn snake_taunt_end_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         if SNAKE_CLOAK_RECHARGE_TIMER[entry_id] <= 0 {
             if ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_HI) || ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_L) || ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_R) || ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_LW) {
+                macros::EFFECT(fighter, Hash40::new("sys_smash_flash"), Hash40::new("top"), 0, 6.0, 0, 0, 0, 0, 1.3, 0, 0, 0, 0, 0, 0, true);
                 SNAKE_CLOAK_TIMER[entry_id] = 540;
         
             }
@@ -1050,6 +1080,8 @@ unsafe extern "C" fn snake_taunt_end_script(fighter: &mut L2CAgentBase) {
 pub fn install() {
     Agent::new("snake")
     .on_line(Main, snake_frame) //opff
+    .game_acmd("game_squatf", snake_squatf_smash_script, Low)
+    .game_acmd("game_squatb", snake_squatb_smash_script, Low)
     .game_acmd("game_attack11", snake_jab_smash_script, Low)
     .game_acmd("game_attack12", snake_jab2_smash_script, Low)
     .game_acmd("game_attack13", snake_jab3_smash_script, Low)
