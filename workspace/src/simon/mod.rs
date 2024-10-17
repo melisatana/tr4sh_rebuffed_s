@@ -1207,6 +1207,7 @@ unsafe extern "C" fn simon_downb_smash_script(fighter: &mut L2CAgentBase) {
 
 //#[skyline::main(name = "tr4sh_rebuffed")]
 pub fn install() {
+
     Agent::new("simon")
       .on_line(Main, simon_frame) //opff
       .game_acmd("game_attack11", simon_jab_smash_script, Low)

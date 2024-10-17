@@ -231,6 +231,7 @@ pub extern "C" fn main() {
     popo::install();
     ridley::install();
     
+    
     /*
     miienemyf::install();
     miienemys::install();

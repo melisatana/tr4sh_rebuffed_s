@@ -17,6 +17,7 @@ static mut SELF_DAMAGE_FRAME_CURRENT_STATUS : [i32; 8] = [0; 8]; //for effect fr
 static mut PICHU_NEUTRALSPECIAL_FROMGROUND : [bool; 8] = [false; 8]; //if neutral special was started on the ground
 static mut PICHU_SELF_DAMAGE_GRACE : [i32; 8] = [0; 8];
 static mut PICHU_SELF_DAMAGE_GRAPHIC : [bool; 8] = [false; 8];
+static mut PICHU_SELF_DAMAGE_HAS_MUL : [bool; 8] = [false; 8];
 
 static PICHU_GRACE_FRAMES : i32 = 60;
 
@@ -136,7 +137,10 @@ unsafe extern "C" fn pichu_frame(fighter: &mut L2CFighterCommon) {
             DamageModule::set_damage_mul(fighter.module_accessor, 0.9);
         }
         else {
-            DamageModule::set_damage_mul(fighter.module_accessor, 1.0);
+            if PICHU_SELF_DAMAGE_HAS_MUL[entry_id] {
+                DamageModule::set_damage_mul(fighter.module_accessor, 1.0);
+                PICHU_SELF_DAMAGE_HAS_MUL[entry_id] = false;
+            }
         }
 
         if PICHU_SELF_DAMAGE_GRACE[entry_id] > 0 {
@@ -264,10 +268,10 @@ unsafe extern "C" fn pichu_dashattack(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
-        macros::FT_ADD_DAMAGE(fighter, 1.9);
-        SELF_DAMAGE_METER[entry_id] -= 1.9;
-        macros::ATTACK(fighter, 0, 0, Hash40::new("neck"), 12.1, 35, 95, 0, 70, 4.9, 3.0, -1.5, 1.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_HEAD);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("hip"), 12.1, 35, 95, 0, 70, 3.5, 0.7, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_HEAD);
+        macros::FT_ADD_DAMAGE(fighter, 1.6);
+        SELF_DAMAGE_METER[entry_id] -= 1.6;
+        macros::ATTACK(fighter, 0, 0, Hash40::new("neck"), 12.1, 38, 95, 0, 70, 4.9, 3.0, -1.5, 1.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_HEAD);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("hip"), 12.1, 38, 95, 0, 70, 3.5, 0.7, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_HEAD);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
@@ -576,8 +580,8 @@ unsafe extern "C" fn pichu_uair(fighter: &mut L2CAgentBase) {
         macros::EFFECT_FOLLOW_NO_STOP(fighter, Hash40::new("pichu_cheek2"), Hash40::new("head"), 0, 0, 0, 0, -90, -90, 1, true);
 
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("tail1"), 6.9, 70, 61, 0, 39, 3.1, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_TAIL);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("tail3"), 6.9, 70, 61, 0, 39, 4.1, 1.5, -0.2, -0.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_TAIL);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("tail1"), 7.2, 70, 61, 0, 39, 3.1, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_TAIL);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("tail3"), 7.2, 70, 61, 0, 39, 4.1, 1.5, -0.2, -0.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_elec"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_ELEC, *ATTACK_REGION_TAIL);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 2.0, false);
         AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 2.0, false);
     }
@@ -659,14 +663,14 @@ unsafe extern "C" fn pichu_grab(fighter: &mut L2CAgentBase) {
         GrabModule::clear_all(fighter.module_accessor);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_CATCH_FLAG_CATCH_WAIT);
         GrabModule::set_rebound(fighter.module_accessor, false);
-        MotionModule::set_rate(fighter.module_accessor, 1.2);
+        MotionModule::set_rate(fighter.module_accessor, 1.25);
     }
 }
 
 unsafe extern "C" fn pichu_grabd(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
-        MotionModule::set_rate(fighter.module_accessor, 1.2);
+        MotionModule::set_rate(fighter.module_accessor, 1.25);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 7.0);
     if macros::is_excute(fighter) {
@@ -688,7 +692,7 @@ unsafe extern "C" fn pichu_grabd(fighter: &mut L2CAgentBase) {
 unsafe extern "C" fn pichu_grabp(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
-        MotionModule::set_rate(fighter.module_accessor, 1.2);
+        MotionModule::set_rate(fighter.module_accessor, 1.25);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
@@ -934,11 +938,11 @@ unsafe extern "C" fn pichu_downspecial_hit(fighter: &mut L2CAgentBase) {
     }
     else if SELF_DAMAGE_METER[entry_id] <= PICHU_CHARGE_LV3 {
         thunder_damage = 32.0;
-        thunder_kbg = 79;
+        thunder_kbg = 74;
     }
     else if SELF_DAMAGE_METER[entry_id] <= PICHU_CHARGE_LV2 {
-        thunder_damage = 24.0;
-        thunder_kbg = 87;
+        thunder_damage = 22.0;
+        thunder_kbg = 83;
     }
     else if SELF_DAMAGE_METER[entry_id] <= PICHU_CHARGE_LV1 {
         thunder_damage = 16.0;

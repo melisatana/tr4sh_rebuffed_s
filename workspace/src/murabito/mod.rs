@@ -9,13 +9,31 @@ use smashline::*;
 use smash_script::*;
 use crate::custom::global_fighter_frame;
 use smashline::Priority::*;
+use smash::hash40;
+
+
+static mut MURABITO_SLOW_DTILT : [bool; 8] = [false; 8];
+static mut MURABITO_SLOW_DTILT_IN_SLOW : [bool; 8] = [false; 8];
+static mut MURABITO_SLOW_DTILT_CAN_CANCEL : [bool; 8] = [false; 8];
 
 // A Once-Per-Fighter-Frame that only applies to Villager
 unsafe extern "C" fn murabito_frame(fighter: &mut L2CFighterCommon) {
     unsafe {
         global_fighter_frame(fighter);
         let status = StatusModule::status_kind(fighter.module_accessor);
-        
+        let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
+        if MURABITO_SLOW_DTILT[entry_id] && status == *FIGHTER_STATUS_KIND_ATTACK_LW3 && MURABITO_SLOW_DTILT_CAN_CANCEL[entry_id] && ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_ATTACK) == false {
+            MURABITO_SLOW_DTILT[entry_id] = false;
+            if MURABITO_SLOW_DTILT_IN_SLOW[entry_id] {
+                MotionModule::set_rate(fighter.module_accessor, 1.0);
+            }
+        }
+
+        if MURABITO_SLOW_DTILT[entry_id] && status != *FIGHTER_STATUS_KIND_ATTACK_LW3 {
+            MURABITO_SLOW_DTILT[entry_id] = false;
+        }
+
 
         if [*FIGHTER_STATUS_KIND_SPECIAL_N, *FIGHTER_MURABITO_STATUS_KIND_SPECIAL_N_SEARCH, *FIGHTER_MURABITO_STATUS_KIND_SPECIAL_N_POCKET, *FIGHTER_MURABITO_STATUS_KIND_SPECIAL_N_TAKE_OUT].contains(&status) {
             crate::custom::fastfall_helper(fighter);
@@ -134,7 +152,7 @@ unsafe extern "C" fn murabito_dashattack_smash_script(fighter: &mut L2CAgentBase
 
 unsafe extern "C" fn flowerpot_thrown(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("have"), 7.3, 74, 60, 0, 50, 4.2, 0.0, 2.5, 0.0, None, None, None, 1.2, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_flower"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("have"), 7.3, 74, 60, 0, 50, 4.2, 0.0, 2.5, 0.0, None, None, None, 1.2, 0.6, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_flower"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
         AttackModule::enable_safe_pos(fighter.module_accessor);
     }
 }
@@ -142,6 +160,14 @@ unsafe extern "C" fn flowerpot_thrown(fighter: &mut L2CAgentBase) {
 unsafe extern "C" fn murabito_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_MURABITO_GENERATE_ARTICLE_UMBRELLA, false, 0);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        MotionModule::set_rate(fighter.module_accessor, 2.0);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 4.0);
+    if macros::is_excute(fighter) {
+        MotionModule::set_rate(fighter.module_accessor, 1.0);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
@@ -158,7 +184,7 @@ unsafe extern "C" fn murabito_ftilt_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 27.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 29.0);
     if macros::is_excute(fighter) {
         CancelModule::enable_cancel(fighter.module_accessor);
     }
@@ -215,19 +241,59 @@ unsafe extern "C" fn murabito_utilt_smash_script(fighter: &mut L2CAgentBase) {
 }
 
 unsafe extern "C" fn murabito_dtilt_smash_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
-        MotionModule::set_rate(fighter.module_accessor, 1.5);
+        MotionModule::set_rate(fighter.module_accessor, 2.0);
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 2.0, 4.0);
-        ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_MURABITO_GENERATE_ARTICLE_WEEDS, true, 0);
+        ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_MURABITO_GENERATE_ARTICLE_WEEDS, true, -1);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 6.0);
+    if macros::is_excute(fighter) {
+        MotionModule::set_rate(fighter.module_accessor, 1.0);
+        MURABITO_SLOW_DTILT[entry_id] = true;
+        MURABITO_SLOW_DTILT_CAN_CANCEL[entry_id] = true;
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 7.0);
+    if macros::is_excute(fighter) {
+        if MURABITO_SLOW_DTILT[entry_id] {
+            MotionModule::set_rate(fighter.module_accessor, 0.016);
+            MURABITO_SLOW_DTILT_IN_SLOW[entry_id] = true;
+        }
+    }
+    sv_animcmd::wait(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        MotionModule::set_rate(fighter.module_accessor, 1.0);
+        MURABITO_SLOW_DTILT_IN_SLOW[entry_id] = false;
+        MURABITO_SLOW_DTILT_CAN_CANCEL[entry_id] = false;
     }
     sv_animcmd::frame(fighter.lua_state_agent, 9.0);
     if macros::is_excute(fighter) {
-        MotionModule::set_rate(fighter.module_accessor, 1.0);
         ArticleModule::remove(fighter.module_accessor, *FIGHTER_MURABITO_GENERATE_ARTICLE_WEEDS, smash::app::ArticleOperationTarget(0));
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.0, 80, 115, 0, 50, 5.5, 0.0, 3.0, 3.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.3, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 10.0, 105, 100, 0, 50, 6.5, 0.0, 3.0, 10.0, Some(0.0), Some(3.0), Some(2.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.3, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
-        AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
+        if MURABITO_SLOW_DTILT[entry_id] {
+            let rand_num = smash::app::sv_math::rand(hash40("fighter"), 15);
+            match rand_num {
+                0 => ItemModule::have_item(fighter.module_accessor, ItemKind(*ITEM_KIND_BOMBER), 0, 0, false, false),
+
+                1 => ItemModule::have_item(fighter.module_accessor, ItemKind(*ITEM_KIND_PITFALL), 0, 0, false, false),
+
+                2 => ItemModule::have_item(fighter.module_accessor, ItemKind(*ITEM_KIND_FREEZER), 0, 0, false, false),
+
+                3 => ItemModule::have_item(fighter.module_accessor, ItemKind(*ITEM_KIND_GENESISSET), 0, 0, false, false),
+
+                4 => ItemModule::have_item(fighter.module_accessor, ItemKind(*ITEM_KIND_SENSORBOMB), 0, 0, false, false),
+
+                5 => ItemModule::have_item(fighter.module_accessor, ItemKind(*ITEM_KIND_BANANA), 0, 0, false, false),
+
+                _ => ItemModule::have_item(fighter.module_accessor, ItemKind(*ITEM_KIND_WOOD), 0, 0, false, false),
+            };
+        }
+        else {
+            macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 13.0, 80, 115, 0, 50, 5.5, 0.0, 3.0, 3.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.3, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
+            macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 10.0, 105, 100, 0, 50, 6.5, 0.0, 3.0, 10.0, Some(0.0), Some(3.0), Some(2.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.3, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_OBJECT);
+            AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);    
+        }
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
@@ -237,6 +303,30 @@ unsafe extern "C" fn murabito_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 18.0);
     if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 3.8, 3.0);
+    }
+}
+
+unsafe extern "C" fn murabito_dtilt_expression_script(fighter: &mut L2CAgentBase) {
+    if macros::is_excute(fighter) {
+        slope!(fighter, *MA_MSC_CMD_SLOPE_SLOPE_INTP, *SLOPE_STATUS_TOP, 2);
+        ItemModule::set_have_item_visibility(fighter.module_accessor, true, 0);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 2.0);
+    if macros::is_excute(fighter) {
+        slope!(fighter, *MA_MSC_CMD_SLOPE_SLOPE_INTP, *SLOPE_STATUS_TOP, 3, true);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 7.0);
+    if macros::is_excute(fighter) {
+        ControlModule::set_rumble(fighter.module_accessor, Hash40::new("rbkind_grapple"), 0, false, *BATTLE_OBJECT_ID_INVALID as u32);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 9.0);
+    if macros::is_excute(fighter) {
+        macros::QUAKE(fighter, *CAMERA_QUAKE_KIND_S);
+        macros::RUMBLE_HIT(fighter, Hash40::new("rbkind_attackm"), 0);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 14.0);
+    if macros::is_excute(fighter) {
+        slope!(fighter, *MA_MSC_CMD_SLOPE_SLOPE_INTP, *SLOPE_STATUS_LR, 4);
     }
 }
 
@@ -419,6 +509,7 @@ unsafe extern "C" fn murabito_fair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 36.0);
     if macros::is_excute(fighter) {
         CancelModule::enable_cancel(fighter.module_accessor);
+        notify_event_msc_cmd!(fighter, Hash40::new_raw(0x2127e37c07), *GROUND_CLIFF_CHECK_KIND_ALWAYS_BOTH_SIDES);
     }
 }
 
@@ -484,7 +575,7 @@ unsafe extern "C" fn slingshot_projectile_bair(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 4.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 9.2, 361, 100, 0, 30, 2.4, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, -2.5, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 9.2, 361, 105, 0, 30, 3.1, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, -2.5, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
     }
 }
 
@@ -936,9 +1027,10 @@ unsafe extern "C" fn murabito_downb_3_air_smash_script(fighter: &mut L2CAgentBas
 unsafe extern "C" fn tree_falling(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 14.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("tree"), 15.0, 60, 100, 0, 30, 7.0, 0.0, 17.5, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 6, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("tree"), 15.0, 60, 100, 0, 30, 5.5, 0.0, 10.0, 5.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 6, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("tree"), 15.0, 60, 100, 0, 30, 5.5, 0.0, 10.0, -5.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 6, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("tree"), 15.0, 60, 100, 0, 30, 7.0, 0.0, 17.5, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 1, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("tree"), 15.0, 60, 100, 0, 30, 5.5, 0.0, 10.0, 5.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 1, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("tree"), 15.0, 60, 100, 0, 30, 5.5, 0.0, 10.0, -5.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 1, 0.0, 0, true, false, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_OBJECT);
+        macros::ATK_SET_SHIELD_SETOFF_MUL_arg4(fighter, 0, 1, 2, 0.8);
     }
 }
 
@@ -979,6 +1071,7 @@ pub fn install() {
     .game_acmd("game_attacks3", murabito_ftilt_smash_script, Low)
     .game_acmd("game_attackhi3", murabito_utilt_smash_script, Low)
     .game_acmd("game_attacklw3", murabito_dtilt_smash_script, Low)
+    .expression_acmd("expression_atttacklw3", murabito_dtilt_expression_script, Low)
     .game_acmd("game_attacks4", murabito_fsmash_smash_script, Low)
     .game_acmd("game_attackhi4", murabito_usmash_smash_script, Low)
     .game_acmd("game_attacklw4", murabito_dsmash_smash_script, Low)

@@ -1,8 +1,8 @@
 [package]
 name = "tr4sh_rebuffed"
-version = "1.20.0"
-authors = ["jam1garner <jam1.mcleod@hotmail.com>"]
-edition = "2018"
+version = "1.34.0"
+authors = ["Meli Satana"]
+edition = "2021"
 
 [package.metadata.skyline]
 titleid = "01006A800016E000"
@@ -11,7 +11,7 @@ titleid = "01006A800016E000"
 crate-type = ["cdylib"]
 
 [dependencies]
-skyline = "0.2.1"
+skyline = { git = "https://github.com/ultimate-research/skyline-rs.git" }
 skyline_smash = { git = "https://github.com/blu-dev/skyline-smash.git", features = ["weak_l2cvalue"] }
 smash_script = { git = "https://github.com/blu-dev/smash-script.git", branch = "development" }
 smashline = { git = "https://github.com/HDR-Development/smashline" }

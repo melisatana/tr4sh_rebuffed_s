@@ -152,6 +152,38 @@
 		"fighter/lucina/c07": [
 			"fighter/lucina/motion/body/c07/c00attack13.nuanmb"
 		],
+		"fighter/mewtwo/c00": [
+			"fighter/mewtwo/motion/body/c00/a05squatb.nuanmb",
+			"fighter/mewtwo/motion/body/c00/a05squatf.nuanmb"
+		],
+		"fighter/mewtwo/c01": [
+			"fighter/mewtwo/motion/body/c01/a05squatb.nuanmb",
+			"fighter/mewtwo/motion/body/c01/a05squatf.nuanmb"
+		],
+		"fighter/mewtwo/c02": [
+			"fighter/mewtwo/motion/body/c02/a05squatb.nuanmb",
+			"fighter/mewtwo/motion/body/c02/a05squatf.nuanmb"
+		],
+		"fighter/mewtwo/c03": [
+			"fighter/mewtwo/motion/body/c03/a05squatb.nuanmb",
+			"fighter/mewtwo/motion/body/c03/a05squatf.nuanmb"
+		],
+		"fighter/mewtwo/c04": [
+			"fighter/mewtwo/motion/body/c04/a05squatb.nuanmb",
+			"fighter/mewtwo/motion/body/c04/a05squatf.nuanmb"
+		],
+		"fighter/mewtwo/c05": [
+			"fighter/mewtwo/motion/body/c05/a05squatb.nuanmb",
+			"fighter/mewtwo/motion/body/c05/a05squatf.nuanmb"
+		],
+		"fighter/mewtwo/c06": [
+			"fighter/mewtwo/motion/body/c06/a05squatb.nuanmb",
+			"fighter/mewtwo/motion/body/c06/a05squatf.nuanmb"
+		],
+		"fighter/mewtwo/c07": [
+			"fighter/mewtwo/motion/body/c07/a05squatb.nuanmb",
+			"fighter/mewtwo/motion/body/c07/a05squatf.nuanmb"
+		],
 		"fighter/lucas/c00": [
 			"fighter/lucas/motion/body/c00/c03attacks4hi.nuanmb",
 			"fighter/lucas/motion/body/c00/c03attacks4lw.nuanmb"
@@ -287,6 +319,10 @@
 			"fighter/shulk/motion/body/c07/c01attacks3hi.nuanmb",
 			"fighter/shulk/motion/body/c07/c01attacks3lw.nuanmb",
 			"fighter/shulk/motion/body/c07/b02escapen_dab.nuanmb"
+		],
+		"fighter/miigunner/c00": [
+			"fighter/miigunner/motion/body/c00/c03attacks4hi.nuanmb",
+			"fighter/miigunner/motion/body/c00/c03attacks4lw.nuanmb"
 		],
 		"fighter/dolly/c00": [
 			"fighter/dolly/motion/body/c00/a05squatb.nuanmb",

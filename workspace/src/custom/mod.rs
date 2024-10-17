@@ -38,6 +38,8 @@ impl BomaExt for BattleObjectModuleAccessor {
 
 static DEBUG_ALLOW_MOMENTUM_JUMPS : bool = false;
 
+//static mut PERCENT : [f32; 8] = [-1.0; 8];
+
 
 
 //handles whether or not you can fast fall, thanks WuBoy
@@ -125,8 +127,7 @@ unsafe fn status_guard_main_common(fighter: &mut L2CFighterCommon) -> L2CValue {
 
     if shield_hp < 0.0 
     && (fighter_kind == *FIGHTER_KIND_PURIN 
-        || ((fighter_kind == *FIGHTER_KIND_SHULK || fighter_kind == *FIGHTER_KIND_KIRBY) 
-        && WorkModule::get_int64(fighter.module_accessor, *FIGHTER_SHULK_INSTANCE_WORK_ID_INT_SPECIAL_N_TYPE) == *FIGHTER_SHULK_MONAD_TYPE_SHIELD as u64)) {
+        || ((fighter_kind == *FIGHTER_KIND_SHULK || fighter_kind == *FIGHTER_KIND_KIRBY) && WorkModule::get_int64(fighter.module_accessor, *FIGHTER_SHULK_INSTANCE_WORK_ID_INT_SPECIAL_N_TYPE) == *FIGHTER_SHULK_MONAD_TYPE_SHIELD as u64)) {
         fighter.change_status(FIGHTER_STATUS_KIND_SHIELD_BREAK_FLY.into(), false.into());
     return true.into();
     }
@@ -288,6 +289,7 @@ unsafe fn set_fighter_status_data_hook(boma: &mut BattleObjectModuleAccessor, ar
         || boma.kind() == *FIGHTER_KIND_PALUTENA && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
         || boma.kind() == *FIGHTER_KIND_CLOUD && boma.is_status_one_of(&[*FIGHTER_CLOUD_STATUS_KIND_SPECIAL_HI2, *FIGHTER_STATUS_KIND_SPECIAL_LW]) 
         || boma.kind() == *FIGHTER_KIND_KAMUI && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_S, *FIGHTER_STATUS_KIND_SPECIAL_LW])
+        || boma.kind() == *FIGHTER_KIND_BAYONETTA && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW])
 
         || boma.kind() == *FIGHTER_KIND_SHIZUE && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW, *FIGHTER_SHIZUE_STATUS_KIND_SPECIAL_LW_SET, *FIGHTER_SHIZUE_STATUS_KIND_SPECIAL_LW_FAILURE]) 
         || boma.kind() == *FIGHTER_KIND_SIMON && boma.is_status_one_of(&[*FIGHTER_STATUS_KIND_SPECIAL_LW]) 
@@ -446,7 +448,7 @@ pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
         let lr = PostureModule::lr(module_accessor);
         let stickx_directional = stickx * lr;
         let fighter_kind = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_KIND);
-        //let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+        let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
             
         if StatusModule::is_situation_changed(module_accessor) {
             let situation_kind = &format!("{}", StatusModule::situation_kind(module_accessor));
@@ -517,7 +519,10 @@ pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
         *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_LR, 
         *FIGHTER_STATUS_KIND_DAMAGE_FLY_REFLECT_JUMP_BOARD,
         *FIGHTER_STATUS_KIND_FURAFURA,
-        *FIGHTER_STATUS_KIND_ICE].contains(&status) {
+        *FIGHTER_STATUS_KIND_ICE,
+        *FIGHTER_STATUS_KIND_SLEEP_START,
+        *FIGHTER_STATUS_KIND_SLEEP,
+        *FIGHTER_STATUS_KIND_SLEEP_FALL].contains(&status) {
             if ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_HI) 
             || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_LW) 
             || ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_S_L) 
@@ -592,7 +597,6 @@ pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
             }
         }
 
-        
 
         //Shield or crouch after starting a brake (works I think)
         if [*FIGHTER_STATUS_KIND_RUN_BRAKE, *FIGHTER_STATUS_KIND_TURN_RUN_BRAKE].contains(&status) {
@@ -740,6 +744,21 @@ pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
             ItemModule::drop_item(fighter.module_accessor, 0.0, 0.0, 0);
         }
 
+        //allows the hammer to be dropped with the special button when on the floor
+        if [*FIGHTER_STATUS_KIND_HAMMER_FALL,
+        //*FIGHTER_STATUS_KIND_HAMMER_JUMP,
+        *FIGHTER_STATUS_KIND_HAMMER_TURN,
+        *FIGHTER_STATUS_KIND_HAMMER_WAIT,
+        *FIGHTER_STATUS_KIND_HAMMER_WALK
+        //*FIGHTER_STATUS_KIND_HAMMER_LANDING,
+        //*FIGHTER_STATUS_KIND_HAMMER_JUMP_SQUAT
+        ].contains(&status) {
+            if ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_SPECIAL) {
+                ItemModule::drop_item(fighter.module_accessor, 0.0, 0.0, 0);
+            }
+        
+        }
+
 
         //airdodges can be canceled with a wall jump
         if [*FIGHTER_STATUS_KIND_ESCAPE_AIR, *FIGHTER_STATUS_KIND_ESCAPE_AIR_SLIDE].contains(&status)  {
@@ -758,7 +777,40 @@ pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
             }
         }
 
+
+        //up taunt button makes you go into tumble lol
+        if 
+        [*FIGHTER_STATUS_KIND_JUMP, 
+        *FIGHTER_STATUS_KIND_JUMP_AERIAL, 
+        *FIGHTER_STATUS_KIND_FLY,
+        *FIGHTER_STATUS_KIND_FALL, 
+        *FIGHTER_STATUS_KIND_FALL_AERIAL,
+        *FIGHTER_STATUS_KIND_WALL_JUMP,
+        *FIGHTER_STATUS_KIND_PASS].contains(&status) {
+            if ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_APPEAL_HI) {
+                StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_DAMAGE_FALL, true);
+            }
+        }
         
+
+        // Attempt to make you auto-thaw out of ice when you take 50% 
+        /*if status == *FIGHTER_STATUS_KIND_ICE {
+            if MotionModule::frame(fighter.module_accessor) == 1.0 {
+                PERCENT[entry_id] = DamageModule::damage(fighter.module_accessor, 0);
+            }
+            if PERCENT[entry_id] + 20.0 <= DamageModule::damage(fighter.module_accessor, 0) {
+                StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_ICE_JUMP, false);
+                PERCENT[entry_id] = -1.0;
+            }
+        }
+
+        //Attempt to make you thaw out of ice after 10 seconds regardless of actual max time
+        if status == *FIGHTER_STATUS_KIND_ICE {
+            if MotionModule::frame(fighter.module_accessor) >= 600.0 {
+                StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_ICE_JUMP, false); 
+            }
+        }*/
+
 
         //Hold buffer clears after 12 frames
         /*let control_pad = [

@@ -20,6 +20,7 @@ unsafe extern "C" fn dedede_frame(fighter: &mut L2CFighterCommon) {
         
         //println!("It'sa me, King Dedede, Gotta clobba that there Kirby!!");
 
+
         if [*FIGHTER_DEDEDE_STATUS_KIND_SPECIAL_HI_JUMP].contains(&status) {
             if sticky <= -0.5 {
                 GroundModule::set_passable_check(fighter.module_accessor, true);

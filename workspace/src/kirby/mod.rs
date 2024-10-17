@@ -27,6 +27,7 @@ unsafe extern "C" fn kirby_frame(fighter: &mut L2CFighterCommon) {
         
         //println!("It'sa me, Kirby, Poyo.");
 
+
         if KIRBY_FTHROW_BURY_RECHARGE_TIMER[entry_id] > 0 {
             KIRBY_FTHROW_BURY_RECHARGE_TIMER[entry_id] -= 1;
             if KIRBY_FTHROW_BURY_RECHARGE_TIMER[entry_id] == 0 {
