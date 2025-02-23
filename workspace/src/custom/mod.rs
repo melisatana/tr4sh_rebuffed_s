@@ -104,6 +104,8 @@ pub unsafe fn escape_air_subtransition(fighter: &mut L2CFighterCommon) -> L2CVal
     original!()(fighter)
 }
 
+
+
 //dash dance handler, disables the code below for 0 momentum backdashes
 unsafe fn dashdance_handler(fighter: &mut L2CFighterCommon) -> bool {
     let fighter_kind = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_KIND);
@@ -157,6 +159,16 @@ pub unsafe fn status_landing_main_sub(fighter: &mut L2CFighterCommon) -> L2CValu
     }
     original!()(fighter)
 }
+
+
+// HDR code to add extra electric hitlag for hit character (not gonna use now)
+/*#[skyline::hook(offset = 0x406824, inline)]
+unsafe fn change_elec_hitlag_for_attacker(ctx: &mut skyline::hooks::InlineCtx) {
+    let is_attacker = *ctx.registers[4].w.as_ref() & 1 == 0;
+    if *ctx.registers[8].x.as_ref() == smash::hash40("collision_attr_elec") && is_attacker {
+        *ctx.registers[8].x.as_mut() = smash::hash40("collision_attr_normal");
+    }
+}*/
 
 
 /*//dash out of run
@@ -468,8 +480,8 @@ pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
 
         //momentum jumps (currently disabled)
         if [*FIGHTER_STATUS_KIND_JUMP_SQUAT, *FIGHTER_STATUS_KIND_JUMP].contains(&status) && DEBUG_ALLOW_MOMENTUM_JUMPS 
-        && WorkModule::is_flag(module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_JUMP_NO_LIMIT) == false {
-            WorkModule::on_flag(module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_JUMP_NO_LIMIT);
+        && WorkModule::is_flag(module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_JUMP_NO_LIMIT_ONCE) == false {
+            WorkModule::on_flag(module_accessor, *FIGHTER_INSTANCE_WORK_ID_FLAG_JUMP_NO_LIMIT_ONCE);
         };
 
 
@@ -595,6 +607,23 @@ pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
                     StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_GUARD_ON, false);
                 }
             }
+        }
+
+        let fighter_kind = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_KIND);
+        if [*FIGHTER_RYU_STATUS_KIND_DASH_BACK, *FIGHTER_DOLLY_STATUS_KIND_DASH_BACK, *FIGHTER_DEMON_STATUS_KIND_DASH_BACK].contains(&status) {
+            if [*FIGHTER_KIND_RYU, *FIGHTER_KIND_KEN, *FIGHTER_KIND_DOLLY, *FIGHTER_KIND_DEMON].contains(&fighter_kind) {
+                if MotionModule::frame(fighter.module_accessor) >= 2.0 {
+                    if sticky <= -0.6 {
+                        StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_SQUAT, false);
+                    }
+                }
+                if MotionModule::frame(fighter.module_accessor) >= 4.0 {
+                    if ControlModule::check_button_on(fighter.module_accessor, *CONTROL_PAD_BUTTON_GUARD) && ControlModule::check_button_off(fighter.module_accessor, *CONTROL_PAD_BUTTON_CATCH) {
+                        StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_GUARD_ON, false);
+                    }
+                }
+            } 
+            
         }
 
 
@@ -777,6 +806,13 @@ pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
             }
         }
 
+        //restore wall jump on hit?
+        if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) 
+        && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false {
+            WorkModule::set_int(fighter.module_accessor, 0, *FIGHTER_INSTANCE_WORK_ID_INT_WALL_JUMP_PAST_FRAME);
+        }
+
+
 
         //up taunt button makes you go into tumble lol
         if 
@@ -791,25 +827,21 @@ pub unsafe extern "C" fn global_fighter_frame(fighter : &mut L2CFighterCommon) {
                 StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_DAMAGE_FALL, true);
             }
         }
-        
 
-        // Attempt to make you auto-thaw out of ice when you take 50% 
-        /*if status == *FIGHTER_STATUS_KIND_ICE {
-            if MotionModule::frame(fighter.module_accessor) == 1.0 {
-                PERCENT[entry_id] = DamageModule::damage(fighter.module_accessor, 0);
-            }
-            if PERCENT[entry_id] + 20.0 <= DamageModule::damage(fighter.module_accessor, 0) {
-                StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_ICE_JUMP, false);
-                PERCENT[entry_id] = -1.0;
+        //Press the Attack button to immediately hoist the assist trophy after landing
+        if ItemModule::is_have_item(fighter.module_accessor, 0) && ItemModule::get_have_item_kind(fighter.module_accessor, 0) == *ITEM_KIND_ASSIST {
+            if StatusModule::situation_kind(fighter.module_accessor) == SITUATION_KIND_GROUND {
+                if [*FIGHTER_STATUS_KIND_LANDING, *FIGHTER_STATUS_KIND_LANDING_LIGHT, *FIGHTER_STATUS_KIND_LANDING_ATTACK_AIR, *FIGHTER_STATUS_KIND_LANDING_FALL_SPECIAL].contains(&status) {
+                    if MotionModule::frame(fighter.module_accessor) >= 3.0 {
+                        if ControlModule::check_button_trigger(fighter.module_accessor, *CONTROL_PAD_BUTTON_ATTACK) {
+                            StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_ITEM_ASSIST_HOIST, false);
+                        }
+                    }
+                    
+                }
             }
         }
-
-        //Attempt to make you thaw out of ice after 10 seconds regardless of actual max time
-        if status == *FIGHTER_STATUS_KIND_ICE {
-            if MotionModule::frame(fighter.module_accessor) >= 600.0 {
-                StatusModule::change_status_request_from_script(fighter.module_accessor, *FIGHTER_STATUS_KIND_ICE_JUMP, false); 
-            }
-        }*/
+        
 
 
         //Hold buffer clears after 12 frames
@@ -910,6 +942,17 @@ unsafe fn add_motion_2nd_hook(boma: &mut BattleObjectModuleAccessor, motion_kind
 }
 
 
+//Calculating landing motion rate?
+/*#[skyline::hook(replace = smash::lua2cpp::L2CFighterCommon_sub_calc_landing_motion_rate)]
+unsafe extern "C" fn sub_calc_landing_motion_rate(_fighter: &mut L2CFighterCommon, end_frame: L2CValue, landing_frame: L2CValue) -> L2CValue {
+    let end_over_landing = end_frame.get_f32() / landing_frame.get_f32();
+    let end_frame_for_some_reason = end_over_landing * landing_frame.get_f32();
+    let huh = end_frame.get_f32() - end_frame_for_some_reason;
+    let end_frame_plus = huh + 0.01;
+    let idk_anymore = end_frame_plus / landing_frame.get_f32();
+    (end_over_landing + idk_anymore).into()
+}*/
+
 // Use this for general per-frame weapon-level hooks
 /*#[weapon_frame_callback]
 pub fn global_weapon_frame(fighter_base : &mut L2CFighterBase) {
@@ -931,7 +974,8 @@ fn nro_hook(info: &skyline::nro::NroInfo) {
             status_landing_main_sub,
             escape_air_subtransition,
             status_guard_main_common,
-            status_rebirth_main
+            status_rebirth_main,
+            //change_elec_hitlag_for_attacker
             //status_dash_main_common,
             //status_run_sub
         );
@@ -949,6 +993,7 @@ pub fn install() {
         set_fighter_status_data_hook,
         change_kinetic_hook,
         add_motion_2nd_hook
+        //sub_calc_landing_motion_rate
     );
     skyline::nro::add_hook(nro_hook);
     

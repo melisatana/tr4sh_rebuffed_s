@@ -96,6 +96,7 @@ mod gamewatch;
 mod pickel;
 mod popo;
 mod ridley;
+mod ptrainer;
 
 /*
 //mod miienemyf;
@@ -230,6 +231,7 @@ pub extern "C" fn main() {
     pickel::install();
     popo::install();
     ridley::install();
+    ptrainer::install();
     
     
     /*

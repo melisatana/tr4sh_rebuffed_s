@@ -228,7 +228,8 @@ unsafe fn set_upspecial_hitboxes(fighter: &mut L2CAgentBase) {
                 let point_offset_x = PostureModule::lr(fighter.module_accessor) * (DARKSAMUS_ELECPOINTS_X[entry_id][j as usize] - PostureModule::pos_x(fighter.module_accessor));
                 let point_offset_y = DARKSAMUS_ELECPOINTS_Y[entry_id][j as usize] - PostureModule::pos_y(fighter.module_accessor);
                 
-                macros::ATTACK(fighter, (j + 1) as u64, 1, Hash40::new("top"), 15.0, 90, 88, 0, 80, 18.0, 0.0, point_offset_y, point_offset_x, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_BOMB, *ATTACK_REGION_BOMB);
+                macros::ATTACK(fighter, (j + 1) as u64, 1, Hash40::new("top"), 13.0, 90, 98, 0, 80, 18.0, 0.0, point_offset_y, point_offset_x, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_paralyze"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_BOMB, *ATTACK_REGION_BOMB);
+                AttackModule::set_no_finish_camera(fighter.module_accessor, (j + 1), true, false);
             }
         }
     }
@@ -515,7 +516,7 @@ unsafe extern "C" fn dark_samus_dtilt(fighter: &mut L2CAgentBase) {
 unsafe extern "C" fn dark_samus_fsmash_charge(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 
-    sv_animcmd::frame(fighter.lua_state_agent, 40.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 30.0);
     if macros::is_excute(fighter) {
         DARKSAMUS_FSMASH_FULLCHARGE[entry_id] = true ;
         macros::PLAY_SE(fighter, Hash40::new("se_common_spirits_critical_l_tail"));
@@ -741,6 +742,10 @@ unsafe extern "C" fn dark_samus_dair(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 34.0);
     if macros::is_excute(fighter) {
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
+    }
+    sv_animcmd::frame(fighter.lua_state_agent, 40.0);
+    if macros::is_excute(fighter) {
+        CancelModule::enable_cancel(fighter.module_accessor);
     }
 }
 
@@ -1401,8 +1406,9 @@ unsafe extern "C" fn dark_samus_downtaunt(fighter: &mut L2CAgentBase) {
 unsafe extern "C" fn dark_samus_chargeshot(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 4.5, 361, 42, 0, 14, 1.9, 0.0, 0.0, 0.0, None, None, None, 1.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 22.5, 40, 64, 0, 46, 8.0, 0.0, 0.0, 0.0, None, None, None, 1.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_purple"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 20.5, 40, 72, 0, 46, 8.0, 0.0, 0.0, 0.0, None, None, None, 1.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, 0, 0.0, 0, true, true, false, false, false, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_curse_poison"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_ENERGY);
         attack!(fighter, *MA_MSC_CMD_ATTACK_SET_LERP, 0, 1);
+        AttackModule::set_poison_param(fighter.module_accessor, 1, 300, 30, 0.8, false);
         GroundModule::set_collidable(fighter.module_accessor, false);
     }
 }

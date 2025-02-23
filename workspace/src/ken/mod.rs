@@ -10,6 +10,8 @@ use smash_script::*;
 use crate::custom::global_fighter_frame;
 use smashline::Priority::*;
 
+static mut KEN_FSMASH_CHARGE : [bool; 8] = [false; 8];
+
 
 // A Once-Per-Fighter-Frame that only applies to Ken
 unsafe extern "C" fn ken_frame(fighter: &mut L2CFighterCommon) {
@@ -460,10 +462,23 @@ unsafe extern "C" fn ken_dtilt_strong_smash_script(fighter: &mut L2CAgentBase) {
     }
 }
 
+unsafe extern "C" fn ken_fsmash_charge_smash_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+        
+    sv_animcmd::frame(fighter.lua_state_agent, 40.0);
+    if macros::is_excute(fighter) {
+        KEN_FSMASH_CHARGE[entry_id] = true;
+        macros::PLAY_SE(fighter, Hash40::new("se_common_spirits_critical_l_tail"));
+    }
+}
+
 unsafe extern "C" fn ken_fsmash_smash_script(fighter: &mut L2CAgentBase) {
+    let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+        
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 3.0);
+        KEN_FSMASH_CHARGE[entry_id] = false;
     }
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
@@ -475,6 +490,9 @@ unsafe extern "C" fn ken_fsmash_smash_script(fighter: &mut L2CAgentBase) {
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_RYU_INSTANCE_WORK_ID_FLAG_FINAL_HIT_CANCEL);
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 14.7, 361, 110, 0, 40, 3.5, 0.0, 12.5, 2.3, Some(0.0), Some(11.5), Some(4.5), 1.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KEN_KICK, *ATTACK_REGION_KICK);
         macros::ATTACK(fighter, 1, 0, Hash40::new("kneer"), 14.7, 361, 110, 0, 40, 3.8, 3.5, 0.0, 0.0, Some(7.0), Some(0.0), Some(0.0), 1.4, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KEN_KICK, *ATTACK_REGION_KICK);
+        if KEN_FSMASH_CHARGE[entry_id] {
+            ArticleModule::generate_article(fighter.module_accessor, *FIGHTER_KEN_GENERATE_ARTICLE_HADOKEN, false, -1);
+        }
     }
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
@@ -1649,6 +1667,7 @@ pub fn install() {
     .game_acmd("game_attackhi3s", ken_utilt_strong_smash_script, Low)
     .game_acmd("game_attacklw3w", ken_dtilt_light_smash_script, Low)
     .game_acmd("game_attacklw3s", ken_dtilt_strong_smash_script, Low)
+    .game_acmd("game_attacks4charge", ken_fsmash_charge_smash_script, Low)
     .game_acmd("game_attacks4", ken_fsmash_smash_script, Low)
     .game_acmd("game_attackhi4", ken_usmash_smash_script, Low)
     .game_acmd("game_attacklw4", ken_dsmash_smash_script, Low)
