@@ -51,6 +51,7 @@ unsafe extern "C" fn mariod_frame(fighter: &mut L2CFighterCommon) {
     }
 }
 
+
 unsafe extern "C" fn mariod_walljump_smash_script(fighter: &mut L2CAgentBase) {
     let entry_id = WorkModule::get_int(fighter.module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
 

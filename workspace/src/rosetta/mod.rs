@@ -1196,10 +1196,6 @@ unsafe extern "C" fn rosetta_upb_ending_smash_script(fighter: &mut L2CAgentBase)
 }
 
 unsafe extern "C" fn rosetta_downb_smash_script(fighter: &mut L2CAgentBase) {
-    sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-    if macros::is_excute(fighter) {
-        damage!(fighter, *MA_MSC_DAMAGE_DAMAGE_NO_REACTION, *DAMAGE_NO_REACTION_MODE_DAMAGE_POWER, 9.0);
-    }
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     for _ in 0..27 {
         if macros::is_excute(fighter) {

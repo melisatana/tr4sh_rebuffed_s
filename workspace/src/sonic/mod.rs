@@ -63,29 +63,29 @@ unsafe extern "C" fn sonic_frame(fighter: &mut L2CFighterCommon) {
         if SONIC_NEUTRALB_CURRENT_SPEEDUP_LEVEL[entry_id] == 4 {
             SONIC_SPEEDUP_FRAME[entry_id] = (SONIC_SPEEDUP_FRAME[entry_id] + 1) % 6;
             if SONIC_SPEEDUP_FRAME[entry_id] == 0 {
-                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_damage_elec"), Hash40::new("top"), 0, 0.9, 0, 0, 0, 0, 1.2, false);
-                macros::LAST_EFFECT_SET_COLOR(fighter, 5.0, 5.0, 5.0);
+                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_damage_elec"), Hash40::new("top"), 0, 0.9, 0, 0, 0, 0, 1.0, false);
+                macros::LAST_EFFECT_SET_COLOR(fighter, 4.5, 4.5, 4.5);
             }
         }
         else if SONIC_NEUTRALB_CURRENT_SPEEDUP_LEVEL[entry_id] == 3 {
             SONIC_SPEEDUP_FRAME[entry_id] = (SONIC_SPEEDUP_FRAME[entry_id] + 1) % 8;
             if SONIC_SPEEDUP_FRAME[entry_id] == 0 {
-                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_damage_elec"), Hash40::new("top"), 0, 0.9, 0, 0, 0, 0, 1.0, false);
-                macros::LAST_EFFECT_SET_COLOR(fighter, 3.0, 0.5, 4.0);
+                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_damage_elec"), Hash40::new("top"), 0, 0.9, 0, 0, 0, 0, 0.9, false);
+                macros::LAST_EFFECT_SET_COLOR(fighter, 2.5, 0.5, 3.5);
             }
         }
         else if SONIC_NEUTRALB_CURRENT_SPEEDUP_LEVEL[entry_id] == 2 {
             SONIC_SPEEDUP_FRAME[entry_id] = (SONIC_SPEEDUP_FRAME[entry_id] + 1) % 10;
             if SONIC_SPEEDUP_FRAME[entry_id] == 0 {
-                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_damage_elec"), Hash40::new("top"), 0, 0.9, 0, 0, 0, 0, 0.8, false);
-                macros::LAST_EFFECT_SET_COLOR(fighter, 2.4, 2.5, 1.5);
+                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_damage_elec"), Hash40::new("top"), 0, 0.9, 0, 0, 0, 0, 0.7, false);
+                macros::LAST_EFFECT_SET_COLOR(fighter, 2.0, 2.0, 1.5);
             }
         }
         else {
             if SONIC_NEUTRALB_CURRENT_SPEEDUP_LEVEL[entry_id] == 1 {
                 SONIC_SPEEDUP_FRAME[entry_id] = (SONIC_SPEEDUP_FRAME[entry_id] + 1) % 12;
                 if SONIC_SPEEDUP_FRAME[entry_id] == 0 {
-                    macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_damage_elec"), Hash40::new("top"), 0, 0.9, 0, 0, 0, 0, 0.65, false);
+                    macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_damage_elec"), Hash40::new("top"), 0, 0.9, 0, 0, 0, 0, 0.6, false);
                     macros::LAST_EFFECT_SET_COLOR(fighter, 1.0, 1.0, 1.0);
                 }
             }
@@ -124,21 +124,21 @@ unsafe extern "C" fn kirby_sonichat_frame(fighter: &mut L2CFighterCommon) {
         if SKIRBY_NEUTRALB_CURRENT_SPEEDUP_LEVEL[entry_id] == 4 {
             SKIRBY_SPEEDUP_FRAME[entry_id] = (SKIRBY_SPEEDUP_FRAME[entry_id] + 1) % 6;
             if SKIRBY_SPEEDUP_FRAME[entry_id] == 0 {
-                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_damage_elec"), Hash40::new("top"), 0, 0.7, 0, 0, 0, 0, 1.0, false);
+                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_damage_elec"), Hash40::new("top"), 0, 0.7, 0, 0, 0, 0, 0.9, false);
                 macros::LAST_EFFECT_SET_COLOR(fighter, 3.0, 3.0, 7.0);
             }
         }
         else if SKIRBY_NEUTRALB_CURRENT_SPEEDUP_LEVEL[entry_id] == 3 {
             SKIRBY_SPEEDUP_FRAME[entry_id] = (SKIRBY_SPEEDUP_FRAME[entry_id] + 1) % 8;
             if SKIRBY_SPEEDUP_FRAME[entry_id] == 0 {
-                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_damage_elec"), Hash40::new("top"), 0, 0.7, 0, 0, 0, 0, 0.75, false);
+                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_damage_elec"), Hash40::new("top"), 0, 0.7, 0, 0, 0, 0, 0.7, false);
                 macros::LAST_EFFECT_SET_COLOR(fighter, 3.0, 0.5, 6.0);
             }
         }
         else if SKIRBY_NEUTRALB_CURRENT_SPEEDUP_LEVEL[entry_id] == 2 {
             SKIRBY_SPEEDUP_FRAME[entry_id] = (SKIRBY_SPEEDUP_FRAME[entry_id] + 1) % 10;
             if SKIRBY_SPEEDUP_FRAME[entry_id] == 0 {
-                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_damage_elec"), Hash40::new("top"), 0, 0.7, 0, 0, 0, 0, 0.6, false);
+                macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_damage_elec"), Hash40::new("top"), 0, 0.7, 0, 0, 0, 0, 0.5, false);
                 macros::LAST_EFFECT_SET_COLOR(fighter, 2.4, 2.5, 4.5);
             }
         }
@@ -146,8 +146,8 @@ unsafe extern "C" fn kirby_sonichat_frame(fighter: &mut L2CFighterCommon) {
             if SKIRBY_NEUTRALB_CURRENT_SPEEDUP_LEVEL[entry_id] == 1 {
                 SKIRBY_SPEEDUP_FRAME[entry_id] = (SKIRBY_SPEEDUP_FRAME[entry_id] + 1) % 12;
                 if SKIRBY_SPEEDUP_FRAME[entry_id] == 0 {
-                    macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_damage_elec"), Hash40::new("top"), 0, 0.7, 0, 0, 0, 0, 0.55, false);
-                    macros::LAST_EFFECT_SET_COLOR(fighter, 1.0, 1.0, 4.0);
+                    macros::EFFECT_FOLLOW(fighter, Hash40::new("sys_damage_elec"), Hash40::new("top"), 0, 0.7, 0, 0, 0, 0, 0.45, false);
+                    macros::LAST_EFFECT_SET_COLOR(fighter, 1.0, 1.0, 3.0);
                 }
             }
         }
@@ -448,7 +448,7 @@ unsafe extern "C" fn sonic_dtilt_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("kneer"), 6.8, 101, 90, 0, 30, 4.1, 8.5, 0.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.2, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("kneer"), 6.8, 98, 90, 0, 30, 4.1, 8.5, 0.0, 0.0, Some(0.0), Some(0.0), Some(0.0), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.2, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
         AttackModule::set_attack_height_all(fighter.module_accessor, AttackHeight(*ATTACK_HEIGHT_LOW), false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
@@ -470,7 +470,7 @@ unsafe extern "C" fn sonic_fsmash_charge_smash_script(fighter: &mut L2CAgentBase
         
         
         //macros::ATTACK(fighter, 0, 0, Hash40::new("handr"), 5.0, 361, 40, 0, 70, 4.4, 4.0, 0.0, 0.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 15, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new(hit_effect), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 0, 0, Hash40::new("handr"), 5.0, 361, 40, 0, 70, 4.4, 4.0, 0.0, 0.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 15, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("handr"), 5.0, 361, 40, 0, 43, 4.4, 4.0, 0.0, 0.0, None, None, None, 0.7, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 15, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
     }        
     sv_animcmd::frame(fighter.lua_state_agent, 60.0);
     if macros::is_excute(fighter) {
@@ -529,8 +529,8 @@ unsafe extern "C" fn sonic_usmash_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 18.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("waist"), 3.5, 80, 60, 70, 0, 6.0, 5.0, 0.0, 0.0, None, None, None, 0.7, 0.2, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("waist"), 3.5, 110, 80, 120, 0, 6.0, -4.0, -1.5, 0.0, None, None, None, 0.7, 0.2, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("waist"), 3.5, 80, 60, 70, 0, 6.0, 5.0, 0.0, 0.0, None, None, None, 0.4, 0.2, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("waist"), 3.5, 110, 80, 120, 0, 6.0, -4.0, -1.5, 0.0, None, None, None, 0.4, 0.2, *ATTACK_SETOFF_KIND_OFF, *ATTACK_LR_CHECK_POS, true, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_BODY);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
@@ -551,7 +551,7 @@ unsafe extern "C" fn sonic_usmash_smash_script(fighter: &mut L2CAgentBase) {
         sv_animcmd::wait(fighter.lua_state_agent, 1.0);
     }
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 5.2, 82, 163, 0, 75, 10.0, 4.0, 25.0, 0.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_BODY);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 6.2, 82, 154, 0, 75, 10.0, 4.0, 25.0, 0.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_BODY);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {

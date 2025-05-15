@@ -796,7 +796,7 @@ unsafe extern "C" fn falco_neutralb_shoot_smash_script(fighter: &mut L2CAgentBas
     }
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.67);
+        macros::FT_MOTION_RATE(fighter, 0.8);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 17.0);
     if macros::is_excute(fighter) {
@@ -819,7 +819,7 @@ unsafe extern "C" fn falco_neutralb_shoot_air_smash_script(fighter: &mut L2CAgen
     }
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
-        macros::FT_MOTION_RATE(fighter, 0.333333333);
+        macros::FT_MOTION_RATE(fighter, 0.5);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 17.0);
     if macros::is_excute(fighter) {
