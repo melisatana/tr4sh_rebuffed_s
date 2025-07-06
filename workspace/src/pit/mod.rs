@@ -766,7 +766,7 @@ unsafe extern "C" fn pit_sidespecial_end(fighter: &mut L2CAgentBase) {
 	if macros::is_excute(fighter) {
 		AttackModule::clear_all(fighter.module_accessor);
 		shield!(fighter, *MA_MSC_CMD_SHIELD_OFF, *COLLISION_KIND_REFLECTOR, *FIGHTER_PIT_REFLECTOR_KIND_SPECIAL_S, *FIGHTER_PIT_REFLECTOR_GROUP_SPECIAL_S);
-		macros::FT_MOTION_RATE(fighter, 0.66666667);
+		macros::FT_MOTION_RATE(fighter, 0.71428571);
 	}
 }
 

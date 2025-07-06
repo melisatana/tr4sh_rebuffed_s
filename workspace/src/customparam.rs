@@ -451,7 +451,17 @@ pub unsafe fn get_param_float_replace(module_accessor: u64, param_type: u64, par
 			}
 			if param_type == hash40("air_speed_x_stable") {
 				if crate::elight::MYTHRA_UTHROW_SPEED[entry_id] {
-					return 1.28;
+					return 1.3;
+				}
+			}
+			if param_type == hash40("air_accel_x_mul") {
+				if crate::elight::MYTHRA_UTHROW_SPEED[entry_id] {
+					return 0.1;
+				}
+			}
+			if param_type == hash40("air_accel_x_add") {
+				if crate::elight::MYTHRA_UTHROW_SPEED[entry_id] {
+					return 0.05;
 				}
 			}
 		}

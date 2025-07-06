@@ -85,11 +85,11 @@ unsafe extern "C" fn wiifit_jab_smash_script(fighter: &mut L2CAgentBase) {
         macros::ATTACK(fighter, 5, 0, Hash40::new("footr"), 7.0, 275, 130, 0, 40, 4.0, 0.0, 0.0, 0.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
         macros::ATTACK(fighter, 6, 0, Hash40::new("top"), 2.7, 180, 30, 20, 20, 5.5, 0.0, 7.0, 5.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
         macros::ATTACK(fighter, 7, 0, Hash40::new("top"), 2.7, 361, 30, 20, 20, 5.5, 0.0, 7.0, 5.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 4.0, false);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 2, 4.0, false);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 4, 4.0, false);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 6, 4.0, false);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 7, 4.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 4.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 4.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 4, 4.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 6, 4.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 7, 4.0, false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
@@ -116,10 +116,10 @@ unsafe extern "C" fn wiifit_jab2_smash_script(fighter: &mut L2CAgentBase) {
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 2.6, 8, 24, 18, 25, 3.2, 0.0, 9.0, 2.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_A, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
         macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 2.6, 8, 24, 18, 25, 4.5, 0.0, 9.3, 6.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_A, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
         macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 2.6, 361, 24, 30, 35, 4.5, 0.0, 9.3, 6.5, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_G, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 8.0, false);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 5.0, false);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 2, 5.0, false);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 3, 8.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 8.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 5.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 5.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 3, 8.0, false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
@@ -137,7 +137,7 @@ unsafe extern "C" fn wiifit_jab2_smash_script(fighter: &mut L2CAgentBase) {
 
 unsafe extern "C" fn wiifit_jab3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
-        if macros::is_excute(fighter) {
+    if macros::is_excute(fighter) {
         FighterAreaModuleImpl::enable_fix_jostle_area(fighter.module_accessor, 2.5, 5.2);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
@@ -165,8 +165,8 @@ unsafe extern "C" fn wiifit_dashattack_smash_script(fighter: &mut L2CAgentBase) 
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("bust"), 9.0, 64, 67, 0, 64, 5.4, 8.0, 0.0, 5.0, None, None, None, 1.1, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 2, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
         macros::ATTACK(fighter, 1, 0, Hash40::new("bust"), 9.0, 64, 67, 0, 64, 3.8, 5.5, 0.0, 0.0, None, None, None, 1.1, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 2, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 2.0, false);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 2.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 2.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 2.0, false);
         macros::ATK_SET_SHIELD_SETOFF_MUL_arg3(fighter, 0, 1, 1.3);
         MotionModule::set_rate(fighter.module_accessor, 1.3);
     }
@@ -183,7 +183,7 @@ unsafe extern "C" fn wiifit_ftilt_smash_script(fighter: &mut L2CAgentBase) {
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 10.5, 361, 101, 0, 50, 4.1, 0.0, 12.7, 4.2, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
         macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 10.5, 361, 101, 0, 50, 4.1, 0.0, 6.7, 4.7, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
         macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 10.5, 90, 85, 0, 40, 5.0, 0.0, 18.5, -6.5, Some(0.0), Some(8.2), Some(-7.5), 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 3, 1.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 3, 1.0, false);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 11.0);
     if macros::is_excute(fighter) {
@@ -204,9 +204,9 @@ unsafe extern "C" fn wiifit_utilt_smash_script(fighter: &mut L2CAgentBase) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("armr"), 8.4, 90, 75, 0, 40, 5.7, 3.5, 0.0, 0.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
         macros::ATTACK(fighter, 1, 0, Hash40::new("armr"), 8.4, 90, 75, 0, 40, 5.2, -1.5, 0.0, 0.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
         macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 8.4, 107, 60, 0, 60, 4.8, 0.0, 10.0, -5.0, None, None, None, 0.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 2.0, false);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 2.0, false);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 2, 2.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 2.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 2.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 2.0, false);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 13.0);
     if macros::is_excute(fighter) {
@@ -358,11 +358,11 @@ unsafe extern "C" fn wiifit_nair_smash_script(fighter: &mut L2CAgentBase) {
         macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 3.3, 118, 72, 35, 35, 4.5, 0.0, 4.9, -7.0, None, None, None, 1.0, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
         macros::ATTACK(fighter, 3, 0, Hash40::new("kneel"), 3.3, 118, 72, 35, 35, 4.5, 3.0, 0.0, -0.5, None, None, None, 1.0, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
         macros::ATTACK(fighter, 4, 0, Hash40::new("top"), 3.3, 90, 72, 35, 35, 5.2, 0.0, 0.0, 0.0, None, None, None, 1.0, 0.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 2.0, false);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 2.0, false);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 2, 2.0, false);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 3, 2.0, false);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 4, 2.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 2.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 2.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 2.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 3, 2.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 4, 2.0, false);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 11.0);
     if macros::is_excute(fighter) {
@@ -372,8 +372,8 @@ unsafe extern "C" fn wiifit_nair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("hip"), 8.2, 87, 90, 0, 34, 7.9, -2.0, 6.5, 0.0, None, None, None, 1.2, 0.8, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PUNCH);
         macros::ATTACK(fighter, 1, 0, Hash40::new("hip"), 8.2, 87, 90, 0, 34, 5.9, -2.0, 0.5, 0.0, None, None, None, 1.2, 0.8, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_PUNCH);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 0, 1.0, false);
-        AttackModule::set_add_reaction_frame(fighter.module_accessor, 1, 1.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 1.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 1.0, false);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 17.0);
     if macros::is_excute(fighter) {
