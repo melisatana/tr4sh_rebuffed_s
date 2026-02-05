@@ -280,6 +280,46 @@
 			"fighter/pikmin/motion/body/c07/c01attacks3hi.nuanmb",
 			"fighter/pikmin/motion/body/c07/c01attacks3lw.nuanmb"
 		],
+		"fighter/diddy/c00": [
+			"fighter/diddy/motion/body/c00/c00attack100.nuanmb",
+			"fighter/diddy/motion/body/c00/c00attack100start.nuanmb",
+			"fighter/diddy/motion/body/c00/c00attackend.nuanmb"
+		],
+		"fighter/diddy/c01": [
+			"fighter/diddy/motion/body/c01/c00attack100.nuanmb",
+			"fighter/diddy/motion/body/c01/c00attack100start.nuanmb",
+			"fighter/diddy/motion/body/c01/c00attackend.nuanmb"
+		],
+		"fighter/diddy/c02": [
+			"fighter/diddy/motion/body/c02/c00attack100.nuanmb",
+			"fighter/diddy/motion/body/c02/c00attack100start.nuanmb",
+			"fighter/diddy/motion/body/c02/c00attackend.nuanmb"
+		],
+		"fighter/diddy/c03": [
+			"fighter/diddy/motion/body/c03/c00attack100.nuanmb",
+			"fighter/diddy/motion/body/c03/c00attack100start.nuanmb",
+			"fighter/diddy/motion/body/c03/c00attackend.nuanmb"
+		],
+		"fighter/diddy/c04": [
+			"fighter/diddy/motion/body/c04/c00attack100.nuanmb",
+			"fighter/diddy/motion/body/c04/c00attack100start.nuanmb",
+			"fighter/diddy/motion/body/c04/c00attackend.nuanmb"
+		],
+		"fighter/diddy/c05": [
+			"fighter/diddy/motion/body/c05/c00attack100.nuanmb",
+			"fighter/diddy/motion/body/c05/c00attack100start.nuanmb",
+			"fighter/diddy/motion/body/c05/c00attackend.nuanmb"
+		],
+		"fighter/diddy/c06": [
+			"fighter/diddy/motion/body/c06/c00attack100.nuanmb",
+			"fighter/diddy/motion/body/c06/c00attack100start.nuanmb",
+			"fighter/diddy/motion/body/c06/c00attackend.nuanmb"
+		],
+		"fighter/diddy/c07": [
+			"fighter/diddy/motion/body/c07/c00attack100.nuanmb",
+			"fighter/diddy/motion/body/c07/c00attack100start.nuanmb",
+			"fighter/diddy/motion/body/c07/c00attackend.nuanmb"
+		],
 		"fighter/shulk/c00": [
 			"fighter/shulk/motion/body/c00/c01attacks3hi.nuanmb",
 			"fighter/shulk/motion/body/c00/c01attacks3lw.nuanmb",

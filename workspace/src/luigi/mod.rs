@@ -7,7 +7,7 @@ use smash::app::lua_bind::*;
 use smash::lua2cpp::{L2CFighterCommon, L2CAgentBase};
 use smash_script::*;
 use smashline::*;
-//use smash::hash40;
+use smash::hash40;
 use crate::custom::global_fighter_frame;
 use smashline::Priority::*;
 
@@ -61,6 +61,456 @@ unsafe extern "C" fn luigi_frame(fighter: &mut L2CFighterCommon) {
 }
 
 
+
+/*unsafe extern "C" fn luigi_sideb_ram_main(fighter: &mut L2CFighterCommon) -> L2CValue {
+    //lib::L2CValue::L2CValue(aLStack80,_FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_TRANSITION_TERM_ID_HIT);
+    //iVar3 = lib::L2CValue::as_integer(aLStack80);
+    WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_TRANSITION_TERM_ID_HIT);
+    //lib::L2CValue::_L2CValue(aLStack80);
+    //lib::L2CValue::L2CValue(aLStack80,_FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_TRANSITION_TERM_ID_GROUND);
+    //iVar3 = lib::L2CValue::as_integer(aLStack80);
+    WorkModule::unable_transition_term(fighter.module_accessor, *FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_TRANSITION_TERM_ID_GROUND);
+    //lib::L2CValue::_L2CValue(aLStack80);
+    //lib::L2CValue::L2CValue(aLStack96,_FIGHTER_LUIGI_STATUS_SPECIAL_S_CHARGE_FLAG_DISCHARGE);
+    //iVar3 = lib::L2CValue::as_integer(aLStack96);
+    //bVar1 = WorkModule::is_flag(fighter.module_accessor, *FIGHTER_LUIGI_STATUS_SPECIAL_S_CHARGE_FLAG_DISCHARGE);
+    //lib::L2CValue::L2CValue(aLStack80,(bool)(bVar1 & 1));
+    //bVar2 = lib::L2CValue::operator_cast_to_bool(aLStack80);
+    //lib::L2CValue::_L2CValue(aLStack80);
+    //lib::L2CValue::_L2CValue(aLStack96);
+
+    if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_LUIGI_STATUS_SPECIAL_S_CHARGE_FLAG_DISCHARGE) == false {
+    //if ((bVar2 & 1U) == 0) {
+        //lib::L2CValue::L2CValue(aLStack80,0x976c3b29b);
+        //lib::L2CValue::L2CValue(aLStack96,0.0);
+        //lib::L2CValue::L2CValue(aLStack112,1.0);
+        //lib::L2CValue::L2CValue(aLStack128,false);
+        //HVar4 = lib::L2CValue::as_hash(aLStack80);
+        //fVar5 = (float)lib::L2CValue::as_number(aLStack96);
+        //fVar6 = (float)lib::L2CValue::as_number(aLStack112);
+        //bVar1 = lib::L2CValue::as_bool(aLStack128);
+        MotionModule::change_motion(fighter.module_accessor, Hash40::new("special_s"), 0.0, 1.0, false, 0.0, false, false);
+    }
+    else {
+        //lib::L2CValue::L2CValue(aLStack80,0x1378df2f6a);
+        //lib::L2CValue::L2CValue(aLStack96,0.0);
+        //lib::L2CValue::L2CValue(aLStack112,1.0);
+        //lib::L2CValue::L2CValue(aLStack128,false);
+        //HVar4 = lib::L2CValue::as_hash(aLStack80);
+        //fVar5 = (float)lib::L2CValue::as_number(aLStack96);
+        //fVar6 = (float)lib::L2CValue::as_number(aLStack112);
+        //bVar1 = lib::L2CValue::as_bool(aLStack128);
+        MotionModule::change_motion(fighter.module_accessor, Hash40::new("special_s_discharge"), 0.0, 1.0, false, 0.0, false, false);
+    }
+    //lib::L2CValue::_L2CValue(aLStack128);
+    //lib::L2CValue::_L2CValue(aLStack112);
+    //lib::L2CValue::_L2CValue(aLStack96);
+    //lib::L2CValue::_L2CValue(aLStack80);
+    //lib::L2CValue::L2CValue(aLStack80,_FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_FLAG_LAST_STRANS);
+    //iVar3 = lib::L2CValue::as_integer(aLStack80);
+    WorkModule::off_flag(fighter.module_accessor, *FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_FLAG_LAST_STRANS);
+    //lib::L2CValue::_L2CValue(aLStack80);
+    //lib::L2CValue::L2CValue(aLStack80,SpecialSRam_main_loop);
+    //lua2cpp::L2CFighterCommon::sub_shift_status_main(this,(L2CValue)0xb0);
+    //lib::L2CValue::_L2CValue(aLStack80);
+    //return;
+    fighter.sub_shift_status_main(L2CValue::Ptr(special_s_ram_main_loop as *const () as _))
+}
+
+
+unsafe extern "C" fn sideb_ram_main_loop(fighter: &mut L2CFighterCommon) -> L2CValue {
+    //ppBVar9 = &this->moduleAccessor;
+    //bVar1 = MotionModule::is_end(fighter.module_accessor);
+    //lib::L2CValue::L2CValue(aLStack80,(bool)(bVar1 & 1));
+    //bVar2 = lib::L2CValue::operator_cast_to_bool(aLStack80);
+    //lib::L2CValue::_L2CValue(aLStack80);
+    if MotionModule::is_end(fighter.module_accessor) {
+        //lib::L2CValue::L2CValue(aLStack416,_FIGHTER_LUIGI_STATUS_KIND_SPECIAL_S_END);
+        //lib::L2CValue::L2CValue(aLStack432,false);
+        //lua2cpp::L2CFighterBase::change_status(this,(L2CValue)0x60,(L2CValue)0x50);
+        //lib::L2CValue::_L2CValue(aLStack432);
+        fighter.change_status(FIGHTER_LUIGI_STATUS_KIND_SPECIAL_S_END.into(), false.into());
+        //pLVar5 = aLStack416;
+        return 0.into();
+        
+    }
+    //lib::L2CValue::L2CValue(aLStack96,_FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_TRANSITION_TERM_ID_HIT);
+    //iVar3 = lib::L2CValue::as_integer(aLStack96);
+    //bVar1 = WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_TRANSITION_TERM_ID_HIT);
+    //lib::L2CValue::L2CValue(aLStack80,(bool)(bVar1 & 1));
+    //bVar2 = lib::L2CValue::operator_cast_to_bool(aLStack80);
+    //lib::L2CValue::_L2CValue(aLStack80);
+    //lib::L2CValue::_L2CValue(aLStack96);
+    if WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_TRANSITION_TERM_ID_HIT) {
+        //bVar1 = app::lua_bind::AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT);
+        //lib::L2CValue::L2CValue(aLStack80,(bool)(bVar1 & 1));
+        //bVar2 = lib::L2CValue::operator_cast_to_bool(aLStack80);
+        //lib::L2CValue::_L2CValue(aLStack80);
+        if AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) {
+            //lib::L2CValue::L2CValue(aLStack80,_FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_FLAG_LAST_STRANS);
+            //iVar3 = lib::L2CValue::as_integer(aLStack80);
+            app::lua_bind::WorkModule::on_flag(fighter.module_accessor, *FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_FLAG_LAST_STRANS);
+            //lib::L2CValue::_L2CValue(aLStack80);
+            //lib::L2CValue::L2CValue(aLStack448,_FIGHTER_LUIGI_STATUS_KIND_SPECIAL_S_END);
+            //lib::L2CValue::L2CValue(aLStack464,false);
+            //lua2cpp::L2CFighterBase::change_status(this,(L2CValue)0x40,(L2CValue)0x30);
+            fighter.change_status(FIGHTER_LUIGI_STATUS_KIND_SPECIAL_S_END.into(), false.into());
+            //lib::L2CValue::_L2CValue(aLStack464);
+            //pLVar5 = aLStack448;
+            return 0.into();
+        }
+    }
+    //lib::L2CValue::L2CValue(aLStack96,_FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_TRANSITION_TERM_ID_GROUND);
+    //iVar3 = lib::L2CValue::as_integer(aLStack96);
+    //bVar1 = WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_TRANSITION_TERM_ID_GROUND);
+    //lib::L2CValue::L2CValue(aLStack80,(bool)(bVar1 & 1));
+    //bVar2 = lib::L2CValue::operator_cast_to_bool(aLStack80);
+    //lib::L2CValue::_L2CValue(aLStack80);
+    //lib::L2CValue::_L2CValue(aLStack96);
+    if WorkModule::is_enable_transition_term(fighter.module_accessor, *FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_TRANSITION_TERM_ID_GROUND) {
+        //pLVar5 = (L2CValue *)lib::L2CValue::operator__((L2CValue *)&this->globalTable,0x16);
+        //lib::L2CValue::L2CValue(aLStack80,_SITUATION_KIND_GROUND);
+        //uVar6 = lib::L2CValue::operator__(pLVar5,aLStack80);
+        //lib::L2CValue::_L2CValue(aLStack80);
+        if StatusModule::situation_kind(fighter.module_accessor) == *SITUATION_KIND_GROUND {
+            //lib::L2CValue::L2CValue(aLStack480,_FIGHTER_LUIGI_STATUS_KIND_SPECIAL_S_END);
+            //lib::L2CValue::L2CValue(aLStack496,false);
+            //lua2cpp::L2CFighterBase::change_status(this,(L2CValue)0x20,(L2CValue)0x10);
+            //lib::L2CValue::_L2CValue(aLStack496);
+            //pLVar5 = aLStack480;
+            fighter.change_status(FIGHTER_LUIGI_STATUS_KIND_SPECIAL_S_END.into(), false.into());
+            return 0.into();
+        }
+    }
+    //lib::L2CValue::L2CValue(aLStack96,0);
+    //lib::L2CValue::L2CValue(aLStack112,0);
+    //lib::L2CValue::L2CValue(aLStack128,0);
+    //lib::L2CValue::L2CValue(aLStack144,0);
+    //lib::L2CValue::L2CValue(aLStack160,0);
+    //lib::L2CValue::L2CValue(aLStack176,0);
+    //lib::L2CValue::L2CValue(aLStack192,0);
+    //lib::L2CValue::L2CValue(aLStack208,0);
+    //lib::L2CValue::L2CValue(aLStack224,0);
+    //lib::L2CValue::L2CValue(aLStack240,0);
+    //lib::L2CValue::L2CValue(aLStack256,0);
+    //lib::L2CValue::L2CValue(aLStack272,0);
+    //lib::L2CValue::L2CValue(aLStack288,0);
+    //iVar3 = GroundModule::get_touch_flag(fighter.module_accessor);
+    GroundModule::get_touch_flag(fighter.module_accessor);
+    //lib::L2CValue::L2CValue(aLStack80,iVar3);
+    //lib::L2CValue::operator_(aLStack112,aLStack80);
+    //lib::L2CValue::_L2CValue(aLStack80);
+    //fVar10 = (float)PostureModule::lr(fighter.module_accessor);
+    //lib::L2CValue::L2CValue(aLStack80,fVar10);
+    //lib::L2CValue::operator_(aLStack192,aLStack80);
+    PostureModule::lr(fighter.module_accessor) = 0;
+    //lib::L2CValue::_L2CValue(aLStack80);
+    //lib::L2CValue::L2CValue(aLStack304,_FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_FLAG_GROUND_CHECK);
+    //iVar3 = lib::L2CValue::as_integer(aLStack304);
+   //bVar1 = WorkModule::is_flag(fighter.module_accessor, *FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_FLAG_GROUND_CHECK);
+    //lib::L2CValue::L2CValue(aLStack80,(bool)(bVar1 & 1));
+    //bVar2 = lib::L2CValue::operator_cast_to_bool(aLStack80);
+    //lib::L2CValue::_L2CValue(aLStack80);
+    //lib::L2CValue::_L2CValue(aLStack304);
+    if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_FLAG_GROUND_CHECK) {
+        //LAB_710000e820:
+        //lib::L2CValue::L2CValue(aLStack320,_FIGHTER_LUIGI_STATUS_SPECIAL_S_CHARGE_FLAG_DISCHARGE);
+        //iVar3 = lib::L2CValue::as_integer(aLStack320);
+        //bVar1 = app::lua_bind::WorkModule::is_flag(fighter.module_accessor, *FIGHTER_LUIGI_STATUS_SPECIAL_S_CHARGE_FLAG_DISCHARGE);
+        //lib::L2CValue::L2CValue(aLStack304,(bool)(bVar1 & 1));
+        //lib::L2CValue::operator_(aLStack304);
+        //bVar2 = lib::L2CValue::operator_cast_to_bool(aLStack80);
+        if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_LUIGI_STATUS_SPECIAL_S_CHARGE_FLAG_DISCHARGE) {
+            lib::L2CValue::_L2CValue(aLStack80);
+            lib::L2CValue::_L2CValue(aLStack304);
+            //pLVar5 = aLStack320;
+            goto LAB_710000ed64;
+        }
+        //lib::L2CValue::L2CValue(aLStack368,_FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_FLAG_SET_ATTACK_POWER);
+        //iVar3 = lib::L2CValue::as_integer(aLStack368);
+       //bVar1 = WorkModule::is_flag(fighter.module_accessor, *FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_FLAG_SET_ATTACK_POWER);
+        //lib::L2CValue::L2CValue(aLStack352,(bool)(bVar1 & 1));
+        //lib::L2CValue::operator_(aLStack352);
+        //bVar2 = lib::L2CValue::operator_cast_to_bool(aLStack336);
+        if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_FLAG_SET_ATTACK_POWER) == false {
+            //bVar1 = 0;
+            WorkModule::is_flag(fighter.module_accessor, *FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_FLAG_SET_ATTACK_POWER) = false; 
+        }
+        else {
+            //lib::L2CValue::L2CValue(aLStack400, 0);
+            //iVar3 = lib::L2CValue::as_integer(aLStack400);
+            //bVar1 = AttackModule::is_attack(fighter.module_accessor, 0, false);
+            //lib::L2CValue::L2CValue(aLStack384,(bool)(bVar1 & 1));
+            //bVar1 = lib::L2CValue::operator_cast_to_bool(aLStack384);
+            //lib::L2CValue::_L2CValue(aLStack384);
+            //lib::L2CValue::_L2CValue(aLStack400);
+            AttackModule::is_attack(fighter.module_accessor, 0, false);
+        }
+        //lib::L2CValue::_L2CValue(aLStack336);
+        //lib::L2CValue::_L2CValue(aLStack352);
+        //lib::L2CValue::_L2CValue(aLStack368);
+        //lib::L2CValue::_L2CValue(aLStack80);
+        //lib::L2CValue::_L2CValue(aLStack304);
+        //lib::L2CValue::_L2CValue(aLStack320);
+        if WorkModule::is_flag(fighter.module_accessor, *FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_FLAG_SET_ATTACK_POWER) {
+            //lib::L2CValue::L2CValue(aLStack304,0xfea97fe73);
+            //lib::L2CValue::L2CValue(aLStack320,0xc75c684a4);
+            //uVar6 = lib::L2CValue::as_integer(aLStack304);
+            //uVar7 = lib::L2CValue::as_integer(aLStack320);
+            //fVar10 = (float)WorkModule::get_param_float(fighter.module_accessor, hash40("param_special_s"), hash40("attack_power"));
+            //lib::L2CValue::L2CValue(aLStack80,fVar10);
+            //lib::L2CValue::operator_(aLStack160,aLStack80);
+            WorkModule::get_param_float(fighter.module_accessor, hash40("param_special_s"), hash40("attack_power"));
+            //lib::L2CValue::_L2CValue(aLStack80);
+            //lib::L2CValue::_L2CValue(aLStack320);
+            //lib::L2CValue::_L2CValue(aLStack304);
+            //lib::L2CValue::L2CValue(aLStack304,0xfea97fe73);
+            //lib::L2CValue::L2CValue(aLStack320,0x13a029afd1);
+            //uVar6 = lib::L2CValue::as_integer(aLStack304);
+            //uVar7 = lib::L2CValue::as_integer(aLStack320);
+            //fVar10 = (float)WorkModule::get_param_float(fighter.module_accessor, hash40("param_special_s"), hash40("attack_power_charge"));
+            //lib::L2CValue::L2CValue(aLStack80,fVar10);
+            //lib::L2CValue::operator_(aLStack256,aLStack80);
+            WorkModule::get_param_float(fighter.module_accessor, hash40("param_special_s"), hash40("attack_power_charge"));
+            //lib::L2CValue::_L2CValue(aLStack80);
+            //lib::L2CValue::_L2CValue(aLStack320);
+            //lib::L2CValue::_L2CValue(aLStack304);
+            //lib::L2CValue::L2CValue(aLStack304,_FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_FLOAT_CHARGE);
+            //iVar3 = lib::L2CValue::as_integer(aLStack304);
+            //fVar10 = (float)WorkModule::get_float(fighter.module_accessor, *FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_FLOAT_CHARGE);
+            //lib::L2CValue::L2CValue(aLStack80,fVar10);
+            WorkModule::get_float(fighter.module_accessor, *FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_FLOAT_CHARGE);
+            //lib::L2CValue::L2CValue(aLStack336,0xfea97fe73);
+            //lib::L2CValue::L2CValue(aLStack352,0xca3dc30e5);
+            //uVar6 = lib::L2CValue::as_integer(aLStack336);
+            //uVar7 = lib::L2CValue::as_integer(aLStack352);
+            //fVar10 = (float)WorkModule::get_param_float(fighter.module_accessor, hash40("param_special_s"), hash40("charge_frame"));
+            //lib::L2CValue::L2CValue(aLStack320,fVar10);
+            //uVar6 = lib::L2CValue::operator__(aLStack320,aLStack80);
+            //lib::L2CValue::_L2CValue(aLStack320);
+            //lib::L2CValue::_L2CValue(aLStack352);
+            //lib::L2CValue::_L2CValue(aLStack336);
+            //lib::L2CValue::_L2CValue(aLStack80);
+            //lib::L2CValue::_L2CValue(aLStack304);
+            if WorkModule::get_param_float(fighter.module_accessor, hash40("param_special_s"), hash40("charge_frame")) == false {
+                //lib::L2CValue::L2CValue(aLStack304,_FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_FLOAT_CHARGE);
+                //iVar3 = lib::L2CValue::as_integer(aLStack304);
+                //fVar10 = (float)WorkModule::get_float(fighter.module_accessor, *FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_FLOAT_CHARGE);
+                //lib::L2CValue::L2CValue(aLStack80,fVar10);
+                //lib::L2CValue::operator_(aLStack96,aLStack80);
+                WorkModule::get_float(fighter.module_accessor, *FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_FLOAT_CHARGE);
+                //pLVar5 = aLStack80;
+            }
+            else {
+                //lib::L2CValue::L2CValue(aLStack304,0xfea97fe73);
+                //lib::L2CValue::L2CValue(aLStack320,0xca3dc30e5);
+                //uVar6 = lib::L2CValue::as_integer(aLStack304);
+                //uVar7 = lib::L2CValue::as_integer(aLStack320);
+                //fVar10 = (float)WorkModule::get_param_float(fighter.module_accessor, hash40("param_special_s"), hash40("charge_frame"));
+                //lib::L2CValue::L2CValue(aLStack80,fVar10);
+                //lib::L2CValue::operator_(aLStack96,aLStack80);
+                //lib::L2CValue::_L2CValue(aLStack80);
+                //pLVar5 = aLStack320;
+                WorkModule::get_param_float(fighter.module_accessor, hash40("param_special_s"), hash40("charge_frame"));
+            }
+            //lib::L2CValue::_L2CValue(pLVar5);
+            //lib::L2CValue::_L2CValue(aLStack304);
+            //lib::L2CValue::operator_(aLStack256, aLStack160);
+            //lib::L2CValue::L2CValue(aLStack336,0xfea97fe73);
+            //lib::L2CValue::L2CValue(aLStack352,0xca3dc30e5);
+            //uVar6 = lib::L2CValue::as_integer(aLStack336);
+            //uVar7 = lib::L2CValue::as_integer(aLStack352);
+            //fVar10 = (float)WorkModule::get_param_float(fighter.module_accessor, hash40("param_special_s"), hash40("charge_frame"));
+            WorkModule::get_param_float(fighter.module_accessor, hash40("param_special_s"), hash40("charge_frame"));
+            lib::L2CValue::L2CValue(aLStack320, fVar10);
+            lib::L2CValue::operator_(aLStack304, aLStack320);
+            lib::L2CValue::operator_(aLStack240, aLStack80);
+            lib::L2CValue::_L2CValue(aLStack80);
+            lib::L2CValue::_L2CValue(aLStack320);
+            lib::L2CValue::_L2CValue(aLStack352);
+            lib::L2CValue::_L2CValue(aLStack336);
+            lib::L2CValue::_L2CValue(aLStack304);
+            lib::L2CValue::operator_(aLStack240,aLStack96);
+            lib::L2CValue::operator_(aLStack304, aLStack160);
+            lib::L2CValue::operator_(aLStack272,aLStack80);
+            lib::L2CValue::_L2CValue(aLStack80);
+            lib::L2CValue::_L2CValue(aLStack304);
+            lib::L2CValue::L2CValue(aLStack80, 10.0);
+            lib::L2CValue::operator_(aLStack272,aLStack80);
+            lib::L2CValue::_L2CValue(aLStack80);
+            lib::L2CValue::operator_(aLStack288,aLStack304);
+            lib::L2CValue::_L2CValue(aLStack304);
+            fVar10 = (float)lib::L2CValue::as_number(aLStack288);
+            AttackModule::set_power_mul_status(fighter.module_accessor, 10.0);
+            lib::L2CValue::L2CValue(aLStack80,_FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_FLAG_SET_ATTACK_POWER);
+            iVar3 = lib::L2CValue::as_integer(aLStack80);
+            WorkModule::on_flag(fighter.module_accessor, *FIGHTER_LUIGI_STATUS_SPECIAL_S_RAM_FLAG_SET_ATTACK_POWER);
+            goto LAB_710000ed60;
+        }
+    }
+    else {
+        lib::L2CValue::L2CValue(aLStack80,_GROUND_TOUCH_FLAG_LEFT);
+        lib::L2CValue::operator_(aLStack112,aLStack80);
+        lib::L2CValue::_L2CValue(aLStack80);
+        bVar2 = lib::L2CValue::operator_cast_to_bool(aLStack304);
+        if ((bVar2 & 1U) == 0) {
+            LAB_710000e494:
+            lib::L2CValue::L2CValue(aLStack80,GROUND_TOUCH_FLAG_RIGHT);
+            lib::L2CValue::operator_(aLStack112,aLStack80);
+            lib::L2CValue::_L2CValue(aLStack80);
+            bVar2 = lib::L2CValue::operator_cast_to_bool(aLStack320);
+            if ((bVar2 & 1U) == 0) {
+                lib::L2CValue::_L2CValue(aLStack320);
+                lib::L2CValue::_L2CValue(aLStack304);
+            }
+            else {
+                lib::L2CValue::L2CValue(aLStack80,1.0);
+                uVar6 = lib::L2CValue::operator__(aLStack192,aLStack80);
+                lib::L2CValue::_L2CValue(aLStack80);
+                lib::L2CValue::_L2CValue(aLStack320);
+                lib::L2CValue::_L2CValue(aLStack304);
+                if ((uVar6 & 1) != 0) goto LAB_710000e4fc;
+
+            }
+            goto LAB_710000e820;
+        }
+        lib::L2CValue::L2CValue(aLStack80,-1.0);
+        uVar6 = lib::L2CValue::operator__(aLStack192,aLStack80);
+        lib::L2CValue::_L2CValue(aLStack80);
+        if ((uVar6 & 1) == 0) goto LAB_710000e494;
+            lib::L2CValue::_L2CValue(aLStack304);
+            LAB_710000e4fc:
+            lib::L2CValue::L2CValue(aLStack80,_FIGHTER_LUIGI_STATUS_KIND_SPECIAL_S_END);
+            lib::L2CValue::operator_(aLStack128,aLStack80);
+            lib::L2CValue::_L2CValue(aLStack80);
+            lib::L2CValue::L2CValue(aLStack304,_KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
+            iVar3 = lib::L2CValue::as_integer(aLStack304);
+            fVar10 = (float)app::lua_bind::KineticModule__get_sum_speed_x_impl(fighter.module_accessor,iVar3);
+            lib::L2CValue::L2CValue(aLStack80,fVar10);
+            lib::L2CValue::operator_(aLStack144,aLStack80);
+            lib::L2CValue::_L2CValue(aLStack80);
+            lib::L2CValue::_L2CValue(aLStack304);
+            GVar4 = lib::L2CValue::as_integer(aLStack112);
+            bVar1 = app::lua_bind::GroundModule__is_attachable_impl(fighter.module_accessor,GVar4);
+            lib::L2CValue::L2CValue(aLStack80,(bool)(bVar1 & 1));
+            bVar2 = lib::L2CValue::operator_cast_to_bool(aLStack80);
+            lib::L2CValue::_L2CValue(aLStack80);
+            if ((bVar2 & 1U) != 0) {
+                lib::L2CValue::L2CValue(aLStack336,0xfea97fe73);
+                lib::L2CValue::L2CValue(aLStack352,0x99a7ac083);
+                uVar6 = lib::L2CValue::as_integer(aLStack336);
+                uVar7 = lib::L2CValue::as_integer(aLStack352);
+                fVar10 = (float)app::lua_bind::WorkModule__get_param_float_impl(fighter.module_accessor,uVar6,uVar7);
+                lib::L2CValue::L2CValue(aLStack320,fVar10);
+                lib::L2CValue::L2CValue(aLStack80,100.0);
+                lib::L2CValue::operator_(aLStack320,aLStack80);
+                lib::L2CValue::_L2CValue(aLStack80);
+                lib::L2CValue::operator_(aLStack176,aLStack304);
+                lib::L2CValue::_L2CValue(aLStack304);
+                lib::L2CValue::_L2CValue(aLStack320);
+                lib::L2CValue::_L2CValue(aLStack352);
+                lib::L2CValue::_L2CValue(aLStack336);
+                lib::L2CValue::L2CValue(aLStack304,0x77a08c3fc);
+                HVar8 = lib::L2CValue::as_hash(aLStack304);
+                fVar10 = (float)app::sv_math::randf(HVar8,1.0);
+                lib::L2CValue::L2CValue(aLStack80,fVar10);
+                lib::L2CValue::operator_(aLStack208,aLStack80);
+                lib::L2CValue::_L2CValue(aLStack80);
+                lib::L2CValue::_L2CValue(aLStack304);
+                lib::L2CValue::L2CValue(aLStack320,aLStack144);
+                lib::L2CValue::L2CValue(aLStack80,0.0);
+                uVar6 = lib::L2CValue::operator_(aLStack320,aLStack80);
+                lib::L2CValue::_L2CValue(aLStack80);
+                if ((uVar6 & 1) != 0) {
+                    lib::L2CValue::operator_(aLStack320);
+                    lib::L2CValue::operator_(aLStack320,aLStack80);
+                    lib::L2CValue::_L2CValue(aLStack80);
+                }
+                lib::L2CValue::L2CValue(aLStack304,aLStack320);
+                lib::L2CValue::L2CValue(aLStack336,0xfea97fe73);
+                lib::L2CValue::L2CValue(aLStack352,0xce07c73da);
+                uVar6 = lib::L2CValue::as_integer(aLStack336);
+                uVar7 = lib::L2CValue::as_integer(aLStack352);
+                fVar10 = (float)app::lua_bind::WorkModule__get_param_float_impl(fighter.module_accessor,uVar6,uVar7);
+                lib::L2CValue::L2CValue(aLStack80,fVar10);
+                uVar6 = lib::L2CValue::operator__(aLStack80,aLStack304);
+                if ((uVar6 & 1) == 0) {
+                    lib::L2CValue::_L2CValue(aLStack80);
+                    lib::L2CValue::_L2CValue(aLStack352);
+                    lib::L2CValue::_L2CValue(aLStack336);
+                    lib::L2CValue::_L2CValue(aLStack304);
+                    pLVar5 = aLStack320;
+                    LAB_710000ed2c:
+                    lib::L2CValue::_L2CValue(pLVar5);
+                }
+            else {
+                uVar6 = lib::L2CValue::operator__(aLStack208,aLStack176);
+                lib::L2CValue::_L2CValue(aLStack80);
+                lib::L2CValue::_L2CValue(aLStack352);
+                lib::L2CValue::_L2CValue(aLStack336);
+                lib::L2CValue::_L2CValue(aLStack304);
+                lib::L2CValue::_L2CValue(aLStack320);
+                if ((uVar6 & 1) != 0) {
+                    lib::L2CValue::L2CValue(aLStack80,_GROUND_TOUCH_FLAG_LEFT);
+                    lib::L2CValue::operator_(aLStack112,aLStack80);
+                    lib::L2CValue::_L2CValue(aLStack80);
+                    bVar2 = lib::L2CValue::operator_cast_to_bool(aLStack304);
+                    lib::L2CValue::_L2CValue(aLStack304);
+                    if ((bVar2 & 1U) == 0) {
+                        lib::L2CValue::L2CValue(aLStack80,1.0);
+                        uVar6 = lib::L2CValue::operator__(aLStack192,aLStack80);
+                        lib::L2CValue::_L2CValue(aLStack80);
+                        if ((uVar6 & 1) != 0) {
+                            lib::L2CValue::L2CValue(aLStack80,_FIGHTER_LUIGI_STATUS_KIND_SPECIAL_S_WALL);
+                            lib::L2CValue::operator_(aLStack128,aLStack80);
+                            goto LAB_710000ee38;
+                        }
+                    }
+                    else {
+                        lib::L2CValue::L2CValue(aLStack80,-1.0);
+                        uVar6 = lib::L2CValue::operator__(aLStack192,aLStack80);
+                        lib::L2CValue::_L2CValue(aLStack80);
+                        if ((uVar6 & 1) != 0) {
+                            lib::L2CValue::L2CValue(aLStack80,_FIGHTER_LUIGI_STATUS_KIND_SPECIAL_S_WALL);
+                            lib::L2CValue::operator_(aLStack128,aLStack80);
+                            LAB_710000ee38:
+                            pLVar5 = aLStack80;
+                            goto LAB_710000ed2c;
+                        }
+                    }
+                }
+            }
+        }
+        lib::L2CValue::L2CValue(aLStack80,aLStack128);
+        lib::L2CValue::L2CValue(aLStack304,false);
+        lua2cpp::L2CFighterBase::change_status(this,(L2CValue)0xb0,(L2CValue)0xd0);
+        lib::L2CValue::_L2CValue(aLStack304);
+        LAB_710000ed60:
+        pLVar5 = aLStack80;
+        LAB_710000ed64:
+        lib::L2CValue::_L2CValue(pLVar5);
+        //cum back later
+    }
+    lib::L2CValue::_L2CValue(aLStack288);
+    lib::L2CValue::_L2CValue(aLStack272);
+    lib::L2CValue::_L2CValue(aLStack256);
+    lib::L2CValue::_L2CValue(aLStack240);
+    lib::L2CValue::_L2CValue(aLStack224);
+    lib::L2CValue::_L2CValue(aLStack208);
+    lib::L2CValue::_L2CValue(aLStack192);
+    lib::L2CValue::_L2CValue(aLStack176);
+    lib::L2CValue::_L2CValue(aLStack160);
+    lib::L2CValue::_L2CValue(aLStack144);
+    lib::L2CValue::_L2CValue(aLStack128);
+    lib::L2CValue::_L2CValue(aLStack112);
+    pLVar5 = aLStack96;
+    LAB_710000edcc:
+    lib::L2CValue::_L2CValue(pLVar5);
+    lib::L2CValue::L2CValue((L2CValue *)return_value,0);
+    return;
+}*/
+
+
 unsafe extern "C" fn luigi_stepjump_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
@@ -71,10 +521,14 @@ unsafe extern "C" fn luigi_stepjump_smash_script(fighter: &mut L2CAgentBase) {
 unsafe extern "C" fn luigi_jab_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.1, 361, 25, 20, 25, 2.7, 0.0, 6.6, 6.5, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 2.1, 361, 25, 20, 25, 3.1, 0.0, 6.6, 9.1, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 2.1, 180, 20, 15, 20, 3.6, 0.0, 6.6, 12.3, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 2.1, 361, 20, 15, 20, 3.6, 0.0, 6.6, 12.3, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.2, 361, 25, 20, 20, 2.9, 0.0, 6.6, 6.5, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 2.2, 361, 25, 10, 15, 3.1, 0.0, 6.6, 9.1, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 2.2, 180, 20, 15, 20, 3.6, 0.0, 6.6, 12.3, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_FIGHTER, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 3, 0, Hash40::new("top"), 2.2, 361, 20, 15, 20, 3.6, 0.0, 6.6, 12.3, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 3.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 3.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 3.0, false);
+        AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 3, 3.0, false);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 2.0);
     if macros::is_excute(fighter) {
@@ -90,9 +544,9 @@ unsafe extern "C" fn luigi_jab_smash_script(fighter: &mut L2CAgentBase) {
 unsafe extern "C" fn luigi_jab2_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.0, 361, 25, 23, 35, 2.5, 0.0, 5.2, 5.5, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 2.0, 361, 20, 15, 25, 3.8, 0.0, 5.8, 9.5, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
-        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 2.0, 180, 20, 15, 25, 4.5, 0.0, 6.2, 14.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 2.2, 361, 25, 20, 20, 2.9, 0.0, 5.2, 5.5, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 2.2, 361, 20, 15, 20, 3.8, 0.0, 5.8, 9.5, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
+        macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 2.2, 180, 20, 15, 25, 4.5, 0.0, 6.2, 14.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_PUNCH);
         AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 0, 2.0, false);
         AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 1, 2.0, false);
         AttackModule::set_add_reaction_frame_revised(fighter.module_accessor, 2, 2.0, false);
@@ -107,8 +561,8 @@ unsafe extern "C" fn luigi_jab2_smash_script(fighter: &mut L2CAgentBase) {
 unsafe extern "C" fn luigi_jab3_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 6.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 6.1, 28, 130, 0, 60, 5.0, 0.0, 8.5, 9.2, None, None, None, 1.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 6, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_HIP);
-        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 6.1, 28, 130, 0, 60, 3.5, 0.0, 7.0, 4.0, None, None, None, 1.8, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 6, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_HIP);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 6.1, 28, 130, 0, 60, 5.0, 0.0, 8.5, 9.2, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 6, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_HIP);
+        macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 6.1, 28, 130, 0, 60, 3.5, 0.0, 7.0, 4.0, None, None, None, 1.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 6, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_HIP);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
@@ -507,7 +961,7 @@ unsafe extern "C" fn luigi_dair_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 10.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("hip"), 12.5, 361, 97, 0, 21, 4.8, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("hip"), 12.5, 361, 103, 0, 21, 4.8, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
         macros::ATTACK(fighter, 1, 0, Hash40::new("top"), 12.5, 270, 80, 0, 30, 5.3, 0.0, -0.5, 2.9, None, None, None, 1.3, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);    
     }
     sv_animcmd::frame(fighter.lua_state_agent, 15.0);
@@ -667,7 +1121,7 @@ unsafe extern "C" fn luigi_fthrow_smash_script(fighter: &mut L2CAgentBase) {
         }
     }
     if macros::is_excute(fighter) {
-        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 9.9, 285, 80, 0, 30, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 9.0, 285, 90, 0, 23, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 13.0);
@@ -684,6 +1138,10 @@ unsafe extern "C" fn luigi_fthrow_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::ATK_HIT_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, Hash40::new("throw"), WorkModule::get_int64(fighter.module_accessor,*FIGHTER_STATUS_THROW_WORK_INT_TARGET_OBJECT), WorkModule::get_int64(fighter.module_accessor,*FIGHTER_STATUS_THROW_WORK_INT_TARGET_HIT_GROUP), WorkModule::get_int64(fighter.module_accessor,*FIGHTER_STATUS_THROW_WORK_INT_TARGET_HIT_NO));
     }
+    sv_animcmd::frame(fighter.lua_state_agent, 26.0);
+    if macros::is_excute(fighter) {
+        CancelModule::enable_cancel(fighter.module_accessor);
+    }
 }
 
 unsafe extern "C" fn luigi_bthrow_smash_script(fighter: &mut L2CAgentBase) {
@@ -693,7 +1151,7 @@ unsafe extern "C" fn luigi_bthrow_smash_script(fighter: &mut L2CAgentBase) {
         }
     }
     if macros::is_excute(fighter) {
-        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 9.3, 45, 100, 0, 73, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
+        macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_THROW, 0, 8.8, 41, 124, 0, 50, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
         macros::ATTACK_ABS(fighter, *FIGHTER_ATTACK_ABSOLUTE_KIND_CATCH, 0, 3.0, 361, 100, 0, 60, 0.0, 1.0, *ATTACK_LR_CHECK_F, 0.0, true, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_NONE, *ATTACK_REGION_THROW);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 14.0);
@@ -820,7 +1278,7 @@ unsafe extern "C" fn luigi_sideb_fly_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("neck"), 11.4, 361, 80, 0, 30, 5.5, 3.0, 0.0, 0.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_HEAD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("neck"), 11.4, 361, 80, 0, 30, 5.5, 3.0, 0.0, 0.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_SPEED, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_NO_FLOOR, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_HEAD);
         AttackModule::set_attack_keep_rumble(fighter.module_accessor, 0, true);
         JostleModule::set_status(fighter.module_accessor, false);
     }
@@ -830,7 +1288,7 @@ unsafe extern "C" fn luigi_sideb_fly_smash_script(fighter: &mut L2CAgentBase) {
     }
     sv_animcmd::frame(fighter.lua_state_agent, 8.0);
     if macros::is_excute(fighter) {
-        macros::ATTACK(fighter, 0, 0, Hash40::new("neck"), 11.4, 361, 80, 0, 30, 5.5, 3.0, 0.0, 0.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_SPEED, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_HEAD);
+        macros::ATTACK(fighter, 0, 0, Hash40::new("neck"), 11.4, 361, 80, 0, 30, 5.5, 3.0, 0.0, 0.0, None, None, None, 1.2, 1.0, *ATTACK_SETOFF_KIND_THRU, *ATTACK_LR_CHECK_SPEED, false, 5, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_fire"), *ATTACK_SOUND_LEVEL_M, *COLLISION_SOUND_ATTR_FIRE, *ATTACK_REGION_HEAD);
     }
     sv_animcmd::frame(fighter.lua_state_agent, 14.0);
     if macros::is_excute(fighter) {

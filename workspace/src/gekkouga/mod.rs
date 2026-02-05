@@ -15,6 +15,8 @@ static mut GEKKOUGA_SMASH_CHARGE : [bool; 8] = [false; 8];
 
 static mut GEKKOUGA_JUMP_RESTORE : [bool; 8] = [false; 8];
 
+static mut GEKKOUGA_AERIAL_CANCANCEL : [bool; 8] = [false; 8];
+
 
 // A Once-Per-Fighter-Frame that only applies to Greninja
 unsafe extern "C" fn gekkouga_frame(fighter: &mut L2CFighterCommon) {
@@ -26,7 +28,7 @@ unsafe extern "C" fn gekkouga_frame(fighter: &mut L2CFighterCommon) {
 
         //println!("It'sa me, Greninja, ninja!!");
 
-        if status == *FIGHTER_STATUS_KIND_ATTACK_AIR {
+        if status == *FIGHTER_STATUS_KIND_ATTACK_AIR && GEKKOUGA_AERIAL_CANCANCEL[entry_id] {
             if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false {
                 WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_JUMP_SQUAT);
                 WorkModule::enable_transition_term(fighter.module_accessor, *FIGHTER_STATUS_TRANSITION_TERM_ID_CONT_JUMP_SQUAT_BUTTON);
@@ -526,6 +528,7 @@ unsafe extern "C" fn gekkouga_nair_smash_script(fighter: &mut L2CAgentBase) {
     
     if macros::is_excute(fighter) {
         GEKKOUGA_JUMP_RESTORE[entry_id] = false;
+        GEKKOUGA_AERIAL_CANCANCEL[entry_id] = false;
     }
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
@@ -539,6 +542,7 @@ unsafe extern "C" fn gekkouga_nair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 12.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, crate::consts::FIGHTER_STATUS_ATTACK_WORK_FLAG_HITFALL);
+        GEKKOUGA_AERIAL_CANCANCEL[entry_id] = true;
         macros::ATTACK(fighter, 0, 0, Hash40::new("hip"), 12.5, 74, 70, 0, 30, 10.0, 0.0, 0.0, 0.0, None, None, None, 1.0, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_water"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_PUNCH, *ATTACK_REGION_NONE);
     }
     sv_animcmd::wait(fighter.lua_state_agent, 3.0);
@@ -563,6 +567,7 @@ unsafe extern "C" fn gekkouga_fair_smash_script(fighter: &mut L2CAgentBase) {
     
     if macros::is_excute(fighter) {
         GEKKOUGA_JUMP_RESTORE[entry_id] = false;
+        GEKKOUGA_AERIAL_CANCANCEL[entry_id] = false;
     }
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
@@ -576,6 +581,7 @@ unsafe extern "C" fn gekkouga_fair_smash_script(fighter: &mut L2CAgentBase) {
     sv_animcmd::frame(fighter.lua_state_agent, 16.0);
     if macros::is_excute(fighter) {
         WorkModule::on_flag(fighter.module_accessor, crate::consts::FIGHTER_STATUS_ATTACK_WORK_FLAG_HITFALL);
+        GEKKOUGA_AERIAL_CANCANCEL[entry_id] = true;
         macros::ATTACK(fighter, 0, 0, Hash40::new("haver"), 12.5, 45, 125, 0, 22, 5.3, 0.0, -8.8, 0.0, None, None, None, 1.1, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
         macros::ATTACK(fighter, 1, 0, Hash40::new("haver"), 12.5, 45, 125, 0, 22, 4.6, 0.0, 0.0, 0.0, None, None, None, 1.1, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
         macros::ATTACK(fighter, 2, 0, Hash40::new("top"), 12.5, 45, 125, 0, 22, 4.1, 0.0, 7.5, 8.0, Some(0.0), Some(8.5), Some(8.0), 1.1, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_F, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_cutup"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_CUTUP, *ATTACK_REGION_SWORD);
@@ -602,11 +608,13 @@ unsafe extern "C" fn gekkouga_bair_smash_script(fighter: &mut L2CAgentBase) {
     
     if macros::is_excute(fighter) {
         GEKKOUGA_JUMP_RESTORE[entry_id] = false;
+        GEKKOUGA_AERIAL_CANCANCEL[entry_id] = false;
     }
     sv_animcmd::frame(fighter.lua_state_agent, 5.0);
     if macros::is_excute(fighter) {
         MotionModule::set_rate(fighter.module_accessor, 0.5);
         WorkModule::on_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
+        GEKKOUGA_AERIAL_CANCANCEL[entry_id] = true;
         macros::ATTACK(fighter, 0, 0, Hash40::new("footr"), 3.1, 367, 100, 30, 30, 5.7, 0.0, -1.5, 0.5, None, None, None, 0.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
         macros::ATTACK(fighter, 1, 0, Hash40::new("kneer"), 3.1, 367, 100, 30, 30, 4.5, -1.0, 0.0, 0.0, None, None, None, 0.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
         macros::ATTACK(fighter, 2, 0, Hash40::new("legr"), 3.1, 367, 100, 30, 30, 3.0, 0.0, 0.0, 0.0, None, None, None, 0.6, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_B, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_S, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
@@ -666,6 +674,7 @@ unsafe extern "C" fn gekkouga_uair_smash_script(fighter: &mut L2CAgentBase) {
     
     if macros::is_excute(fighter) {
         GEKKOUGA_JUMP_RESTORE[entry_id] = false;
+        GEKKOUGA_AERIAL_CANCANCEL[entry_id] = false;
     }
     sv_animcmd::frame(fighter.lua_state_agent, 3.0);
     if macros::is_excute(fighter) {
@@ -703,6 +712,10 @@ unsafe extern "C" fn gekkouga_uair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         AttackModule::clear_all(fighter.module_accessor);
     }
+    sv_animcmd::wait(fighter.lua_state_agent, 1.0);
+    if macros::is_excute(fighter) {
+        GEKKOUGA_AERIAL_CANCANCEL[entry_id] = true;
+    }
     sv_animcmd::frame(fighter.lua_state_agent, 35.0);
     if macros::is_excute(fighter) {
         WorkModule::off_flag(fighter.module_accessor, *FIGHTER_STATUS_ATTACK_AIR_FLAG_ENABLE_LANDING);
@@ -716,6 +729,7 @@ unsafe extern "C" fn gekkouga_dair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         macros::SET_SPEED_EX(fighter, 0, 2, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
         GEKKOUGA_JUMP_RESTORE[entry_id] = true;
+        GEKKOUGA_AERIAL_CANCANCEL[entry_id] = false;
     }
     sv_animcmd::frame(fighter.lua_state_agent, 1.0);
     if macros::is_excute(fighter) {
@@ -730,9 +744,10 @@ unsafe extern "C" fn gekkouga_dair_smash_script(fighter: &mut L2CAgentBase) {
     if macros::is_excute(fighter) {
         JostleModule::set_status(fighter.module_accessor, true);
         macros::SET_SPEED_EX(fighter, 0, -5, *KINETIC_ENERGY_RESERVE_ATTRIBUTE_MAIN);
+        GEKKOUGA_AERIAL_CANCANCEL[entry_id] = true;
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.2, 270, 95, 0, 20, 5.0, 0.0, 0.1, 0.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
     }
-    sv_animcmd::frame(fighter.lua_state_agent, 27.0);
+    sv_animcmd::frame(fighter.lua_state_agent, 25.0);
     if macros::is_excute(fighter) {
         macros::ATTACK(fighter, 0, 0, Hash40::new("top"), 12.2, 60, 95, 0, 35, 6.0, 0.0, 0.1, 0.0, None, None, None, 1.5, 1.0, *ATTACK_SETOFF_KIND_ON, *ATTACK_LR_CHECK_POS, false, 0, 0.0, 0, false, false, false, false, true, *COLLISION_SITUATION_MASK_GA, *COLLISION_CATEGORY_MASK_ALL, *COLLISION_PART_MASK_ALL, false, Hash40::new("collision_attr_normal"), *ATTACK_SOUND_LEVEL_L, *COLLISION_SOUND_ATTR_KICK, *ATTACK_REGION_KICK);
     }

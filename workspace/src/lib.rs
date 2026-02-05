@@ -97,12 +97,12 @@ mod pickel;
 mod popo;
 mod ridley;
 mod ptrainer;
+//mod koopag;
 
 /*
 //mod miienemyf;
 //mod miienemys;
-//mod miienemyg;
-//mod koopag;*/
+//mod miienemyg;*/
 
 std::arch::global_asm!(
     r#"
@@ -232,13 +232,14 @@ pub extern "C" fn main() {
     popo::install();
     ridley::install();
     ptrainer::install();
-    
+    //koopag::install();
+
+
     
     /*
     miienemyf::install();
     miienemys::install();
-    miienemyg::install();
-    koopag::install();*/
+    miienemyg::install();*/
 
 
 }

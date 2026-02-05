@@ -18,6 +18,7 @@ use skyline::nn::ro::LookupSymbol;
 
 //start of custom consts
 pub const FIGHTER_STATUS_ATTACK_WORK_FLAG_HITFALL : i32 = 495;
+
 //pub const FIGHTER_STATUS_ATTACK_WORK_FLAG_CRITICAL: i32 = 495; //0x100000b;
 
 //end of custom consts lmfao

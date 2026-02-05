@@ -41,7 +41,9 @@ unsafe extern "C" fn metaknight_frame(fighter: &mut L2CFighterCommon) {
         }
 
         if status == *FIGHTER_STATUS_KIND_ATTACK_AIR {
-            if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false && METAKNIGHT_NAIR_CANCANCEL[entry_id] {
+            if AttackModule::is_infliction_status(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) 
+            && AttackModule::is_infliction(fighter.module_accessor, *COLLISION_KIND_MASK_HIT) == false 
+            && METAKNIGHT_NAIR_CANCANCEL[entry_id] {
                 CancelModule::enable_cancel(fighter.module_accessor);
             }
         }

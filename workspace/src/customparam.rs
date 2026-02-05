@@ -56,7 +56,7 @@ pub static FLOAT_SEARCH_CODE: &[u8] = &[
     0x00, 0x1c, 0x40, 0xf9, 0x08, 0x00, 0x40, 0xf9, 0x03, 0x19, 0x40, 0xf9,
 ];
 
-pub static mut INT_OFFSET : usize = 0x4E5380;
+pub static mut INT_OFFSET : usize = 0x4E53E0;
 
 //pub static mut INT_OFFSET: usize = 0x4DED80;
 
@@ -76,7 +76,7 @@ fn find_subsequence(haystack: &[u8], needle: &[u8]) -> Option<usize> {
 #[skyline::hook(offset=0x3f0028, inline)]
 pub unsafe fn offset_dump(ctx: &InlineCtx) {
 	let text = skyline::hooks::getRegionAddress(skyline::hooks::Region::Text) as u64;
-	println!("Function Offset: {:#X}", ctx.registers[8].x.as_ref() - text);
+	//println!("Function Offset: {:#X}", ctx.registers[8].x.as_ref() - text);
 }
 
 //Param Adjustments
@@ -197,6 +197,13 @@ pub unsafe fn get_param_float_replace(module_accessor: u64, param_type: u64, par
 					}
 				}
 			}
+			if param_type == hash40("param_special_n") {
+				if param_hash == hash40("n1_start_speed_x") {
+					if crate::miifighter::MIIFIGHTER_IRONBALL_OOPS[entry_id] {
+						return -2.45;
+					}
+				}
+			}
 		}
 		if fighter_kind == *FIGHTER_KIND_LUIGI {
 			if param_type == hash40("dive_speed_y") {
@@ -257,7 +264,7 @@ pub unsafe fn get_param_float_replace(module_accessor: u64, param_type: u64, par
 					return 3.6;
 				}
 				if crate::sonic::SONIC_NEUTRALB_CURRENT_SPEEDUP_LEVEL[entry_id] == 4 {
-					return 3.9;
+					return 3.8;
 				}
 			}
 			if param_type == hash40("walk_speed_max") {
@@ -530,7 +537,7 @@ pub unsafe fn get_param_float_replace(module_accessor: u64, param_type: u64, par
 			if param_type == hash40("param_paralyzer_bullet") {
 				if param_hash == hash40("speed_tame") {
 					if crate::szerosuit::SZEROSUIT_LASER_TOGGLE_TYPE[entry_id] == 1 {
-						return 2.7;
+						return 2.8;
 					}
 					if crate::szerosuit::SZEROSUIT_LASER_TOGGLE_TYPE[entry_id] == 2 {
 						return 2.0;
@@ -567,46 +574,137 @@ pub unsafe fn get_param_float_replace(module_accessor: u64, param_type: u64, par
 }
 
 
-#[skyline::hook(offset=INT_OFFSET)]
-pub unsafe fn get_param_int_replace(module_accessor: u64, param_type: u64, param_hash: u64) -> i32 {
-	let mut boma = *((module_accessor as *mut u64).offset(1)) as *mut BattleObjectModuleAccessor;
-	let boma_reference = &mut *boma;
-	let fighter_kind = boma_reference.kind();
-	let entry_id = WorkModule::get_int(boma, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
-	if boma_reference.is_fighter() {
-		if fighter_kind == *FIGHTER_KIND_EFLAME {
-			if param_type == hash40("jump_count_max") {
-				if crate::eflame::PYRA_FTHROW_ARMOR[entry_id] {
-					return 10;
-				}
-			}
-		}
-	}
-	else if boma_reference.is_weapon() {
-		let owner_module_accessor = &mut *sv_battle_object::module_accessor((WorkModule::get_int(boma, *WEAPON_INSTANCE_WORK_ID_INT_LINK_OWNER)) as u32);
-		let entry_id = WorkModule::get_int(owner_module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
-		if fighter_kind == *WEAPON_KIND_MARIO_FIREBALL {
-			if param_type == hash40("param_fireball") {
+
+//OG TR4SH Code
+/*#[skyline::hook(offset=INT_OFFSET)] //used Lily's episode 26 and the old turbo mod code
+pub unsafe fn get_param_int_replace(boma: u64, param_type: u64, param_hash: u64) -> i32 {
+    let module_accessor = &mut *(*((boma as *mut u64).offset(1)) as *mut BattleObjectModuleAccessor);
+    let fighter_kind = smash::app::utility::get_kind(module_accessor);
+    let entry_id = WorkModule::get_int(module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+	
+    if utility::get_category(module_accessor) == *BATTLE_OBJECT_CATEGORY_FIGHTER {
+        /*if fighter_kind == *WEAPON_KIND_MARIO_FIREBALL {
+            if param_type == hash40("param_fireball") {
+                if param_hash == hash40("is_penetration") {
+                    if crate::mario::MARIO_GIANT_FIREBALL[entry_id] {
+                        return 1;
+                    }
+                }
+            }
+        }*/
+    }
+	if utility::get_category(module_accessor) == *BATTLE_OBJECT_CATEGORY_WEAPON {
+        if fighter_kind == *WEAPON_KIND_MARIO_FIREBALL {
+            if param_type == hash40("param_fireball") {
+                if param_hash == hash40("is_penetration") {
+                    if crate::mario::MARIO_GIANT_FIREBALL[entry_id] {
+                        return 1;
+                    }
+                }
 				if param_hash == hash40("life") {
 					if crate::mario::MARIO_GIANT_FIREBALL[entry_id] {
-						return 240;
+						return 180;
 					}
 				}
+            }
+        }
+		if fighter_kind == *WEAPON_KIND_SZEROSUIT_PARALYZER_BULLET {
+			if param_type == hash40("param_paralyzer_bullet") {
 				if param_hash == hash40("is_penetration") {
-					if crate::mario::MARIO_GIANT_FIREBALL[entry_id] {
+					if crate::szerosuit::SZEROSUIT_LASER_TOGGLE_TYPE[entry_id] == 1 {
 						return 1;
 					}
 				}
-				if param_hash == hash40("bound_count_max") {
+			}
+		}
+    }
+
+    original!()(boma, param_type, param_hash)
+}*/
+
+//Will'd version
+#[skyline::hook(offset=INT_OFFSET)]
+pub unsafe fn get_param_int_replace(module_accessor: u64, param_type: u64, param_hash :u64) -> i32 {
+    let mut boma = *((module_accessor as *mut u64).offset(1)) as *mut BattleObjectModuleAccessor;
+    let boma_reference = &mut *boma;
+    let fighter_kind = boma_reference.kind();
+    let entry_id = WorkModule::get_int(boma, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+    if boma_reference.is_weapon() {
+
+        // For articles
+        let owner_module_accessor = &mut *sv_battle_object::module_accessor((WorkModule::get_int(boma, *WEAPON_INSTANCE_WORK_ID_INT_LINK_OWNER)) as u32);
+		let entry_id = WorkModule::get_int(owner_module_accessor, *FIGHTER_INSTANCE_WORK_ID_INT_ENTRY_ID) as usize;
+		
+		if fighter_kind == *WEAPON_KIND_MARIO_FIREBALL {
+            if param_type == hash40("param_fireball") {
+                if param_hash == hash40("is_penetration") {
+                    if crate::mario::MARIO_GIANT_FIREBALL[entry_id] {
+                        return 1;
+                    }
+                }
+				if param_hash == hash40("life") {
 					if crate::mario::MARIO_GIANT_FIREBALL[entry_id] {
-						return 20;
+						return 180;
+					}
+				}
+            }
+        }
+		if fighter_kind == *WEAPON_KIND_SZEROSUIT_PARALYZER_BULLET {
+			if param_type == hash40("param_paralyzer_bullet") {
+				if param_hash == hash40("is_penetration") {
+					if crate::szerosuit::SZEROSUIT_LASER_TOGGLE_TYPE[entry_id] == 1 {
+						return 1;
 					}
 				}
 			}
 		}
+		if fighter_kind == *WEAPON_KIND_RYU_SHINKUHADOKEN {
+			if param_type == hash40("param_shinkuhadoken") {
+				if param_hash == hash40("life") {
+					if crate::ryu::DAN_MODE[entry_id] {
+                        return 25;
+                    }
+				}
+				
+			}
+		}
+		if fighter_kind == *WEAPON_KIND_RYU_HADOKEN {
+			if param_type == hash40("param_hadoken") {
+				if param_hash == hash40("life_w") {
+					if crate::ryu::DAN_MODE[entry_id] {
+                        return 20;
+                    }
+				}
+				if param_hash == hash40("life_m") {
+					if crate::ryu::DAN_MODE[entry_id] {
+                        return 17;
+                    }
+				}
+				if param_hash == hash40("life_s") {
+					if crate::ryu::DAN_MODE[entry_id] {
+                        return 13;
+                    }
+				}
+				if param_hash == hash40("life_w_sp") {
+					if crate::ryu::DAN_MODE[entry_id] {
+                        return 19;
+                    }
+				}
+				if param_hash == hash40("life_m_sp") {
+					if crate::ryu::DAN_MODE[entry_id] {
+                        return 15;
+                    }
+				}
+				if param_hash == hash40("life_s_sp") {
+					if crate::ryu::DAN_MODE[entry_id] {
+                        return 11;
+                    }
+				}
+			}
+		}
+		
 	}
-
-	original!()(module_accessor, param_type, param_hash)
+    original!()(module_accessor, param_type, param_hash)
 }
 
 
@@ -619,9 +717,9 @@ pub fn install() {
         if let Some(offset) = find_subsequence(text, FLOAT_SEARCH_CODE) {
             FLOAT_OFFSET = offset;
         }
-        /*if let Some(offset) = find_subsequence(text, INT_SEARCH_CODE) {
+        if let Some(offset) = find_subsequence(text, INT_SEARCH_CODE) {
             INT_OFFSET = offset;
-        }*/
+        }
     }
 	skyline::install_hooks!(get_param_float_replace);
 	skyline::install_hooks!(get_param_int_replace);
